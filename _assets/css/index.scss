@@ -19,6 +19,14 @@
   background-size: cover;
 }
 
+.usa-section--dark {
+  // adjust colors a bit
+  background-color: color($theme-color-base);
+  h3 {
+    color: color('white');
+  }
+}
+
 /*
   Add your SASS/CSS here
 */
