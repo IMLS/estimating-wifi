@@ -1,5 +1,7 @@
 - name: install and update packages
   ansible.builtin.package:
     name:
+      - python-apt
       - vim
     state: latest
+  become: yes
