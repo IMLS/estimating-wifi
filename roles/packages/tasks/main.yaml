@@ -1,0 +1,5 @@
+- name: install and update packages
+  ansible.builtin.package:
+    name:
+      - vim
+    state: latest

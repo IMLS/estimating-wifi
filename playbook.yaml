@@ -2,4 +2,4 @@
 - hosts: pi
   connection: local
   roles:
-    - configure-monitor-mode
+    - packages
