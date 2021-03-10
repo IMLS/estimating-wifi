@@ -1,0 +1,18 @@
+- name: install the u-a package
+  ansible.builtin.package:
+    name: unattended-upgrades
+  become: yes
+
+- name: enable reboots
+  # /etc/apt/apt.conf.d/50unattended-upgrades
+  # //Unattended-Upgrade::Automatic-Reboot "false";
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    line: "{{ item }}"
+    state: present
+  become: yes
+  loop:
+    - Unattended-Upgrade::Automatic-Reboot-Time "02:00";
+    - Unattended-Upgrade::Automatic-Reboot "true";
+    - Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+    - Unattended-Upgrade::SyslogEnable "true";
