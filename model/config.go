@@ -7,8 +7,11 @@ type Config struct {
 		Collection string `yaml:"collection"`
 	} `yaml:"server"`
 	Wireshark struct {
-		Duration int    `yaml:"duration"`
-		Adapter  string `yaml:"adapter"`
+		Duration  int    `yaml:"duration"`
+		Rounds    int    `yaml:"rounds"`
+		Threshold int    `yaml:"threshold"`
+		Adapter   string `yaml:"adapter"`
+		Path      string `yaml:"path"`
 	} `yaml:"wireshark"`
 	Manufacturers struct {
 		Db string `yaml:"db"`

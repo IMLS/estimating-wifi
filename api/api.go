@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"reflect"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -29,14 +29,13 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 		substr := mac[0:length]
 		// FIXME: error handling
 		q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'%"+substr+"'")
-		// fmt.Printf("query: %s\n", q)
+
 		rows, _ := db.Query(q)
 		var id string
 
 		for rows.Next() {
 			_ = rows.Scan(&id)
 			if id != "" {
-				fmt.Printf("Found mfg: %s\n", id)
 				return id
 			}
 		}
@@ -45,7 +44,7 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 	return "unknown"
 }
 
-func get_token(cfg model.Config) model.Token {
+func Get_token(cfg model.Config) model.Token {
 	user := os.Getenv(constants.EnvUsername)
 	pass := os.Getenv(constants.EnvPassword)
 	var uri string = (cfg.Server.Scheme + "://" +
@@ -69,24 +68,59 @@ func get_token(cfg model.Config) model.Token {
 	body, _ := ioutil.ReadAll(resp.Body)
 	res := model.Token{}
 	json.Unmarshal(body, &res)
-	fmt.Println(res)
+
 	return res
 }
 
-func post_manufactuerer_count(cfg model.Config, e model.Entry) {
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
+}
+
+func post_ram_usage(cfg model.Config, tok model.Token) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
-		cfg.Server.Collection)
-
-	var tok model.Token = get_token(cfg)
+		"memory_usage")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
-	fmt.Println("Reporting ", e.MAC, e.Mfg, e.Count)
-	fmt.Println("mfg type: ", reflect.TypeOf(e.Mfg))
+	//fmt.Println("Reporting ", e.MAC, e.Mfg, e.Count)
+	//fmt.Println("mfg type: ", reflect.TypeOf(e.Mfg))
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+
+	all := fmt.Sprintf("alloc[%v], total[%v], sys[%v], numgc[%v]",
+		bToMb(m.Alloc), bToMb(m.TotalAlloc),
+		bToMb(m.Sys), m.NumGC)
+
+	reqBody, _ := json.Marshal(map[string]string{
+		"bytes": strconv.Itoa(int(m.Alloc)),
+		"notes": all,
+	})
+
+	req, _ := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+	req.Header.Set("Content-type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+
+}
+
+func post_manufactuerer_count(cfg model.Config, tok model.Token, e model.Entry) {
+	var uri string = (cfg.Server.Scheme + "://" +
+		cfg.Server.Host + "/items/" +
+		cfg.Server.Collection)
+
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	//fmt.Println("Reporting ", e.MAC, e.Mfg, e.Count)
+	//fmt.Println("mfg type: ", reflect.TypeOf(e.Mfg))
 
 	reqBody, _ := json.Marshal(map[string]string{
 		"mfgs":               e.Mfg,
@@ -103,11 +137,17 @@ func post_manufactuerer_count(cfg model.Config, e model.Entry) {
 
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Print("received data: ")
-	fmt.Println(string(body[:]))
+
+	// Hopefully it doesn't matter if we do anything
+	// with the body. However, this is a big FIXME.
+	// body, _ := ioutil.ReadAll(resp.Body)
+
 }
 
-func Report_mfg(cfg model.Config, e model.Entry) {
-	post_manufactuerer_count(cfg, e)
+func Report_telemetry(cfg model.Config, tok model.Token) {
+	post_ram_usage(cfg, tok)
+}
+
+func Report_mfg(cfg model.Config, tok model.Token, e model.Entry) {
+	post_manufactuerer_count(cfg, tok, e)
 }

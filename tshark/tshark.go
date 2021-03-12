@@ -11,9 +11,7 @@ import (
 
 func Tshark(cfg model.Config) map[string]int {
 
-	tshark_path := "/usr/bin/tshark"
-
-	tsharkCmd := exec.Command(tshark_path,
+	tsharkCmd := exec.Command(cfg.Wireshark.Path,
 		"-a", fmt.Sprintf("duration:%d", cfg.Wireshark.Duration),
 		"-I", "-i", cfg.Wireshark.Adapter,
 		"-Tfields", "-e", "wlan.sa")

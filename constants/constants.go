@@ -1,7 +1,7 @@
 package constants
 
-const OBSERVE_SECONDS = 45
-const REPORT_MINUTES = 10
+// const OBSERVE_SECONDS = 45
+// const REPORT_MINUTES = 10
 
 const MACLENGTH = 17
 

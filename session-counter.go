@@ -38,7 +38,7 @@ func tock_every_n(tag string, n int, in chan bool, out chan bool) {
 		<-in
 		counter = counter + 1
 		if counter == n {
-			fmt.Printf("tock: %s %d\n", tag, n)
+			// fmt.Printf("tock: %s %d\n", tag, n)
 			counter = 0
 			out <- true
 		}
@@ -55,8 +55,6 @@ func tock_every_n(tag string, n int, in chan bool, out chan bool) {
 func run_wireshark(cfg model.Config, in chan bool, out chan map[string]int) {
 	for {
 		<-in
-		fmt.Println("getting mac addresses")
-
 		macmap := tshark.Tshark(cfg)
 
 		var to_remove []string
@@ -72,18 +70,6 @@ func run_wireshark(cfg model.Config, in chan bool, out chan map[string]int) {
 		}
 		// Report out the cleaned MACmap.
 		out <- macmap
-	}
-}
-
-/* PROCESS show_map
- * Walks a hashmap and prints it.
- */
-func show_map(in chan map[string]int) {
-	for {
-		macmap := <-in
-		for k, v := range macmap {
-			fmt.Println(k, " <- ", v)
-		}
 	}
 }
 
@@ -150,10 +136,52 @@ func mac_to_Entry(cfg model.Config, macmap chan map[string]int, mfgmap chan map[
  * each one to the server individually. We have no bulk insert.
  */
 func report_map(cfg model.Config, mfgs chan map[string]model.Entry) {
+	var count int = 0
 	for {
 		m := <-mfgs
+		count = count + 1
+		fmt.Println("reporting: ", count)
+		var tok model.Token = api.Get_token(cfg)
 		for _, entry := range m {
-			api.Report_mfg(cfg, entry)
+			api.Report_mfg(cfg, tok, entry)
+		}
+		api.Report_telemetry(cfg, tok)
+	}
+}
+
+func count_macs(cfg model.Config, in chan map[string]int, out chan map[string]int) {
+	var count int = 0
+	total := make(map[string]int)
+	for {
+		m := <-in
+		count = count + 1
+		// fmt.Printf("Gathered in %d maps of %d\n", count, cfg.Wireshark.Rounds)
+
+		for mac, _ := range m {
+			cnt, ok := total[mac]
+			if ok {
+				total[mac] = cnt + 1
+			} else {
+				total[mac] = 1
+			}
+		}
+
+		if count == cfg.Wireshark.Rounds {
+			// Filter out the ones that don't make the cut.
+			var filter []string
+			for mac, count := range total {
+				if count < cfg.Wireshark.Threshold {
+					filter = append(filter, mac)
+				}
+			}
+			for _, f := range filter {
+				delete(total, f)
+			}
+			// These are the MAC addresses that passed our
+			// threshold of `threshold` or more of `rounds` cycles.
+			out <- total
+			count = 0
+			total = make(map[string]int)
 		}
 	}
 }
@@ -173,17 +201,15 @@ func main() {
 	ch_sec := make(chan bool)
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan map[string]int)
-	ch_m1 := make(chan map[string]int)
-	ch_m2 := make(chan map[string]int)
+	ch_macs_counted := make(chan map[string]int)
 	mfg := make(chan map[string]model.Entry)
 
 	go tick(ch_sec)
-	go tock_every_n("min", 10, ch_sec, ch_nsec)
+	go tock_every_n("min", 60, ch_sec, ch_nsec)
 	go run_wireshark(cfg, ch_nsec, ch_macs)
-	go delta_map(ch_macs, ch_m1, ch_m2)
-	go mac_to_Entry(cfg, ch_m1, mfg)
+	go count_macs(cfg, ch_macs, ch_macs_counted)
+	go mac_to_Entry(cfg, ch_macs_counted, mfg)
 	go report_map(cfg, mfg)
-	go show_map(ch_m2)
 
 	// Wait forever.
 	var wg sync.WaitGroup
