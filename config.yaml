@@ -1,0 +1,9 @@
+server:
+  scheme: https
+  host: directus-demo.app.cloud.gov
+  collection: people2
+wireshark:
+  adapter: wlan1
+  duration: 45
+manufacturers:
+  db: /home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite
