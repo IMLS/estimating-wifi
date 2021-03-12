@@ -14,8 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf.urls import url, include
 from django.urls import path
+import data_ingest.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url('accounts/', include('django.contrib.auth.urls')),
+    url(r'data/', include(data_ingest.urls)),
+    # TODO: single upload
+    # TODO: csv upload
 ]

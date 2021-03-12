@@ -29,6 +29,12 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+DATA_INGEST = {
+    'VALIDATORS': {
+        'wifi.json': 'data_ingest.ingestors.GoodtablesValidator',
+    },
+    # TODO: DESTINATION_FORMAT
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'data_ingest',
 ]
 
