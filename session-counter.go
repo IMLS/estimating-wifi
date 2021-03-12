@@ -45,7 +45,7 @@ func tock_every_n(tag string, n int, in chan bool, out chan bool) {
 	}
 }
 
-/* PROCESS get_ip_addrs
+/* PROCESS run_wireshark
  * Runs a subprocess for a duration of OBSERVE_SECONDS.
  * Therefore, this process effectively blocks for that time.
  * Gathers a hashmap of [MAC -> count] values. This hashmap
@@ -75,6 +75,9 @@ func run_wireshark(cfg model.Config, in chan bool, out chan map[string]int) {
 	}
 }
 
+/* PROCESS show_map
+ * Walks a hashmap and prints it.
+ */
 func show_map(in chan map[string]int) {
 	for {
 		macmap := <-in
@@ -84,6 +87,11 @@ func show_map(in chan map[string]int) {
 	}
 }
 
+/* FUNC check_env_vars
+ * Checks to see if the username and password for
+ * working with Directus is in memory.
+ * If not, it quits.
+ */
 func check_env_vars() {
 	if os.Getenv(constants.EnvUsername) == "" {
 		fmt.Printf("%s must be set in the env!\n", constants.EnvUsername)
@@ -95,6 +103,13 @@ func check_env_vars() {
 	}
 }
 
+/* PROC delta (int)
+ * A `delta` process copies the input from a channel
+ * and outputs it to two other channels.
+ * This is a PAR delta, because it spawns two anonymous
+ * goroutines to do the sends on the two outputs
+ * "at the same time."
+ */
 func delta_int(in chan int, o1 chan int, o2 chan int) {
 	for {
 		v := <-in
@@ -104,6 +119,7 @@ func delta_int(in chan int, o1 chan int, o2 chan int) {
 	}
 }
 
+/* PROC delta (map) */
 func delta_map(in chan map[string]int, o1 chan map[string]int, o2 chan map[string]int) {
 	for {
 		v := <-in
@@ -113,21 +129,32 @@ func delta_map(in chan map[string]int, o1 chan map[string]int, o2 chan map[strin
 	}
 }
 
-func mac_to_mfg(cfg model.Config, macmap chan map[string]int, mfgmap chan map[string]int) {
+/* PROC mac_to_mfg
+ * Takes in a hashmap of MAC addresses and counts, and passes on a hashmap
+ * of manufacturer IDs and counts.
+ * Uses "unknown" for all unknown manufacturers.
+ */
+func mac_to_Entry(cfg model.Config, macmap chan map[string]int, mfgmap chan map[string]model.Entry) {
 	for {
-		mfgs := make(map[string]int)
+		mfgs := make(map[string]model.Entry)
 		for mac, count := range <-macmap {
 			mfg := api.Mac_to_mfg(cfg, mac)
-			mfgs[mfg] = count
+			mfgs[mac] = model.Entry{MAC: mac, Mfg: mfg, Count: count}
 		}
 		mfgmap <- mfgs
 	}
 }
 
-func report_map(mfgs chan map[string]int) {
+/* PROC report_map
+ * Takes a hashmap of [mfg id : count] and POSTs
+ * each one to the server individually. We have no bulk insert.
+ */
+func report_map(cfg model.Config, mfgs chan map[string]model.Entry) {
 	for {
 		m := <-mfgs
-		fmt.Println(m)
+		for _, entry := range m {
+			api.Report_mfg(cfg, entry)
+		}
 	}
 }
 
@@ -135,10 +162,6 @@ func main() {
 	check_env_vars()
 	cfgPtr := flag.String("config", "config.yaml", "config file")
 
-	// adapterPtr := flag.String("adapter", "wlan1", "adapter to monitor")
-	// windowPtr := flag.Int("window", 10, "window size in minutes")
-	// mfgPtr := flag.String("manufacturers", "", "manufacturerer sqlite database")
-	//appearThreshPtr := flag.Int("appearThresh", 3, "number of times MAC must appear")
 	flag.Parse()
 	// FIXME: handle errors
 	f, _ := os.Open(*cfgPtr)
@@ -152,14 +175,14 @@ func main() {
 	ch_macs := make(chan map[string]int)
 	ch_m1 := make(chan map[string]int)
 	ch_m2 := make(chan map[string]int)
-	mfg := make(chan map[string]int)
+	mfg := make(chan map[string]model.Entry)
 
 	go tick(ch_sec)
 	go tock_every_n("min", 10, ch_sec, ch_nsec)
 	go run_wireshark(cfg, ch_nsec, ch_macs)
 	go delta_map(ch_macs, ch_m1, ch_m2)
-	go mac_to_mfg(cfg, ch_m1, mfg)
-	go report_map(mfg)
+	go mac_to_Entry(cfg, ch_m1, mfg)
+	go report_map(cfg, mfg)
 	go show_map(ch_m2)
 
 	// Wait forever.
