@@ -44,6 +44,9 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 			substr := mac[0:length]
 			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
 			rows, err := db.Query(q)
+			// Close the rows down, too...
+			// Another possible leak?
+			defer rows.Close()
 			if err != nil {
 				log.Printf("Manufactuerer query failed: %s", q)
 			} else {
