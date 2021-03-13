@@ -22,14 +22,16 @@ func Tshark(cfg model.Config) map[string]int {
 	tsharkCmd.Wait()
 	macs := strings.Split(string(tsharkBytes), "\n")
 
-	counts := make(map[string]int)
+	pkts := make(map[string]int)
 
 	for _, a_mac := range macs {
-		if v, ok := counts[a_mac]; ok {
-			counts[a_mac] = v + 1
+		v, ok := pkts[a_mac]
+		if ok {
+			pkts[a_mac] = v + 1
 		} else {
-			counts[a_mac] = 1
+			pkts[a_mac] = 1
 		}
 	}
-	return counts
+
+	return pkts
 }

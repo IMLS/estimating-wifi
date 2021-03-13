@@ -15,7 +15,7 @@ wireshark:
   rounds: 5
   # threshold is how many rounds a MAC address must be present
   # before we consider reporting it to the server.
-  threshold: 3
+  threshold: 4
   # EXAMPLE:
   # rounds of 10 and threshold of 8 would have a 10m reporting window
   # and require a device to be present 8 out of 10 minutes.

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -114,7 +115,7 @@ func report_map(cfg model.Config, mfgs chan map[string]model.Entry) {
 	for {
 		m := <-mfgs
 		count = count + 1
-		fmt.Println("reporting: ", count)
+		log.Println("reporting: ", count)
 		var tok model.Token = api.Get_token(cfg)
 		for _, entry := range m {
 			api.Report_mfg(cfg, tok, entry)
@@ -129,7 +130,6 @@ func count_macs(cfg model.Config, in chan map[string]int, out chan map[string]in
 	for {
 		m := <-in
 		count = count + 1
-		// fmt.Printf("Gathered in %d maps of %d\n", count, cfg.Wireshark.Rounds)
 
 		for mac, _ := range m {
 			cnt, ok := total[mac]
@@ -160,6 +160,65 @@ func count_macs(cfg model.Config, in chan map[string]int, out chan map[string]in
 	}
 }
 
+func ring_buffer(cfg model.Config, in chan map[string]int, out chan map[string]int) {
+	// Nothing in the buffer, capacity = number of rounds
+	buffer := make([]map[string]int, cfg.Wireshark.Rounds)
+	for ndx := 0; ndx < cap(buffer); ndx++ {
+		buffer[ndx] = nil
+	}
+	// Circular index.
+	ring_ndx := 0
+
+	for {
+		// Read in to the most recent buffer index.
+		buffer[ring_ndx] = <-in
+		// Zero out a map for counting how many times
+		// MAC addresses appear.
+		total := make(map[string]int)
+
+		// Count everything in the ring. The ring is right-sized
+		// to the window we're interested in.
+		filled_slots := 0
+		for _, m := range buffer {
+			if m != nil {
+				filled_slots += 1
+				for mac, _ := range m {
+					cnt, ok := total[mac]
+					if ok {
+						total[mac] = cnt + 1
+					} else {
+						total[mac] = 1
+					}
+				}
+			}
+		}
+
+		// If we have filled enough slots to be "countable,"
+		// we should go through and see which MAC addresses appeared
+		// enough times to be "worth reporting."
+		if filled_slots == cfg.Wireshark.Rounds {
+			// Filter out the ones that don't make the cut.
+			var filter []string
+			for mac, count := range total {
+				if count < cfg.Wireshark.Threshold {
+					filter = append(filter, mac)
+				}
+			}
+			for _, f := range filter {
+				delete(total, f)
+			}
+			// These are the MAC addresses that passed our
+			// threshold of `threshold` in `rounds` cycles.
+			out <- total
+		}
+
+		// Bump the index. Overwrite old values.
+		// Then, wait for the next hash to come in.
+		ring_ndx = (ring_ndx + 1) % cfg.Wireshark.Rounds
+
+	}
+}
+
 func main() {
 	check_env_vars()
 	cfgPtr := flag.String("config", "config.yaml", "config file")
@@ -181,7 +240,8 @@ func main() {
 	go tick(ch_sec)
 	go tock_every_n("min", 60, ch_sec, ch_nsec)
 	go run_wireshark(cfg, ch_nsec, ch_macs)
-	go count_macs(cfg, ch_macs, ch_macs_counted)
+	//go count_macs(cfg, ch_macs, ch_macs_counted)
+	go ring_buffer(cfg, ch_macs, ch_macs_counted)
 	go mac_to_Entry(cfg, ch_macs_counted, mfg)
 	go report_map(cfg, mfg)
 

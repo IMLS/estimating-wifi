@@ -42,21 +42,21 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 		// try and slice more of the string than exists.
 		if len(mac) >= length {
 			substr := mac[0:length]
-			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'%"+substr+"'")
-
+			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
 			rows, err := db.Query(q)
 			if err != nil {
-				log.Fatalf("Manufactuerer query failed: %s", q)
-			}
-			var id string
+				log.Printf("Manufactuerer query failed: %s", q)
+			} else {
+				var id string
 
-			for rows.Next() {
-				err = rows.Scan(&id)
-				if err != nil {
-					log.Fatal("Failed in DB result row scanning.")
-				}
-				if id != "" {
-					return id
+				for rows.Next() {
+					err = rows.Scan(&id)
+					if err != nil {
+						log.Fatal("Failed in DB result row scanning.")
+					}
+					if id != "" {
+						return id
+					}
 				}
 			}
 		}

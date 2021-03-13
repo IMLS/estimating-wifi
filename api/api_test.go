@@ -20,13 +20,14 @@ func Test_get_manufactuerer(t *testing.T) {
 		{"3c:37:86", "unknown"},
 		{"dc:a6:32", "Raspberr"},
 		{"b0:34:95", "Apple"},
+		{"60:38:e0:bd:15", "BelkinIn"},
 	}
 
-	for ndx, tc := range tests {
-		t.Run(fmt.Sprintf("Get Manufactuerer = %d", ndx), func(t *testing.T) {
+	for _, tc := range tests {
+		t.Run(fmt.Sprintf("Get Manufactuerer = %v", tc.mfgs), func(t *testing.T) {
 			got := Mac_to_mfg(cfg, tc.mac)
 			if got != tc.mfgs {
-				t.Fatalf("got %v; want %v", got, tc.mfgs)
+				t.Fatalf("got [ %v ] want [ %v ]", got, tc.mfgs)
 			} else {
 				t.Logf("Success !")
 			}
