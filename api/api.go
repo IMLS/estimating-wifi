@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"runtime"
@@ -18,25 +19,38 @@ import (
 )
 
 func Mac_to_mfg(cfg model.Config, mac string) string {
-	// FIXME: error handling
-	db, _ := sql.Open("sqlite3", cfg.Manufacturers.Db)
+	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
+	if err != nil {
+		log.Fatal("Failed to open manufacturer database.")
+	}
+	// Close the DB at the end of the function.
+	defer db.Close()
+
 	// We need to try the longest to the shortest MAC address
 	// in order to match.
 	// Start with aa:bb:cc:dd:ee
 	lengths := []int{14, 11, 8}
 
 	for _, length := range lengths {
-		substr := mac[0:length]
-		// FIXME: error handling
-		q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'%"+substr+"'")
+		if len(mac) >= length {
+			substr := mac[0:length]
+			// FIXME: error handling
+			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'%"+substr+"'")
 
-		rows, _ := db.Query(q)
-		var id string
+			rows, err := db.Query(q)
+			if err != nil {
+				log.Fatalf("Manufactuerer query failed: %s", q)
+			}
+			var id string
 
-		for rows.Next() {
-			_ = rows.Scan(&id)
-			if id != "" {
-				return id
+			for rows.Next() {
+				err = rows.Scan(&id)
+				if err != nil {
+					log.Fatal("Failed in DB result row scanning.")
+				}
+				if id != "" {
+					return id
+				}
 			}
 		}
 	}
