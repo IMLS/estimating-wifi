@@ -34,3 +34,23 @@ func Test_get_manufactuerer(t *testing.T) {
 		})
 	}
 }
+
+// I'm hoping that if we're leaking DB connections that
+// this loop will find it. When the DB isn't closed properly,
+// this will fail around 1078ish connections.
+func Test_thrash_db(t *testing.T) {
+	cfg := model.Config{}
+	cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
+
+	for ndx := 0; ndx < 2000; ndx++ {
+		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
+			got := Mac_to_mfg(cfg, "aa:bb:cc")
+			if got != "unknown" {
+				t.Fatalf("got %v; want %v", got, "unknown")
+			} else {
+				t.Logf("Success !")
+			}
+
+		})
+	}
+}

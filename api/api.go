@@ -18,23 +18,30 @@ import (
 	"gsa.gov/18f/session-counter/model"
 )
 
+// FUNC Mac_to_mfg
+// Looks up a MAC address in the manufactuerer's database.
+// Returns a valid name or "unknown" if the name cannot be found.
 func Mac_to_mfg(cfg model.Config, mac string) string {
 	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
 		log.Fatal("Failed to open manufacturer database.")
 	}
 	// Close the DB at the end of the function.
+	// If not, it's a resource leak.
 	defer db.Close()
 
 	// We need to try the longest to the shortest MAC address
 	// in order to match.
 	// Start with aa:bb:cc:dd:ee
+	// ... then   aa:bb:cc:dd
+	// ... then   aa:bb:cc
 	lengths := []int{14, 11, 8}
 
 	for _, length := range lengths {
+		// If we're given a short MAC address, don't
+		// try and slice more of the string than exists.
 		if len(mac) >= length {
 			substr := mac[0:length]
-			// FIXME: error handling
 			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'%"+substr+"'")
 
 			rows, err := db.Query(q)
@@ -58,6 +65,10 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 	return "unknown"
 }
 
+// FUNC Get_token
+// Fetches a token from Directus for authenticating
+// subsequent interactions with the service.
+// Requires environment variables to be set
 func Get_token(cfg model.Config) model.Token {
 	user := os.Getenv(constants.EnvUsername)
 	pass := os.Getenv(constants.EnvPassword)
@@ -69,27 +80,46 @@ func Get_token(cfg model.Config) model.Token {
 		Timeout: timeout,
 	}
 
-	reqBody, _ := json.Marshal(map[string]string{
+	reqBody, err := json.Marshal(map[string]string{
 		"email":    user,
 		"password": pass,
 	})
 
-	req, _ := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
-	req.Header.Set("Content-type", "application/json")
+	if err != nil {
+		log.Fatal("Could not authenticate to Directus.")
+	}
 
-	resp, _ := client.Do(req)
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+	req.Header.Set("Content-type", "application/json")
+	if err != nil {
+		log.Fatal("Unable to construct URI for authentication.")
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("Error in client request to Directus /auth.")
+	}
+	// Closes the connection at function exit.
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Unable to read body of response from Directus /auth.")
+	}
 	res := model.Token{}
 	json.Unmarshal(body, &res)
 
 	return res
 }
 
+// FUNC bToMb
+// Internal. Converts bytes to MB for reporting telemetry.
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
 }
 
+// FUNC post_ram_usage
+// Part of telemetry. Posts RAM usage.
 func post_ram_usage(cfg model.Config, tok model.Token) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
@@ -100,8 +130,6 @@ func post_ram_usage(cfg model.Config, tok model.Token) {
 		Timeout: timeout,
 	}
 
-	//fmt.Println("Reporting ", e.MAC, e.Mfg, e.Count)
-	//fmt.Println("mfg type: ", reflect.TypeOf(e.Mfg))
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 
@@ -109,20 +137,34 @@ func post_ram_usage(cfg model.Config, tok model.Token) {
 		bToMb(m.Alloc), bToMb(m.TotalAlloc),
 		bToMb(m.Sys), m.NumGC)
 
-	reqBody, _ := json.Marshal(map[string]string{
+	reqBody, err := json.Marshal(map[string]string{
 		"bytes": strconv.Itoa(int(m.Alloc)),
 		"notes": all,
 	})
 
-	req, _ := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+	if err != nil {
+		log.Fatal("Failed to marshal RAM data to JSON.")
+	}
+
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+	if err != nil {
+		log.Fatal("Unable to generate request for RAM usage.")
+	}
+
 	req.Header.Set("Content-type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
 
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+
+	if err != nil {
+		log.Fatal("Error in client POST for RAM usage.")
+	}
 	defer resp.Body.Close()
 
 }
 
+// FUNC post_manufactuerer_count
+// Posts the manufactuerer count to Directus.
 func post_manufactuerer_count(cfg model.Config, tok model.Token, e model.Entry) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
@@ -133,10 +175,7 @@ func post_manufactuerer_count(cfg model.Config, tok model.Token, e model.Entry) 
 		Timeout: timeout,
 	}
 
-	//fmt.Println("Reporting ", e.MAC, e.Mfg, e.Count)
-	//fmt.Println("mfg type: ", reflect.TypeOf(e.Mfg))
-
-	reqBody, _ := json.Marshal(map[string]string{
+	reqBody, err := json.Marshal(map[string]string{
 		"mfgs":               e.Mfg,
 		"mac":                e.MAC[0:8],
 		"count":              strconv.Itoa(e.Count),
@@ -144,18 +183,25 @@ func post_manufactuerer_count(cfg model.Config, tok model.Token, e model.Entry) 
 		"libid":              "not implemented",
 		"local_date_created": fmt.Sprintf(time.Now().Format(time.RFC3339)),
 	})
+	if err != nil {
+		log.Fatal("Unable to marshal post of mfg count to JSON.")
+	}
 
-	req, _ := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+	if err != nil {
+		log.Fatal("Unable to construct request for manufactuerer POST.")
+	}
 	req.Header.Set("Content-type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
 
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("Failure in client manufactuerer POST to Directus.")
+	}
+	// Close the body at function exit.
 	defer resp.Body.Close()
 
-	// Hopefully it doesn't matter if we do anything
-	// with the body. However, this is a big FIXME.
-	// body, _ := ioutil.ReadAll(resp.Body)
-
+	// We could process the result, but why?
 }
 
 func Report_telemetry(cfg model.Config, tok model.Token) {
