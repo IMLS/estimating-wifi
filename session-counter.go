@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/constants"
+	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tshark"
 )
@@ -19,10 +20,20 @@ import (
  * communicates out on the channel `ch` once
  * per second.
  */
-func tick(ch chan bool) {
+func tick(ka *csp.Keepalive, ch chan bool) {
+	log.Println("Starting tick...")
+	ping, pong := ka.Subscribe("tick", 2)
+
 	for {
-		time.Sleep(1 * time.Second)
-		ch <- true
+		select {
+		case <-ping:
+			log.Println("tick keepalive.")
+			pong <- "tick"
+		// Drive the 1 second ticker
+		case <-time.After(1 * time.Second):
+			log.Println("Ticking...")
+			ch <- true
+		}
 	}
 }
 
@@ -33,15 +44,24 @@ func tick(ch chan bool) {
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func tock_every_n(tag string, n int, in chan bool, out chan bool) {
+func tock_every_n(ka *csp.Keepalive, n int, in chan bool, out chan bool) {
+	log.Println("Starting tock_every_n")
 	var counter int = 0
+	// We timeout one second beyond the number of ticks we're waiting for
+	ping, pong := ka.Subscribe("tock", 2)
+
 	for {
-		<-in
-		counter = counter + 1
-		if counter == n {
-			// fmt.Printf("tock: %s %d\n", tag, n)
-			counter = 0
-			out <- true
+		select {
+		case <-ping:
+			log.Println("tock keepalive")
+			pong <- "tock"
+
+		case <-in:
+			counter = counter + 1
+			if counter == n {
+				counter = 0
+				out <- true
+			}
 		}
 	}
 }
@@ -124,42 +144,6 @@ func report_map(cfg model.Config, mfgs chan map[string]model.Entry) {
 	}
 }
 
-func count_macs(cfg model.Config, in chan map[string]int, out chan map[string]int) {
-	var count int = 0
-	total := make(map[string]int)
-	for {
-		m := <-in
-		count = count + 1
-
-		for mac, _ := range m {
-			cnt, ok := total[mac]
-			if ok {
-				total[mac] = cnt + 1
-			} else {
-				total[mac] = 1
-			}
-		}
-
-		if count == cfg.Wireshark.Rounds {
-			// Filter out the ones that don't make the cut.
-			var filter []string
-			for mac, count := range total {
-				if count < cfg.Wireshark.Threshold {
-					filter = append(filter, mac)
-				}
-			}
-			for _, f := range filter {
-				delete(total, f)
-			}
-			// These are the MAC addresses that passed our
-			// threshold of `threshold` or more of `rounds` cycles.
-			out <- total
-			count = 0
-			total = make(map[string]int)
-		}
-	}
-}
-
 func ring_buffer(cfg model.Config, in chan map[string]int, out chan map[string]int) {
 	// Nothing in the buffer, capacity = number of rounds
 	buffer := make([]map[string]int, cfg.Wireshark.Rounds)
@@ -219,31 +203,59 @@ func ring_buffer(cfg model.Config, in chan map[string]int, out chan map[string]i
 	}
 }
 
-func main() {
-	check_env_vars()
-	cfgPtr := flag.String("config", "config.yaml", "config file")
+func read_config(cfgPtr string) model.Config {
 
-	flag.Parse()
 	// FIXME: handle errors
-	f, _ := os.Open(*cfgPtr)
+	f, _ := os.Open(cfgPtr)
 	defer f.Close()
 	var cfg model.Config
 	decoder := yaml.NewDecoder(f)
 	_ = decoder.Decode(&cfg)
 
+	return cfg
+}
+
+func run(cfg model.Config, ka *csp.Keepalive) {
+	log.Println("Running...")
+	// Create channels for process network
 	ch_sec := make(chan bool)
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan map[string]int)
 	ch_macs_counted := make(chan map[string]int)
 	mfg := make(chan map[string]model.Entry)
 
-	go tick(ch_sec)
-	go tock_every_n("min", 60, ch_sec, ch_nsec)
+	// Run the process network.
+	// Driven by a 1s `tick` process.
+	go tick(ka, ch_sec)
+	go tock_every_n(ka, 60, ch_sec, ch_nsec)
 	go run_wireshark(cfg, ch_nsec, ch_macs)
-	//go count_macs(cfg, ch_macs, ch_macs_counted)
 	go ring_buffer(cfg, ch_macs, ch_macs_counted)
 	go mac_to_Entry(cfg, ch_macs_counted, mfg)
 	go report_map(cfg, mfg)
+
+}
+
+func keepalive(cfg model.Config, ka *csp.Keepalive) {
+	counter := 0
+	for {
+		time.Sleep(5 * time.Second)
+		log.Println("Messaging...")
+		ka.Publish(fmt.Sprintf("test %d", counter))
+		counter = counter + 1
+	}
+}
+
+func main() {
+	check_env_vars()
+	// FIXME consider turning this into an env var
+	cfgPtr := flag.String("config", "config.yaml", "config file")
+	flag.Parse()
+	cfg := read_config(*cfgPtr)
+
+	ka := csp.NewKeepalive()
+	go ka.Start()
+	go keepalive(cfg, ka)
+	go run(cfg, ka)
 
 	// Wait forever.
 	var wg sync.WaitGroup

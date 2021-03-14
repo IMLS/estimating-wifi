@@ -46,11 +46,12 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 			rows, err := db.Query(q)
 			// Close the rows down, too...
 			// Another possible leak?
-			defer rows.Close()
 			if err != nil {
 				log.Printf("Manufactuerer query failed: %s", q)
 			} else {
 				var id string
+
+				defer rows.Close()
 
 				for rows.Next() {
 					err = rows.Scan(&id)
