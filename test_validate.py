@@ -23,7 +23,11 @@ headers = {
     "Authorization": f"Token {token}",
 }
 
-content = { "source": [] }
-resp = requests.post(f"{base_url}/validate/", json=content, headers=headers)
-print(resp)
-print(resp.json())
+content = json.dumps({"source": [
+    {"mac": "60:38:e0", "mfgs": "Belkin", "count": 20},
+    {"mac": "something", "mfgs": "unknown", "count": 20},
+]})
+resp = requests.post(f"{base_url}/validate/", data=content, headers=headers)
+validation = resp.json()
+
+print([row["errors"][0]["message"] for row in validation["tables"][0]['rows']])

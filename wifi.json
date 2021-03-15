@@ -1,1 +1,26 @@
-{}
+{
+  "fields": [
+    {
+      "name": "mac",
+      "type": "string",
+      "description": "Shortened MAC address of device",
+      "constraints": {
+        "pattern": "[a-z0-9]{2}:[a-z0-9]{2}:[a-z0-9]{2}"
+      }
+    },
+    {
+      "name": "mfgs",
+      "type": "string",
+      "description": "Manufacturer of device (if found)"
+    },
+    {
+      "name": "count",
+      "type": "number",
+      "description": "How often device has shown up in the last monitoring period",
+      "constraints": {
+        "minimum": 0,
+        "maximum": 10
+      }
+    }
+  ]
+}
