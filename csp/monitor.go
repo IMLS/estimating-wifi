@@ -3,6 +3,8 @@ package csp
 import (
 	"log"
 	"time"
+
+	"github.com/coreos/go-systemd/daemon"
 )
 
 // Inspired by the broker pattern found here:
@@ -31,6 +33,17 @@ func (b *Keepalive) Start() {
 	// Internal state for the broker.
 	procs := make(map[chan interface{}]resp)
 
+	// Notify that we are ready.
+	// https://vincent.bernat.ch/en/blog/2017-systemd-golang
+	daemon.SdNotify(false, daemon.SdNotifyReady)
+	interval, err := daemon.SdWatchdogEnabled(false)
+
+	if err != nil {
+		log.Println("monitor: unable to enable watchdog")
+		log.Fatal(err)
+	}
+	processTimedOut := false
+
 	for {
 		select {
 		// Likewise, also init the response map.
@@ -52,11 +65,17 @@ func (b *Keepalive) Start() {
 					case <-procs[c].pongCh:
 						// log.Printf("Pong from %v", procs[c].id)
 					case <-time.After(procs[c].timeout):
-						log.Fatalf("TIMEOUT [%v :: %v]", procs[c].id, procs[c].timeout)
+						log.Printf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
+						processTimedOut = true
 					}
 				}(ch)
 			}
-		}
+		case <-time.After(interval / 3):
+			if !processTimedOut {
+				// log.Println("... kicking the dog")
+				daemon.SdNotify(false, daemon.SdNotifyWatchdog)
+			}
+		} // end select
 	}
 }
 
