@@ -44,7 +44,7 @@ func tick(ka *csp.Keepalive, ch chan<- bool) {
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func tock_every_n(ka *csp.Keepalive, n int, in chan<- bool, out <-chan bool) {
+func tock_every_n(ka *csp.Keepalive, n int, in <-chan bool, out chan<- bool) {
 	log.Println("Starting tock_every_n")
 	// We timeout one second beyond the number of ticks we're waiting for
 	ping, pong := ka.Subscribe("tock", 2)
@@ -91,7 +91,8 @@ func run_wireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan
 			// Mark and remove too-short MAC addresses
 			// for removal from the tshark findings.
 			var to_remove []string
-			for k, _ := range macmap {
+			// for `k, _ :=` is the same as `for k :=`
+			for k := range macmap {
 				if len(k) < constants.MACLENGTH {
 					to_remove = append(to_remove, k)
 				}
@@ -238,7 +239,7 @@ func ring_buffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, 
 			for _, m := range buffer {
 				if m != nil {
 					filled_slots += 1
-					for mac, _ := range m {
+					for mac := range m {
 						cnt, ok := total[mac]
 						if ok {
 							total[mac] = cnt + 1
