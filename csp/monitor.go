@@ -41,7 +41,7 @@ func (b *Keepalive) Start() {
 			for ch := range procs {
 				// In parallel...
 				go func(c chan interface{}) {
-					log.Printf("Pinging %v\n", procs[c].id)
+					// log.Printf("Pinging %v\n", procs[c].id)
 					// Ping every process that is subscribed.
 					// The channel has a single slot.
 					c <- msg
@@ -50,7 +50,7 @@ func (b *Keepalive) Start() {
 					// We'll log an error and die, so that we can be restarted.
 					select {
 					case <-procs[c].pongCh:
-						log.Printf("Pong from %v", procs[c].id)
+						// log.Printf("Pong from %v", procs[c].id)
 					case <-time.After(procs[c].timeout):
 						log.Fatalf("TIMEOUT [%v :: %v]", procs[c].id, procs[c].timeout)
 					}

@@ -21,7 +21,7 @@ import (
  * communicates out on the channel `ch` once
  * per second.
  */
-func tick(ka *csp.Keepalive, ch chan bool) {
+func tick(ka *csp.Keepalive, ch chan<- bool) {
 	log.Println("Starting tick")
 	ping, pong := ka.Subscribe("tick", 2)
 
@@ -44,7 +44,7 @@ func tick(ka *csp.Keepalive, ch chan bool) {
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func tock_every_n(ka *csp.Keepalive, n int, in chan bool, out chan bool) {
+func tock_every_n(ka *csp.Keepalive, n int, in chan<- bool, out <-chan bool) {
 	log.Println("Starting tock_every_n")
 	// We timeout one second beyond the number of ticks we're waiting for
 	ping, pong := ka.Subscribe("tock", 2)
@@ -72,7 +72,7 @@ func tock_every_n(ka *csp.Keepalive, n int, in chan bool, out chan bool) {
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func run_wireshark(ka *csp.Keepalive, cfg model.Config, in chan bool, out chan map[string]int) {
+func run_wireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan<- map[string]int) {
 	log.Println("Starting run_wireshark")
 	// If we have to wait twice the monitor duration, something broke.
 	ping, pong := ka.Subscribe("run_wireshark", cfg.Wireshark.Duration*2)
@@ -126,7 +126,7 @@ func check_env_vars() {
  * of manufacturer IDs and counts.
  * Uses "unknown" for all unknown manufacturers.
  */
-func mac_to_Entry(ka *csp.Keepalive, cfg model.Config, macmap chan map[string]int, mfgmap chan map[string]model.Entry) {
+func mac_to_Entry(ka *csp.Keepalive, cfg model.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
 	log.Println("Starting mac_to_Entry")
 	ping, pong := ka.Subscribe("mac_to_Entry", 5)
 
@@ -150,7 +150,7 @@ func mac_to_Entry(ka *csp.Keepalive, cfg model.Config, macmap chan map[string]in
  * Takes a hashmap of [mfg id : count] and POSTs
  * each one to the server individually. We have no bulk insert.
  */
-func report_map(ka *csp.Keepalive, cfg model.Config, mfgs chan map[string]model.Entry) {
+func report_map(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]model.Entry) {
 	log.Println("Starting report_map")
 	ping, pong := ka.Subscribe("report_map", 5)
 
@@ -209,7 +209,7 @@ func report_map(ka *csp.Keepalive, cfg model.Config, mfgs chan map[string]model.
 	}
 }
 
-func ring_buffer(ka *csp.Keepalive, cfg model.Config, in chan map[string]int, out chan map[string]int) {
+func ring_buffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, out chan<- map[string]int) {
 	log.Println("Starting ring_buffer")
 	ping, pong := ka.Subscribe("ring_buffer", 3)
 
