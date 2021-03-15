@@ -1,3 +1,7 @@
+monitoring:
+  pinginterval: 10
+  max_http_error_count: 10
+  http_error_interval_mins: 60
 server:
   scheme: https
   host: directus-demo.app.cloud.gov
@@ -12,10 +16,10 @@ wireshark:
   duration: 45
   # rounds is the number of listening rounds we do before
   # reporting up to the server. 
-  rounds: 5
+  rounds: 3
   # threshold is how many rounds a MAC address must be present
   # before we consider reporting it to the server.
-  threshold: 4
+  threshold: 2
   # EXAMPLE:
   # rounds of 10 and threshold of 8 would have a 10m reporting window
   # and require a device to be present 8 out of 10 minutes.

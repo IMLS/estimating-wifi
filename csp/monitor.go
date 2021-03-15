@@ -5,58 +5,54 @@ import (
 	"time"
 )
 
+// Inspired by the broker pattern found here:
 // https://stackoverflow.com/questions/36417199/how-to-broadcast-message-using-channel
 
 type resp struct {
-	uid     chan interface{}
-	respCh  chan interface{}
+	pingCh  chan interface{}
+	pongCh  chan interface{}
 	id      string
 	timeout time.Duration
 }
 
 type Keepalive struct {
 	publishCh chan interface{}
-	respCh    chan resp
-	subCh     chan chan interface{}
+	subCh     chan resp
 }
 
 func NewKeepalive() *Keepalive {
 	return &Keepalive{
 		publishCh: make(chan interface{}, 1),
-		respCh:    make(chan resp, 1),
-		subCh:     make(chan chan interface{}, 1),
+		subCh:     make(chan resp, 1),
 	}
 }
 
 func (b *Keepalive) Start() {
-	pings := map[chan interface{}]struct{}{}
-	pongs := make(map[chan interface{}]resp)
+	// Internal state for the broker.
+	procs := make(map[chan interface{}]resp)
 
 	for {
 		select {
-		case msgCh := <-b.subCh:
-			pings[msgCh] = struct{}{}
-		case r := <-b.respCh:
-			pongs[r.uid] = r
+		// Likewise, also init the response map.
+		case r := <-b.subCh:
+			procs[r.pingCh] = r
+		// When a message is published...
 		case msg := <-b.publishCh:
-			// Send all the pings
-			for ch := range pings {
-				select {
-				case ch <- msg:
-				default:
-				}
-			}
-
-			// Listen for all of the pings with their respective timeouts.
-			// If any fail, then exit. Wait for all of them.
-			for ch := range pings {
-				go func(cid chan interface{}) {
+			for ch := range procs {
+				// In parallel...
+				go func(c chan interface{}) {
+					log.Printf("Pinging %v\n", procs[c].id)
+					// Ping every process that is subscribed.
+					// The channel has a single slot.
+					c <- msg
+					// Now, wait for the response, or timeout.
+					// If we timeout, that means someone didn't reply.
+					// We'll log an error and die, so that we can be restarted.
 					select {
-					case id := <-pongs[cid].respCh:
-						log.Printf("Pong from %v", id)
-					case <-time.After(pongs[cid].timeout):
-						log.Printf("Timeout: %v after %v", pongs[cid].id, pongs[cid].timeout)
-						log.Fatalf("FAIL BECAUSE OF %v", pongs[cid].id)
+					case <-procs[c].pongCh:
+						log.Printf("Pong from %v", procs[c].id)
+					case <-time.After(procs[c].timeout):
+						log.Fatalf("TIMEOUT [%v :: %v]", procs[c].id, procs[c].timeout)
 					}
 				}(ch)
 			}
@@ -65,11 +61,9 @@ func (b *Keepalive) Start() {
 }
 
 func (b *Keepalive) Subscribe(id string, timeout int) (chan interface{}, chan interface{}) {
-	// The message on which we send a ping has a one-slot buffer
-	pingCh := make(chan interface{}, 1)
-	b.subCh <- pingCh
-	pongCh := make(chan interface{}, 1)
-	b.respCh <- resp{pingCh, pongCh, id, time.Duration(time.Duration(timeout) * time.Second)}
+	pingCh := make(chan interface{})
+	pongCh := make(chan interface{})
+	b.subCh <- resp{pingCh, pongCh, id, time.Duration(time.Duration(timeout) * time.Second)}
 	return pingCh, pongCh
 }
 

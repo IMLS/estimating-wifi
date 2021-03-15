@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -73,7 +74,7 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 // Fetches a token from Directus for authenticating
 // subsequent interactions with the service.
 // Requires environment variables to be set
-func Get_token(cfg model.Config) model.Token {
+func Get_token(cfg model.Config) (tok *model.Token, err error) {
 	user := os.Getenv(constants.EnvUsername)
 	pass := os.Getenv(constants.EnvPassword)
 	var uri string = (cfg.Server.Scheme + "://" +
@@ -90,30 +91,30 @@ func Get_token(cfg model.Config) model.Token {
 	})
 
 	if err != nil {
-		log.Fatal("Could not authenticate to Directus.")
+		return nil, errors.New("api: could not authenticate to Directus")
 	}
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-type", "application/json")
 	if err != nil {
-		log.Fatal("Unable to construct URI for authentication.")
+		return nil, errors.New("api: unable to construct URI for authentication")
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal("Error in client request to Directus /auth.")
+		return nil, errors.New("api: error in client request to Directus /auth")
 	}
 	// Closes the connection at function exit.
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal("Unable to read body of response from Directus /auth.")
+		return nil, errors.New("api: unable to read body of response from Directus /auth")
 	}
 	res := model.Token{}
 	json.Unmarshal(body, &res)
 
-	return res
+	return &res, nil
 }
 
 // FUNC bToMb
@@ -124,7 +125,7 @@ func bToMb(b uint64) uint64 {
 
 // FUNC post_ram_usage
 // Part of telemetry. Posts RAM usage.
-func post_ram_usage(cfg model.Config, tok model.Token) {
+func Report_telemetry(cfg model.Config, tok *model.Token) (err error) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
 		"memory_usage")
@@ -147,12 +148,12 @@ func post_ram_usage(cfg model.Config, tok model.Token) {
 	})
 
 	if err != nil {
-		log.Fatal("Failed to marshal RAM data to JSON.")
+		return errors.New("api: ailed to marshal RAM data to JSON")
 	}
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 	if err != nil {
-		log.Fatal("Unable to generate request for RAM usage.")
+		return errors.New("api: unable to generate request for RAM usage")
 	}
 
 	req.Header.Set("Content-type", "application/json")
@@ -161,15 +162,15 @@ func post_ram_usage(cfg model.Config, tok model.Token) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		log.Fatal("Error in client POST for RAM usage.")
+		return errors.New("api: error in client POST for RAM usage")
 	}
 	defer resp.Body.Close()
-
+	return nil
 }
 
 // FUNC post_manufactuerer_count
 // Posts the manufactuerer count to Directus.
-func post_manufactuerer_count(cfg model.Config, tok model.Token, e model.Entry) {
+func Report_mfg(cfg model.Config, tok *model.Token, e model.Entry) (err error) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
 		cfg.Server.Collection)
@@ -185,33 +186,25 @@ func post_manufactuerer_count(cfg model.Config, tok model.Token, e model.Entry) 
 		"count":              strconv.Itoa(e.Count),
 		"mfgl":               "not implemented",
 		"libid":              "not implemented",
-		"local_date_created": fmt.Sprintf(time.Now().Format(time.RFC3339)),
+		"local_date_created": time.Now().Format(time.RFC3339),
 	})
 	if err != nil {
-		log.Fatal("Unable to marshal post of mfg count to JSON.")
+		return errors.New("api: unable to marshal post of mfg count to JSON")
 	}
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 	if err != nil {
-		log.Fatal("Unable to construct request for manufactuerer POST.")
+		return errors.New("api: unable to construct request for manufactuerer POST")
 	}
 	req.Header.Set("Content-type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal("Failure in client manufactuerer POST to Directus.")
+		return errors.New("api: failure in client manufactuerer POST to Directus")
 	}
 	// Close the body at function exit.
 	defer resp.Body.Close()
 
-	// We could process the result, but why?
-}
-
-func Report_telemetry(cfg model.Config, tok model.Token) {
-	post_ram_usage(cfg, tok)
-}
-
-func Report_mfg(cfg model.Config, tok model.Token, e model.Entry) {
-	post_manufactuerer_count(cfg, tok, e)
+	return nil
 }
