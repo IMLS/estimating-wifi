@@ -5,7 +5,7 @@ import sys
 username = sys.argv[1]
 password = sys.argv[2]
 
-base_url = "http://localhost:8000/data/api"
+base_url = "http://localhost:8000"
 
 resp = requests.post(
     f"{base_url}/api-token-auth/", data=dict(username=username, password=password),  # nosec
