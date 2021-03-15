@@ -20,5 +20,5 @@ type Config struct {
 	} `yaml:"wireshark"`
 	Manufacturers struct {
 		Db string `yaml:"db"`
-	} `yaml:"manufacturers`
+	} `yaml:"manufacturers"`
 }

@@ -185,7 +185,7 @@ func report_map(ka *csp.Keepalive, cfg model.Config, mfgs chan map[string]model.
 						time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
 						err := api.Report_mfg(cfg, tok, entry)
 						if err != nil {
-							log.Println("report: error results POST")
+							log.Println("report: results POST failure")
 							log.Println(err)
 							http_error_count = http_error_count + 1
 						}
