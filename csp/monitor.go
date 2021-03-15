@@ -37,7 +37,6 @@ func (b *Keepalive) Start() {
 	// https://vincent.bernat.ch/en/blog/2017-systemd-golang
 	daemon.SdNotify(false, daemon.SdNotifyReady)
 	interval, err := daemon.SdWatchdogEnabled(false)
-
 	if err != nil {
 		log.Println("monitor: unable to enable watchdog")
 		log.Fatal(err)
@@ -60,7 +59,8 @@ func (b *Keepalive) Start() {
 					c <- msg
 					// Now, wait for the response, or timeout.
 					// If we timeout, that means someone didn't reply.
-					// We'll log an error and die, so that we can be restarted.
+					// We'll log an error and stop notifying systemd.
+					// This way, systemd will restart us.
 					select {
 					case <-procs[c].pongCh:
 						// log.Printf("Pong from %v", procs[c].id)
