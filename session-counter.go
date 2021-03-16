@@ -160,36 +160,40 @@ func reportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]mode
 			log.Println("reporting: ", count)
 			// Try and grab the token from the OS Env.
 			// It would have been set if we found it in a global config file.
-			tok := os.Getenv(constants.TokenEnvKey)
-			if len(tok) < 1 {
+			accessKey := os.Getenv(constants.TokenEnvKey)
+			tok := &model.Token{}
+			if len(accessKey) > 1 {
+				tok.Data.AccessToken = accessKey
+			} else {
 				// If the token is too short/empty, we should try and get a token
 				// via username/password in the env. This should have failed long ago
 				// if the username/password are not in the env.
-				tok, err := api.Get_token(cfg)
+				apiTok, err := api.Get_token(cfg)
+				tok = apiTok
 				if err != nil {
 					log.Println("report: error in token fetch")
 					log.Println(err)
 					http_error_count = http_error_count + 1
-				} else {
-					for _, entry := range m {
-						go func(entry model.Entry) {
-							// Smear the requests out in time.
-							time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
-							err := api.Report_mfg(cfg, tok, entry)
-							if err != nil {
-								log.Println("report: results POST failure")
-								log.Println(err)
-								http_error_count = http_error_count + 1
-							}
-						}(entry)
-					}
-					err := api.Report_telemetry(cfg, tok)
+				}
+			}
+
+			for _, entry := range m {
+				go func(entry model.Entry) {
+					// Smear the requests out in time.
+					time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
+					err := api.Report_mfg(cfg, tok, entry)
 					if err != nil {
-						log.Println("report: error in telemetry POST")
+						log.Println("report: results POST failure")
 						log.Println(err)
 						http_error_count = http_error_count + 1
 					}
-				}
+				}(entry)
+			}
+			err := api.Report_telemetry(cfg, tok)
+			if err != nil {
+				log.Println("report: error in telemetry POST")
+				log.Println(err)
+				http_error_count = http_error_count + 1
 			}
 
 		case <-time.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):
