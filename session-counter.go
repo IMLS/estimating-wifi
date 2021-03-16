@@ -37,15 +37,15 @@ func tick(ka *csp.Keepalive, ch chan<- bool) {
 	}
 }
 
-/* PROCESS tock_every_n
+/* PROCESS tockEveryN
  * consumes a tag (for logging purposes) as well as
  * a driving `tick` on `in`. Every `n` ticks, it outputs
  * a boolean `tock` on the channel `out`.
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func tock_every_n(ka *csp.Keepalive, n int, in <-chan bool, out chan<- bool) {
-	log.Println("Starting tock_every_n")
+func tockEveryN(ka *csp.Keepalive, n int, in <-chan bool, out chan<- bool) {
+	log.Println("Starting tockEveryN")
 	// We timeout one second beyond the number of ticks we're waiting for
 	ping, pong := ka.Subscribe("tock", 2)
 
@@ -65,17 +65,17 @@ func tock_every_n(ka *csp.Keepalive, n int, in <-chan bool, out chan<- bool) {
 	}
 }
 
-/* PROCESS run_wireshark
+/* PROCESS runWireshark
  * Runs a subprocess for a duration of OBSERVE_SECONDS.
  * Therefore, this process effectively blocks for that time.
  * Gathers a hashmap of [MAC -> count] values. This hashmap
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func run_wireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan<- map[string]int) {
-	log.Println("Starting run_wireshark")
+func runWireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan<- map[string]int) {
+	log.Println("Starting runWireshark")
 	// If we have to wait twice the monitor duration, something broke.
-	ping, pong := ka.Subscribe("run_wireshark", cfg.Wireshark.Duration*2)
+	ping, pong := ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)
 
 	for {
 		select {
@@ -106,35 +106,19 @@ func run_wireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan
 	}
 }
 
-/* FUNC check_env_vars
- * Checks to see if the username and password for
- * working with Directus is in memory.
- * If not, it quits.
- */
-func check_env_vars() {
-	if os.Getenv(constants.EnvUsername) == "" {
-		fmt.Printf("%s must be set in the env!\n", constants.EnvUsername)
-		os.Exit(constants.ExitNoUsername)
-	}
-	if os.Getenv(constants.EnvPassword) == "" {
-		fmt.Printf("%s must be set in the env!\n", constants.EnvPassword)
-		os.Exit(constants.ExitNoPassword)
-	}
-}
-
 /* PROC mac_to_mfg
  * Takes in a hashmap of MAC addresses and counts, and passes on a hashmap
  * of manufacturer IDs and counts.
  * Uses "unknown" for all unknown manufacturers.
  */
-func mac_to_Entry(ka *csp.Keepalive, cfg model.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
-	log.Println("Starting mac_to_Entry")
-	ping, pong := ka.Subscribe("mac_to_Entry", 5)
+func macToEntry(ka *csp.Keepalive, cfg model.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
+	log.Println("Starting macToEntry")
+	ping, pong := ka.Subscribe("macToEntry", 5)
 
 	for {
 		select {
 		case <-ping:
-			pong <- "mac_to_Entry"
+			pong <- "macToEntry"
 
 		case mm := <-macmap:
 			mfgs := make(map[string]model.Entry)
@@ -147,13 +131,13 @@ func mac_to_Entry(ka *csp.Keepalive, cfg model.Config, macmap <-chan map[string]
 	}
 }
 
-/* PROC report_map
+/* PROC reportMap
  * Takes a hashmap of [mfg id : count] and POSTs
  * each one to the server individually. We have no bulk insert.
  */
-func report_map(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]model.Entry) {
-	log.Println("Starting report_map")
-	ping, pong := ka.Subscribe("report_map", 5)
+func reportMap(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]model.Entry) {
+	log.Println("Starting reportMap")
+	ping, pong := ka.Subscribe("reportMap", 5)
 
 	var count int64 = 0
 	http_error_count := 0
@@ -166,7 +150,7 @@ func report_map(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]mode
 			// minutes, then we should fail the next pong request. This will
 			// kill the program, and we'll restart.
 			if http_error_count < cfg.Monitoring.MaxHTTPErrorCount {
-				pong <- "report_map"
+				pong <- "reportMap"
 			} else {
 				log.Printf("report: http_error_count threshold of %d reached\n", http_error_count)
 			}
@@ -210,9 +194,9 @@ func report_map(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]mode
 	}
 }
 
-func ring_buffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, out chan<- map[string]int) {
-	log.Println("Starting ring_buffer")
-	ping, pong := ka.Subscribe("ring_buffer", 3)
+func ringBuffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, out chan<- map[string]int) {
+	log.Println("Starting ringBuffer")
+	ping, pong := ka.Subscribe("ringBuffer", 3)
 
 	// Nothing in the buffer, capacity = number of rounds
 	buffer := make([]map[string]int, cfg.Wireshark.Rounds)
@@ -225,7 +209,7 @@ func ring_buffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, 
 	for {
 		select {
 		case <-ping:
-			pong <- "ring_buffer"
+			pong <- "ringBuffer"
 
 		case buffer[ring_ndx] = <-in:
 			// Read in to the most recent buffer index.
@@ -276,7 +260,23 @@ func ring_buffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, 
 	}
 }
 
-func read_config(cfgPtr string) model.Config {
+/* FUNC checkEnvVars
+ * Checks to see if the username and password for
+ * working with Directus is in memory.
+ * If not, it quits.
+ */
+func checkEnvVars() {
+	if os.Getenv(constants.EnvUsername) == "" {
+		fmt.Printf("%s must be set in the env!\n", constants.EnvUsername)
+		os.Exit(constants.ExitNoUsername)
+	}
+	if os.Getenv(constants.EnvPassword) == "" {
+		fmt.Printf("%s must be set in the env!\n", constants.EnvPassword)
+		os.Exit(constants.ExitNoPassword)
+	}
+}
+
+func readConfig(cfgPtr string) model.Config {
 
 	f, err := os.Open(cfgPtr)
 	if err != nil {
@@ -305,11 +305,11 @@ func run(ka *csp.Keepalive, cfg model.Config) {
 	// Driven by a 1s `tick` process.
 	// Thread the keepalive through the network
 	go tick(ka, ch_sec)
-	go tock_every_n(ka, 60, ch_sec, ch_nsec)
-	go run_wireshark(ka, cfg, ch_nsec, ch_macs)
-	go ring_buffer(ka, cfg, ch_macs, ch_macs_counted)
-	go mac_to_Entry(ka, cfg, ch_macs_counted, mfg)
-	go report_map(ka, cfg, mfg)
+	go tockEveryN(ka, 60, ch_sec, ch_nsec)
+	go runWireshark(ka, cfg, ch_nsec, ch_macs)
+	go ringBuffer(ka, cfg, ch_macs, ch_macs_counted)
+	go macToEntry(ka, cfg, ch_macs_counted, mfg)
+	go reportMap(ka, cfg, mfg)
 }
 
 func keepalive(ka *csp.Keepalive, cfg model.Config) {
@@ -323,11 +323,11 @@ func keepalive(ka *csp.Keepalive, cfg model.Config) {
 }
 
 func main() {
-	check_env_vars()
+	checkEnvVars()
 	// FIXME consider turning this into an env var
 	cfgPtr := flag.String("config", "config.yaml", "config file")
 	flag.Parse()
-	cfg := read_config(*cfgPtr)
+	cfg := readConfig(*cfgPtr)
 
 	ka := csp.NewKeepalive()
 	go ka.Start()
