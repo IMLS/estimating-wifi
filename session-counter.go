@@ -158,29 +158,37 @@ func reportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]mode
 		case m := <-mfgs:
 			count = count + 1
 			log.Println("reporting: ", count)
-			tok, err := api.Get_token(cfg)
-			if err != nil {
-				log.Println("report: error in token fetch")
-				log.Println(err)
-				http_error_count = http_error_count + 1
-			} else {
-				for _, entry := range m {
-					go func(entry model.Entry) {
-						// Smear the requests out in time.
-						time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
-						err := api.Report_mfg(cfg, tok, entry)
-						if err != nil {
-							log.Println("report: results POST failure")
-							log.Println(err)
-							http_error_count = http_error_count + 1
-						}
-					}(entry)
-				}
-				err := api.Report_telemetry(cfg, tok)
+			// Try and grab the token from the OS Env.
+			// It would have been set if we found it in a global config file.
+			tok := os.Getenv(constants.TokenEnvKey)
+			if len(tok) < 1 {
+				// If the token is too short/empty, we should try and get a token
+				// via username/password in the env. This should have failed long ago
+				// if the username/password are not in the env.
+				tok, err := api.Get_token(cfg)
 				if err != nil {
-					log.Println("report: error in telemetry POST")
+					log.Println("report: error in token fetch")
 					log.Println(err)
 					http_error_count = http_error_count + 1
+				} else {
+					for _, entry := range m {
+						go func(entry model.Entry) {
+							// Smear the requests out in time.
+							time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
+							err := api.Report_mfg(cfg, tok, entry)
+							if err != nil {
+								log.Println("report: results POST failure")
+								log.Println(err)
+								http_error_count = http_error_count + 1
+							}
+						}(entry)
+					}
+					err := api.Report_telemetry(cfg, tok)
+					if err != nil {
+						log.Println("report: error in telemetry POST")
+						log.Println(err)
+						http_error_count = http_error_count + 1
+					}
 				}
 			}
 
@@ -311,6 +319,27 @@ func devConfig() *model.Config {
 	return cfg
 }
 
+func readToken() (*model.AccessToken, error) {
+	_, err := os.Stat(constants.TokenPath)
+	if err != nil {
+		return &model.AccessToken{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.TokenPath)
+	}
+
+	f, err := os.Open(constants.TokenPath)
+	if err != nil {
+		log.Fatal("readToken: could not open token file. Exiting.")
+	}
+	defer f.Close()
+	var accessToken *model.AccessToken
+	decoder := yaml.NewDecoder(f)
+	err = decoder.Decode(&accessToken)
+	if err != nil {
+		log.Fatalf("readToken: could not decode YAML:\n%v\n", err)
+	}
+
+	return accessToken, nil
+}
+
 func readConfig() *model.Config {
 	// We expect config to be here:
 	//   * /etc/session-counter/config.yaml
@@ -328,6 +357,12 @@ func readConfig() *model.Config {
 		return devConfig()
 	}
 
+	token, err := readToken()
+	if err != nil {
+		log.Fatal("readConfig: cannot find auth token")
+	}
+
+	os.Setenv(constants.TokenEnvKey, token.Token)
 	return cfg
 }
 

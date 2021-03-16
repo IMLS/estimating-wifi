@@ -13,3 +13,7 @@ type Token struct {
 		RefreshToken string `json:"refresh_token"`
 	} `json:"data"`
 }
+
+type AccessToken struct {
+	Token string `json:"token"`
+}
