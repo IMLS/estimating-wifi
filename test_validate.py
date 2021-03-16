@@ -24,10 +24,21 @@ headers = {
 }
 
 content = json.dumps({"source": [
+    {"mac": "60:38:e0", "mfgs": "Belkin", "count": 5},
+    {"mac": "0a:de:be", "mfgs": "unknown", "count": 1},
+]})
+resp = requests.post(f"{base_url}/validate/", data=content, headers=headers)
+validation = resp.json()
+if validation["valid"]:
+    print("passed")
+
+content = json.dumps({"source": [
     {"mac": "60:38:e0", "mfgs": "Belkin", "count": 20},
     {"mac": "something", "mfgs": "unknown", "count": 20},
 ]})
 resp = requests.post(f"{base_url}/validate/", data=content, headers=headers)
 validation = resp.json()
 
-print([row["errors"][0]["message"] for row in validation["tables"][0]['rows']])
+if not validation["valid"]:
+    print("failed:")
+    print([row["errors"][0]["message"] for row in validation["tables"][0]['rows']])

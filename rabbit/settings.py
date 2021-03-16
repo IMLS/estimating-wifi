@@ -33,7 +33,6 @@ DATA_INGEST = {
     'VALIDATORS': {
         'wifi.json': 'data_ingest.ingestors.GoodtablesValidator',
     },
-    # TODO: DESTINATION_FORMAT
 }
 
 INSTALLED_APPS = [
