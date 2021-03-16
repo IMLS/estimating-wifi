@@ -27,7 +27,7 @@ DEBUG = os.environ.get('DEBUG', False)
 if DEBUG:
     ALLOWED_HOSTS = ['127.0.0.1']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10x-rabbit-demo.app.cloud.gov']
 
 DIRECTUS_HOST = os.environ.get('DIRECTUS_HOST')
 DIRECTUS_USERNAME = os.environ.get('DIRECTUS_USERNAME')
