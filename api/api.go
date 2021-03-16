@@ -22,7 +22,7 @@ import (
 // FUNC Mac_to_mfg
 // Looks up a MAC address in the manufactuerer's database.
 // Returns a valid name or "unknown" if the name cannot be found.
-func Mac_to_mfg(cfg model.Config, mac string) string {
+func Mac_to_mfg(cfg *model.Config, mac string) string {
 	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
 		log.Fatal("Failed to open manufacturer database.")
@@ -74,7 +74,7 @@ func Mac_to_mfg(cfg model.Config, mac string) string {
 // Fetches a token from Directus for authenticating
 // subsequent interactions with the service.
 // Requires environment variables to be set
-func Get_token(cfg model.Config) (tok *model.Token, err error) {
+func Get_token(cfg *model.Config) (tok *model.Token, err error) {
 	user := os.Getenv(constants.EnvUsername)
 	pass := os.Getenv(constants.EnvPassword)
 	var uri string = (cfg.Server.Scheme + "://" +
@@ -125,7 +125,7 @@ func bToMb(b uint64) uint64 {
 
 // FUNC post_ram_usage
 // Part of telemetry. Posts RAM usage.
-func Report_telemetry(cfg model.Config, tok *model.Token) (err error) {
+func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
 		"memory_usage")
@@ -170,7 +170,7 @@ func Report_telemetry(cfg model.Config, tok *model.Token) (err error) {
 
 // FUNC post_manufactuerer_count
 // Posts the manufactuerer count to Directus.
-func Report_mfg(cfg model.Config, tok *model.Token, e model.Entry) (err error) {
+func Report_mfg(cfg *model.Config, tok *model.Token, e model.Entry) (err error) {
 	var uri string = (cfg.Server.Scheme + "://" +
 		cfg.Server.Host + "/items/" +
 		cfg.Server.Collection)

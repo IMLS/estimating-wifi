@@ -72,7 +72,7 @@ func tockEveryN(ka *csp.Keepalive, n int, in <-chan bool, out chan<- bool) {
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func runWireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan<- map[string]int) {
+func runWireshark(ka *csp.Keepalive, cfg *model.Config, in <-chan bool, out chan<- map[string]int) {
 	log.Println("Starting runWireshark")
 	// If we have to wait twice the monitor duration, something broke.
 	ping, pong := ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)
@@ -111,7 +111,7 @@ func runWireshark(ka *csp.Keepalive, cfg model.Config, in <-chan bool, out chan<
  * of manufacturer IDs and counts.
  * Uses "unknown" for all unknown manufacturers.
  */
-func macToEntry(ka *csp.Keepalive, cfg model.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
+func macToEntry(ka *csp.Keepalive, cfg *model.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
 	log.Println("Starting macToEntry")
 	ping, pong := ka.Subscribe("macToEntry", 5)
 
@@ -135,7 +135,7 @@ func macToEntry(ka *csp.Keepalive, cfg model.Config, macmap <-chan map[string]in
  * Takes a hashmap of [mfg id : count] and POSTs
  * each one to the server individually. We have no bulk insert.
  */
-func reportMap(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]model.Entry) {
+func reportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]model.Entry) {
 	log.Println("Starting reportMap")
 	ping, pong := ka.Subscribe("reportMap", 5)
 
@@ -194,7 +194,7 @@ func reportMap(ka *csp.Keepalive, cfg model.Config, mfgs <-chan map[string]model
 	}
 }
 
-func ringBuffer(ka *csp.Keepalive, cfg model.Config, in <-chan map[string]int, out chan<- map[string]int) {
+func ringBuffer(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, out chan<- map[string]int) {
 	log.Println("Starting ringBuffer")
 	ping, pong := ka.Subscribe("ringBuffer", 3)
 
@@ -276,23 +276,62 @@ func checkEnvVars() {
 	}
 }
 
-func readConfig(cfgPtr string) model.Config {
+func parseConfigFile(filepath string) (*model.Config, error) {
+	_, err := os.Stat(filepath)
 
-	f, err := os.Open(cfgPtr)
-	if err != nil {
-		log.Fatal("Could not open configuration file. Exiting.")
+	// Stat will set an error if the file cannot be found.
+	if err == nil {
+		f, err := os.Open(filepath)
+		if err != nil {
+			log.Fatal("parseConfigFile: could not open configuration file. Exiting.")
+		}
+		defer f.Close()
+		var cfg *model.Config
+		decoder := yaml.NewDecoder(f)
+		err = decoder.Decode(&cfg)
+		if err != nil {
+			log.Fatalf("parseConfigFile: could not decode YAML:\n%v\n", err)
+		}
+		return cfg, nil
+	} else {
+		log.Printf("parseConfigFile: could not find config: %v\n", filepath)
 	}
-	defer f.Close()
-	var cfg model.Config
-	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(&cfg)
+	return nil, fmt.Errorf("config: could not find config file [%v]\n", filepath)
+}
+func devConfig() *model.Config {
+	checkEnvVars()
+	// FIXME consider turning this into an env var
+	cfgPtr := flag.String("config", "config.yaml", "config file")
+	flag.Parse()
+	cfg, err := parseConfigFile(*cfgPtr)
 	if err != nil {
-		log.Fatalf("Could not decode YAML:\n%v\n", err)
+		log.Println("config: could not load dev config. Exiting.")
+		log.Fatalln(err)
 	}
 	return cfg
 }
 
-func run(ka *csp.Keepalive, cfg model.Config) {
+func readConfig() *model.Config {
+	// We expect config to be here:
+	//   * /etc/session-counter/config.yaml
+	// We expect there to be a token file at
+	//   * /etc/session-counter/access-token
+	//
+	// If neither of those is true, we can check for a
+	// the username and password to be in the ENV, and
+	// for the config to be passed via command line.
+
+	cfg, err := parseConfigFile(constants.ConfigPath)
+	if err != nil {
+		fmt.Printf("config: could not find config at default path [%v]\n", constants.ConfigPath)
+		fmt.Println("config: loading dev config")
+		return devConfig()
+	}
+
+	return cfg
+}
+
+func run(ka *csp.Keepalive, cfg *model.Config) {
 	log.Println("Starting run")
 	// Create channels for process network
 	ch_sec := make(chan bool)
@@ -312,7 +351,7 @@ func run(ka *csp.Keepalive, cfg model.Config) {
 	go reportMap(ka, cfg, mfg)
 }
 
-func keepalive(ka *csp.Keepalive, cfg model.Config) {
+func keepalive(ka *csp.Keepalive, cfg *model.Config) {
 	log.Println("Starting keepalive")
 	var counter int64 = 0
 	for {
@@ -323,11 +362,8 @@ func keepalive(ka *csp.Keepalive, cfg model.Config) {
 }
 
 func main() {
-	checkEnvVars()
-	// FIXME consider turning this into an env var
-	cfgPtr := flag.String("config", "config.yaml", "config file")
-	flag.Parse()
-	cfg := readConfig(*cfgPtr)
+
+	cfg := readConfig()
 
 	ka := csp.NewKeepalive()
 	go ka.Start()

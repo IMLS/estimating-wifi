@@ -25,7 +25,7 @@ func Test_get_manufactuerer(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(fmt.Sprintf("Get Manufactuerer = %v", tc.mfgs), func(t *testing.T) {
-			got := Mac_to_mfg(cfg, tc.mac)
+			got := Mac_to_mfg(&cfg, tc.mac)
 			if got != tc.mfgs {
 				t.Fatalf("got [ %v ] want [ %v ]", got, tc.mfgs)
 			} else {
@@ -45,7 +45,7 @@ func Test_thrash_db(t *testing.T) {
 
 	for ndx := 0; ndx < 2000; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
-			got := Mac_to_mfg(cfg, "aa:bb:cc")
+			got := Mac_to_mfg(&cfg, "aa:bb:cc")
 			if got != "unknown" {
 				t.Fatalf("got %v; want %v", got, "unknown")
 			} else {

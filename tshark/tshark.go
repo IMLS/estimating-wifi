@@ -9,7 +9,7 @@ import (
 	"gsa.gov/18f/session-counter/model"
 )
 
-func Tshark(cfg model.Config) map[string]int {
+func Tshark(cfg *model.Config) map[string]int {
 
 	tsharkCmd := exec.Command(cfg.Wireshark.Path,
 		"-a", fmt.Sprintf("duration:%d", cfg.Wireshark.Duration),
