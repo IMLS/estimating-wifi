@@ -102,10 +102,10 @@ func getRAlinkDevice() RAlink {
 }
 
 // https://stackoverflow.com/questions/18930910/access-struct-property-by-name
-func getField(v *RAlink, field string) string {
+func getField(v *RAlink, field string) reflect.Value {
 	r := reflect.ValueOf(v)
 	f := reflect.Indirect(r).FieldByName(field)
-	return f.String()
+	return f
 }
 
 func main() {
@@ -115,10 +115,22 @@ func main() {
 	device := getRAlinkDevice()
 	if device.exists {
 		res := getField(&device, *fieldPtr)
-		fmt.Println(res)
+		if reflect.TypeOf(res).Kind() == reflect.Bool {
+			fmt.Println(res.Interface())
+		} else {
+			fmt.Println(res)
+		}
 		os.Exit(0)
 	} else {
-		fmt.Println("Device not found")
-		os.Exit(-1)
+		// If we're explicitly asking to see if it exists, say no, and
+		// return a zero error code.
+		if *fieldPtr == "exists" {
+			fmt.Println("false")
+			os.Exit(0)
+		} else {
+			// Otherwise... this is bad. Exit with error.
+			fmt.Println("Device not found")
+			os.Exit(-1)
+		}
 	}
 }
