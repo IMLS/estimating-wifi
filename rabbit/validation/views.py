@@ -9,7 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 import json
 import requests
 from data_ingest.ingestors import apply_validators_to
-from . import settings
+
+from rabbit import settings
 
 
 def get_directus_token():

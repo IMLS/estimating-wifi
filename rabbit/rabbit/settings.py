@@ -25,9 +25,9 @@ SECRET_KEY = os.environ.get('SECURITY_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
 if DEBUG:
-    ALLOWED_HOSTS = ['127.0.0.1']
-
-ALLOWED_HOSTS = ['10x-rabbit-demo.app.cloud.gov']
+    ALLOWED_HOSTS = ['localhost']
+else:
+    ALLOWED_HOSTS = ['10x-rabbit-demo.app.cloud.gov']
 
 DIRECTUS_HOST = os.environ.get('DIRECTUS_HOST')
 DIRECTUS_USERNAME = os.environ.get('DIRECTUS_USERNAME')
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'data_ingest',
+    'validation',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
 
 ROOT_URLCONF = 'rabbit.urls'
 

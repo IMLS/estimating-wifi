@@ -5,7 +5,7 @@ from django.urls import path
 from rest_framework.authtoken import views as authtoken_views
 import data_ingest.urls
 
-from .views import wifi_interceptor
+from validation.views import wifi_interceptor
 
 urlpatterns = [
     path('admin/', admin.site.urls),
