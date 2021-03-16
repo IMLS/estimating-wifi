@@ -5,10 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"reflect"
 	"regexp"
 	"strconv"
+
+	"gsa.gov/18f/find-ralink/constants"
 )
 
 const (
@@ -18,6 +21,7 @@ const (
 )
 
 type RAlink struct {
+	exists        bool
 	physicalId    int
 	description   string
 	busInfo       string
@@ -29,6 +33,7 @@ type RAlink struct {
 
 func getRAlinkDevice() RAlink {
 	wlan := RAlink{}
+	wlan.exists = false
 
 	cmd := exec.Command("/usr/bin/lshw", "-class", "network")
 	stdout, err := cmd.StdoutPipe()
@@ -41,12 +46,6 @@ func getRAlinkDevice() RAlink {
 		log.Println("cpw: cannot start `lshw` command")
 		log.Fatal(err)
 	}
-
-	// output, err := ioutil.ReadAll(stdout)
-	// if err != nil {
-	// 	log.Println("cpw: unable to read all of stdout from `lshw`")
-	// 	log.Fatal(err)
-	// }
 
 	scanner := bufio.NewScanner(stdout)
 	hash := make(map[string]string)
@@ -61,20 +60,21 @@ func getRAlinkDevice() RAlink {
 		case LOOKING_FOR_USB:
 			match := usbSecRe.MatchString(line)
 			if match {
-				//fmt.Println("-> READING_HASH")
+				// fmt.Println("-> READING_HASH")
 				state = READING_HASH
 			}
 		case READING_HASH:
-			//fmt.Printf("checking: [ %v ]", line)
+			// fmt.Printf("checking: [ %v ]\n", line)
 			newSecMatch := newSecRe.MatchString(line)
 			hashMatch := hashRe.MatchString(line)
 			hashPieces := hashRe.FindStringSubmatch(line)
 
 			if newSecMatch {
-				//fmt.Println("-> DONE_READING")
+				// fmt.Println("-> DONE_READING")
 				state = DONE_READING
 			} else if hashMatch {
 				// fmt.Printf("%v <- %v\n", hashPieces[1], hashPieces[2])
+				// 0 is the full string, 1 the first group, 2 the second.
 				hash[hashPieces[1]] = hashPieces[2]
 			}
 		case DONE_READING:
@@ -82,17 +82,21 @@ func getRAlinkDevice() RAlink {
 		}
 	}
 
+	v, _ := regexp.MatchString("Ralink", hash["vendor"])
+	if v {
+		wlan.exists = true
+	}
+
 	wlan.physicalId, _ = strconv.Atoi(hash["physical id"])
 	wlan.description = hash["description"]
 	wlan.busInfo = hash["bus info"]
 	wlan.logicalName = hash["logical name"]
 	wlan.serial = hash["serial"]
-	if len(hash["serial"]) >= 17 {
-		wlan.mac = hash["serial"][0:17]
+	if len(hash["serial"]) >= constants.MACLENGTH {
+		wlan.mac = hash["serial"][0:constants.MACLENGTH]
 	} else {
 		wlan.mac = hash["serial"]
 	}
-
 	wlan.configuration = hash["configuration"]
 	return wlan
 }
@@ -109,6 +113,12 @@ func main() {
 	flag.Parse()
 
 	device := getRAlinkDevice()
-	res := getField(&device, *fieldPtr)
-	fmt.Println(res)
+	if device.exists {
+		res := getField(&device, *fieldPtr)
+		fmt.Println(res)
+		os.Exit(0)
+	} else {
+		fmt.Println("Device not found")
+		os.Exit(-1)
+	}
 }

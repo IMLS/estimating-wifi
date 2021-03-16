@@ -1,3 +1,3 @@
-module gsa.gov/18f/configure-pi-wifi
+module gsa.gov/18f/find-ralink
 
 go 1.16
