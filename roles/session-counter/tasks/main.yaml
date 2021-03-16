@@ -1,1 +1,42 @@
-- name: 
+- name: install session counter binary from github
+  ansible.builtin.get_url:
+    url: "{{ session_counter.binary_url }}"
+    dest: "{{ session_counter.install_path }}"
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+
+- name: create a place for the config file.
+  ansible.builtin.file:
+    path: /etc/session-counter
+    state: directory
+  become: yes
+
+# We will update the config file in the ansible repository
+# when we want a new config to be used. This will have to update
+# lockstep with a new binary.
+- name: always update some files
+  ansible.builtin.copy:
+    src: "files{{session_counter.config_path}}/{{ item }}"
+    dest: "{{session_counter.config_path}}/{{ item }}"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+    force: yes
+  loop:
+    - config.yaml
+    - manufacturers.sqlite
+  become: yes
+
+- name: create these files on first run, then leave alone
+  ansible.builtin.copy:
+    src: "files{{session_counter.config_path}}/{{ item }}"
+    dest: "{{session_counter.config_path}}/{{ item }}"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+    force: no
+  loop:
+    - access-token.yaml
+  become: yes

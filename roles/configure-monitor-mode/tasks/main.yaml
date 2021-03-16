@@ -1,2 +1,44 @@
-- name: ping
-  ping:
+- name: install find-ralink tool binary
+  ansible.builtin.get_url:
+    url: "{{ findralink.binary_url }}"
+    dest: "{{ findralink.install_path }}"
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+
+# find-ralink options for -descriptor
+# exists bool
+# physicalId    int
+# description   string
+# busInfo       string
+# logicalName   string
+# serial        string
+# mac           string
+# configuration string
+
+# We must "become" for the find-ralink tool.
+# It will not find USB devices as non-root.
+# Normally, if no device is found, there is a non-zero error.
+# However, if we're asking nicely to find out if one exists,
+# we will get "true" or "false", and a 0 error code always.
+# (Short of catestrophic errors/failures.)
+- name: do we find an ralink adapter?
+  ansible.builtin.command:
+    cmd: "{{ findralink.bin }} --descriptor exists"
+  register: ralink_exists
+  become: yes
+
+- name: check
+  debug: 
+    msg: "{{ ralink_exists.stdout }}"
+
+- name: debug if found
+  debug:
+    msg: i found an ralink adapter!
+  when: "'true' in ralink_exists.stdout"
+
+- name: debug if not found
+  debug:
+    msg: CANNOT FIND!
+  when: "'false' in ralink_exists.stdout"

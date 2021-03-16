@@ -1,0 +1,29 @@
+monitoring:
+  pinginterval: 10
+  max_http_error_count: 10
+  http_error_interval_mins: 60
+server:
+  scheme: https
+  host: directus-demo.app.cloud.gov
+  collection: people2
+wireshark:
+  path: /usr/bin/tshark
+  adapter: wlan1
+  # duration is the number of seconds that wireshark
+  # will listen to the adapter before reporting out.
+  # best if this is below one minute.
+  # FIXME: this should not be configurable.
+  duration: 45
+  # rounds is the number of listening rounds we do before
+  # reporting up to the server. 
+  rounds: 3
+  # threshold is how many rounds a MAC address must be present
+  # before we consider reporting it to the server.
+  threshold: 2
+  # EXAMPLE:
+  # rounds of 10 and threshold of 8 would have a 10m reporting window
+  # and require a device to be present 8 out of 10 minutes.
+  # rounds of 60 and threshold of 30 would watch for an hour, and then 
+  # consider any device that was present for 30 minutes to be 
+manufacturers:
+  db: /home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite

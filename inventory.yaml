@@ -3,5 +3,17 @@ all:
     pi: 
       ansible_host: 127.0.0.1
       ansible_python_interpreter: /usr/bin/python
-  branches:
-    session-counter: main
+  vars:
+    # We might change the default user.
+    default_user: pi
+    session_counter:
+      # WARNING
+      # If the config file changes with the binary, make sure the config in this repo changes with 
+      # updates to the binary! This is a fragile point. Or, we could pull config from the session-counter repos.
+      binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.0.1/session-counter"
+      install_path: /usr/local/session_counter
+      config_path: /etc/session-counter
+    findralink:
+      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.1/find-ralink"
+      install_path: /usr/local/
+      bin: /usr/local/find-ralink

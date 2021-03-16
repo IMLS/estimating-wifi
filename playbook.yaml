@@ -4,3 +4,5 @@
   roles:
     - packages
     - unattended-upgrades
+    - session-counter
+    - configure-monitor-mode
