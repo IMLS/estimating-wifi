@@ -1,0 +1,1470 @@
+2021/03/17 20:38:41 Starting rawToUids
+2021/03/17 20:39:14 Starting rawToUids
+2021/03/17 20:39:15 received map:  map[aa:bb:dd:ee:43 xx:bb:cc:dd:42]
+2021/03/17 20:40:30 Starting rawToUids
+2021/03/17 20:40:31 rtu: received map:  map[aa:bb:dd:ee:43 xx:bb:cc:dd:42]
+2021/03/17 20:40:31 rtu: [xx:bb:cc:dd :: true]
+2021/03/17 20:40:31 rtu: [aa:bb:dd:ee :: true]
+2021/03/17 20:41:42 Starting rawToUids
+2021/03/17 20:41:43 rtu: received map:  map[aa:bb:dd:ee:43 xx:bb:cc:dd:42]
+2021/03/17 20:41:43 rtu: [xx:bb:cc:dd :: false]
+2021/03/17 20:41:43 rtu: dding [xx:bb:cc:dd] as [0]
+2021/03/17 20:41:43 rtu: [aa:bb:dd:ee :: false]
+2021/03/17 20:41:43 rtu: dding [aa:bb:dd:ee] as [1]
+2021/03/17 20:53:55 Starting rawToUids
+2021/03/17 20:53:56 rtu: received map:  map[aa:bb:dd:ee:43 xx:bb:cc:dd:42]
+2021/03/17 20:53:56 rtu: [xx:bb:cc:dd :: false]
+2021/03/17 20:53:56 rtu: dding [xx:bb:cc:dd] as [0]
+2021/03/17 20:53:56 rtu: [aa:bb:dd:ee :: false]
+2021/03/17 20:53:56 rtu: dding [aa:bb:dd:ee] as [1]
+2021/03/17 20:58:49 Starting rawToUids
+2021/03/17 20:58:50 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 20:58:50 rtu: [de:ad:be:ef :: false]
+2021/03/17 20:58:50 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 20:58:51 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 20:58:51 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:01:19 Starting rawToUids
+2021/03/17 21:01:20 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:01:20 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:01:20 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:01:21 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:01:21 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:01:39 Starting rawToUids
+2021/03/17 21:01:40 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:01:40 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:01:40 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:01:41 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:01:41 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:04:06 Starting rawToUids
+2021/03/17 21:04:07 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:04:07 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:04:07 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:04:08 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:04:08 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:07:25 Starting rawToUids
+2021/03/17 21:07:26 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:07:26 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:07:26 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:07:27 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:07:27 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:13:44 Starting rawToUids
+2021/03/17 21:13:45 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:13:45 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:13:45 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:13:46 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:13:46 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:13:47 Starting rawToUids
+2021/03/17 21:15:25 Starting rawToUids
+2021/03/17 21:15:26 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:15:26 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:15:26 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:15:27 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:15:27 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:16:49 Starting rawToUids
+2021/03/17 21:16:50 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:16:50 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:16:50 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:16:51 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:16:51 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:16:52 rtu: exiting
+2021/03/17 21:16:52 Starting rawToUids
+2021/03/17 21:17:40 Starting rawToUids
+2021/03/17 21:17:41 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:17:41 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:17:41 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:17:42 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:17:42 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:17:43 rtu: exiting
+2021/03/17 21:17:43 Starting rawToUids
+2021/03/17 21:18:16 Starting rawToUids
+2021/03/17 21:18:17 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:18:17 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:18:17 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:18:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:18:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:18:19 rtu: exiting
+2021/03/17 21:18:19 Starting rawToUids
+2021/03/17 21:19:14 Starting rawToUids
+2021/03/17 21:19:15 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:19:15 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:19:15 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:19:16 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:19:16 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:19:17 rtu: exiting
+2021/03/17 21:19:17 Starting rawToUids
+2021/03/17 21:19:47 Starting rawToUids
+2021/03/17 21:19:48 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:19:48 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:19:48 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:19:49 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:19:49 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:19:50 rtu: exiting
+2021/03/17 21:19:50 Starting rawToUids
+2021/03/17 21:20:23 Starting rawToUids
+2021/03/17 21:20:24 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:20:24 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:20:24 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:20:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:20:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:20:26 rtu: exiting
+2021/03/17 21:20:26 Starting rawToUids
+2021/03/17 21:21:36 Starting rawToUids
+2021/03/17 21:21:36 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:21:36 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:21:36 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:21:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:21:36 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:21:36 rtu: exiting
+2021/03/17 21:21:36 Starting rawToUids
+2021/03/17 21:23:40 Starting rawToUids
+2021/03/17 21:23:40 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:23:40 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:23:40 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:23:40 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:23:40 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:23:52 Starting rawToUids
+2021/03/17 21:23:52 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:23:52 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:23:52 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:23:52 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:23:52 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:23:52 rtu: exiting
+2021/03/17 21:23:52 Starting rawToUids
+2021/03/17 21:24:39 Starting rawToUids
+2021/03/17 21:24:39 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:24:39 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:24:39 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:24:39 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:24:39 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:24:39 rtu: exiting
+2021/03/17 21:24:39 Starting rawToUids
+2021/03/17 21:25:16 Starting rawToUids
+2021/03/17 21:25:16 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:25:16 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:25:16 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:25:16 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:25:16 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:25:16 rtu: exiting
+2021/03/17 21:25:16 Starting rawToUids
+2021/03/17 21:26:35 Starting rawToUids
+2021/03/17 21:26:35 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:26:35 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:26:35 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:26:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:26:36 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:26:36 rtu: exiting
+2021/03/17 21:26:36 Starting rawToUids
+2021/03/17 21:27:12 Starting rawToUids
+2021/03/17 21:27:12 rtu: initialized keepalive
+2021/03/17 21:27:12 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:27:12 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:27:12 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:27:12 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:27:12 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:27:13 rtu: exiting
+2021/03/17 21:27:13 Starting rawToUids
+2021/03/17 21:29:18 Starting rawToUids
+2021/03/17 21:29:18 rtu: initialized keepalive
+2021/03/17 21:29:18 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:29:18 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:29:18 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:29:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:29:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:29:18 Starting rawToUids
+2021/03/17 21:29:18 rtu: exiting
+---
+2021/03/17 21:30:00 Starting rawToUids
+2021/03/17 21:30:00 rtu: initialized keepalive
+2021/03/17 21:30:00 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:30:00 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:30:00 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:30:01 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:30:01 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:30:01 rtu: exiting
+2021/03/17 21:30:01 Starting rawToUids
+2021/03/17 21:30:31 Starting rawToUids
+2021/03/17 21:30:31 rtu: initialized keepalive
+2021/03/17 21:30:31 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:30:31 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:30:31 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:30:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:30:31 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:30:31 Starting rawToUids
+2021/03/17 21:30:31 rtu: initialized keepalive
+2021/03/17 21:30:31 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:30:31 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:30:31 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:30:31 rtu: exiting
+2021/03/17 21:30:31 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:30:31 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:30:31 rtu: dding [be:ef:ca:fe] as [1]
+2021/03/17 21:30:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:30:31 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:30:31 rtu: exiting
+2021/03/17 21:32:19 Starting rawToUids
+2021/03/17 21:32:19 rtu: initialized keepalive
+2021/03/17 21:32:19 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:32:19 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:32:19 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:32:19 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:32:19 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:32:19 rtu: exiting
+2021/03/17 21:32:19 Starting rawToUids
+2021/03/17 21:32:19 rtu: initialized keepalive
+2021/03/17 21:32:19 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:32:19 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:32:19 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:32:19 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:32:19 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:32:19 rtu: dding [be:ef:ca:fe] as [1]
+2021/03/17 21:32:19 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:32:19 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:34:17 Starting rawToUids
+2021/03/17 21:34:17 rtu: initialized keepalive
+2021/03/17 21:34:17 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:34:17 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:34:17 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:34:17 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:34:17 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:34:17 rtu: exiting
+2021/03/17 21:34:17 Starting rawToUids
+2021/03/17 21:34:17 rtu: initialized keepalive
+2021/03/17 21:34:17 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:34:17 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:34:17 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:34:17 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:34:17 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:34:17 rtu: dding [be:ef:ca:fe] as [1]
+2021/03/17 21:34:17 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:34:17 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:34:17 rtu: exiting
+2021/03/17 21:34:27 Starting rawToUids
+2021/03/17 21:34:27 rtu: initialized keepalive
+2021/03/17 21:34:27 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:34:27 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:34:27 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:34:27 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:34:27 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:34:27 rtu: exiting
+2021/03/17 21:34:27 Starting rawToUids
+2021/03/17 21:34:27 rtu: initialized keepalive
+2021/03/17 21:34:27 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:34:27 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:34:27 rtu: dding [de:ad:be:ef] as [0]
+2021/03/17 21:34:27 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:34:27 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:34:27 rtu: dding [be:ef:ca:fe] as [1]
+2021/03/17 21:34:27 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:34:27 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:34:28 rtu: exiting
+2021/03/17 21:36:20 Starting rawToUids
+2021/03/17 21:36:20 rtu: initialized keepalive
+2021/03/17 21:36:20 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:36:20 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:36:20 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:36:20 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:36:20 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:36:20 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:36:20 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:36:20 rtu: exiting
+2021/03/17 21:36:20 Starting rawToUids
+2021/03/17 21:36:20 rtu: initialized keepalive
+2021/03/17 21:36:20 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:36:20 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:36:20 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:36:20 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:36:20 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:36:20 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:36:20 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:36:20 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:36:20 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:36:20 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:36:20 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:37:13 Starting rawToUids
+2021/03/17 21:37:13 rtu: initialized keepalive
+2021/03/17 21:37:13 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:37:13 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:37:13 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:37:13 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:37:13 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:37:13 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:37:13 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:37:13 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:37:13 rtu: exiting
+2021/03/17 21:37:13 Starting rawToUids
+2021/03/17 21:37:13 rtu: initialized keepalive
+2021/03/17 21:37:13 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:37:13 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:37:13 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:37:13 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:37:13 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:37:13 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:37:13 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:37:13 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:37:13 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:37:13 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:37:13 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:37:13 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:38:37 Starting rawToUids
+2021/03/17 21:38:37 rtu: initialized keepalive
+2021/03/17 21:38:37 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:38:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:38:37 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:38:37 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:38:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:38:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:38:38 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:38:38 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:38:38 rtu: exiting
+2021/03/17 21:38:38 Starting rawToUids
+2021/03/17 21:38:38 rtu: initialized keepalive
+2021/03/17 21:38:38 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:38:38 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:38:38 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:38:38 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:38:38 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:38:38 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:38:38 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:38:38 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:38:38 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:38:38 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:38:38 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:38:38 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:39:28 Starting rawToUids
+2021/03/17 21:39:28 rtu: initialized keepalive
+2021/03/17 21:39:28 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:39:28 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:39:28 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:39:28 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:39:28 newmap is  map[{unknown 0}:42]
+2021/03/17 21:39:28 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:39:28 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:39:28 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:39:28 newmap is  map[{unknown 0}:87]
+2021/03/17 21:39:28 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:39:28 Starting rawToUids
+2021/03/17 21:39:28 rtu: initialized keepalive
+2021/03/17 21:39:28 rtu: exiting
+2021/03/17 21:39:28 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:39:28 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:39:28 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:39:28 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:39:28 newmap is  map[{unknown 0}:42]
+2021/03/17 21:39:28 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:39:28 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:39:28 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:39:28 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:39:28 newmap is  map[{unknown 1}:137]
+2021/03/17 21:39:28 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:39:28 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:39:28 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:39:28 newmap is  map[{unknown 0}:87]
+2021/03/17 21:39:28 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:43:20 Starting rawToUids
+2021/03/17 21:43:20 rtu: initialized keepalive
+2021/03/17 21:43:20 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:43:20 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:43:20 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:43:20 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:43:20 newmap is  map[{unknown 0}:42]
+2021/03/17 21:43:20 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:43:20 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:43:20 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:43:20 newmap is  map[{unknown 0}:87]
+2021/03/17 21:43:20 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:43:20 rtu: exiting
+2021/03/17 21:43:20 Starting rawToUids
+2021/03/17 21:43:20 rtu: initialized keepalive
+2021/03/17 21:43:20 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:43:20 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:43:20 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:43:21 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:43:21 newmap is  map[{unknown 0}:42]
+2021/03/17 21:43:21 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:43:21 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:43:21 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:43:21 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:43:21 newmap is  map[{unknown 1}:137]
+2021/03/17 21:43:21 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:43:21 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:43:21 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:43:21 newmap is  map[{unknown 0}:87]
+2021/03/17 21:43:21 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:43:21 rtu: exiting
+2021/03/17 21:44:25 Starting rawToUids
+2021/03/17 21:44:25 rtu: initialized keepalive
+2021/03/17 21:44:25 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:44:25 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:44:25 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:44:25 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:44:25 newmap is  map[{unknown 0}:42]
+2021/03/17 21:44:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:44:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:44:25 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:44:25 newmap is  map[{unknown 0}:87]
+2021/03/17 21:44:25 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:44:25 rtu: exiting
+2021/03/17 21:44:25 Starting rawToUids
+2021/03/17 21:44:25 rtu: initialized keepalive
+2021/03/17 21:44:25 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:44:25 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:44:25 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:44:25 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:44:25 newmap is  map[{unknown 0}:42]
+2021/03/17 21:44:25 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:44:25 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:44:25 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:44:25 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:44:25 newmap is  map[{unknown 1}:137]
+2021/03/17 21:44:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:44:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:44:25 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:44:25 newmap is  map[{unknown 0}:87]
+2021/03/17 21:44:25 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:45:17 Starting rawToUids
+2021/03/17 21:45:17 rtu: initialized keepalive
+2021/03/17 21:45:17 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:45:17 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:45:17 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:45:18 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:45:18 newmap is  map[{unknown 0}:42]
+2021/03/17 21:45:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:45:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:45:18 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:45:18 newmap is  map[{unknown 0}:87]
+2021/03/17 21:45:18 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:45:18 rtu: exiting
+2021/03/17 21:45:18 Starting rawToUids
+2021/03/17 21:45:18 rtu: initialized keepalive
+2021/03/17 21:45:18 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:45:18 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:45:18 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:45:18 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:45:18 newmap is  map[{unknown 0}:42]
+2021/03/17 21:45:18 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:45:18 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:45:18 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:45:18 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:45:18 newmap is  map[{unknown 1}:137]
+2021/03/17 21:45:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:45:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:45:18 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:45:18 newmap is  map[{unknown 0}:87]
+2021/03/17 21:45:18 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:46:51 Starting rawToUids
+2021/03/17 21:46:51 rtu: initialized keepalive
+2021/03/17 21:46:51 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:46:51 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:46:51 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:46:51 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:46:51 newmap is  map[{unknown 0}:42]
+2021/03/17 21:46:51 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:46:51 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:46:51 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:46:51 newmap is  map[{unknown 0}:87]
+2021/03/17 21:46:51 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:46:51 rtu: exiting
+2021/03/17 21:46:51 Starting rawToUids
+2021/03/17 21:46:51 rtu: initialized keepalive
+2021/03/17 21:46:51 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:46:51 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:46:51 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:46:51 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:46:51 newmap is  map[{unknown 0}:42]
+2021/03/17 21:46:51 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:46:51 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:46:51 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:46:51 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:46:51 newmap is  map[{unknown 1}:137]
+2021/03/17 21:46:51 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:46:51 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:46:51 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:46:51 newmap is  map[{unknown 0}:87]
+2021/03/17 21:46:51 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:48:54 Starting rawToUids
+2021/03/17 21:48:54 rtu: initialized keepalive
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:48:54 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:48:54 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:48:54 newmap is  map[{unknown 0}:42]
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:48:54 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:48:54 newmap is  map[{unknown 0}:87]
+2021/03/17 21:48:54 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:48:54 rtu: exiting
+2021/03/17 21:48:54 Starting rawToUids
+2021/03/17 21:48:54 rtu: initialized keepalive
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:48:54 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:48:54 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:48:54 newmap is  map[{unknown 0}:42]
+2021/03/17 21:48:54 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:48:54 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:48:54 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:48:54 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:48:54 newmap is  map[{unknown 1}:137]
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:48:54 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:48:54 newmap is  map[{unknown 0}:87]
+2021/03/17 21:48:54 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:48:54 rtu: exiting
+2021/03/17 21:48:54 Starting rawToUids
+2021/03/17 21:48:54 rtu: initialized keepalive
+2021/03/17 21:48:54 rtu: received map:  map[00:00:0F:ef:42]
+2021/03/17 21:48:54 rtu: [00:00:0F:ef :: false]
+2021/03/17 21:48:54 rtu: adding [00:00:0F:ef] as [0]
+2021/03/17 21:48:54 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:48:54 newmap is  map[{Next 0}:42]
+2021/03/17 21:48:54 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:48:54 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:48:54 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:48:54 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:48:54 newmap is  map[{unknown 1}:137]
+2021/03/17 21:48:54 rtu: received map:  map[be:ef:be:ef:4]
+2021/03/17 21:48:54 rtu: [be:ef:be:ef :: false]
+2021/03/17 21:48:54 rtu: adding [be:ef:be:ef] as [2]
+2021/03/17 21:48:54 rtu: newmap  {unknown 2}  to  4
+2021/03/17 21:48:54 newmap is  map[{unknown 2}:4]
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:48:54 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:48:54 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:48:54 newmap is  map[{unknown 3}:87]
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:48:54 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:48:54 newmap is  map[{unknown 3}:87]
+2021/03/17 21:48:54 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:48:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:48:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:48:54 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:48:54 newmap is  map[{unknown 3}:87]
+2021/03/17 21:48:54 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:49:48 Starting rawToUids
+2021/03/17 21:49:48 rtu: initialized keepalive
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:49:48 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:49:48 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:49:48 newmap is  map[{unknown 0}:42]
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:49:48 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:49:48 newmap is  map[{unknown 0}:87]
+2021/03/17 21:49:48 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:49:48 rtu: exiting
+2021/03/17 21:49:48 Starting rawToUids
+2021/03/17 21:49:48 rtu: initialized keepalive
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:49:48 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:49:48 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:49:48 newmap is  map[{unknown 0}:42]
+2021/03/17 21:49:48 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:49:48 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:49:48 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:49:48 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:49:48 newmap is  map[{unknown 1}:137]
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:49:48 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:49:48 newmap is  map[{unknown 0}:87]
+2021/03/17 21:49:48 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:49:48 rtu: exiting
+2021/03/17 21:49:48 Starting rawToUids
+2021/03/17 21:49:48 rtu: initialized keepalive
+2021/03/17 21:49:48 rtu: received map:  map[00:00:0F:ef:42]
+2021/03/17 21:49:48 rtu: [00:00:0F:ef :: false]
+2021/03/17 21:49:48 rtu: adding [00:00:0F:ef] as [0]
+2021/03/17 21:49:48 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:49:48 newmap is  map[{Next 0}:42]
+2021/03/17 21:49:48 rtu: received map:  map[00:00:11:ff:137]
+2021/03/17 21:49:48 rtu: [00:00:11:ff :: false]
+2021/03/17 21:49:48 rtu: adding [00:00:11:ff] as [1]
+2021/03/17 21:49:48 rtu: newmap  {Normerel 1}  to  137
+2021/03/17 21:49:48 newmap is  map[{Normerel 1}:137]
+2021/03/17 21:49:48 rtu: received map:  map[be:ef:be:ef:4]
+2021/03/17 21:49:48 rtu: [be:ef:be:ef :: false]
+2021/03/17 21:49:48 rtu: adding [be:ef:be:ef] as [2]
+2021/03/17 21:49:48 rtu: newmap  {unknown 2}  to  4
+2021/03/17 21:49:48 newmap is  map[{unknown 2}:4]
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:49:48 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:49:48 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:49:48 newmap is  map[{unknown 3}:87]
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:49:48 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:49:48 newmap is  map[{unknown 3}:87]
+2021/03/17 21:49:48 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:49:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:49:48 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:49:48 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:49:48 newmap is  map[{unknown 3}:87]
+2021/03/17 21:49:48 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:49:48 rtu: exiting
+2021/03/17 21:52:01 Starting rawToUids
+2021/03/17 21:52:01 rtu: initialized keepalive
+2021/03/17 21:52:01 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:52:01 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:52:01 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:52:01 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:52:01 newmap is  map[{unknown 0}:42]
+2021/03/17 21:52:01 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:01 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:02 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:52:02 newmap is  map[{unknown 0}:87]
+2021/03/17 21:52:02 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:52:02 rtu: exiting
+2021/03/17 21:52:02 Starting rawToUids
+2021/03/17 21:52:02 rtu: initialized keepalive
+2021/03/17 21:52:02 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:52:02 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:52:02 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:52:02 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:52:02 newmap is  map[{unknown 0}:42]
+2021/03/17 21:52:02 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:52:02 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:52:02 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:52:02 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:52:02 newmap is  map[{unknown 1}:137]
+2021/03/17 21:52:02 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:02 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:02 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:52:02 newmap is  map[{unknown 0}:87]
+2021/03/17 21:52:02 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:52:02 rtu: exiting
+2021/03/17 21:52:02 Starting rawToUids
+2021/03/17 21:52:02 rtu: initialized keepalive
+2021/03/17 21:52:02 rtu: received map:  map[00:00:0F:ef:42]
+2021/03/17 21:52:02 rtu: [00:00:0F:ef :: false]
+2021/03/17 21:52:02 rtu: adding [00:00:0F:ef] as [0]
+2021/03/17 21:52:02 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:52:02 newmap is  map[{Next 0}:42]
+2021/03/17 21:52:02 rtu: received map:  map[00:03:93:ff:137]
+2021/03/17 21:52:02 rtu: [00:03:93:ff :: false]
+2021/03/17 21:52:02 rtu: adding [00:03:93:ff] as [1]
+2021/03/17 21:52:02 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:52:02 newmap is  map[{Apple 1}:137]
+2021/03/17 21:52:02 rtu: received map:  map[be:ef:be:ef:4]
+2021/03/17 21:52:02 rtu: [be:ef:be:ef :: false]
+2021/03/17 21:52:02 rtu: adding [be:ef:be:ef] as [2]
+2021/03/17 21:52:02 rtu: newmap  {unknown 2}  to  4
+2021/03/17 21:52:02 newmap is  map[{unknown 2}:4]
+2021/03/17 21:52:02 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:02 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:52:02 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:52:02 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:52:02 newmap is  map[{unknown 3}:87]
+2021/03/17 21:52:02 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:02 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:02 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:52:02 newmap is  map[{unknown 3}:87]
+2021/03/17 21:52:02 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:52:02 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:02 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:02 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:52:02 newmap is  map[{unknown 3}:87]
+2021/03/17 21:52:02 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:52:31 Starting rawToUids
+2021/03/17 21:52:31 rtu: initialized keepalive
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:52:31 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:52:31 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:52:31 newmap is  map[{unknown 0}:42]
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:31 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:52:31 newmap is  map[{unknown 0}:87]
+2021/03/17 21:52:31 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:52:31 rtu: exiting
+2021/03/17 21:52:31 Starting rawToUids
+2021/03/17 21:52:31 rtu: initialized keepalive
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:52:31 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:52:31 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:52:31 newmap is  map[{unknown 0}:42]
+2021/03/17 21:52:31 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:52:31 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:52:31 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:52:31 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:52:31 newmap is  map[{unknown 1}:137]
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:31 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:52:31 newmap is  map[{unknown 0}:87]
+2021/03/17 21:52:31 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:52:31 rtu: exiting
+2021/03/17 21:52:31 Starting rawToUids
+2021/03/17 21:52:31 rtu: initialized keepalive
+2021/03/17 21:52:31 rtu: received map:  map[00:00:0F:ef:42]
+2021/03/17 21:52:31 rtu: [00:00:0F:ef :: false]
+2021/03/17 21:52:31 rtu: adding [00:00:0F:ef] as [0]
+2021/03/17 21:52:31 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:52:31 newmap is  map[{Next 0}:42]
+2021/03/17 21:52:31 rtu: received map:  map[00:03:93:ff:137]
+2021/03/17 21:52:31 rtu: [00:03:93:ff :: false]
+2021/03/17 21:52:31 rtu: adding [00:03:93:ff] as [1]
+2021/03/17 21:52:31 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:52:31 newmap is  map[{Apple 1}:137]
+2021/03/17 21:52:31 rtu: received map:  map[be:ef:be:ef:4]
+2021/03/17 21:52:31 rtu: [be:ef:be:ef :: false]
+2021/03/17 21:52:31 rtu: adding [be:ef:be:ef] as [2]
+2021/03/17 21:52:31 rtu: newmap  {unknown 2}  to  4
+2021/03/17 21:52:31 newmap is  map[{unknown 2}:4]
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:52:31 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:52:31 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:52:31 newmap is  map[{unknown 3}:87]
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:31 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:52:31 newmap is  map[{unknown 3}:87]
+2021/03/17 21:52:31 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:52:31 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:52:31 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:52:31 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:52:31 newmap is  map[{unknown 3}:87]
+2021/03/17 21:52:31 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:54:00 Starting rawToUids
+2021/03/17 21:54:00 rtu: initialized keepalive
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:54:00 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:54:00 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:54:00 newmap is  map[{unknown 0}:42]
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:00 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:54:00 newmap is  map[{unknown 0}:87]
+2021/03/17 21:54:00 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:54:00 rtu: exiting
+2021/03/17 21:54:00 Starting rawToUids
+2021/03/17 21:54:00 rtu: initialized keepalive
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:54:00 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:54:00 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:54:00 newmap is  map[{unknown 0}:42]
+2021/03/17 21:54:00 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:54:00 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:54:00 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:54:00 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:54:00 newmap is  map[{unknown 1}:137]
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:00 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:54:00 newmap is  map[{unknown 0}:87]
+2021/03/17 21:54:00 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:54:00 rtu: exiting
+2021/03/17 21:54:00 Starting rawToUids
+2021/03/17 21:54:00 rtu: initialized keepalive
+2021/03/17 21:54:00 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:54:00 rtu: [00:00:0F :: false]
+2021/03/17 21:54:00 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:54:00 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:54:00 newmap is  map[{Next 0}:42]
+2021/03/17 21:54:00 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:54:00 rtu: [00:03:93 :: false]
+2021/03/17 21:54:00 rtu: adding [00:03:93] as [1]
+2021/03/17 21:54:00 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:54:00 newmap is  map[{Apple 1}:137]
+2021/03/17 21:54:00 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:54:00 rtu: [00:01:ec :: false]
+2021/03/17 21:54:00 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:54:00 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:54:00 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:54:00 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:54:00 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:54:00 newmap is  map[{unknown 3}:87]
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:00 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:54:00 newmap is  map[{unknown 3}:87]
+2021/03/17 21:54:00 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:54:00 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:00 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:00 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:54:00 newmap is  map[{unknown 3}:87]
+2021/03/17 21:54:00 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:54:00 rtu: exiting
+2021/03/17 21:54:25 Starting rawToUids
+2021/03/17 21:54:25 rtu: initialized keepalive
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:54:25 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:54:25 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:54:25 newmap is  map[{unknown 0}:42]
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:25 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:54:25 newmap is  map[{unknown 0}:87]
+2021/03/17 21:54:25 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:54:25 Starting rawToUids
+2021/03/17 21:54:25 rtu: initialized keepalive
+2021/03/17 21:54:25 rtu: exiting
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:54:25 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:54:25 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:54:25 newmap is  map[{unknown 0}:42]
+2021/03/17 21:54:25 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:54:25 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:54:25 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:54:25 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:54:25 newmap is  map[{unknown 1}:137]
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:25 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:54:25 newmap is  map[{unknown 0}:87]
+2021/03/17 21:54:25 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:54:25 rtu: exiting
+2021/03/17 21:54:25 Starting rawToUids
+2021/03/17 21:54:25 rtu: initialized keepalive
+2021/03/17 21:54:25 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:54:25 rtu: [00:00:0F :: false]
+2021/03/17 21:54:25 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:54:25 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:54:25 newmap is  map[{Next 0}:42]
+2021/03/17 21:54:25 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:54:25 rtu: [00:03:93 :: false]
+2021/03/17 21:54:25 rtu: adding [00:03:93] as [1]
+2021/03/17 21:54:25 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:54:25 newmap is  map[{Apple 1}:137]
+2021/03/17 21:54:25 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:54:25 rtu: [00:01:ec :: false]
+2021/03/17 21:54:25 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:54:25 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:54:25 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:54:25 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:54:25 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:54:25 newmap is  map[{unknown 3}:87]
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:25 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:54:25 newmap is  map[{unknown 3}:87]
+2021/03/17 21:54:25 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:54:25 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:54:25 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:54:25 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:54:25 newmap is  map[{unknown 3}:87]
+2021/03/17 21:54:25 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:54:25 rtu: exiting
+2021/03/17 21:55:10 Starting rawToUids
+2021/03/17 21:55:10 rtu: initialized keepalive
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:55:10 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:55:10 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:55:10 newmap is  map[{unknown 0}:42]
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:55:10 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:55:10 newmap is  map[{unknown 0}:87]
+2021/03/17 21:55:10 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:55:10 rtu: exiting
+2021/03/17 21:55:10 Starting rawToUids
+2021/03/17 21:55:10 rtu: initialized keepalive
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:55:10 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:55:10 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:55:10 newmap is  map[{unknown 0}:42]
+2021/03/17 21:55:10 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:55:10 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:55:10 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:55:10 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:55:10 newmap is  map[{unknown 1}:137]
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:55:10 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:55:10 newmap is  map[{unknown 0}:87]
+2021/03/17 21:55:10 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:55:10 Starting rawToUids
+2021/03/17 21:55:10 rtu: initialized keepalive
+2021/03/17 21:55:10 rtu: exiting
+2021/03/17 21:55:10 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:55:10 rtu: [00:00:0F :: false]
+2021/03/17 21:55:10 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:55:10 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:55:10 newmap is  map[{Next 0}:42]
+2021/03/17 21:55:10 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:55:10 rtu: [00:03:93 :: false]
+2021/03/17 21:55:10 rtu: adding [00:03:93] as [1]
+2021/03/17 21:55:10 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:55:10 newmap is  map[{Apple 1}:137]
+2021/03/17 21:55:10 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:55:10 rtu: [00:01:ec :: false]
+2021/03/17 21:55:10 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:55:10 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:55:10 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:55:10 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:55:10 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:55:10 newmap is  map[{unknown 3}:87]
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:55:10 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:55:10 newmap is  map[{unknown 3}:87]
+2021/03/17 21:55:10 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:55:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:55:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:55:10 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:55:10 newmap is  map[{unknown 3}:87]
+2021/03/17 21:55:10 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:56:18 Starting rawToUids
+2021/03/17 21:56:18 rtu: initialized keepalive
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:56:18 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:56:18 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:56:18 newmap is  map[{unknown 0}:42]
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:56:18 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:56:18 newmap is  map[{unknown 0}:87]
+2021/03/17 21:56:18 rtu: exiting
+2021/03/17 21:56:18 Starting rawToUids
+2021/03/17 21:56:18 rtu: initialized keepalive
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:56:18 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:56:18 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:56:18 newmap is  map[{unknown 0}:42]
+2021/03/17 21:56:18 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:56:18 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:56:18 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:56:18 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:56:18 newmap is  map[{unknown 1}:137]
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:56:18 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:56:18 newmap is  map[{unknown 0}:87]
+2021/03/17 21:56:18 rtu: exiting
+2021/03/17 21:56:18 Starting rawToUids
+2021/03/17 21:56:18 rtu: initialized keepalive
+2021/03/17 21:56:18 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:56:18 rtu: [00:00:0F :: false]
+2021/03/17 21:56:18 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:56:18 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:56:18 newmap is  map[{Next 0}:42]
+2021/03/17 21:56:18 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:56:18 rtu: [00:03:93 :: false]
+2021/03/17 21:56:18 rtu: adding [00:03:93] as [1]
+2021/03/17 21:56:18 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:56:18 newmap is  map[{Apple 1}:137]
+2021/03/17 21:56:18 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:56:18 rtu: [00:01:ec :: false]
+2021/03/17 21:56:18 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:56:18 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:56:18 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:56:18 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:56:18 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:56:18 newmap is  map[{unknown 3}:87]
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:56:18 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:56:18 newmap is  map[{unknown 3}:87]
+2021/03/17 21:56:18 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:56:18 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:56:18 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:56:18 newmap is  map[{unknown 3}:87]
+2021/03/17 21:56:18 rtu: exiting
+2021/03/17 21:57:09 Starting rawToUids
+2021/03/17 21:57:09 rtu: initialized keepalive
+2021/03/17 21:57:09 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:57:09 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:57:09 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:57:09 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:57:09 newmap is  map[{unknown 0}:42]
+2021/03/17 21:57:09 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:57:09 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:09 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:09 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:57:09 newmap is  map[{unknown 0}:87]
+2021/03/17 21:57:09 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:57:09 rtu: exiting
+2021/03/17 21:57:09 Starting rawToUids
+2021/03/17 21:57:09 rtu: initialized keepalive
+2021/03/17 21:57:09 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:57:09 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:57:09 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:57:09 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:57:09 newmap is  map[{unknown 0}:42]
+2021/03/17 21:57:09 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:57:09 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:57:09 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:57:09 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:57:10 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:57:10 newmap is  map[{unknown 1}:137]
+2021/03/17 21:57:10 rtu: adding  {unknown 1}  to uniq/disco
+2021/03/17 21:57:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:10 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:57:10 newmap is  map[{unknown 0}:87]
+2021/03/17 21:57:10 rtu: adding  {unknown 0}  to uniq/disco
+2021/03/17 21:57:10 rtu: exiting
+2021/03/17 21:57:10 Starting rawToUids
+2021/03/17 21:57:10 rtu: initialized keepalive
+2021/03/17 21:57:10 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:57:10 rtu: [00:00:0F :: false]
+2021/03/17 21:57:10 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:57:10 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:57:10 newmap is  map[{Next 0}:42]
+2021/03/17 21:57:10 rtu: adding  {Next 0}  to uniq/disco
+2021/03/17 21:57:10 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:57:10 rtu: [00:03:93 :: false]
+2021/03/17 21:57:10 rtu: adding [00:03:93] as [1]
+2021/03/17 21:57:10 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:57:10 newmap is  map[{Apple 1}:137]
+2021/03/17 21:57:10 rtu: adding  {Apple 1}  to uniq/disco
+2021/03/17 21:57:10 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:57:10 rtu: [00:01:ec :: false]
+2021/03/17 21:57:10 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:57:10 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:57:10 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:57:10 rtu: adding  {Ericsson 2}  to uniq/disco
+2021/03/17 21:57:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:10 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:57:10 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:57:10 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:57:10 newmap is  map[{unknown 3}:87]
+2021/03/17 21:57:10 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:57:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:10 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:57:10 newmap is  map[{unknown 3}:87]
+2021/03/17 21:57:10 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:57:10 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:10 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:10 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:57:10 newmap is  map[{unknown 3}:87]
+2021/03/17 21:57:10 rtu: adding  {unknown 3}  to uniq/disco
+2021/03/17 21:57:37 Starting rawToUids
+2021/03/17 21:57:37 rtu: initialized keepalive
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:57:37 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:57:37 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:57:37 newmap is  map[{unknown 0}:42]
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:37 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:57:37 newmap is  map[{unknown 0}:87]
+2021/03/17 21:57:37 rtu: exiting
+2021/03/17 21:57:37 Starting rawToUids
+2021/03/17 21:57:37 rtu: initialized keepalive
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:57:37 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:57:37 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:57:37 newmap is  map[{unknown 0}:42]
+2021/03/17 21:57:37 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:57:37 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:57:37 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:57:37 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:57:37 newmap is  map[{unknown 1}:137]
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:37 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:57:37 newmap is  map[{unknown 0}:87]
+2021/03/17 21:57:37 rtu: exiting
+2021/03/17 21:57:37 Starting rawToUids
+2021/03/17 21:57:37 rtu: initialized keepalive
+2021/03/17 21:57:37 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:57:37 rtu: [00:00:0F :: false]
+2021/03/17 21:57:37 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:57:37 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:57:37 newmap is  map[{Next 0}:42]
+2021/03/17 21:57:37 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:57:37 rtu: [00:03:93 :: false]
+2021/03/17 21:57:37 rtu: adding [00:03:93] as [1]
+2021/03/17 21:57:37 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:57:37 newmap is  map[{Apple 1}:137]
+2021/03/17 21:57:37 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:57:37 rtu: [00:01:ec :: false]
+2021/03/17 21:57:37 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:57:37 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:57:37 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:57:37 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:57:37 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:57:37 newmap is  map[{unknown 3}:87]
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:37 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:57:37 newmap is  map[{unknown 3}:87]
+2021/03/17 21:57:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:57:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:57:38 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:57:38 newmap is  map[{unknown 3}:87]
+2021/03/17 21:58:54 Starting rawToUids
+2021/03/17 21:58:54 rtu: initialized keepalive
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:58:54 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:58:54 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:58:54 newmap is  map[{unknown 0}:42]
+2021/03/17 21:58:54 looking for  {unknown 0}  in uniq
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:58:54 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:58:54 newmap is  map[{unknown 0}:87]
+2021/03/17 21:58:54 looking for  {unknown 0}  in uniq
+2021/03/17 21:58:54 rtu: exiting
+2021/03/17 21:58:54 Starting rawToUids
+2021/03/17 21:58:54 rtu: initialized keepalive
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:58:54 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 21:58:54 rtu: newmap  {unknown 0}  to  42
+2021/03/17 21:58:54 newmap is  map[{unknown 0}:42]
+2021/03/17 21:58:54 looking for  {unknown 0}  in uniq
+2021/03/17 21:58:54 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 21:58:54 rtu: [be:ef:ca:fe :: false]
+2021/03/17 21:58:54 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 21:58:54 rtu: newmap  {unknown 1}  to  137
+2021/03/17 21:58:54 newmap is  map[{unknown 1}:137]
+2021/03/17 21:58:54 looking for  {unknown 0}  in uniq
+2021/03/17 21:58:54 {unknown 0}  not found, bumping to 1
+2021/03/17 21:58:54 looking for  {unknown 1}  in uniq
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:58:54 rtu: newmap  {unknown 0}  to  87
+2021/03/17 21:58:54 newmap is  map[{unknown 0}:87]
+2021/03/17 21:58:54 looking for  {unknown 0}  in uniq
+2021/03/17 21:58:54 looking for  {unknown 1}  in uniq
+2021/03/17 21:58:54 {unknown 1}  not found, bumping to 1
+2021/03/17 21:58:54 rtu: exiting
+2021/03/17 21:58:54 Starting rawToUids
+2021/03/17 21:58:54 rtu: initialized keepalive
+2021/03/17 21:58:54 rtu: received map:  map[00:00:0F:42]
+2021/03/17 21:58:54 rtu: [00:00:0F :: false]
+2021/03/17 21:58:54 rtu: adding [00:00:0F] as [0]
+2021/03/17 21:58:54 rtu: newmap  {Next 0}  to  42
+2021/03/17 21:58:54 newmap is  map[{Next 0}:42]
+2021/03/17 21:58:54 looking for  {Next 0}  in uniq
+2021/03/17 21:58:54 rtu: received map:  map[00:03:93:137]
+2021/03/17 21:58:54 rtu: [00:03:93 :: false]
+2021/03/17 21:58:54 rtu: adding [00:03:93] as [1]
+2021/03/17 21:58:54 rtu: newmap  {Apple 1}  to  137
+2021/03/17 21:58:54 newmap is  map[{Apple 1}:137]
+2021/03/17 21:58:54 looking for  {Next 0}  in uniq
+2021/03/17 21:58:54 {Next 0}  not found, bumping to 1
+2021/03/17 21:58:54 looking for  {Apple 1}  in uniq
+2021/03/17 21:58:54 rtu: received map:  map[00:01:ec:4]
+2021/03/17 21:58:54 rtu: [00:01:ec :: false]
+2021/03/17 21:58:54 rtu: adding [00:01:ec] as [2]
+2021/03/17 21:58:54 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 21:58:54 newmap is  map[{Ericsson 2}:4]
+2021/03/17 21:58:54 looking for  {Ericsson 2}  in uniq
+2021/03/17 21:58:54 looking for  {Next 0}  in uniq
+2021/03/17 21:58:54 {Next 0}  not found, bumping to 2
+2021/03/17 21:58:54 looking for  {Apple 1}  in uniq
+2021/03/17 21:58:54 {Apple 1}  not found, bumping to 1
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: false]
+2021/03/17 21:58:54 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 21:58:54 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:58:54 newmap is  map[{unknown 3}:87]
+2021/03/17 21:58:54 looking for  {Apple 1}  in uniq
+2021/03/17 21:58:54 {Apple 1}  not found, bumping to 2
+2021/03/17 21:58:54 looking for  {Ericsson 2}  in uniq
+2021/03/17 21:58:54 {Ericsson 2}  not found, bumping to 1
+2021/03/17 21:58:54 looking for  {unknown 3}  in uniq
+2021/03/17 21:58:54 looking for  {Next 0}  in uniq
+2021/03/17 21:58:54 {Next 0}  not found, bumping to 3
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:58:54 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:58:54 newmap is  map[{unknown 3}:87]
+2021/03/17 21:58:54 looking for  {Next 0}  in uniq
+2021/03/17 21:58:54 {Next 0}  not found, bumping to 4
+2021/03/17 21:58:54 looking for  {Apple 1}  in uniq
+2021/03/17 21:58:54 {Apple 1}  not found, bumping to 3
+2021/03/17 21:58:54 looking for  {Ericsson 2}  in uniq
+2021/03/17 21:58:54 {Ericsson 2}  not found, bumping to 2
+2021/03/17 21:58:54 looking for  {unknown 3}  in uniq
+2021/03/17 21:58:54 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 21:58:54 rtu: [de:ad:be:ef :: true]
+2021/03/17 21:58:54 rtu: newmap  {unknown 3}  to  87
+2021/03/17 21:58:54 newmap is  map[{unknown 3}:87]
+2021/03/17 21:58:54 looking for  {unknown 3}  in uniq
+2021/03/17 21:58:54 looking for  {Next 0}  in uniq
+2021/03/17 21:58:54 {Next 0}  not found, bumping to 5
+2021/03/17 21:58:54 looking for  {Apple 1}  in uniq
+2021/03/17 21:58:54 {Apple 1}  not found, bumping to 4
+2021/03/17 21:58:54 looking for  {Ericsson 2}  in uniq
+2021/03/17 21:58:54 {Ericsson 2}  not found, bumping to 3
+2021/03/17 21:58:54 rtu: exiting
+2021/03/17 22:03:37 Starting rawToUids
+2021/03/17 22:03:37 rtu: initialized keepalive
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:03:37 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 22:03:37 rtu: newmap  {unknown 0}  to  42
+2021/03/17 22:03:37 newmap is  map[{unknown 0}:42]
+2021/03/17 22:03:37 looking for  {unknown 0}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:03:37 rtu: newmap  {unknown 0}  to  87
+2021/03/17 22:03:37 newmap is  map[{unknown 0}:87]
+2021/03/17 22:03:37 looking for  {unknown 0}  in uniq
+2021/03/17 22:03:37 rtu: exiting
+2021/03/17 22:03:37 Starting rawToUids
+2021/03/17 22:03:37 rtu: initialized keepalive
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:03:37 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 22:03:37 rtu: newmap  {unknown 0}  to  42
+2021/03/17 22:03:37 newmap is  map[{unknown 0}:42]
+2021/03/17 22:03:37 looking for  {unknown 0}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 22:03:37 rtu: [be:ef:ca:fe :: false]
+2021/03/17 22:03:37 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 22:03:37 rtu: newmap  {unknown 1}  to  137
+2021/03/17 22:03:37 newmap is  map[{unknown 1}:137]
+2021/03/17 22:03:37 looking for  {unknown 0}  in uniq
+2021/03/17 22:03:37 looking for  {unknown 1}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:03:37 rtu: newmap  {unknown 0}  to  87
+2021/03/17 22:03:37 newmap is  map[{unknown 0}:87]
+2021/03/17 22:03:37 looking for  {unknown 0}  in uniq
+2021/03/17 22:03:37 looking for  {unknown 1}  in uniq
+2021/03/17 22:03:37 rtu: exiting
+2021/03/17 22:03:37 Starting rawToUids
+2021/03/17 22:03:37 rtu: initialized keepalive
+2021/03/17 22:03:37 rtu: received map:  map[00:00:0F:42]
+2021/03/17 22:03:37 rtu: [00:00:0F :: false]
+2021/03/17 22:03:37 rtu: adding [00:00:0F] as [0]
+2021/03/17 22:03:37 rtu: newmap  {Next 0}  to  42
+2021/03/17 22:03:37 newmap is  map[{Next 0}:42]
+2021/03/17 22:03:37 looking for  {Next 0}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[00:03:93:137]
+2021/03/17 22:03:37 rtu: [00:03:93 :: false]
+2021/03/17 22:03:37 rtu: adding [00:03:93] as [1]
+2021/03/17 22:03:37 rtu: newmap  {Apple 1}  to  137
+2021/03/17 22:03:37 newmap is  map[{Apple 1}:137]
+2021/03/17 22:03:37 looking for  {Next 0}  in uniq
+2021/03/17 22:03:37 looking for  {Apple 1}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[00:01:ec:4]
+2021/03/17 22:03:37 rtu: [00:01:ec :: false]
+2021/03/17 22:03:37 rtu: adding [00:01:ec] as [2]
+2021/03/17 22:03:37 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 22:03:37 newmap is  map[{Ericsson 2}:4]
+2021/03/17 22:03:37 looking for  {Next 0}  in uniq
+2021/03/17 22:03:37 looking for  {Apple 1}  in uniq
+2021/03/17 22:03:37 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:03:37 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 22:03:37 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:03:37 newmap is  map[{unknown 3}:87]
+2021/03/17 22:03:37 looking for  {unknown 3}  in uniq
+2021/03/17 22:03:37 looking for  {Next 0}  in uniq
+2021/03/17 22:03:37 looking for  {Apple 1}  in uniq
+2021/03/17 22:03:37 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:03:37 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:03:37 newmap is  map[{unknown 3}:87]
+2021/03/17 22:03:37 looking for  {unknown 3}  in uniq
+2021/03/17 22:03:37 looking for  {Next 0}  in uniq
+2021/03/17 22:03:37 looking for  {Apple 1}  in uniq
+2021/03/17 22:03:37 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:03:37 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:03:37 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:03:37 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:03:37 newmap is  map[{unknown 3}:87]
+2021/03/17 22:03:37 looking for  {Next 0}  in uniq
+2021/03/17 22:03:37 looking for  {Apple 1}  in uniq
+2021/03/17 22:03:37 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:03:37 looking for  {unknown 3}  in uniq
+2021/03/17 22:03:37 rtu: exiting
+2021/03/17 22:06:48 Starting rawToUids
+2021/03/17 22:06:48 rtu: initialized keepalive
+2021/03/17 22:06:48 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 22:06:48 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:06:48 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 22:06:48 rtu: newmap  {unknown 0}  to  42
+2021/03/17 22:06:48 newmap is  map[{unknown 0}:42]
+2021/03/17 22:06:48 looking for  {unknown 0}  in uniq
+2021/03/17 22:06:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:06:48 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:06:48 rtu: newmap  {unknown 0}  to  87
+2021/03/17 22:06:48 newmap is  map[{unknown 0}:87]
+2021/03/17 22:06:48 looking for  {unknown 0}  in uniq
+2021/03/17 22:06:48 rtu: exiting
+2021/03/17 22:06:48 Starting rawToUids
+2021/03/17 22:06:48 rtu: initialized keepalive
+2021/03/17 22:06:48 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 22:06:48 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:06:48 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 22:06:48 rtu: newmap  {unknown 0}  to  42
+2021/03/17 22:06:48 newmap is  map[{unknown 0}:42]
+2021/03/17 22:06:48 looking for  {unknown 0}  in uniq
+2021/03/17 22:06:48 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 22:06:48 rtu: [be:ef:ca:fe :: false]
+2021/03/17 22:06:48 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 22:06:48 rtu: newmap  {unknown 1}  to  137
+2021/03/17 22:06:48 newmap is  map[{unknown 1}:137]
+2021/03/17 22:06:48 looking for  {unknown 0}  in uniq
+2021/03/17 22:06:48 looking for  {unknown 1}  in uniq
+2021/03/17 22:06:48 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:06:48 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:06:49 rtu: newmap  {unknown 0}  to  87
+2021/03/17 22:06:49 newmap is  map[{unknown 0}:87]
+2021/03/17 22:06:49 looking for  {unknown 0}  in uniq
+2021/03/17 22:06:49 looking for  {unknown 1}  in uniq
+2021/03/17 22:06:49 rtu: exiting
+2021/03/17 22:06:49 Starting rawToUids
+2021/03/17 22:06:49 rtu: initialized keepalive
+2021/03/17 22:06:49 rtu: received map:  map[00:00:0F:42]
+2021/03/17 22:06:49 rtu: [00:00:0F :: false]
+2021/03/17 22:06:49 rtu: adding [00:00:0F] as [0]
+2021/03/17 22:06:49 rtu: newmap  {Next 0}  to  42
+2021/03/17 22:06:49 newmap is  map[{Next 0}:42]
+2021/03/17 22:06:49 looking for  {Next 0}  in uniq
+2021/03/17 22:06:49 rtu: received map:  map[00:03:93:137]
+2021/03/17 22:06:49 rtu: [00:03:93 :: false]
+2021/03/17 22:06:49 rtu: adding [00:03:93] as [1]
+2021/03/17 22:06:49 rtu: newmap  {Apple 1}  to  137
+2021/03/17 22:06:49 newmap is  map[{Apple 1}:137]
+2021/03/17 22:06:49 looking for  {Next 0}  in uniq
+2021/03/17 22:06:49 looking for  {Apple 1}  in uniq
+2021/03/17 22:06:49 rtu: received map:  map[00:01:ec:4]
+2021/03/17 22:06:49 rtu: [00:01:ec :: false]
+2021/03/17 22:06:49 rtu: adding [00:01:ec] as [2]
+2021/03/17 22:06:49 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 22:06:49 newmap is  map[{Ericsson 2}:4]
+2021/03/17 22:06:49 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:06:49 looking for  {Next 0}  in uniq
+2021/03/17 22:06:49 looking for  {Apple 1}  in uniq
+2021/03/17 22:06:49 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:06:49 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:06:49 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 22:06:49 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:06:49 newmap is  map[{unknown 3}:87]
+2021/03/17 22:06:49 looking for  {Next 0}  in uniq
+2021/03/17 22:06:49 looking for  {Apple 1}  in uniq
+2021/03/17 22:06:49 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:06:49 looking for  {unknown 3}  in uniq
+2021/03/17 22:06:49 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:06:49 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:06:49 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:06:49 newmap is  map[{unknown 3}:87]
+2021/03/17 22:06:49 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:06:49 looking for  {unknown 3}  in uniq
+2021/03/17 22:06:49 looking for  {Next 0}  in uniq
+2021/03/17 22:06:49 looking for  {Apple 1}  in uniq
+2021/03/17 22:06:49 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:06:49 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:06:49 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:06:49 newmap is  map[{unknown 3}:87]
+2021/03/17 22:06:49 looking for  {Apple 1}  in uniq
+2021/03/17 22:06:49 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:06:49 looking for  {unknown 3}  in uniq
+2021/03/17 22:06:49 looking for  {Next 0}  in uniq
+2021/03/17 22:06:49 rtu: exiting
+2021/03/17 22:07:36 Starting rawToUids
+2021/03/17 22:07:36 rtu: initialized keepalive
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:07:36 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 22:07:36 rtu: newmap  {unknown 0}  to  42
+2021/03/17 22:07:36 newmap is  map[{unknown 0}:42]
+2021/03/17 22:07:36 looking for  {unknown 0}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:07:36 rtu: newmap  {unknown 0}  to  87
+2021/03/17 22:07:36 newmap is  map[{unknown 0}:87]
+2021/03/17 22:07:36 looking for  {unknown 0}  in uniq
+2021/03/17 22:07:36 rtu: exiting
+2021/03/17 22:07:36 Starting rawToUids
+2021/03/17 22:07:36 rtu: initialized keepalive
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:42]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:07:36 rtu: adding [de:ad:be:ef] as [0]
+2021/03/17 22:07:36 rtu: newmap  {unknown 0}  to  42
+2021/03/17 22:07:36 newmap is  map[{unknown 0}:42]
+2021/03/17 22:07:36 looking for  {unknown 0}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[be:ef:ca:fe:137]
+2021/03/17 22:07:36 rtu: [be:ef:ca:fe :: false]
+2021/03/17 22:07:36 rtu: adding [be:ef:ca:fe] as [1]
+2021/03/17 22:07:36 rtu: newmap  {unknown 1}  to  137
+2021/03/17 22:07:36 newmap is  map[{unknown 1}:137]
+2021/03/17 22:07:36 looking for  {unknown 0}  in uniq
+2021/03/17 22:07:36 looking for  {unknown 1}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:07:36 rtu: newmap  {unknown 0}  to  87
+2021/03/17 22:07:36 newmap is  map[{unknown 0}:87]
+2021/03/17 22:07:36 looking for  {unknown 0}  in uniq
+2021/03/17 22:07:36 looking for  {unknown 1}  in uniq
+2021/03/17 22:07:36 rtu: exiting
+2021/03/17 22:07:36 Starting rawToUids
+2021/03/17 22:07:36 rtu: initialized keepalive
+2021/03/17 22:07:36 rtu: received map:  map[00:00:0F:42]
+2021/03/17 22:07:36 rtu: [00:00:0F :: false]
+2021/03/17 22:07:36 rtu: adding [00:00:0F] as [0]
+2021/03/17 22:07:36 rtu: newmap  {Next 0}  to  42
+2021/03/17 22:07:36 newmap is  map[{Next 0}:42]
+2021/03/17 22:07:36 looking for  {Next 0}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[00:03:93:137]
+2021/03/17 22:07:36 rtu: [00:03:93 :: false]
+2021/03/17 22:07:36 rtu: adding [00:03:93] as [1]
+2021/03/17 22:07:36 rtu: newmap  {Apple 1}  to  137
+2021/03/17 22:07:36 newmap is  map[{Apple 1}:137]
+2021/03/17 22:07:36 looking for  {Apple 1}  in uniq
+2021/03/17 22:07:36 looking for  {Next 0}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[00:01:ec:4]
+2021/03/17 22:07:36 rtu: [00:01:ec :: false]
+2021/03/17 22:07:36 rtu: adding [00:01:ec] as [2]
+2021/03/17 22:07:36 rtu: newmap  {Ericsson 2}  to  4
+2021/03/17 22:07:36 newmap is  map[{Ericsson 2}:4]
+2021/03/17 22:07:36 looking for  {Next 0}  in uniq
+2021/03/17 22:07:36 looking for  {Apple 1}  in uniq
+2021/03/17 22:07:36 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: false]
+2021/03/17 22:07:36 rtu: adding [de:ad:be:ef] as [3]
+2021/03/17 22:07:36 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:07:36 newmap is  map[{unknown 3}:87]
+2021/03/17 22:07:36 looking for  {Next 0}  in uniq
+2021/03/17 22:07:36 looking for  {Apple 1}  in uniq
+2021/03/17 22:07:36 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:07:36 looking for  {unknown 3}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:07:36 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:07:36 newmap is  map[{unknown 3}:87]
+2021/03/17 22:07:36 looking for  {Next 0}  in uniq
+2021/03/17 22:07:36 looking for  {Apple 1}  in uniq
+2021/03/17 22:07:36 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:07:36 looking for  {unknown 3}  in uniq
+2021/03/17 22:07:36 rtu: received map:  map[de:ad:be:ef:87]
+2021/03/17 22:07:36 rtu: [de:ad:be:ef :: true]
+2021/03/17 22:07:36 rtu: newmap  {unknown 3}  to  87
+2021/03/17 22:07:36 newmap is  map[{unknown 3}:87]
+2021/03/17 22:07:36 looking for  {Apple 1}  in uniq
+2021/03/17 22:07:36 looking for  {Ericsson 2}  in uniq
+2021/03/17 22:07:36 looking for  {unknown 3}  in uniq
+2021/03/17 22:07:36 looking for  {Next 0}  in uniq
+2021/03/17 22:07:36 rtu: exiting

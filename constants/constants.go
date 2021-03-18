@@ -11,5 +11,7 @@ const ExitNoUsername = -100
 const ExitNoPassword = -101
 
 const ConfigPath = "/etc/session-counter/config.yaml"
-const TokenPath = "/etc/session-counter/access-token.yaml"
-const TokenEnvKey = "ACCESSTOKEN"
+const AuthPath = "/etc/session-counter/auth.yaml"
+
+const AuthTokenKey = "AUTHTOKEN"
+const AuthEmailKey = "AUTHEMAIL"

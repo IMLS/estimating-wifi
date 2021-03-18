@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"log"
@@ -160,7 +161,7 @@ func reportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]mode
 			log.Println("reporting: ", count)
 			// Try and grab the token from the OS Env.
 			// It would have been set if we found it in a global config file.
-			accessKey := os.Getenv(constants.TokenEnvKey)
+			accessKey := os.Getenv(constants.AuthTokenKey)
 			tok := &model.Token{}
 			if len(accessKey) > 1 {
 				tok.Data.AccessToken = accessKey
@@ -272,6 +273,111 @@ func ringBuffer(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, 
 	}
 }
 
+func rawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, out chan<- map[model.UserMapping]int, kill <-chan bool) {
+	log.Println("Starting rawToUids")
+
+	// This is an odd construct to facilitate unit testing.
+	var ping chan interface{} = nil
+	var pong chan interface{} = nil
+	if kill == nil {
+		ping, pong = ka.Subscribe("rawToUids", 5)
+	}
+	log.Println("rtu: initialized keepalive")
+
+	macToNdx := make(map[string]int)
+	ndxToMac := make(map[int]string)
+
+	// The ndx, or nextId, needs to be maintained as a "monotonically increasing"
+	// value for the life of a session-counter run.
+	nextId := 0
+	// To track who has overstayed their disconnection window.
+	uniq := make(map[model.UserMapping]int)
+	disco := make(map[model.UserMapping]int)
+
+	for {
+		select {
+		case <-kill:
+			log.Println("rtu: exiting")
+			return
+		case <-ping:
+			pong <- "rawToUids"
+		case m := <-in:
+			log.Println("rtu: received map: ", m)
+			// For each incoming address, decide if it is already in our map.
+			// If it is, do nothing. If not, give that mac address a new id.
+			for addr := range m {
+				_, found := macToNdx[addr]
+				log.Printf("rtu: [%v :: %v]\n", addr, found)
+				if !found {
+					log.Printf("rtu: adding [%v] as [%v]\n", addr, nextId)
+					macToNdx[addr] = nextId
+					nextId += 1
+				}
+			}
+			// Now, build a new mapping for sending down the pipeline.
+			// That mapping will be their user id and the device manufacturer
+			// and we will keep the "count" of the number of packets that WS saw.
+			// That number is probably not meaningful, but we'll hold it for a moment.
+			newMapping := make(map[model.UserMapping]int)
+
+			for oldaddr, v := range m {
+				mfg := api.Mac_to_mfg(cfg, oldaddr)
+				um := model.UserMapping{Mfg: mfg, Id: macToNdx[oldaddr]}
+				log.Println("rtu: newmap ", um, " to ", v)
+				newMapping[um] = v
+				// If you just arrived to be mapped, you by
+				// definition have a 0 uniqueness window ticker
+				// and a 0 disco ticker.
+				uniq[um] = 0
+				disco[um] = 0
+			}
+
+			// Everyone we do *not* see has their time bumped.
+			// Everyone we see has their uniqueness timeout set to 0.
+			// And, their disconnect timeout must necessarily be reset as well.
+			log.Println("newmap is ", newMapping)
+			for k := range uniq {
+				log.Println("looking for ", k, " in uniq")
+				_, here := newMapping[k]
+				if !here {
+					uniq[k] = uniq[k] + 1
+					disco[k] = disco[k] + 1
+				}
+			}
+
+			// Now, we have to do some munging. A new map is needed.
+			sendmap := make(map[model.UserMapping]int)
+			for k, v := range uniq {
+				sendmap[k] = v
+			}
+
+			// Anyone who timed out should not be communicated in the sendmap.
+			for k, v := range disco {
+				if v > cfg.Monitoring.DisconnectionWindow {
+					delete(sendmap, k)
+				}
+			}
+
+			// And, if anyone overstays their uniqueness,
+			// complettely remove them.
+			for k, v := range uniq {
+				if v > cfg.Monitoring.UniquenessWindow {
+					delete(sendmap, k)
+					delete(disco, k)
+					delete(uniq, k)
+					// And, clean up the other state we have lying around
+					addr := ndxToMac[k.Id]
+					delete(ndxToMac, k.Id)
+					delete(macToNdx, addr)
+				}
+			}
+
+			out <- sendmap
+
+		}
+	}
+}
+
 /* FUNC checkEnvVars
  * Checks to see if the username and password for
  * working with Directus is in memory.
@@ -308,7 +414,7 @@ func parseConfigFile(filepath string) (*model.Config, error) {
 	} else {
 		log.Printf("parseConfigFile: could not find config: %v\n", filepath)
 	}
-	return nil, fmt.Errorf("config: could not find config file [%v]\n", filepath)
+	return nil, fmt.Errorf("config: could not find config file [%v]", filepath)
 }
 func devConfig() *model.Config {
 	checkEnvVars()
@@ -323,25 +429,25 @@ func devConfig() *model.Config {
 	return cfg
 }
 
-func readToken() (*model.AccessToken, error) {
-	_, err := os.Stat(constants.TokenPath)
+func readAuth() (*model.Auth, error) {
+	_, err := os.Stat(constants.AuthPath)
 	if err != nil {
-		return &model.AccessToken{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.TokenPath)
+		return &model.Auth{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.AuthPath)
 	}
 
-	f, err := os.Open(constants.TokenPath)
+	f, err := os.Open(constants.AuthPath)
 	if err != nil {
 		log.Fatal("readToken: could not open token file. Exiting.")
 	}
 	defer f.Close()
-	var accessToken *model.AccessToken
+	var auth *model.Auth
 	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(&accessToken)
+	err = decoder.Decode(&auth)
 	if err != nil {
 		log.Fatalf("readToken: could not decode YAML:\n%v\n", err)
 	}
 
-	return accessToken, nil
+	return auth, nil
 }
 
 func readConfig() *model.Config {
@@ -361,12 +467,13 @@ func readConfig() *model.Config {
 		return devConfig()
 	}
 
-	token, err := readToken()
+	auth, err := readAuth()
 	if err != nil {
 		log.Fatal("readConfig: cannot find auth token")
 	}
 
-	os.Setenv(constants.TokenEnvKey, token.Token)
+	os.Setenv(constants.AuthTokenKey, auth.Token)
+	os.Setenv(constants.AuthEmailKey, auth.Email)
 	return cfg
 }
 
@@ -377,7 +484,8 @@ func run(ka *csp.Keepalive, cfg *model.Config) {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan map[string]int)
 	ch_macs_counted := make(chan map[string]int)
-	mfg := make(chan map[string]model.Entry)
+	ch_mfg := make(chan map[string]model.Entry)
+	ch_uniq := make(chan map[model.UserMapping]int)
 
 	// Run the process network.
 	// Driven by a 1s `tick` process.
@@ -386,8 +494,10 @@ func run(ka *csp.Keepalive, cfg *model.Config) {
 	go tockEveryN(ka, 60, ch_sec, ch_nsec)
 	go runWireshark(ka, cfg, ch_nsec, ch_macs)
 	go ringBuffer(ka, cfg, ch_macs, ch_macs_counted)
-	go macToEntry(ka, cfg, ch_macs_counted, mfg)
-	go reportMap(ka, cfg, mfg)
+	// ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, remove <-chan int, out chan<- map[model.UserMapping]int
+	go rawToUids(ka, cfg, ch_macs, ch_uniq, nil)
+	go macToEntry(ka, cfg, ch_macs_counted, ch_mfg)
+	go reportMap(ka, cfg, ch_mfg)
 }
 
 func keepalive(ka *csp.Keepalive, cfg *model.Config) {
@@ -400,9 +510,22 @@ func keepalive(ka *csp.Keepalive, cfg *model.Config) {
 	}
 }
 
-func main() {
+func calcSessionId() string {
+	h := sha256.New()
+	email := os.Getenv(constants.AuthEmailKey)
+	// FIXME: Use the email instead of the token.
+	// Guaranteed to be unique. Current time along with our auth token, hashed.
+	h.Write([]byte(fmt.Sprintf("%v%x", time.Now(), email)))
+	sid := fmt.Sprintf("%x", h.Sum(nil))
+	log.Println("Session id: ", sid)
+	return sid
+}
 
+func main() {
+	// Read in a config
 	cfg := readConfig()
+	// Add a "sessionId" to the mix.
+	cfg.SessionId = calcSessionId()
 
 	ka := csp.NewKeepalive()
 	go ka.Start()

@@ -48,7 +48,8 @@ func Mac_to_mfg(cfg *model.Config, mac string) string {
 			// Close the rows down, too...
 			// Another possible leak?
 			if err != nil {
-				log.Printf("Manufactuerer query failed: %s", q)
+				log.Println(err)
+				log.Printf("manufactuerer not found: %s", q)
 			} else {
 				var id string
 
