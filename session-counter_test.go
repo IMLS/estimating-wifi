@@ -7,6 +7,7 @@ import (
 
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/session-counter/tlp"
 )
 
 const PASS = true
@@ -170,7 +171,7 @@ func TestRawToUid(t *testing.T) {
 			defer wg.Done()
 		}()
 
-		go rawToUids(ka, cfg, ch_macs, ch_uniq, ch_poison)
+		go tlp.RawToUids(ka, cfg, ch_macs, ch_uniq, ch_poison)
 
 		wg.Add(1)
 		go func() {
