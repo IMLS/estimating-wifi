@@ -52,7 +52,7 @@ func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			// FIXME: Traversing in order, primarily for consistency in testing.
 			// This should not be a big enough performance issue to matter for production.
 			sortedaddrs := make([]string, 0)
-			for k, _ := range m {
+			for k := range m {
 				sortedaddrs = append(sortedaddrs, k)
 			}
 			sort.Strings(sortedaddrs)
