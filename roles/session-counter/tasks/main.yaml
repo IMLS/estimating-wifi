@@ -38,5 +38,5 @@
     mode: '0644'
     force: no
   loop:
-    - access-token.yaml
+    - auth.yaml
   become: yes

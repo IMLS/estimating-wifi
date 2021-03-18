@@ -25,11 +25,11 @@
 # (Short of catestrophic errors/failures.)
 - name: do we find an ralink adapter?
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --descriptor exists"
+    cmd: "{{ findralink.bin }} --exists"
   register: ralink_exists
   become: yes
 
-- name: check
+- name: check ... not done...
   debug: 
     msg: "{{ ralink_exists.stdout }}"
 
