@@ -2,6 +2,20 @@ monitoring:
   pinginterval: 10
   max_http_error_count: 10
   http_error_interval_mins: 60
+  uniqueness_window: 10
+  disconnection_window: 5
+# For the next update...
+# servers:
+#   directus:
+#     host: directus-demo.app.cloud.gov
+#     authpath: auth/login/
+#     user: email
+#     pass: password
+#   reval:
+#     host: 10x-rabbit-demo.app.cloud.gov
+#     authpath: api-token-auth/
+#     user: username
+#     pass: password
 server:
   scheme: https
   host: directus-demo.app.cloud.gov

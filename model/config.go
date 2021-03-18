@@ -5,6 +5,8 @@ type Config struct {
 		PingInterval          int `yaml:"pinginterval"`
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
 		HTTPErrorIntervalMins int `yaml:"http_error_interval_mins"`
+		UniquenessWindow      int `yaml:"uniqueness_window"`
+		DisconnectionWindow   int `yaml:"disconnection_window"`
 	} `yaml:"monitoring"`
 	Server struct {
 		Scheme     string `yaml:"scheme"`
@@ -21,4 +23,5 @@ type Config struct {
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
+	SessionId string
 }
