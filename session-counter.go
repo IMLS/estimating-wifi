@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -281,8 +282,8 @@ func rawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 	var pong chan interface{} = nil
 	if kill == nil {
 		ping, pong = ka.Subscribe("rawToUids", 5)
+		log.Println("rtu: initialized keepalive")
 	}
-	log.Println("rtu: initialized keepalive")
 
 	macToNdx := make(map[string]int)
 	ndxToMac := make(map[int]string)
@@ -302,14 +303,15 @@ func rawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 		case <-ping:
 			pong <- "rawToUids"
 		case m := <-in:
-			log.Println("rtu: received map: ", m)
+			// log.Println("rtu: received map: ", m)
 			// For each incoming address, decide if it is already in our map.
 			// If it is, do nothing. If not, give that mac address a new id.
 			for addr := range m {
+				addr = strings.ToLower(addr)
 				_, found := macToNdx[addr]
-				log.Printf("rtu: [%v :: %v]\n", addr, found)
+				// log.Printf("rtu: [%v :: %v]\n", addr, found)
 				if !found {
-					log.Printf("rtu: adding [%v] as [%v]\n", addr, nextId)
+					// log.Printf("rtu: adding [%v] as [%v]\n", addr, nextId)
 					macToNdx[addr] = nextId
 					nextId += 1
 				}
@@ -323,7 +325,7 @@ func rawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			for oldaddr, v := range m {
 				mfg := api.Mac_to_mfg(cfg, oldaddr)
 				um := model.UserMapping{Mfg: mfg, Id: macToNdx[oldaddr]}
-				log.Println("rtu: newmap ", um, " to ", v)
+				// log.Println("rtu: newmap ", um, " to ", v)
 				newMapping[um] = v
 				// If you just arrived to be mapped, you by
 				// definition have a 0 uniqueness window ticker
@@ -335,9 +337,9 @@ func rawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			// Everyone we do *not* see has their time bumped.
 			// Everyone we see has their uniqueness timeout set to 0.
 			// And, their disconnect timeout must necessarily be reset as well.
-			log.Println("newmap is ", newMapping)
+			// log.Println("newmap is ", newMapping)
 			for k := range uniq {
-				log.Println("looking for ", k, " in uniq")
+				// log.Println("looking for ", k, " in uniq")
 				_, here := newMapping[k]
 				if !here {
 					uniq[k] = uniq[k] + 1
@@ -362,6 +364,7 @@ func rawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			// complettely remove them.
 			for k, v := range uniq {
 				if v > cfg.Monitoring.UniquenessWindow {
+					log.Printf("%v [%v] no longer uniq\n", k, v)
 					delete(sendmap, k)
 					delete(disco, k)
 					delete(uniq, k)

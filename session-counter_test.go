@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"sync"
 	"testing"
 
@@ -75,16 +73,64 @@ var tests = []struct {
 			{Mfg: "unknown", Id: 3}:  0,
 		},
 	},
+
+	// Next times out, because it is considered to
+	// have "disconnected" after 5 minutes.
+	{PASS, 10, 5,
+		[]map[string]int{
+			{"00:00:0F": 42},  // Next
+			{"00:03:93": 137}, // Apple
+			{"00:01:ec": 4},   // Eriksson
+		},
+		[]map[string]int{
+			{"de:ad:be:ef": 87},
+			{"de:ad:be:ef": 87},
+			{"de:ad:be:ef": 87},
+			{"de:ad:be:ef": 87},
+		},
+		// Why zero and one?
+		// Zero for deadbeef, because we send it in the loop.
+		// One for beefcafe, because it was only sent once, and
+		// one tick goes by.
+		map[model.UserMapping]int{
+			{Mfg: "Apple", Id: 1}:    5,
+			{Mfg: "Ericsson", Id: 2}: 4,
+			{Mfg: "unknown", Id: 3}:  0,
+		},
+	},
+
+	// Next times out, comes back. Still ID 0.
+	// Apple is considered to have disconnected.
+	{PASS, 10, 5,
+		[]map[string]int{
+			{"00:00:0f": 42},  // Next
+			{"00:03:93": 137}, // Apple
+			{"00:01:ec": 4},   // Eriksson
+		},
+		[]map[string]int{
+			{"de:ad:be:ef": 87},
+			{"de:ad:be:ef": 87},
+			{"de:ad:be:ef": 87},
+			{"de:ad:be:ef": 87},
+			{"00:00:0f": 4},
+		},
+		// Why zero and one?
+		// Zero for deadbeef, because we send it in the loop.
+		// One for beefcafe, because it was only sent once, and
+		// one tick goes by.
+		map[model.UserMapping]int{
+			{Mfg: "Next", Id: 0}:     0,
+			{Mfg: "Ericsson", Id: 2}: 5,
+			{Mfg: "unknown", Id: 3}:  1,
+		},
+	},
 }
 
 func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 	if a == b {
 		return
 	}
-	if len(message) == 0 {
-		message = fmt.Sprintf("%v != %v", a, b)
-	}
-	t.Fatal(message)
+	t.Fatal(message, "\n\ta: ", a, "\n\tb: ", b)
 }
 
 func assertNotEqual(t *testing.T, a interface{}, b interface{}, message string) {
@@ -101,13 +147,6 @@ func TestRawToUid(t *testing.T) {
 	cfg := new(model.Config)
 	cfg.Manufacturers.Db = "/etc/session-counter/manufacturers.sqlite"
 	ka := csp.NewKeepalive()
-
-	f, err := os.OpenFile("testlogfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
-	}
-	defer f.Close()
-	log.SetOutput(f)
 
 	for testNdx, e := range tests {
 		t.Logf("Test #%v\n", testNdx)
