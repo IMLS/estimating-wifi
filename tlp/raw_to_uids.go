@@ -89,11 +89,7 @@ func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			}
 
 			// Everyone we do *not* see has their time bumped.
-			// Everyone we see has their uniqueness timeout set to 0.
-			// And, their disconnect timeout must necessarily be reset as well.
-			// log.Println("newmap is ", newMapping)
 			for k := range uniq {
-				// log.Println("looking for ", k, " in uniq")
 				_, here := newMapping[k]
 				if !here {
 					uniq[k] = uniq[k] + 1
@@ -102,23 +98,27 @@ func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			}
 
 			// Now, we have to do some munging. A new map is needed.
+			// We begin with everyone who is still in the uniqueness window.
 			sendmap := make(map[model.UserMapping]int)
 			for k, v := range uniq {
 				sendmap[k] = v
 			}
 
-			// Anyone who timed out should not be communicated in the sendmap.
-			for k, v := range disco {
+			// Now look at everyone we are uniquely tracking.
+			// We'll clean up our sendmap based on this set.
+			for k, v := range uniq {
+				// Anyone who disconnected should not be communicated in the sendmap.
 				if v >= cfg.Monitoring.DisconnectionWindow {
 					delete(sendmap, k)
 				}
-			}
 
-			// And, if anyone overstays their uniqueness,
-			// complettely remove them.
-			for k, v := range uniq {
+				// Anyone who overstays our unique tracking window gets
+				// removed *completely*. If they show up again, they are considered
+				// a new device.
 				if v >= cfg.Monitoring.UniquenessWindow {
-					log.Printf("%v [%v] no longer uniq\n", k, v)
+					if testing {
+						log.Printf("%v [%v] no longer uniq\n", k, v)
+					}
 					delete(sendmap, k)
 					delete(disco, k)
 					delete(uniq, k)
