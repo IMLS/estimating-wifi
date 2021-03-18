@@ -6,6 +6,7 @@ username = sys.argv[1]
 password = sys.argv[2]
 
 base_url = "http://localhost:8000"
+base_url = "https://10x-rabbit-demo.app.cloud.gov"
 
 resp = requests.post(
     f"{base_url}/api-token-auth/", data=dict(username=username, password=password),  # nosec
