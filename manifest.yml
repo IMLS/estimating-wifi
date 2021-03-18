@@ -1,0 +1,8 @@
+---
+applications:
+  - name: 10x-rabbit-demo
+    env:
+      SECRET_KEY: ((secret_key))
+      DIRECTUS_HOST: ((directus_host))
+      DIRECTUS_USERNAME: ((directus_username))
+      DIRECTUS_PASSWORD: ((directus_password))
