@@ -2,6 +2,7 @@ package tlp
 
 import (
 	"log"
+	"sort"
 	"strings"
 
 	"gsa.gov/18f/session-counter/api"
@@ -12,10 +13,15 @@ import (
 func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, out chan<- map[model.UserMapping]int, kill <-chan bool) {
 	log.Println("Starting rawToUids")
 
-	// This is an odd construct to facilitate unit testing.
+	// If we are running live, the kill channel is `nil`.
+	// When we are live, THEN init the ping/pong.
+	testing := true
+	if kill == nil {
+		testing = false
+	}
 	var ping chan interface{} = nil
 	var pong chan interface{} = nil
-	if kill == nil {
+	if !testing {
 		ping, pong = ka.Subscribe("rawToUids", 5)
 		log.Println("rtu: initialized keepalive")
 	}
@@ -38,15 +44,28 @@ func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 		case <-ping:
 			pong <- "rawToUids"
 		case m := <-in:
-			// log.Println("rtu: received map: ", m)
+			if testing {
+				log.Println("rtu: received map: ", m)
+			}
 			// For each incoming address, decide if it is already in our map.
 			// If it is, do nothing. If not, give that mac address a new id.
-			for addr := range m {
+			// FIXME: Traversing in order, primarily for consistency in testing.
+			// This should not be a big enough performance issue to matter for production.
+			sortedaddrs := make([]string, 0)
+			for k, _ := range m {
+				sortedaddrs = append(sortedaddrs, k)
+			}
+			sort.Strings(sortedaddrs)
+			for _, addr := range sortedaddrs {
 				addr = strings.ToLower(addr)
 				_, found := macToNdx[addr]
-				// log.Printf("rtu: [%v :: %v]\n", addr, found)
+				if testing {
+					log.Printf("rtu: [%v :: %v]\n", addr, found)
+				}
 				if !found {
-					// log.Printf("rtu: adding [%v] as [%v]\n", addr, nextId)
+					if testing {
+						log.Printf("rtu: adding newmap [%v <- %v]\n", addr, nextId)
+					}
 					macToNdx[addr] = nextId
 					nextId += 1
 				}
@@ -90,7 +109,7 @@ func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 
 			// Anyone who timed out should not be communicated in the sendmap.
 			for k, v := range disco {
-				if v > cfg.Monitoring.DisconnectionWindow {
+				if v >= cfg.Monitoring.DisconnectionWindow {
 					delete(sendmap, k)
 				}
 			}
@@ -98,7 +117,7 @@ func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, o
 			// And, if anyone overstays their uniqueness,
 			// complettely remove them.
 			for k, v := range uniq {
-				if v > cfg.Monitoring.UniquenessWindow {
+				if v >= cfg.Monitoring.UniquenessWindow {
 					log.Printf("%v [%v] no longer uniq\n", k, v)
 					delete(sendmap, k)
 					delete(disco, k)
