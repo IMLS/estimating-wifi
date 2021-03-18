@@ -3,11 +3,9 @@ package tlp
 import (
 	"log"
 	"math/rand"
-	"os"
 	"time"
 
 	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
 )
@@ -22,6 +20,7 @@ func ReportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]mode
 
 	var count int64 = 0
 	http_error_count := 0
+	directusServer := model.GetServer(cfg, "directus")
 
 	for {
 		select {
@@ -39,30 +38,18 @@ func ReportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]mode
 		case m := <-mfgs:
 			count = count + 1
 			log.Println("reporting: ", count)
-			// Try and grab the token from the OS Env.
-			// It would have been set if we found it in a global config file.
-			accessKey := os.Getenv(constants.AuthTokenKey)
-			tok := &model.Token{}
-			if len(accessKey) > 1 {
-				tok.Data.AccessToken = accessKey
-			} else {
-				// If the token is too short/empty, we should try and get a token
-				// via username/password in the env. This should have failed long ago
-				// if the username/password are not in the env.
-				apiTok, err := api.Get_token(cfg)
-				tok = apiTok
-				if err != nil {
-					log.Println("report: error in token fetch")
-					log.Println(err)
-					http_error_count = http_error_count + 1
-				}
+			tok, errGT := api.Get_token(directusServer)
+			if errGT != nil {
+				log.Println("report: error in token fetch")
+				log.Println(errGT)
+				http_error_count = http_error_count + 1
 			}
 
 			for _, entry := range m {
 				go func(entry model.Entry) {
 					// Smear the requests out in time.
 					time.Sleep(time.Duration(rand.Intn(3000)) * time.Millisecond)
-					err := api.Report_mfg(cfg, tok, entry)
+					err := api.Report_mfg(directusServer, tok, entry)
 					if err != nil {
 						log.Println("report: results POST failure")
 						log.Println(err)
@@ -70,10 +57,11 @@ func ReportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]mode
 					}
 				}(entry)
 			}
-			err := api.Report_telemetry(cfg, tok)
-			if err != nil {
+
+			errRT := api.Report_telemetry(directusServer, tok)
+			if errRT != nil {
 				log.Println("report: error in telemetry POST")
-				log.Println(err)
+				log.Println(errRT)
 				http_error_count = http_error_count + 1
 			}
 

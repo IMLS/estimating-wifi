@@ -71,28 +71,61 @@ func Mac_to_mfg(cfg *model.Config, mac string) string {
 	return "unknown"
 }
 
+func unmarshalResponse(cfg *model.Server, body []byte) (tok *model.Auth, err error) {
+	a := new(model.Auth)
+
+	switch cfg.Name {
+	case "directus":
+		res := new(model.DirectusToken)
+		err := json.Unmarshal(body, &res)
+
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("api: error unmarshalling directus token")
+		}
+		a.User = model.GetUser(res)
+		a.Token = model.GetToken(res)
+	case "reval":
+		res := new(model.RevalToken)
+		err := json.Unmarshal(body, &res)
+
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("api: error unmarshalling reval token")
+		}
+		a.User = model.GetUser(res)
+		a.Token = model.GetToken(res)
+	default:
+		return nil, errors.New("api: no parser found for token response")
+	}
+
+	// Never get here
+	log.Fatal("Should never get here. API :micdrop:")
+	return nil, errors.New("api: catastrophic fail.")
+}
+
 // FUNC Get_token
 // Fetches a token from Directus for authenticating
 // subsequent interactions with the service.
 // Requires environment variables to be set
-func Get_token(cfg *model.Config) (tok *model.Token, err error) {
-	user := os.Getenv(constants.EnvUsername)
-	pass := os.Getenv(constants.EnvPassword)
-	var uri string = (cfg.Server.Scheme + "://" +
-		cfg.Server.Host + "/auth/login")
+func Get_token(cfg *model.Server) (tok *model.Auth, err error) {
+	var uri string = ("https://" + cfg.Host + cfg.Authpath)
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
+	// This makes it work for either of our services...
+	user := os.Getenv(constants.EnvUsername)
+	pass := os.Getenv(constants.EnvPassword)
 	reqBody, err := json.Marshal(map[string]string{
-		"email":    user,
-		"password": pass,
+		cfg.User: user,
+		cfg.Pass: pass,
 	})
 
 	if err != nil {
-		return nil, errors.New("api: could not authenticate to Directus")
+		return nil, errors.New(fmt.Sprintf("api: could not authenticate to %v", cfg.Name))
 	}
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
@@ -103,19 +136,19 @@ func Get_token(cfg *model.Config) (tok *model.Token, err error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New("api: error in client request to Directus /auth")
+		return nil, errors.New(fmt.Sprintf("api: error in client request to %v %v", cfg.Name, cfg.Authpath))
 	}
 	// Closes the connection at function exit.
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.New("api: unable to read body of response from Directus /auth")
+		return nil, errors.New(fmt.Sprintf("api: unable to read body of response from %v %v", cfg.Name, cfg.Authpath))
 	}
-	res := model.Token{}
-	json.Unmarshal(body, &res)
 
-	return &res, nil
+	tok, err = unmarshalResponse(cfg, body)
+
+	return tok, err
 }
 
 // FUNC bToMb
@@ -126,10 +159,8 @@ func bToMb(b uint64) uint64 {
 
 // FUNC post_ram_usage
 // Part of telemetry. Posts RAM usage.
-func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
-	var uri string = (cfg.Server.Scheme + "://" +
-		cfg.Server.Host + "/items/" +
-		"memory_usage")
+func Report_telemetry(cfg *model.Server, tok *model.Auth) (err error) {
+	var uri string = ("https://" + cfg.Host + "/items/memory_usage")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -158,7 +189,7 @@ func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
 	}
 
 	req.Header.Set("Content-type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Token))
 
 	resp, err := client.Do(req)
 
@@ -171,10 +202,8 @@ func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
 
 // FUNC post_manufactuerer_count
 // Posts the manufactuerer count to Directus.
-func Report_mfg(cfg *model.Config, tok *model.Token, e model.Entry) (err error) {
-	var uri string = (cfg.Server.Scheme + "://" +
-		cfg.Server.Host + "/items/" +
-		cfg.Server.Collection)
+func Report_mfg(cfg *model.Server, tok *model.Auth, e model.Entry) (err error) {
+	var uri string = ("https://" + cfg.Host + "/items/people2")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -199,7 +228,7 @@ func Report_mfg(cfg *model.Config, tok *model.Token, e model.Entry) (err error) 
 	}
 	req.Header.Set("Content-type", "application/json")
 	// log.Printf("Using access token: %v\n", tok.Data.AccessToken)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Token))
 
 	// log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)

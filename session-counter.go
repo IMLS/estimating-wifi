@@ -110,8 +110,10 @@ func readConfig() *model.Config {
 		log.Fatal("readConfig: cannot find auth token")
 	}
 
+	// Stick the username/token into the environment.
+	// This will be used by the Get_token() auth dance.
 	os.Setenv(constants.AuthTokenKey, auth.Token)
-	os.Setenv(constants.AuthEmailKey, auth.Email)
+	os.Setenv(constants.AuthEmailKey, auth.User)
 	return cfg
 }
 
@@ -152,7 +154,8 @@ func calcSessionId() string {
 	// Guaranteed to be unique. Current time along with our auth token, hashed.
 	h.Write([]byte(fmt.Sprintf("%v%x", time.Now(), email)))
 	sid := fmt.Sprintf("%x", h.Sum(nil))
-	log.Println("Session id: ", sid)
+	// Keep it short.
+	log.Println("Session id: ", sid[0:8])
 	return sid
 }
 
