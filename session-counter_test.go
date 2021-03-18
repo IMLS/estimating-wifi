@@ -71,7 +71,7 @@ var tests = []struct {
 		map[model.UserMapping]int{
 			{Mfg: "Next", Id: 0}:     5,
 			{Mfg: "Apple", Id: 1}:    4,
-			{Mfg: "Eriksson", Id: 2}: 3,
+			{Mfg: "Ericsson", Id: 2}: 3,
 			{Mfg: "unknown", Id: 3}:  0,
 		},
 	},
@@ -122,7 +122,7 @@ func TestRawToUid(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			for _, h := range e.initMaps {
-				t.Log("send ", h)
+				//t.Log("send ", h)
 				ch_macs <- h
 			}
 			for _, h := range e.loopMaps {
@@ -136,25 +136,21 @@ func TestRawToUid(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			count := len(e.loopMaps) + len(e.initMaps) - 1
-			t.Log("receiving ", count)
+			//t.Log("receiving ", count)
 			for i := 0; i < count; i++ {
-				h := <-ch_uniq
-				t.Log("receive ", h)
+				<-ch_uniq
+				//t.Log("receive ", h)
 			}
 			u := <-ch_uniq
 			ch_poison <- true
 			defer wg.Done()
 
+			s1 := fmt.Sprint(u)
+			s2 := fmt.Sprint(e.resultMap)
 			if e.passfail {
-				s1 := fmt.Sprint(u)
-				s2 := fmt.Sprint(e.resultMap)
-				t.Log("s1: ", s1)
-				t.Log("s2: ", s2)
-				t.Log("s1 == s2: ", s1 == s2)
-
-				assertEqual(t, fmt.Sprint(u), fmt.Sprint(e.resultMap), "maps not equal")
+				assertEqual(t, s1, s2, "maps not equal")
 			} else {
-				assertNotEqual(t, fmt.Sprint(u), fmt.Sprint(e.resultMap), "maps incorrectly equal")
+				assertNotEqual(t, s1, s2, "maps incorrectly equal")
 			}
 		}()
 
