@@ -60,6 +60,23 @@ func Test_thrash_db(t *testing.T) {
 	}
 }
 
+func Test_ReadAuth(t *testing.T) {
+	a, e := config.ReadAuth()
+	if e != nil {
+		t.Fatal("failure in reading auth")
+	}
+	if a == nil {
+		t.Fatal("auth is nil")
+	}
+
+	if len(a.User) < 3 {
+		t.Fatal("auth username too short")
+	}
+	if len(a.Token) < 8 {
+		t.Fatal("auth token too short")
+	}
+}
+
 func Test_GetToken(t *testing.T) {
 	cfg := config.ReadConfig()
 	a, _ := config.ReadAuth()
@@ -77,21 +94,4 @@ func Test_GetToken(t *testing.T) {
 		t.Fatal("Failed to get auth token.")
 	}
 
-}
-
-func Test_GetAuth(t *testing.T) {
-	a, e := config.ReadAuth()
-	if e != nil {
-		t.Fatal("failure in reading auth")
-	}
-	if a == nil {
-		t.Fatal("auth is nil")
-	}
-
-	if len(a.User) < 3 {
-		t.Fatal("auth username too short")
-	}
-	if len(a.Token) < 8 {
-		t.Fatal("auth token too short")
-	}
 }
