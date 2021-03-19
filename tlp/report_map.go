@@ -39,7 +39,7 @@ func ReportMap(ka *csp.Keepalive, cfg *config.Config, mfgs <-chan map[string]mod
 		case m := <-mfgs:
 			count = count + 1
 			log.Println("reporting: ", count)
-			tok, errGT := api.Get_token(directusServer)
+			tok, errGT := api.GetToken(directusServer)
 			if errGT != nil {
 				log.Println("report: error in token fetch")
 				log.Println(errGT)
