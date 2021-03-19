@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gsa.gov/18f/session-counter/api"
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
 )
@@ -14,13 +15,13 @@ import (
  * Takes a hashmap of [mfg id : count] and POSTs
  * each one to the server individually. We have no bulk insert.
  */
-func ReportMap(ka *csp.Keepalive, cfg *model.Config, mfgs <-chan map[string]model.Entry) {
+func ReportMap(ka *csp.Keepalive, cfg *config.Config, mfgs <-chan map[string]model.Entry) {
 	log.Println("Starting reportMap")
 	ping, pong := ka.Subscribe("reportMap", 5)
 
 	var count int64 = 0
 	http_error_count := 0
-	directusServer := model.GetServer(cfg, "directus")
+	directusServer := config.GetServer(cfg, "directus")
 
 	for {
 		select {

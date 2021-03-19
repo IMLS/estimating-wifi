@@ -2,13 +2,17 @@ package api
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
-	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/session-counter/constants"
 )
 
+const dbIterations = 10
+
 func Test_get_manufactuerer(t *testing.T) {
-	cfg := model.Config{}
+	cfg := config.Config{}
 	cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
 
 	var tests = []struct {
@@ -40,10 +44,10 @@ func Test_get_manufactuerer(t *testing.T) {
 // this loop will find it. When the DB isn't closed properly,
 // this will fail around 1078ish connections.
 func Test_thrash_db(t *testing.T) {
-	cfg := model.Config{}
+	cfg := config.Config{}
 	cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
 
-	for ndx := 0; ndx < 2000; ndx++ {
+	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
 			got := Mac_to_mfg(&cfg, "aa:bb:cc")
 			if got != "unknown" {
@@ -53,5 +57,41 @@ func Test_thrash_db(t *testing.T) {
 			}
 
 		})
+	}
+}
+
+func Test_GetToken(t *testing.T) {
+	cfg := config.ReadConfig()
+	a, _ := config.ReadAuth()
+	os.Setenv(constants.EnvUsername, a.User)
+	os.Setenv(constants.EnvPassword, a.Token)
+
+	directusServer := config.GetServer(cfg, "directus")
+	auth, err := GetToken(directusServer)
+	if err != nil {
+		t.Log(err)
+		t.Fatal("Failed to get token.")
+	}
+
+	if len(auth.Token) < 8 {
+		t.Fatal("Failed to get auth token.")
+	}
+
+}
+
+func Test_GetAuth(t *testing.T) {
+	a, e := config.ReadAuth()
+	if e != nil {
+		t.Fatal("failure in reading auth")
+	}
+	if a == nil {
+		t.Fatal("auth is nil")
+	}
+
+	if len(a.User) < 3 {
+		t.Fatal("auth username too short")
+	}
+	if len(a.Token) < 8 {
+		t.Fatal("auth token too short")
 	}
 }

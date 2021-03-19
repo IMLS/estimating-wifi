@@ -1,14 +1,14 @@
-package model
+package config
 
 import "log"
 
 func GetServer(cfg *Config, which string) *Server {
-	log.Println("cfg:", cfg)
-	log.Println("servers: ", cfg.Servers)
+	// log.Println("cfg:", cfg)
+	// log.Println("servers: ", cfg.Servers)
 	for _, s := range cfg.Servers {
-		log.Printf("model: considering: %v", s)
+		// log.Printf("config: considering: %v", s)
 		if s.Name == which {
-			return new(Server)
+			return &s
 		}
 	}
 	log.Printf("model: could not retrieve server matching name '%v'", which)
@@ -31,13 +31,7 @@ type Config struct {
 		UniquenessWindow      int `yaml:"uniqueness_window"`
 		DisconnectionWindow   int `yaml:"disconnection_window"`
 	} `yaml:"monitoring"`
-	Servers []struct {
-		Name     string `yaml:"name"`
-		Host     string `yaml:"host"`
-		Authpath string `yaml:"authpath"`
-		User     string `yaml:"user"`
-		Pass     string `yaml:"pass"`
-	} `yaml:"servers"`
+	Servers   []Server `yaml:"servers"`
 	Wireshark struct {
 		Duration  int    `yaml:"duration"`
 		Rounds    int    `yaml:"rounds"`

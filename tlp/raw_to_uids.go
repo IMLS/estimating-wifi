@@ -6,11 +6,12 @@ import (
 	"strings"
 
 	"gsa.gov/18f/session-counter/api"
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
 )
 
-func RawToUids(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, out chan<- map[model.UserMapping]int, kill <-chan bool) {
+func RawToUids(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]int, out chan<- map[model.UserMapping]int, kill <-chan bool) {
 	log.Println("Starting rawToUids")
 
 	// If we are running live, the kill channel is `nil`.

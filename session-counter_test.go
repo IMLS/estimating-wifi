@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
@@ -147,7 +148,7 @@ func assertNotEqual(t *testing.T, a interface{}, b interface{}, message string) 
 }
 
 func TestRawToUid(t *testing.T) {
-	cfg := new(model.Config)
+	cfg := new(config.Config)
 	cfg.Manufacturers.Db = "/etc/session-counter/manufacturers.sqlite"
 	ka := csp.NewKeepalive()
 

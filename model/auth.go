@@ -6,9 +6,10 @@ import (
 	"gsa.gov/18f/session-counter/constants"
 )
 
+// Located at /etc/sc/auth.yaml
 type Auth struct {
-	Token string `json:"token"`
-	User  string `json:"username"`
+	Token string `yaml:"token"`
+	User  string `yaml:"username"`
 }
 
 type Authorization interface {

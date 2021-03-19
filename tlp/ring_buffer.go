@@ -3,11 +3,11 @@ package tlp
 import (
 	"log"
 
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/csp"
-	"gsa.gov/18f/session-counter/model"
 )
 
-func RingBuffer(ka *csp.Keepalive, cfg *model.Config, in <-chan map[string]int, out chan<- map[string]int) {
+func RingBuffer(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]int, out chan<- map[string]int) {
 	log.Println("Starting ringBuffer")
 	ping, pong := ka.Subscribe("ringBuffer", 3)
 

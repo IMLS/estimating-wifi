@@ -9,20 +9,19 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"runtime"
 	"strconv"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/session-counter/constants"
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/model"
 )
 
 // FUNC Mac_to_mfg
 // Looks up a MAC address in the manufactuerer's database.
 // Returns a valid name or "unknown" if the name cannot be found.
-func Mac_to_mfg(cfg *model.Config, mac string) string {
+func Mac_to_mfg(cfg *config.Config, mac string) string {
 	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
 		log.Fatal("Failed to open manufacturer database.")
@@ -71,9 +70,8 @@ func Mac_to_mfg(cfg *model.Config, mac string) string {
 	return "unknown"
 }
 
-func unmarshalResponse(cfg *model.Server, body []byte) (tok *model.Auth, err error) {
+func unmarshalResponse(cfg *config.Server, body []byte) (tok *model.Auth, err error) {
 	a := new(model.Auth)
-
 	switch cfg.Name {
 	case "directus":
 		res := new(model.DirectusToken)
@@ -85,6 +83,8 @@ func unmarshalResponse(cfg *model.Server, body []byte) (tok *model.Auth, err err
 		}
 		a.User = model.GetUser(res)
 		a.Token = model.GetToken(res)
+
+		return a, nil
 	case "reval":
 		res := new(model.RevalToken)
 		err := json.Unmarshal(body, &res)
@@ -95,20 +95,21 @@ func unmarshalResponse(cfg *model.Server, body []byte) (tok *model.Auth, err err
 		}
 		a.User = model.GetUser(res)
 		a.Token = model.GetToken(res)
+		return a, nil
 	default:
 		return nil, errors.New("api: no parser found for token response")
 	}
 
 	// Never get here
-	log.Fatal("Should never get here. API :micdrop:")
-	return nil, errors.New("api: catastrophic fail.")
+	// log.Fatal("Should never get here. API :micdrop:")
+	// return nil, errors.New("api: catastrophic fail.")
 }
 
-// FUNC Get_token
+// FUNC GetToken
 // Fetches a token from Directus for authenticating
 // subsequent interactions with the service.
 // Requires environment variables to be set
-func Get_token(cfg *model.Server) (tok *model.Auth, err error) {
+func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 	var uri string = ("https://" + cfg.Host + cfg.Authpath)
 
 	timeout := time.Duration(5 * time.Second)
@@ -116,16 +117,18 @@ func Get_token(cfg *model.Server) (tok *model.Auth, err error) {
 		Timeout: timeout,
 	}
 
-	// This makes it work for either of our services...
-	user := os.Getenv(constants.EnvUsername)
-	pass := os.Getenv(constants.EnvPassword)
+	auth, err := config.ReadAuth()
+	if err != nil {
+		log.Println("api: could not read auth from filesystem")
+	}
+
 	reqBody, err := json.Marshal(map[string]string{
-		cfg.User: user,
-		cfg.Pass: pass,
+		cfg.User: auth.User,
+		cfg.Pass: auth.Token,
 	})
 
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("api: could not authenticate to %v", cfg.Name))
+		return nil, fmt.Errorf("api: could not marshal POST body for %v", cfg.Name)
 	}
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
@@ -136,14 +139,14 @@ func Get_token(cfg *model.Server) (tok *model.Auth, err error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("api: error in client request to %v %v", cfg.Name, cfg.Authpath))
+		return nil, fmt.Errorf("api: error in client request to %v %v", cfg.Name, cfg.Authpath)
 	}
 	// Closes the connection at function exit.
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("api: unable to read body of response from %v %v", cfg.Name, cfg.Authpath))
+		return nil, fmt.Errorf("api: unable to read body of response from %v %v", cfg.Name, cfg.Authpath)
 	}
 
 	tok, err = unmarshalResponse(cfg, body)
@@ -159,7 +162,7 @@ func bToMb(b uint64) uint64 {
 
 // FUNC post_ram_usage
 // Part of telemetry. Posts RAM usage.
-func Report_telemetry(cfg *model.Server, tok *model.Auth) (err error) {
+func Report_telemetry(cfg *config.Server, tok *model.Auth) (err error) {
 	var uri string = ("https://" + cfg.Host + "/items/memory_usage")
 
 	timeout := time.Duration(5 * time.Second)
@@ -202,7 +205,7 @@ func Report_telemetry(cfg *model.Server, tok *model.Auth) (err error) {
 
 // FUNC post_manufactuerer_count
 // Posts the manufactuerer count to Directus.
-func Report_mfg(cfg *model.Server, tok *model.Auth, e model.Entry) (err error) {
+func Report_mfg(cfg *config.Server, tok *model.Auth, e model.Entry) (err error) {
 	var uri string = ("https://" + cfg.Host + "/items/people2")
 
 	timeout := time.Duration(5 * time.Second)
