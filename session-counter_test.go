@@ -178,7 +178,7 @@ func TestRawToUid(t *testing.T) {
 			defer wg.Done()
 		}()
 
-		go tlp.RawToUids(ka, cfg, ch_macs, ch_uniq, ch_poison)
+		go tlp.AlgorithmOne(ka, cfg, ch_macs, ch_uniq, ch_poison)
 
 		wg.Add(1)
 		go func() {

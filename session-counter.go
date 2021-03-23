@@ -20,7 +20,7 @@ func run(ka *csp.Keepalive, cfg *config.Config) {
 	// Create channels for process network
 	ch_sec := make(chan bool)
 	ch_nsec := make(chan bool)
-	ch_macs := make(chan map[string]int)
+	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
 	ch_mfg := make(chan map[string]model.Entry)
 
@@ -51,9 +51,9 @@ func calcSessionId() string {
 	// FIXME: Use the email instead of the token.
 	// Guaranteed to be unique. Current time along with our auth token, hashed.
 	h.Write([]byte(fmt.Sprintf("%v%x", time.Now(), email)))
-	sid := fmt.Sprintf("%x", h.Sum(nil))
+	sid := fmt.Sprintf("%x", h.Sum(nil))[0:8]
 	// Keep it short.
-	log.Println("Session id: ", sid[0:8])
+	log.Println("Session id: ", sid)
 	return sid
 }
 

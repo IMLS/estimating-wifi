@@ -70,7 +70,7 @@ func Mac_to_mfg(cfg *config.Config, mac string) string {
 	return "unknown"
 }
 
-func unmarshalResponse(cfg *config.Server, body []byte) (tok *model.Auth, err error) {
+func unmarshalResponse(cfg *config.Server, authcfg *model.AuthConfig, body []byte) (tok *model.Auth, err error) {
 	a := new(model.Auth)
 	switch cfg.Name {
 	case "directus":
@@ -81,7 +81,9 @@ func unmarshalResponse(cfg *config.Server, body []byte) (tok *model.Auth, err er
 			log.Println(err)
 			return nil, errors.New("api: error unmarshalling directus token")
 		}
-		a.User = model.GetUser(res)
+
+		log.Println("directus token: ", res)
+		a.User = authcfg.Directus.User
 		a.Token = model.GetToken(res)
 
 		return a, nil
@@ -93,7 +95,7 @@ func unmarshalResponse(cfg *config.Server, body []byte) (tok *model.Auth, err er
 			log.Println(err)
 			return nil, errors.New("api: error unmarshalling reval token")
 		}
-		a.User = model.GetUser(res)
+		a.User = authcfg.Reval.User
 		a.Token = model.GetToken(res)
 		return a, nil
 	default:
@@ -106,7 +108,7 @@ func unmarshalResponse(cfg *config.Server, body []byte) (tok *model.Auth, err er
 }
 
 // FUNC GetToken
-// Fetches a token from Directus for authenticating
+// Fetches a token from a service for authenticating
 // subsequent interactions with the service.
 // Requires environment variables to be set
 func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
@@ -117,10 +119,24 @@ func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 		Timeout: timeout,
 	}
 
-	auth, err := config.ReadAuth()
+	// The auth structure contains a username and password
+	// for each of the services.
+	authcfg, err := config.ReadAuth()
+	auth := new(model.Auth)
+
 	if err != nil {
 		log.Println("api: could not read auth from filesystem")
 	}
+
+	if cfg.Name == "directus" {
+		auth.User = authcfg.Directus.User
+		auth.Token = authcfg.Directus.Token
+	} else {
+		auth.User = authcfg.Reval.User
+		auth.Token = authcfg.Reval.Token
+	}
+
+	log.Println("user ", auth.User, " token ", auth.Token)
 
 	reqBody, err := json.Marshal(map[string]string{
 		cfg.User: auth.User,
@@ -145,11 +161,27 @@ func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	// log.Println("resp: ", string(body))
+	// FIXME
+	// Handle error conditions better.
+	// 2021/03/19 12:10:52 resp:  {"errors":[{"message":"Invalid user credentials.","extensions":{"code":"INVALID_CREDENTIALS"}}]}
+
 	if err != nil {
 		return nil, fmt.Errorf("api: unable to read body of response from %v %v", cfg.Name, cfg.Authpath)
 	}
 
-	tok, err = unmarshalResponse(cfg, body)
+	errRes := new(model.AuthError)
+	errR := json.Unmarshal(body, &errRes)
+	if errR != nil {
+		log.Println("api: could not unmarshal error response")
+		log.Println(errR)
+		log.Println("api: err message ", errRes.Errors)
+		for _, e := range errRes.Errors {
+			log.Println("api: err code ", e.Message)
+		}
+	}
+
+	tok, err = unmarshalResponse(cfg, authcfg, body)
 
 	return tok, err
 }
@@ -229,8 +261,9 @@ func Report_mfg(cfg *config.Server, tok *model.Auth, e model.Entry) (err error) 
 	if err != nil {
 		return errors.New("api: unable to construct request for manufactuerer POST")
 	}
+
 	req.Header.Set("Content-type", "application/json")
-	// log.Printf("Using access token: %v\n", tok.Data.AccessToken)
+	log.Printf("Using access token: %v\n", tok.Token)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Token))
 
 	// log.Printf("req:\n%v\n", req)

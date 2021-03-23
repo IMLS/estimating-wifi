@@ -62,10 +62,10 @@ func devConfig() *Config {
 	return cfg
 }
 
-func ReadAuth() (*model.Auth, error) {
+func ReadAuth() (*model.AuthConfig, error) {
 	_, err := os.Stat(constants.AuthPath)
 	if err != nil {
-		return &model.Auth{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.AuthPath)
+		return &model.AuthConfig{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.AuthPath)
 	}
 
 	f, err := os.Open(constants.AuthPath)
@@ -73,7 +73,7 @@ func ReadAuth() (*model.Auth, error) {
 		log.Fatal("readToken: could not open token file. Exiting.")
 	}
 	defer f.Close()
-	var auth *model.Auth
+	var auth *model.AuthConfig
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(&auth)
 	if err != nil {
@@ -100,14 +100,18 @@ func ReadConfig() *Config {
 		return devConfig()
 	}
 
-	auth, err := ReadAuth()
-	if err != nil {
-		log.Fatal("readConfig: cannot find auth token")
-	}
+	// FIXME 20210323 MCJ
+	// ARE THESE USED ANYWHERE?
+
+	// auth, err := ReadAuth()
+	// if err != nil {
+	// 	log.Fatal("readConfig: cannot find auth token")
+	// }
 
 	// Stick the username/token into the environment.
 	// This will be used by the Get_token() auth dance.
-	os.Setenv(constants.AuthTokenKey, auth.Token)
-	os.Setenv(constants.AuthEmailKey, auth.User)
+	// os.Setenv(constants.AuthTokenKey, auth.Token)
+	// os.Setenv(constants.AuthEmailKey, auth.User)
+
 	return cfg
 }

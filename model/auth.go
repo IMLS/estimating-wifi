@@ -1,12 +1,27 @@
 package model
 
-import (
-	"os"
+type AuthError struct {
+	// {"errors":[{"message":"Invalid user credentials.","extensions":{"code":"INVALID_CREDENTIALS"}}]}
+	Errors []struct {
+		Message    string `json:"message"`
+		Extensions struct {
+			Code string `json:"code"`
+		} `json:"extensions"`
+	} `json:"errors"`
+}
 
-	"gsa.gov/18f/session-counter/constants"
-)
+// Located at /etc/session-counter/auth.yaml
+type AuthConfig struct {
+	Directus struct {
+		Token string `yaml:"token"`
+		User  string `yaml:"username"`
+	} `yaml:"directus"`
+	Reval struct {
+		Token string `yaml:"token"`
+		User  string `yaml:"username"`
+	} `yaml:"reval"`
+}
 
-// Located at /etc/sc/auth.yaml
 type Auth struct {
 	Token string `yaml:"token"`
 	User  string `yaml:"username"`
@@ -14,7 +29,6 @@ type Auth struct {
 
 type Authorization interface {
 	GetToken() string
-	GetUser() string
 }
 
 type RevalToken struct {
@@ -23,15 +37,6 @@ type RevalToken struct {
 
 func (rt RevalToken) GetToken() string {
 	return rt.AccessToken
-}
-
-func getUserFromEnv() string {
-	user := os.Getenv(constants.EnvUsername)
-	return user
-}
-
-func (rt RevalToken) GetUser() string {
-	return getUserFromEnv()
 }
 
 type DirectusToken struct {
@@ -46,18 +51,10 @@ func (dt DirectusToken) GetToken() string {
 	return dt.Data.AccessToken
 }
 
-func (dt DirectusToken) GetUser() string {
-	return getUserFromEnv()
-}
-
 type Entry struct {
 	MAC   string
 	Mfg   string
 	Count int
-}
-
-func GetUser(a Authorization) string {
-	return a.GetUser()
 }
 
 func GetToken(a Authorization) string {

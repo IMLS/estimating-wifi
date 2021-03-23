@@ -7,12 +7,12 @@ import (
 	"gsa.gov/18f/session-counter/csp"
 )
 
-func RingBuffer(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]int, out chan<- map[string]int) {
+func RingBuffer(ka *csp.Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int) {
 	log.Println("Starting ringBuffer")
 	ping, pong := ka.Subscribe("ringBuffer", 3)
 
 	// Nothing in the buffer, capacity = number of rounds
-	buffer := make([]map[string]int, cfg.Wireshark.Rounds)
+	buffer := make([][]string, cfg.Wireshark.Rounds)
 	for ndx := 0; ndx < cap(buffer); ndx++ {
 		buffer[ndx] = nil
 	}
@@ -33,10 +33,10 @@ func RingBuffer(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]int,
 			// Count everything in the ring. The ring is right-sized
 			// to the window we're interested in.
 			filled_slots := 0
-			for _, m := range buffer {
-				if m != nil {
+			for _, arr := range buffer {
+				if arr != nil {
 					filled_slots += 1
-					for mac := range m {
+					for _, mac := range arr {
 						cnt, ok := total[mac]
 						if ok {
 							total[mac] = cnt + 1

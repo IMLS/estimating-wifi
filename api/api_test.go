@@ -2,13 +2,13 @@ package api
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/constants"
 )
 
+// This should be much higher, like 2000
+// But, it slows down practical testing... :/
 const dbIterations = 10
 
 func Test_get_manufactuerer(t *testing.T) {
@@ -69,29 +69,26 @@ func Test_ReadAuth(t *testing.T) {
 		t.Fatal("auth is nil")
 	}
 
-	if len(a.User) < 3 {
-		t.Fatal("auth username too short")
-	}
-	if len(a.Token) < 8 {
-		t.Fatal("auth token too short")
-	}
 }
 
 func Test_GetToken(t *testing.T) {
 	cfg := config.ReadConfig()
-	a, _ := config.ReadAuth()
-	os.Setenv(constants.EnvUsername, a.User)
-	os.Setenv(constants.EnvPassword, a.Token)
+	// authcfg, _ := config.ReadAuth()
 
-	directusServer := config.GetServer(cfg, "directus")
-	auth, err := GetToken(directusServer)
-	if err != nil {
-		t.Log(err)
-		t.Fatal("Failed to get token.")
-	}
+	for _, server := range []string{"directus", "reval"} {
+		directusServer := config.GetServer(cfg, server)
 
-	if len(auth.Token) < 8 {
-		t.Fatal("Failed to get auth token.")
+		auth, err := GetToken(directusServer)
+		if err != nil {
+			t.Log(err)
+			t.Fatal("Failed to get token.")
+		}
+
+		if len(auth.Token) < 2 {
+			t.Log(auth)
+			t.Fatal("Failed to get auth token.")
+		}
+
 	}
 
 }
