@@ -70,7 +70,7 @@ func Mac_to_mfg(cfg *config.Config, mac string) string {
 	return "unknown"
 }
 
-func unmarshalResponse(cfg *config.Server, authcfg *model.AuthConfig, body []byte) (tok *model.Auth, err error) {
+func unmarshalResponse(cfg *config.Server, authcfg *config.AuthConfig, body []byte) (tok *model.Auth, err error) {
 	a := new(model.Auth)
 	switch cfg.Name {
 	case "directus":

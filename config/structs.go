@@ -44,3 +44,15 @@ type Config struct {
 	} `yaml:"manufacturers"`
 	SessionId string
 }
+
+// Located at /etc/session-counter/auth.yaml
+type AuthConfig struct {
+	Directus struct {
+		Token string `yaml:"token"`
+		User  string `yaml:"username"`
+	} `yaml:"directus"`
+	Reval struct {
+		Token string `yaml:"token"`
+		User  string `yaml:"username"`
+	} `yaml:"reval"`
+}

@@ -8,7 +8,6 @@ import (
 
 	"gopkg.in/yaml.v2"
 	"gsa.gov/18f/session-counter/constants"
-	"gsa.gov/18f/session-counter/model"
 )
 
 /* FUNC checkEnvVars
@@ -62,10 +61,10 @@ func devConfig() *Config {
 	return cfg
 }
 
-func ReadAuth() (*model.AuthConfig, error) {
+func ReadAuth() (*AuthConfig, error) {
 	_, err := os.Stat(constants.AuthPath)
 	if err != nil {
-		return &model.AuthConfig{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.AuthPath)
+		return &AuthConfig{}, fmt.Errorf("readToken: cannot find default token file at [%v]", constants.AuthPath)
 	}
 
 	f, err := os.Open(constants.AuthPath)
@@ -73,7 +72,7 @@ func ReadAuth() (*model.AuthConfig, error) {
 		log.Fatal("readToken: could not open token file. Exiting.")
 	}
 	defer f.Close()
-	var auth *model.AuthConfig
+	var auth *AuthConfig
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(&auth)
 	if err != nil {
