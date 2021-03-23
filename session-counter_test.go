@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"sync"
 	"testing"
 
@@ -15,19 +14,20 @@ import (
 const PASS = true
 const FAIL = false
 
-func macs(arr ...string) map[string]int {
-	h := make(map[string]int)
-	for _, s := range arr {
-		h[s] = rand.Intn(1024)
-	}
-	return h
+func macs(arr ...string) []string {
+	// h := make(map[string]int)
+	// for _, s := range arr {
+	// 	h[s] = rand.Intn(1024)
+	// }
+	// return h
+	return arr
 }
 
-func hashes(arr ...string) []map[string]int {
+func hashes(arr ...string) [][]string {
 	// Return a list of hashes, one hash for each string
-	harr := make([]map[string]int, 0)
+	harr := make([][]string, 0)
 	for _, s := range arr {
-		harr = append(harr, map[string]int{s: rand.Intn(1024)})
+		harr = append(harr, []string{s})
 	}
 	return harr
 }
@@ -47,8 +47,8 @@ var tests = []struct {
 	passfail             bool
 	uniqueness_window    int
 	disconnection_window int
-	initMap              map[string]int
-	loopMaps             []map[string]int
+	initMap              []string
+	loopMaps             [][]string
 	resultMap            map[model.UserMapping]int
 }{
 	// One input hash.
@@ -164,7 +164,7 @@ func TestRawToUid(t *testing.T) {
 		cfg.Monitoring.DisconnectionWindow = e.disconnection_window
 		var wg sync.WaitGroup
 
-		ch_macs := make(chan map[string]int)
+		ch_macs := make(chan []string)
 		ch_uniq := make(chan map[model.UserMapping]int)
 		ch_poison := make(chan bool)
 		var u map[model.UserMapping]int = nil
@@ -172,13 +172,13 @@ func TestRawToUid(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			ch_macs <- e.initMap
-			for _, h := range e.loopMaps {
-				ch_macs <- h
+			for _, sarr := range e.loopMaps {
+				ch_macs <- sarr
 			}
 			defer wg.Done()
 		}()
 
-		go tlp.AlgorithmOne(ka, cfg, ch_macs, ch_uniq, ch_poison)
+		go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_uniq, ch_poison)
 
 		wg.Add(1)
 		go func() {

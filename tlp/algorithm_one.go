@@ -12,7 +12,7 @@ import (
 )
 
 func AlgorithmOne(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]int, out chan<- map[model.UserMapping]int, kill <-chan bool) {
-	log.Println("Starting rawToUids")
+	log.Println("Starting AlgorithmOne")
 
 	// If we are running live, the kill channel is `nil`.
 	// When we are live, THEN init the ping/pong.
@@ -23,7 +23,7 @@ func AlgorithmOne(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]in
 	var ping chan interface{} = nil
 	var pong chan interface{} = nil
 	if !testing {
-		ping, pong = ka.Subscribe("rawToUids", 5)
+		ping, pong = ka.Subscribe("AlgorithmOne", 5)
 		log.Println("rtu: initialized keepalive")
 	}
 
