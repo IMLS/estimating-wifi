@@ -44,12 +44,13 @@ func Test_get_manufactuerer(t *testing.T) {
 // this loop will find it. When the DB isn't closed properly,
 // this will fail around 1078ish connections.
 func Test_thrash_db(t *testing.T) {
-	cfg := config.Config{}
-	cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
+	// cfg := config.Config{}
+	// cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
+	cfg := config.ReadConfig()
 
 	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
-			got := Mac_to_mfg(&cfg, "aa:bb:cc")
+			got := Mac_to_mfg(cfg, "aa:bb:cc")
 			if got != "unknown" {
 				t.Fatalf("got %v; want %v", got, "unknown")
 			} else {
@@ -76,9 +77,10 @@ func Test_GetToken(t *testing.T) {
 	// authcfg, _ := config.ReadAuth()
 
 	for _, server := range []string{"directus", "reval"} {
-		directusServer := config.GetServer(cfg, server)
+		s := config.GetServer(cfg, server)
 
-		auth, err := GetToken(directusServer)
+		auth, err := GetToken(s)
+
 		if err != nil {
 			t.Log(err)
 			t.Fatal("Failed to get token.")

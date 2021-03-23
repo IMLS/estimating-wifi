@@ -136,8 +136,6 @@ func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 		auth.Token = authcfg.Reval.Token
 	}
 
-	log.Println("user ", auth.User, " token ", auth.Token)
-
 	reqBody, err := json.Marshal(map[string]string{
 		cfg.User: auth.User,
 		cfg.Pass: auth.Token,
@@ -149,6 +147,8 @@ func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-type", "application/json")
+	log.Println("req: ", req)
+
 	if err != nil {
 		return nil, errors.New("api: unable to construct URI for authentication")
 	}
@@ -161,10 +161,13 @@ func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	// log.Println("resp: ", string(body))
+	log.Println("resp: ", string(body))
 	// FIXME
 	// Handle error conditions better.
+	// Directus
 	// 2021/03/19 12:10:52 resp:  {"errors":[{"message":"Invalid user credentials.","extensions":{"code":"INVALID_CREDENTIALS"}}]}
+	// Reval
+	// {"non_field_errors":["Unable to log in with provided credentials."]}
 
 	if err != nil {
 		return nil, fmt.Errorf("api: unable to read body of response from %v %v", cfg.Name, cfg.Authpath)
@@ -174,6 +177,8 @@ func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 	errR := json.Unmarshal(body, &errRes)
 	if errR != nil {
 		log.Println("api: could not unmarshal error response")
+		log.Println("user ", auth.User, " token ", auth.Token)
+		log.Println(uri)
 		log.Println(errR)
 		log.Println("api: err message ", errRes.Errors)
 		for _, e := range errRes.Errors {
