@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"testing"
 
@@ -61,19 +62,19 @@ var tests = []struct {
 		},
 	},
 	// // Two input hashes
-	// {"two input macs, one loop mac",
-	// 	PASS, 10, 5,
-	// 	macs(m["next"], m["apple"]),
-	// 	hashes(m["next"]),
-	// 	// Why zero and one?
-	// 	// Zero for deadbeef, because we send it in the loop.
-	// 	// One for beefcafe, because it was only sent once, and
-	// 	// one tick goes by.
-	// 	map[*model.UserMapping]int{
-	// 		{Mfg: "Next", Id: 0}:  0,
-	// 		{Mfg: "Apple", Id: 1}: 1,
-	// 	},
-	// },
+	{"two input macs, one loop mac",
+		PASS, 10, 5,
+		macs(m["next"], m["apple"]),
+		hashes(m["next"]),
+		// Why zero and one?
+		// Zero for deadbeef, because we send it in the loop.
+		// One for beefcafe, because it was only sent once, and
+		// one tick goes by.
+		map[string]int{
+			"Next:0":  0,
+			"Apple:1": 1,
+		},
+	},
 	// // Three hashes, three minutes
 	// {"three input macs, three comms in the middle",
 	// 	PASS, 10, 5,
@@ -206,9 +207,9 @@ func TestRawToUid(t *testing.T) {
 		wg.Wait()
 
 		// The last value we receive needs to have its time updated.
-
 		expected := fmt.Sprint(e.resultMap)
 		received := fmt.Sprint(u)
+		log.Println("expected", expected, "received", received)
 
 		if e.passfail {
 			assertEqual(t, expected, received, "not equal")

@@ -11,7 +11,7 @@ import (
 )
 
 type uniqueMappingDB struct {
-	lastid    int
+	lastid    *int
 	uid       map[string]int
 	mfg       map[string]string
 	timestamp map[string]string
@@ -24,7 +24,7 @@ func newUMDB() *uniqueMappingDB {
 	// umdb.mfg = make(map[string]string)
 	// umdb.timestamp = make(map[string]time.Time)
 	umdb := &uniqueMappingDB{
-		lastid:    0,
+		lastid:    new(int),
 		uid:       make(map[string]int),
 		mfg:       make(map[string]string),
 		timestamp: make(map[string]string)}
@@ -37,9 +37,11 @@ func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
 	// If we didn't find it, then we need to add it.
 	if !found {
 		// Assign the next id.
-		umdb.uid[mac] = umdb.lastid
+		umdb.uid[mac] = *umdb.lastid
+		log.Println("mapping", mac, "to uid", *umdb.lastid)
 		// Increment for the next found address.
-		umdb.lastid += 1
+		*umdb.lastid = *umdb.lastid + 1
+		log.Println("bumped uid to", *umdb.lastid)
 		// Grab a manufacturer for this MAC
 		umdb.mfg[mac] = api.Mac_to_mfg(cfg, mac)
 		// Say when we saw it.
