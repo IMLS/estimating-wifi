@@ -180,6 +180,7 @@ func TestRawToUid(t *testing.T) {
 		go func() {
 			ch_macs <- e.initMap
 			for _, sarr := range e.loopMaps {
+
 				ch_macs <- sarr
 			}
 			defer wg.Done()
@@ -203,10 +204,11 @@ func TestRawToUid(t *testing.T) {
 		}()
 
 		wg.Wait()
-		// t.Log(buf.String())
 
-		expected := fmt.Sprint(&e.resultMap)
-		received := fmt.Sprint(&u)
+		// The last value we receive needs to have its time updated.
+
+		expected := fmt.Sprint(e.resultMap)
+		received := fmt.Sprint(u)
 
 		if e.passfail {
 			assertEqual(t, expected, received, "not equal")

@@ -32,28 +32,22 @@ func newUMDB() *uniqueMappingDB {
 }
 
 func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
-	log.Println("looking for", mac)
-	mfg, found := umdb.mfg[mac]
-	log.Println("v, ok: ", mfg, found)
+	_, found := umdb.mfg[mac]
 
 	// If we didn't find it, then we need to add it.
 	if !found {
-		log.Println("not found", mac)
 		// Assign the next id.
 		umdb.uid[mac] = umdb.lastid
 		// Increment for the next found address.
 		umdb.lastid += 1
 		// Grab a manufacturer for this MAC
 		umdb.mfg[mac] = api.Mac_to_mfg(cfg, mac)
-		log.Println("mapping", mac, "to", umdb.mfg[mac])
 		// Say when we saw it.
 		now := time.Now().Format(time.RFC3339)
-		log.Println("now is", now)
 		umdb.timestamp[mac] = now
 	} else {
 		// If this address is already known, update
 		// when we last saw it.
-		log.Println("updating timestamp", mac)
 		umdb.timestamp[mac] = time.Now().Format(time.RFC3339)
 	}
 }
@@ -85,7 +79,6 @@ func (umdb uniqueMappingDB) asUserMappings() map[string]int {
 
 	for mac, _ := range umdb.mfg {
 		userm := fmt.Sprintf("%v:%d", umdb.mfg[mac], umdb.uid[mac])
-		log.Println("inserting", userm)
 		storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
 		diff := n.Sub(storedtime)
 		h[userm] = int(diff.Minutes())
