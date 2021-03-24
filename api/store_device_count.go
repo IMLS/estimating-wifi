@@ -42,12 +42,12 @@ func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int
 	}
 
 	req.Header.Set("Content-type", "application/json")
-	// log.Printf("Using access token: %v\n", tok.Token)
+	log.Printf("Using access token: %v\n", tok.Token)
 	req.Header.Set("Authorization", fmt.Sprintf("%s %s", cfg.Bearer, tok.Token))
 
-	// log.Printf("req:\n%v\n", req)
+	log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)
-	// log.Printf("resp: %v\n", resp)
+	log.Printf("resp: %v\n", resp)
 	// FIXME
 	// If we fail to auth, it won't be a failed POST.
 	// we'll get back a resp object with a 401
@@ -72,7 +72,7 @@ func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int
 	*/
 	if err != nil {
 		log.Printf("err resp: %v\n", resp)
-		return errors.New("api: failure in client manufactuerer POST to Directus")
+		return fmt.Errorf("api: failure in client manufactuerer POST to %v", cfg.Name)
 	} else {
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
 			log.Printf("api: bad status on POST to: %v\n", uri)

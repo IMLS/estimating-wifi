@@ -94,3 +94,14 @@ func Test_GetToken(t *testing.T) {
 	}
 
 }
+
+func Test_StoreContent(t *testing.T) {
+	cfg := config.ReadConfig()
+	// authcfg, _ := config.ReadAuth()
+
+	for _, server := range []string{"directus", "reval"} {
+		svr := config.GetServer(cfg, server)
+		auth, _ := GetToken(svr)
+		StoreDeviceCount(svr, auth, "Next:0", 1)
+	}
+}
