@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"sync"
 	"testing"
 
@@ -38,23 +37,23 @@ func hashes(arr ...string) [][]string {
 // in this test set that "next" will always be UID 0.
 // (If "next" and "apple" are together)
 var m = map[string]string{
-	"next":     "00:00:0f", // ID 0
-	"ericsson": "00:01:ec",
-	"apple":    "00:03:93",
+	"next":     "00:00:0f:aa:bb:cc", // ID 0
+	"ericsson": "00:01:ec:aa:bb:cc",
+	"apple":    "00:03:93:aa:bb:cc",
+	"next2":    "00:00:0f:ee:ff:00",
 }
 
 var tests = []struct {
-	description          string
-	passfail             bool
-	uniqueness_window    int
-	disconnection_window int
-	initMap              []string
-	loopMaps             [][]string
-	resultMap            map[string]int
+	description       string
+	passfail          bool
+	uniqueness_window int
+	initMap           []string
+	loopMaps          [][]string
+	resultMap         map[string]int
 }{
 	// One input hash.
 	{"one input mac, one loop mac",
-		PASS, 10, 5,
+		PASS, 5,
 		macs(m["next"]),
 		hashes(m["next"]),
 		map[string]int{
@@ -63,7 +62,7 @@ var tests = []struct {
 	},
 	// // Two input hashes
 	{"two input macs, one loop mac",
-		PASS, 10, 5,
+		PASS, 5,
 		macs(m["next"], m["apple"]),
 		hashes(m["next"]),
 		// Why zero and one?
@@ -75,63 +74,77 @@ var tests = []struct {
 			"Apple:1": 1,
 		},
 	},
-	// // Three hashes, three minutes
-	// {"three input macs, three comms in the middle",
-	// 	PASS, 10, 5,
-	// 	// Next, Apple, Ericsson
-	// 	macs(m["next"], m["apple"], m["ericsson"]),
-	// 	hashes("de:ad:be:ef", "de:ad:be:ef", "de:ad:be:ef"),
-	// 	// IDs will be assigned by MAC address sort!
-	// 	map[*model.UserMapping]int{
-	// 		{Mfg: "Next", Id: 0}:     3,
-	// 		{Mfg: "Apple", Id: 2}:    3,
-	// 		{Mfg: "Ericsson", Id: 1}: 3,
-	// 		{Mfg: "unknown", Id: 3}:  0,
-	// 	},
-	// },
+	// // Two input hashes
+	{"two input macs, one loop mac, both next",
+		PASS, 5,
+		macs(m["next"], m["next2"]),
+		hashes(m["next"]),
+		// Why zero and one?
+		// Zero for deadbeef, because we send it in the loop.
+		// One for beefcafe, because it was only sent once, and
+		// one tick goes by.
+		map[string]int{
+			"Next:0": 0,
+			"Next:1": 1,
+		},
+	},
+	// Three hashes, three minutes
+	{"three input macs, three comms in the middle",
+		PASS, 5,
+		// Next, Apple, Ericsson
+		macs(m["next"], m["apple"], m["ericsson"]),
+		hashes("de:ad:be:ef", "de:ad:be:ef", "de:ad:be:ef"),
+		// IDs will be assigned by MAC address sort!
+		map[string]int{
+			"Next:0":     3,
+			"Apple:1":    3,
+			"Ericsson:2": 3,
+			"unknown:3":  0,
+		},
+	},
 
-	// // Next times out, because it is considered to
-	// // have "disconnected" after 5 minutes.
-	// {"Next should disappear",
-	// 	PASS, 10, 5,
-	// 	macs(m["next"], m["apple"], m["ericsson"]),
-	// 	hashes(
-	// 		"de:ad:be:ef",
-	// 		"de:ad:be:ef",
-	// 		"de:ad:be:ef",
-	// 		m["apple"],
-	// 		m["ericsson"]),
-	// 	// Why zero and one?
-	// 	// Zero for deadbeef, because we send it in the loop.
-	// 	// One for beefcafe, because it was only sent once, and
-	// 	// one tick goes by.
-	// 	map[*model.UserMapping]int{
-	// 		{Mfg: "Apple", Id: 2}:    1,
-	// 		{Mfg: "Ericsson", Id: 1}: 0,
-	// 		{Mfg: "unknown", Id: 3}:  2,
-	// 	},
-	// },
+	// Next times out, because it is considered to
+	// have "disconnected" after 5 minutes.
+	{"Next should disappear",
+		PASS, 5,
+		macs(m["next"], m["apple"], m["ericsson"]),
+		hashes(
+			"de:ad:be:ef",
+			"de:ad:be:ef",
+			"de:ad:be:ef",
+			m["apple"],
+			m["ericsson"]),
+		// Why zero and one?
+		// Zero for deadbeef, because we send it in the loop.
+		// One for beefcafe, because it was only sent once, and
+		// one tick goes by.
+		map[string]int{
+			"Apple:1":    1,
+			"Ericsson:2": 0,
+			"unknown:3":  2,
+		},
+	},
 
-	// // Next times out, comes back. Still ID 0.
-	// // Apple is considered to have disconnected.
-	// {"Drop two",
-	// 	PASS, 10, 5,
-	// 	macs(m["next"], m["apple"], m["ericsson"]),
-	// 	hashes(
-	// 		"de:ad:be:ef",
-	// 		"de:ad:be:ef",
-	// 		"de:ad:be:ef",
-	// 		"de:ad:be:ef",
-	// 		m["next"]),
-	// 	// Why zero and one?
-	// 	// Zero for deadbeef, because we send it in the loop.
-	// 	// One for beefcafe, because it was only sent once, and
-	// 	// one tick goes by.
-	// 	map[*model.UserMapping]int{
-	// 		{Mfg: "Next", Id: 0}:    0,
-	// 		{Mfg: "unknown", Id: 3}: 1,
-	// 	},
-	// },
+	// Next times out, comes back. Still ID 0.
+	// Apple is considered to have disconnected.
+	{"Drop two",
+		PASS, 5,
+		macs(m["next"], m["apple"], m["ericsson"]),
+		hashes(
+			"de:ad:be:ef",
+			"de:ad:be:ef",
+			"de:ad:be:ef",
+			"de:ad:be:ef",
+			m["next"]),
+		// Why zero and one?
+		// Zero for deadbeef, because we send it in the loop.
+		// One for beefcafe, because it was only sent once, and
+		// one tick goes by.
+		map[string]int{
+			"Next:0":    0,
+			"unknown:3": 1,
+		},
+	},
 }
 
 func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
@@ -169,7 +182,6 @@ func TestRawToUid(t *testing.T) {
 	for testNdx, e := range tests {
 		t.Logf("Test #%v: %v\n", testNdx, e.description)
 		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
-		cfg.Monitoring.DisconnectionWindow = e.disconnection_window
 		var wg sync.WaitGroup
 
 		ch_macs := make(chan []string)
@@ -194,10 +206,9 @@ func TestRawToUid(t *testing.T) {
 			// The init map
 			<-ch_uniq
 			count := len(e.loopMaps) - 1
-			//t.Log("receiving ", count)
 			for i := 0; i < count; i++ {
+				// This reads in the intervening maps.
 				<-ch_uniq
-				//t.Log("receive ", h)
 			}
 			u = <-ch_uniq
 			ch_poison <- true
@@ -209,7 +220,7 @@ func TestRawToUid(t *testing.T) {
 		// The last value we receive needs to have its time updated.
 		expected := fmt.Sprint(e.resultMap)
 		received := fmt.Sprint(u)
-		log.Println("expected", expected, "received", received)
+		//log.Println("expected", expected, "received", received)
 
 		if e.passfail {
 			assertEqual(t, expected, received, "not equal")
