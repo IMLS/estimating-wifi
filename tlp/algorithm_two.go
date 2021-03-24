@@ -1,79 +1,93 @@
 package tlp
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/csp"
-	"gsa.gov/18f/session-counter/model"
 )
 
-type uniqueMapping struct {
+type uniqueMappingDB struct {
 	lastid    int
 	uid       map[string]int
 	mfg       map[string]string
-	timestamp map[string]time.Time
+	timestamp map[string]string
 }
 
-func (um uniqueMapping) init() {
-	um.lastid = 0
-	um.uid = make(map[string]int)
-	um.mfg = make(map[string]string)
-	um.timestamp = make(map[string]time.Time)
+func newUMDB() *uniqueMappingDB {
+	// var umdb uniqueMappingDB
+	// umdb.lastid = 0
+	// umdb.uid = make(map[string]int)
+	// umdb.mfg = make(map[string]string)
+	// umdb.timestamp = make(map[string]time.Time)
+	umdb := &uniqueMappingDB{
+		lastid:    0,
+		uid:       make(map[string]int),
+		mfg:       make(map[string]string),
+		timestamp: make(map[string]string)}
+	return umdb
 }
 
-//
-func (um uniqueMapping) updateMapping(cfg *config.Config, mac string) {
-	_, ok := um.mfg[mac]
+func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
+	log.Println("looking for", mac)
+	mfg, found := umdb.mfg[mac]
+	log.Println("v, ok: ", mfg, found)
+
 	// If we didn't find it, then we need to add it.
-	if !ok {
+	if !found {
+		log.Println("not found", mac)
 		// Assign the next id.
-		log.Println("lastid")
-		um.uid[mac] = um.lastid
+		umdb.uid[mac] = umdb.lastid
 		// Increment for the next found address.
-		um.lastid += 1
+		umdb.lastid += 1
 		// Grab a manufacturer for this MAC
-		log.Println("mfg")
-		um.mfg[mac] = api.Mac_to_mfg(cfg, mac)
+		umdb.mfg[mac] = api.Mac_to_mfg(cfg, mac)
+		log.Println("mapping", mac, "to", umdb.mfg[mac])
 		// Say when we saw it.
-		um.timestamp[mac] = time.Now()
+		now := time.Now().Format(time.RFC3339)
+		log.Println("now is", now)
+		umdb.timestamp[mac] = now
 	} else {
 		// If this address is already known, update
 		// when we last saw it.
-		um.timestamp[mac] = time.Now()
+		log.Println("updating timestamp", mac)
+		umdb.timestamp[mac] = time.Now().Format(time.RFC3339)
 	}
 }
 
-func (um uniqueMapping) removeOldMappings(window int) {
-	n := time.Now()
+func (umdb uniqueMappingDB) removeOldMappings(window int) {
+	now := time.Now()
 	remove := make([]string, 0)
 	// Find everything we need to remove.
-	for _, mac := range um.mfg {
-		diff := n.Sub(um.timestamp[mac])
+	for mac, _ := range umdb.mfg {
+		storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
+		diff := now.Sub(storedtime)
 		// Is it further in the past than our window (in minutes)?
 		if int(diff.Minutes()) > window {
+			log.Println(mac, "is old. removing. diff:", diff.Minutes())
 			remove = append(remove, mac)
 		}
 	}
 	// Remove everything that's old.
 	for _, mac := range remove {
-		delete(um.uid, mac)
-		delete(um.mfg, mac)
-		delete(um.timestamp, mac)
+		delete(umdb.uid, mac)
+		delete(umdb.mfg, mac)
+		delete(umdb.timestamp, mac)
 	}
 }
 
-func (um uniqueMapping) asUserMappings() map[model.UserMapping]int {
-	h := make(map[model.UserMapping]int)
+func (umdb uniqueMappingDB) asUserMappings() map[string]int {
+	h := make(map[string]int)
 	n := time.Now()
 
-	for _, mac := range um.mfg {
-		diff := n.Sub(um.timestamp[mac])
-		userm := model.UserMapping{}
-		userm.Id = um.uid[mac]
-		userm.Mfg = um.mfg[mac]
+	for mac, _ := range umdb.mfg {
+		userm := fmt.Sprintf("%v:%d", umdb.mfg[mac], umdb.uid[mac])
+		log.Println("inserting", userm)
+		storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
+		diff := n.Sub(storedtime)
 		h[userm] = int(diff.Minutes())
 	}
 
@@ -90,16 +104,11 @@ func (um uniqueMapping) asUserMappings() map[model.UserMapping]int {
  * 5. Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *csp.Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[model.UserMapping]int, kill <-chan bool) {
+func AlgorithmTwo(ka *csp.Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, kill <-chan bool) {
 	log.Println("Starting AlgorithmTwo")
 	// This is our "tracking database"
-	um := &uniqueMapping{}
-	log.Println(um)
-	um.init()
-	log.Println(um)
-	if um.mfg == nil {
-		log.Println("um.mfg is nil")
-	}
+	umdb := newUMDB()
+
 	// If we are running live, the kill channel is `nil`.
 	// When we are live, THEN init the ping/pong.
 	testing := true
@@ -123,12 +132,12 @@ func AlgorithmTwo(ka *csp.Keepalive, cfg *config.Config, in <-chan []string, out
 			// We get in a list of MAC addresses. Create mappings.
 			// Timestamp everything as we see it, new or old.
 			for _, mac := range arr {
-				um.updateMapping(cfg, mac)
+				umdb.updateMapping(cfg, mac)
 			}
 			// Now, filter old things out
-			um.removeOldMappings(cfg.Monitoring.UniquenessWindow)
+			umdb.removeOldMappings(cfg.Monitoring.UniquenessWindow)
 			// Get the mappings as UserMappings, and send them out
-			out <- um.asUserMappings()
+			out <- umdb.asUserMappings()
 		}
 	}
 
