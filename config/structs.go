@@ -19,6 +19,8 @@ type Server struct {
 	Name     string `yaml:"name"`
 	Host     string `yaml:"host"`
 	Authpath string `yaml:"authpath"`
+	Bearer   string `yaml:"bearer"`
+	Postpath string `yaml:"postpath"`
 	User     string `yaml:"user"`
 	Pass     string `yaml:"pass"`
 }

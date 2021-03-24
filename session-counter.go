@@ -11,7 +11,6 @@ import (
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/csp"
-	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 )
 
@@ -22,7 +21,6 @@ func run(ka *csp.Keepalive, cfg *config.Config) {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_mfg := make(chan map[string]model.Entry)
 
 	// Run the process network.
 	// Driven by a 1s `tick` process.
@@ -30,9 +28,8 @@ func run(ka *csp.Keepalive, cfg *config.Config) {
 	go tlp.Tick(ka, ch_sec)
 	go tlp.TockEveryN(ka, 60, ch_sec, ch_nsec)
 	go tlp.RunWireshark(ka, cfg, ch_nsec, ch_macs)
-	go tlp.MacToEntry(ka, cfg, ch_macs_counted, ch_mfg)
-	go tlp.RingBuffer(ka, cfg, ch_macs, ch_macs_counted)
-	go tlp.ReportMap(ka, cfg, ch_mfg)
+	go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_macs_counted, nil)
+	go tlp.ReportOut(ka, cfg, ch_macs_counted)
 }
 
 func keepalive(ka *csp.Keepalive, cfg *config.Config) {

@@ -8,11 +8,15 @@ servers:
   - name: directus
     host: directus-demo.app.cloud.gov
     authpath: /auth/login
+    bearer: Bearer
+    postpath: /items/people2
     user: email
     pass: password
   - name: reval
     host: 10x-rabbit-demo.app.cloud.gov
     authpath: /api-token-auth
+    bearer: Token
+    postpath: /validate
     user: username
     pass: password
 wireshark:

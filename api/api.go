@@ -268,7 +268,7 @@ func Report_mfg(cfg *config.Server, tok *model.Auth, e model.Entry) (err error) 
 	}
 
 	req.Header.Set("Content-type", "application/json")
-	log.Printf("Using access token: %v\n", tok.Token)
+	// log.Printf("Using access token: %v\n", tok.Token)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Token))
 
 	// log.Printf("req:\n%v\n", req)
