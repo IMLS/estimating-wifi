@@ -24,14 +24,28 @@ func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int
 		Timeout: timeout,
 	}
 
-	reqBody, err := json.Marshal(map[string]string{
+	data := map[string]string{
 		"mfgs":               uid,
 		"mac":                uid,
 		"count":              strconv.Itoa(count),
 		"mfgl":               "not implemented",
 		"libid":              "not implemented",
 		"local_date_created": time.Now().Format(time.RFC3339),
-	})
+	}
+
+	// Either
+	// reqBody, err := json.Marshal(data)
+
+	var reqBody []byte
+	var err error
+	switch cfg.Name {
+	case "directus":
+		reqBody, err = json.Marshal(data)
+	case "reval":
+		source := map[string][]map[string]string{"source": {data}}
+		reqBody, err = json.Marshal(source)
+	}
+
 	if err != nil {
 		return errors.New("api: unable to marshal post of mfg count to JSON")
 	}
