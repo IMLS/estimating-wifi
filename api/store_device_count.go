@@ -16,8 +16,8 @@ import (
 
 // FUNC StoreDeviceCount
 // Stores the device count JSON to directus and reval.
-func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int) error {
-	var uri string = ("https://" + cfg.Host + cfg.Postpath)
+func StoreDeviceCount(cfg *config.Config, svr *config.Server, tok *model.Auth, uid string, count int) error {
+	var uri string = ("https://" + svr.Host + svr.Postpath)
 	log.Println("storing to", uri)
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -38,7 +38,7 @@ func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int
 
 	var reqBody []byte
 	var err error
-	switch cfg.Name {
+	switch svr.Name {
 	case "directus":
 		reqBody, err = json.Marshal(data)
 	case "reval":
@@ -57,7 +57,7 @@ func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int
 
 	req.Header.Set("Content-type", "application/json")
 	log.Printf("Using access token: %v\n", tok.Token)
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", cfg.Bearer, tok.Token))
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", svr.Bearer, tok.Token))
 
 	log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)
@@ -86,7 +86,7 @@ func StoreDeviceCount(cfg *config.Server, tok *model.Auth, uid string, count int
 	*/
 	if err != nil {
 		log.Printf("err resp: %v\n", resp)
-		return fmt.Errorf("api: failure in client manufactuerer POST to %v", cfg.Name)
+		return fmt.Errorf("api: failure in client manufactuerer POST to %v", svr.Name)
 	} else {
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
 			log.Printf("api: bad status on POST to: %v\n", uri)

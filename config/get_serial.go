@@ -7,6 +7,9 @@ import (
 	"regexp"
 )
 
+const FakeSerial = "CESTNEPASUNESERIE"
+const FakeSerialCheck = "PAS"
+
 func cpuinfoLines() (lines []string) {
 	file, err := os.Open("/proc/cpuinfo")
 
@@ -31,7 +34,7 @@ func cpuinfoLines() (lines []string) {
 
 func GetSerial() string {
 	lines := cpuinfoLines()
-	serial := "DENTARTHURDENT"
+	serial := FakeSerial
 	re := regexp.MustCompile(`Serial\s+:\s+([a-f0-9]+)`)
 	for _, line := range lines {
 		// log.Println("line", line)

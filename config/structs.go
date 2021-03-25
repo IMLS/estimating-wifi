@@ -45,6 +45,7 @@ type Config struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
 	SessionId string
+	Serial    string
 }
 
 // Located at /etc/session-counter/auth.yaml

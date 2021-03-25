@@ -1,15 +1,11 @@
 package main
 
 import (
-	"crypto/sha256"
-	"fmt"
 	"log"
-	"os"
 	"sync"
 	"time"
 
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/tlp"
 )
@@ -42,23 +38,13 @@ func keepalive(ka *csp.Keepalive, cfg *config.Config) {
 	}
 }
 
-func calcSessionId() string {
-	h := sha256.New()
-	email := os.Getenv(constants.AuthEmailKey)
-	// FIXME: Use the email instead of the token.
-	// Guaranteed to be unique. Current time along with our auth token, hashed.
-	h.Write([]byte(fmt.Sprintf("%v%x", time.Now(), email)))
-	sid := fmt.Sprintf("%x", h.Sum(nil))[0:8]
-	// Keep it short.
-	log.Println("Session id: ", sid)
-	return sid
-}
-
 func main() {
 	// Read in a config
 	cfg := config.ReadConfig()
-	// Add a "sessionId" to the mix.
-	cfg.SessionId = calcSessionId()
+	// Set the session ID for this entire run
+	cfg.SessionId = config.CreateSessionId()
+	// Store this so we don't keep hitting /proc/cpuinfo
+	cfg.Serial = config.GetSerial()
 
 	ka := csp.NewKeepalive()
 	go ka.Start()
