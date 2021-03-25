@@ -10,7 +10,7 @@ import (
 	"gsa.gov/18f/session-counter/csp"
 )
 
-func report(service string, cfg *config.Config, h map[string]int) (http_error_count int, err error) {
+func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
 	http_error_count = 0
 
 	svr := config.GetServer(cfg, service)
@@ -22,10 +22,13 @@ func report(service string, cfg *config.Config, h map[string]int) (http_error_co
 	} else {
 		// If we had no problems getting a token, we can then report
 		// the data to Directus.
+		// First, grab an event ID.
+
 		for uid, count := range h {
 			go func(id string, cnt int) {
 				time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-				err := api.StoreDeviceCount(cfg, svr, tok, id, cnt)
+
+				err := api.StoreDeviceCount(cfg, svr, tok, session_id, id, cnt)
 				if err != nil {
 					log.Println("report:", service, "results POST failure")
 					log.Println(err)
@@ -44,6 +47,8 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 
 	http_error_count := 0
 
+	session_id := 0
+
 	for {
 		select {
 		case <-ping:
@@ -59,13 +64,16 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case h := <-ch_uidmap:
 			for _, service := range []string{"directus", "reval"} {
-				errCount, err := report(service, cfg, h)
+				errCount, err := report(service, cfg, session_id, h)
 				if err != nil {
 					log.Println("reportout: error in reporting to", service)
 					log.Println(err)
 					http_error_count += errCount
 				}
 			}
+			// FIXME Bump the session counter.
+			// FIXME This should be the result of inserting an event.
+			session_id = session_id + 1
 
 		case <-time.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):
 			// If this much time has gone by, go ahead and reset the error count.

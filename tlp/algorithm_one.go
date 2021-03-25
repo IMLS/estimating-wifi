@@ -78,7 +78,7 @@ func AlgorithmOne(ka *csp.Keepalive, cfg *config.Config, in <-chan map[string]in
 			newMapping := make(map[model.UserMapping]int)
 
 			for oldaddr, v := range m {
-				mfg := api.Mac_to_mfg(cfg, oldaddr)
+				mfg := api.MacToMfg(cfg, oldaddr)
 				um := model.UserMapping{Mfg: mfg, Id: macToNdx[oldaddr]}
 				// log.Println("rtu: newmap ", um, " to ", v)
 				newMapping[um] = v

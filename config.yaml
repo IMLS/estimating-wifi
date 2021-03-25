@@ -6,14 +6,14 @@ monitoring:
   disconnection_window: 5
 servers: 
   - name: directus
-    host: directus-demo.app.cloud.gov
+    host: directus-demo2.app.cloud.gov
     authpath: /auth/login
     bearer: Bearer
-    postpath: /items/people2
+    postpath: /items/pls_data
     user: email
     pass: password
   - name: reval
-    host: 10x-rabbit-demo.app.cloud.gov
+    host: https://10x-rabbit-demo.app.cloud.gov
     authpath: /api-token-auth
     bearer: Token
     postpath: /validate

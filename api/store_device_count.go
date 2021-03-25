@@ -16,8 +16,8 @@ import (
 
 // FUNC StoreDeviceCount
 // Stores the device count JSON to directus and reval.
-func StoreDeviceCount(cfg *config.Config, svr *config.Server, tok *model.Auth, uid string, count int) error {
-	var uri string = ("https://" + svr.Host + svr.Postpath)
+func StoreDeviceCount(cfg *config.Config, svr *config.Server, tok *model.Auth, session_id int, uid string, count int) error {
+	var uri string = (svr.Host + svr.Postpath)
 	log.Println("storing to", uri)
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -25,16 +25,17 @@ func StoreDeviceCount(cfg *config.Config, svr *config.Server, tok *model.Auth, u
 	}
 
 	data := map[string]string{
-		"mfgs":               uid,
-		"mac":                uid,
-		"count":              strconv.Itoa(count),
-		"mfgl":               "not implemented",
-		"libid":              "not implemented",
-		"local_date_created": time.Now().Format(time.RFC3339),
+		// FIXME: This needs to be captured first and passed in.
+		"event_id":    strconv.Itoa(session_id),
+		"device_uuid": config.GetSerial(),
+		"lib_user":    tok.User,
+		"localtime":   time.Now().Format(time.RFC3339),
+		// FIXME: The server needs to auto-set this
+		"servertime": time.Now().Format(time.RFC3339),
+		"session_id": cfg.SessionId,
+		"device_id":  uid,
+		"last_seen":  strconv.Itoa(count),
 	}
-
-	// Either
-	// reqBody, err := json.Marshal(data)
 
 	var reqBody []byte
 	var err error
@@ -62,28 +63,7 @@ func StoreDeviceCount(cfg *config.Config, svr *config.Server, tok *model.Auth, u
 	log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)
 	log.Printf("resp: %v\n", resp)
-	// FIXME
-	// If we fail to auth, it won't be a failed POST.
-	// we'll get back a resp object with a 401
-	/*
-		2021/03/16 10:57:32 resp: &{
-			401
-			Unauthorized 401 HTTP/2.0 2 0
-			map[
-				Content-Length:[96]
-				Content-Type:[application/json; charset=utf-8]
-				Date:[Tue, 16 Mar 2021 14:57:32 GMT]
-				Etag:[W/"60-SpvBqFAbsdy4SkXwsevzfPClFZA"]
-				Strict-Transport-Security:[max-age=31536000]
-				Vary:[Origin]
-				X-Content-Type-Options:[nosniff]
-				X-Frame-Options:[DENY]
-				X-Powered-By:[Directus]
-				X-Vcap-Request-Id:[f6273432-1e44-45fa-7950-54ca7d0eac47]
-				X-Xss-Protection:[1; mode=block]
-				] 0x2649b10 96 [] false false map[] 0x2528700 0x25e0120
-			}
-	*/
+
 	if err != nil {
 		log.Printf("err resp: %v\n", resp)
 		return fmt.Errorf("api: failure in client manufactuerer POST to %v", svr.Name)

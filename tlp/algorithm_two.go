@@ -50,7 +50,7 @@ func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
 		// Increment for the next found address.
 		*umdb.lastid = *umdb.lastid + 1
 		// Grab a manufacturer for this MAC
-		umdb.mfg[mac] = api.Mac_to_mfg(cfg, mac)
+		umdb.mfg[mac] = api.MacToMfg(cfg, mac)
 		// Say when we saw it.
 		// now := time.Now().Format(time.RFC3339)
 		// umdb.timestamp[mac] = now

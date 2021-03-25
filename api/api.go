@@ -2,11 +2,9 @@ package api
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
@@ -18,179 +16,6 @@ import (
 	"gsa.gov/18f/session-counter/model"
 )
 
-// FUNC Mac_to_mfg
-// Looks up a MAC address in the manufactuerer's database.
-// Returns a valid name or "unknown" if the name cannot be found.
-func Mac_to_mfg(cfg *config.Config, mac string) string {
-	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
-	if err != nil {
-		log.Fatal("Failed to open manufacturer database.")
-	}
-	// Close the DB at the end of the function.
-	// If not, it's a resource leak.
-	defer db.Close()
-
-	// We need to try the longest to the shortest MAC address
-	// in order to match.
-	// Start with aa:bb:cc:dd:ee
-	// ... then   aa:bb:cc:dd
-	// ... then   aa:bb:cc
-	lengths := []int{14, 11, 8}
-
-	for _, length := range lengths {
-		// If we're given a short MAC address, don't
-		// try and slice more of the string than exists.
-		if len(mac) >= length {
-			substr := mac[0:length]
-			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
-			rows, err := db.Query(q)
-			// Close the rows down, too...
-			// Another possible leak?
-			if err != nil {
-				log.Println(err)
-				log.Printf("manufactuerer not found: %s", q)
-			} else {
-				var id string
-
-				defer rows.Close()
-
-				for rows.Next() {
-					err = rows.Scan(&id)
-					if err != nil {
-						log.Fatal("Failed in DB result row scanning.")
-					}
-					if id != "" {
-						return id
-					}
-				}
-			}
-		}
-	}
-
-	return "unknown"
-}
-
-func unmarshalResponse(cfg *config.Server, authcfg *config.AuthConfig, body []byte) (tok *model.Auth, err error) {
-	a := new(model.Auth)
-	switch cfg.Name {
-	case "directus":
-		res := new(model.DirectusToken)
-		err := json.Unmarshal(body, &res)
-
-		if err != nil {
-			log.Println(err)
-			return nil, errors.New("api: error unmarshalling directus token")
-		}
-
-		log.Println("directus token: ", res)
-		a.User = authcfg.Directus.User
-		a.Token = model.GetToken(res)
-
-		return a, nil
-	case "reval":
-		res := new(model.RevalToken)
-		err := json.Unmarshal(body, &res)
-
-		if err != nil {
-			log.Println(err)
-			return nil, errors.New("api: error unmarshalling reval token")
-		}
-		a.User = authcfg.Reval.User
-		a.Token = model.GetToken(res)
-		return a, nil
-	default:
-		return nil, errors.New("api: no parser found for token response")
-	}
-
-	// Never get here
-	// log.Fatal("Should never get here. API :micdrop:")
-	// return nil, errors.New("api: catastrophic fail.")
-}
-
-// FUNC GetToken
-// Fetches a token from a service for authenticating
-// subsequent interactions with the service.
-// Requires environment variables to be set
-func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
-	var uri string = ("https://" + cfg.Host + cfg.Authpath)
-
-	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
-
-	// The auth structure contains a username and password
-	// for each of the services.
-	authcfg, err := config.ReadAuth()
-	auth := new(model.Auth)
-
-	if err != nil {
-		log.Println("api: could not read auth from filesystem")
-	}
-
-	if cfg.Name == "directus" {
-		auth.User = authcfg.Directus.User
-		auth.Token = authcfg.Directus.Token
-	} else {
-		auth.User = authcfg.Reval.User
-		auth.Token = authcfg.Reval.Token
-	}
-
-	reqBody, err := json.Marshal(map[string]string{
-		cfg.User: auth.User,
-		cfg.Pass: auth.Token,
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf("api: could not marshal POST body for %v", cfg.Name)
-	}
-
-	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
-	req.Header.Set("Content-type", "application/json")
-	log.Println("req: ", req)
-
-	if err != nil {
-		return nil, errors.New("api: unable to construct URI for authentication")
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("api: error in client request to %v %v", cfg.Name, cfg.Authpath)
-	}
-	// Closes the connection at function exit.
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	log.Println("resp: ", string(body))
-	// FIXME
-	// Handle error conditions better.
-	// Directus
-	// 2021/03/19 12:10:52 resp:  {"errors":[{"message":"Invalid user credentials.","extensions":{"code":"INVALID_CREDENTIALS"}}]}
-	// Reval
-	// {"non_field_errors":["Unable to log in with provided credentials."]}
-
-	if err != nil {
-		return nil, fmt.Errorf("api: unable to read body of response from %v %v", cfg.Name, cfg.Authpath)
-	}
-
-	errRes := new(model.AuthError)
-	errR := json.Unmarshal(body, &errRes)
-	if errR != nil {
-		log.Println("api: could not unmarshal error response")
-		log.Println("user ", auth.User, " token ", auth.Token)
-		log.Println(uri)
-		log.Println(errR)
-		log.Println("api: err message ", errRes.Errors)
-		for _, e := range errRes.Errors {
-			log.Println("api: err code ", e.Message)
-		}
-	}
-
-	tok, err = unmarshalResponse(cfg, authcfg, body)
-
-	return tok, err
-}
-
 // FUNC bToMb
 // Internal. Converts bytes to MB for reporting telemetry.
 func bToMb(b uint64) uint64 {
@@ -200,7 +25,7 @@ func bToMb(b uint64) uint64 {
 // FUNC post_ram_usage
 // Part of telemetry. Posts RAM usage.
 func Report_telemetry(cfg *config.Server, tok *model.Auth) (err error) {
-	var uri string = ("https://" + cfg.Host + "/items/memory_usage")
+	var uri string = (cfg.Host + "/items/memory_usage")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -243,7 +68,7 @@ func Report_telemetry(cfg *config.Server, tok *model.Auth) (err error) {
 // FUNC post_manufactuerer_count
 // Posts the manufactuerer count to Directus.
 func Report_mfg(cfg *config.Server, tok *model.Auth, e model.Entry) (err error) {
-	var uri string = ("https://" + cfg.Host + "/items/people2")
+	var uri string = (cfg.Host + "/items/people2")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{

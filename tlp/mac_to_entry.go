@@ -26,7 +26,7 @@ func MacToEntry(ka *csp.Keepalive, cfg *config.Config, macmap <-chan map[string]
 		case mm := <-macmap:
 			mfgs := make(map[string]model.Entry)
 			for mac, count := range mm {
-				mfg := api.Mac_to_mfg(cfg, mac)
+				mfg := api.MacToMfg(cfg, mac)
 				mfgs[mac] = model.Entry{MAC: mac, Mfg: mfg, Count: count}
 			}
 			mfgmap <- mfgs
