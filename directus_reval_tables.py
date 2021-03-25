@@ -19,9 +19,26 @@ def jq(response):
     print(json.dumps(response.json()))
 
 
-def create_table_schema(table_name, fields, note=''):
-    '''create a table with a primary key id'''
+def make_field(name, what, primary=False):
+    if what not in ['string', 'integer', 'timestamp', 'json']:
+        raise hell  # other types aren't supported here at present
     return {
+        'collection': name,
+        'field': name,
+        'type': what,
+        'display': 'formatted-json-value' if what == 'json' else None,
+        'meta': {
+            'collection': name,
+            'field': name,
+            'hidden': False,
+            'interface': INTERFACES[what]
+        }
+    }
+
+
+def create_table(table_name, fields, note=''):
+    '''create a table with a primary key id'''
+    data = {
         'collection': table_name,
         'meta': {
             'icon' : 'build',
@@ -42,23 +59,9 @@ def create_table_schema(table_name, fields, note=''):
             }
         ] + fields,
     }
-
-
-def create_field_schema(name, what, primary=False):
-    if what not in ['string', 'integer', 'timestamp', 'json']:
-        raise hell  # other types aren't supported here at present
-    return {
-        'collection': name,
-        'field': name,
-        'type': what,
-        'display': 'formatted-json-value' if what == 'json' else None,
-        'meta': {
-            'collection': name,
-            'field': name,
-            'hidden': False,
-            'interface': INTERFACES[what]
-        }
-    }
+    return requests.post(f'{URL}/collections/',
+                         data=json.dumps(data),
+                         headers=headers)
 
 
 username = sys.argv[1]
@@ -76,21 +79,46 @@ headers['Authorization'] = f'Bearer {token}'
 response = requests.get(f'{URL}/collections', headers=headers)
 tables = [c['collection'] for c in response.json()['data']]
 
-# delete.
+# delete if extant.
 for table in ['wifi_raw', 'wifi_review', 'wifi_validated']:
     if table in tables:
         print(f'warning: deleting "{table}"')
         requests.delete(f'{URL}/collections/{table}', headers=headers)
 
-# start with wifi_raw.
 print('building "wifi_raw"')
-wifi_raw = create_table_schema(
+response = create_table(
     'wifi_raw',
     [
-        create_field_schema('date_created', 'timestamp'),
-        create_field_schema('data', 'json'),
-        create_field_schema('content_type', 'string'),
+        make_field('date_created', 'timestamp'),
+        make_field('data', 'json'),
+        make_field('content_type', 'string'),
     ],
     note='raw wifi session data from rabbit',
 )
-response = requests.post(f'{URL}/collections/', data=json.dumps(wifi_raw), headers=headers)
+
+print('building "wifi_review"')
+response = create_table(
+    'wifi_review',
+    [
+        make_field('date_created', 'timestamp'),
+        make_field('headers', 'json'),
+        make_field('whole_table_errors', 'json'),
+        make_field('rows', 'json'),
+        make_field('valid_row_count', 'integer'),
+        make_field('invalid_row_count', 'integer'),
+    ],
+    note='wifi session data that did not pass rabbit validation',
+)
+
+# note: wifi_validated is deprecated
+print('building "wifi_validated"')
+response = create_table(
+    'wifi_validated',
+    [
+        make_field('date_created', 'timestamp'),
+        make_field('mac', 'string'),
+        make_field('mfgs', 'string'),
+        make_field('count', 'integer'),
+    ],
+    note='rabbit validated wifi session data',
+)
