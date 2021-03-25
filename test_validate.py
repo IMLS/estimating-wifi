@@ -18,7 +18,7 @@ if "token" not in token_result:
     print(f"error: could not obtain token: {token_result}")
     sys.exit(1)
 token = token_result["token"]
-print(f"obtained token: {token}")
+# print(f"obtained token: {token}")
 
 headers = {
     "Content-Type": "application/json",
