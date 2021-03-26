@@ -11,10 +11,10 @@ import (
 )
 
 func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
-	http_error_count = 0
-
 	svr := config.GetServer(cfg, service)
 	tok, errGT := api.GetToken(svr)
+	http_error_count = 0
+
 	if errGT != nil {
 		log.Println("report:", service, "error in token fetch")
 		log.Println(errGT)
@@ -27,7 +27,6 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 		for uid, count := range h {
 			go func(id string, cnt int) {
 				time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-
 				err := api.StoreDeviceCount(cfg, svr, tok, session_id, id, cnt)
 				if err != nil {
 					log.Println("report:", service, "results POST failure")
@@ -66,8 +65,8 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 		case h := <-ch_uidmap:
 			event_ndx := el.Log("logging_devices", nil)
 
-			for _, service := range []string{"directus", "reval"} {
-
+			// FIXME: This used to loop over "directus" and "reval"
+			for _, service := range []string{"reval"} {
 				errCount, err := report(service, cfg, event_ndx, h)
 				if err != nil {
 					log.Println("reportout: error in reporting to", service)
