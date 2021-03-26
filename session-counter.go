@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/tlp"
@@ -45,6 +46,11 @@ func main() {
 	cfg.SessionId = config.CreateSessionId()
 	// Store this so we don't keep hitting /proc/cpuinfo
 	cfg.Serial = config.GetSerial()
+	svr := config.GetServer(cfg, "directus")
+
+	el := new(api.EventLogger)
+	el.Init(cfg, svr)
+	el.Log("startup", nil)
 
 	ka := csp.NewKeepalive()
 	go ka.Start()

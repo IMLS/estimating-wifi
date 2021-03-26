@@ -16,13 +16,14 @@ func GetServer(cfg *Config, which string) *Server {
 }
 
 type Server struct {
-	Name     string `yaml:"name"`
-	Host     string `yaml:"host"`
-	Authpath string `yaml:"authpath"`
-	Bearer   string `yaml:"bearer"`
-	Postpath string `yaml:"postpath"`
-	User     string `yaml:"user"`
-	Pass     string `yaml:"pass"`
+	Name      string `yaml:"name"`
+	Host      string `yaml:"host"`
+	Authpath  string `yaml:"authpath"`
+	Bearer    string `yaml:"bearer"`
+	Datapath  string `yaml:"datapath"`
+	Eventpath string `yaml:"eventpath"`
+	User      string `yaml:"user"`
+	Pass      string `yaml:"pass"`
 }
 
 type Config struct {

@@ -110,3 +110,22 @@ func Test_StoreContent(t *testing.T) {
 		StoreDeviceCount(cfg, svr, auth, 42, "Next:0", 1)
 	}
 }
+
+func Test_LogEvent(t *testing.T) {
+	cfg := config.ReadConfig()
+	// Fill in the rest of the config.
+	cfg.SessionId = config.CreateSessionId()
+	cfg.Serial = config.GetSerial()
+	svr := config.GetServer(cfg, "directus")
+	auth, _ := GetToken(svr)
+	t.Log("auth", auth)
+
+	// Create a new logger
+
+	el := new(EventLogger)
+	el.Init(cfg, svr)
+	el.Log("startup", map[string]string{"msg": "starting session-counter"})
+	el.Log("empty", map[string]string{})
+	el.Log("nil", nil)
+
+}
