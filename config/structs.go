@@ -31,15 +31,14 @@ type Config struct {
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
 		HTTPErrorIntervalMins int `yaml:"http_error_interval_mins"`
 		UniquenessWindow      int `yaml:"uniqueness_window"`
-		DisconnectionWindow   int `yaml:"disconnection_window"`
+		Rounds                int `yaml:"rounds"`
+		Threshold             int `yaml:"threshold"`
 	} `yaml:"monitoring"`
 	Servers   []Server `yaml:"servers"`
 	Wireshark struct {
-		Duration  int    `yaml:"duration"`
-		Rounds    int    `yaml:"rounds"`
-		Threshold int    `yaml:"threshold"`
-		Adapter   string `yaml:"adapter"`
-		Path      string `yaml:"path"`
+		Duration int    `yaml:"duration"`
+		Adapter  string `yaml:"adapter"`
+		Path     string `yaml:"path"`
 	} `yaml:"wireshark"`
 	Manufacturers struct {
 		Db string `yaml:"db"`
