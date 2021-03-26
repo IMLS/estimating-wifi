@@ -1,26 +1,44 @@
 {
   "fields": [
     {
-      "name": "mac",
-      "type": "string",
-      "description": "Shortened MAC address of device",
-      "constraints": {
-        "pattern": "[a-z0-9]{2}:[a-z0-9]{2}:[a-z0-9]{2}"
-      }
-    },
-    {
-      "name": "mfgs",
-      "type": "string",
-      "description": "Manufacturer of device (if found)"
-    },
-    {
-      "name": "count",
+      "name": "event_id",
       "type": "number",
-      "description": "How often device has shown up in the last monitoring period",
-      "constraints": {
-        "minimum": 0,
-        "maximum": 10
-      }
+      "description": "Event ID"
+    },
+    {
+      "name": "device_uuid",
+      "type": "string",
+      "description": "Device UUID"
+    },
+    {
+      "name": "lib_user",
+      "type": "string",
+      "description": "Library user ID"
+    },
+    {
+      "name": "localtime",
+      "type": "string",
+      "description": "Local time of the device"
+    },
+    {
+      "name": "servertime",
+      "type": "string",
+      "description": "Server time"
+    },
+    {
+      "name": "session_id",
+      "type": "string",
+      "description": "Session ID"
+    },
+    {
+      "name": "device_id",
+      "type": "string",
+      "description": "Device ID"
+    },
+    {
+      "name": "last_seen",
+      "type": "number",
+      "description": "How often device has shown up in the last monitoring period"
     }
   ]
 }
