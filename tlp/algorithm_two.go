@@ -35,7 +35,7 @@ func newUMDB() *uniqueMappingDB {
 
 func (umdb uniqueMappingDB) advanceTime() {
 	// Bump all the ticks by one.
-	for mac, _ := range umdb.mfg {
+	for mac := range umdb.mfg {
 		umdb.tick[mac] = umdb.tick[mac] + 1
 	}
 }
@@ -67,7 +67,7 @@ func (umdb uniqueMappingDB) removeOldMappings(window int) {
 	// now := time.Now()
 	remove := make([]string, 0)
 	// Find everything we need to remove.
-	for mac, _ := range umdb.mfg {
+	for mac := range umdb.mfg {
 		// storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
 		// diff := now.Sub(storedtime)
 		// Is it further in the past than our window (in minutes)?
@@ -90,7 +90,7 @@ func (umdb uniqueMappingDB) asUserMappings() map[string]int {
 	h := make(map[string]int)
 	// n := time.Now()
 
-	for mac, _ := range umdb.mfg {
+	for mac := range umdb.mfg {
 		userm := fmt.Sprintf("%v:%d", umdb.mfg[mac], umdb.uid[mac])
 		// storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
 		// diff := n.Sub(storedtime)
