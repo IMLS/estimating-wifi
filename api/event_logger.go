@@ -14,9 +14,15 @@ type EventLogger struct {
 	Server *config.Server
 }
 
-func (el *EventLogger) Init(cfg *config.Config, svr *config.Server) {
+func (el *EventLogger) init(cfg *config.Config, svr *config.Server) {
 	el.Server = svr
 	el.Cfg = cfg
+}
+
+func NewEventLogger(cfg *config.Config, svr *config.Server) *EventLogger {
+	el := new(EventLogger)
+	el.init(cfg, svr)
+	return el
 }
 
 // "event_id":    strconv.Itoa(session_id),

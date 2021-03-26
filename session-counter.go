@@ -48,8 +48,7 @@ func main() {
 	cfg.Serial = config.GetSerial()
 	svr := config.GetServer(cfg, "directus")
 
-	el := new(api.EventLogger)
-	el.Init(cfg, svr)
+	el := api.NewEventLogger(cfg, svr)
 	el.Log("startup", nil)
 
 	ka := csp.NewKeepalive(cfg)

@@ -27,9 +27,7 @@ type Keepalive struct {
 }
 
 func NewKeepalive(cfg *config.Config) *Keepalive {
-	svr := config.GetServer(cfg, "directus")
-	el := new(api.EventLogger)
-	el.Init(cfg, svr)
+	el := api.NewEventLogger(cfg, config.GetServer(cfg, "directus"))
 
 	return &Keepalive{
 		publishCh:   make(chan interface{}, 1),

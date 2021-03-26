@@ -20,10 +20,6 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 		log.Println(errGT)
 		http_error_count = http_error_count + 1
 	} else {
-		// If we had no problems getting a token, we can then report
-		// the data to Directus.
-		// First, grab an event ID.
-
 		for uid, count := range h {
 			go func(id string, cnt int) {
 				time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
@@ -46,8 +42,7 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 	http_error_count := 0
 
 	// For event logging
-	el := new(api.EventLogger)
-	el.Init(cfg, config.GetServer(cfg, "directus"))
+	el := api.NewEventLogger(cfg, config.GetServer(cfg, "directus"))
 
 	for {
 		select {
@@ -65,14 +60,14 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 		case h := <-ch_uidmap:
 			event_ndx := el.Log("logging_devices", nil)
 
-			// FIXME: This used to loop over "directus" and "reval"
-			for _, service := range []string{"reval"} {
-				errCount, err := report(service, cfg, event_ndx, h)
-				if err != nil {
-					log.Println("reportout: error in reporting to", service)
-					log.Println(err)
-					http_error_count += errCount
-				}
+			// This used to loop over "directus" and "reval"
+			// We decided we will log only to reval, and it will handle validation and logging.
+			service := "reval"
+			errCount, err := report(service, cfg, event_ndx, h)
+			if err != nil {
+				log.Println("reportout: error in reporting to", service)
+				log.Println(err)
+				http_error_count += errCount
 			}
 
 		case <-time.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):

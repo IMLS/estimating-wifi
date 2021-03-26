@@ -122,8 +122,7 @@ func Test_LogEvent(t *testing.T) {
 
 	// Create a new logger
 
-	el := new(EventLogger)
-	el.Init(cfg, svr)
+	el := NewEventLogger(cfg, svr)
 	el.Log("startup", map[string]string{"msg": "starting session-counter"})
 	el.Log("empty", map[string]string{})
 	el.Log("nil", nil)
