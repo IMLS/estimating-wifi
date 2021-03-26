@@ -52,7 +52,7 @@ func main() {
 	el.Init(cfg, svr)
 	el.Log("startup", nil)
 
-	ka := csp.NewKeepalive()
+	ka := csp.NewKeepalive(cfg)
 	go ka.Start()
 	go keepalive(ka, cfg)
 	go run(ka, cfg)

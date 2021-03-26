@@ -44,10 +44,11 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]int) {
 	log.Println("Starting ReportOut")
 	ping, pong := ka.Subscribe("ReportOut", 30)
-
 	http_error_count := 0
 
-	session_id := 0
+	// For event logging
+	el := new(api.EventLogger)
+	el.Init(cfg, config.GetServer(cfg, "directus"))
 
 	for {
 		select {
@@ -63,17 +64,17 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 			}
 		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case h := <-ch_uidmap:
+			event_ndx := el.Log("logging_devices", nil)
+
 			for _, service := range []string{"directus", "reval"} {
-				errCount, err := report(service, cfg, session_id, h)
+
+				errCount, err := report(service, cfg, event_ndx, h)
 				if err != nil {
 					log.Println("reportout: error in reporting to", service)
 					log.Println(err)
 					http_error_count += errCount
 				}
 			}
-			// FIXME Bump the session counter.
-			// FIXME This should be the result of inserting an event.
-			session_id = session_id + 1
 
 		case <-time.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):
 			// If this much time has gone by, go ahead and reset the error count.

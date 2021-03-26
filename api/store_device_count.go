@@ -26,6 +26,6 @@ func StoreDeviceCount(cfg *config.Config, svr *config.Server, tok *model.Auth, s
 		"last_seen":  strconv.Itoa(count),
 	}
 
-	err := postJSON(svr, tok, uri, data)
-	return err
+	postJSON(svr, tok, uri, data)
+	return nil
 }

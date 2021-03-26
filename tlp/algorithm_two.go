@@ -136,6 +136,7 @@ func AlgorithmTwo(ka *csp.Keepalive, cfg *config.Config, in <-chan []string, out
 		case <-ping:
 			pong <- "AlgorithmTwo"
 		case arr := <-in:
+
 			// If we consider every message a "tick" of the clock, we need to advance time.
 			umdb.advanceTime()
 

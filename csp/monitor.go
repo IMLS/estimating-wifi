@@ -1,10 +1,13 @@
 package csp
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"gsa.gov/18f/session-counter/api"
+	"gsa.gov/18f/session-counter/config"
 )
 
 // Inspired by the broker pattern found here:
@@ -18,18 +21,25 @@ type resp struct {
 }
 
 type Keepalive struct {
-	publishCh chan interface{}
-	subCh     chan resp
+	publishCh   chan interface{}
+	subCh       chan resp
+	eventLogger *api.EventLogger
 }
 
-func NewKeepalive() *Keepalive {
+func NewKeepalive(cfg *config.Config) *Keepalive {
+	svr := config.GetServer(cfg, "directus")
+	el := new(api.EventLogger)
+	el.Init(cfg, svr)
+
 	return &Keepalive{
-		publishCh: make(chan interface{}, 1),
-		subCh:     make(chan resp, 1),
+		publishCh:   make(chan interface{}, 1),
+		subCh:       make(chan resp, 1),
+		eventLogger: el,
 	}
 }
 
 func (b *Keepalive) Start() {
+
 	// Internal state for the broker.
 	procs := make(map[chan interface{}]resp)
 
@@ -65,6 +75,11 @@ func (b *Keepalive) Start() {
 					case <-procs[c].pongCh:
 						// log.Printf("Pong from %v", procs[c].id)
 					case <-time.After(procs[c].timeout):
+						b.eventLogger.Log("keepalive_timeout",
+							map[string]string{
+								"process_id":      fmt.Sprint(procs[c].id),
+								"process_timeout": fmt.Sprint(procs[c].timeout)})
+
 						log.Printf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
 						processTimedOut = true
 					}

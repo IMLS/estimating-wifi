@@ -29,7 +29,7 @@ func (el *EventLogger) Init(cfg *config.Config, svr *config.Server) {
 // 		"device_id":  uid,
 // 		"last_seen":  strconv.Itoa(count),
 
-func (el *EventLogger) Log(tag string, info map[string]string) {
+func (el *EventLogger) Log(tag string, info map[string]string) int {
 	var uri string = (el.Server.Host + el.Server.Eventpath)
 	log.Println("event log uri:", uri)
 	tok, _ := GetToken(el.Server)
@@ -52,5 +52,7 @@ func (el *EventLogger) Log(tag string, info map[string]string) {
 		"tag":         tag,
 		"info":        string(asJson),
 	}
-	postJSON(el.Server, tok, uri, data)
+	ndx, _ := postJSON(el.Server, tok, uri, data)
+	return ndx
+
 }

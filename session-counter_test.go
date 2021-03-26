@@ -171,7 +171,7 @@ func assertValueEqual(t *testing.T, a *model.UserMapping, b *model.UserMapping, 
 func TestRawToUid(t *testing.T) {
 	cfg := new(config.Config)
 	cfg.Manufacturers.Db = "/etc/session-counter/manufacturers.sqlite"
-	ka := csp.NewKeepalive()
+	ka := csp.NewKeepalive(cfg)
 
 	// var buf bytes.Buffer
 	// log.SetOutput(&buf)
