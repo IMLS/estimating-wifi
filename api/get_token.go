@@ -55,6 +55,10 @@ func unmarshalResponse(cfg *config.Server, authcfg *config.AuthConfig, body []by
 // Fetches a token from a service for authenticating
 // subsequent interactions with the service.
 // Requires environment variables to be set
+func GetTokenStub(cfg *config.Server) (tok *model.Auth, err error) {
+	return nil, nil
+}
+
 func GetToken(cfg *config.Server) (tok *model.Auth, err error) {
 	var uri string = (cfg.Host + cfg.Authpath)
 

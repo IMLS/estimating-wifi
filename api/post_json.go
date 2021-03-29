@@ -40,8 +40,10 @@ func postJSON(svr *config.Server, tok *model.Auth, uri string, data map[string]s
 	}
 
 	req.Header.Set("Content-type", "application/json")
-	log.Printf("Using access token: %v\n", tok.Token)
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", svr.Bearer, tok.Token))
+	if tok != nil {
+		log.Printf("Using access token: %v\n", tok.Token)
+		req.Header.Set("Authorization", fmt.Sprintf("%s %s", svr.Bearer, tok.Token))
+	}
 
 	log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)

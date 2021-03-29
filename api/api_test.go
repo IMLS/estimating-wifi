@@ -101,8 +101,6 @@ func Test_StoreContent(t *testing.T) {
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
 
-	// authcfg, _ := config.ReadAuth()
-
 	for _, server := range []string{"directus", "reval"} {
 		svr := config.GetServer(cfg, server)
 		auth, _ := GetToken(svr)
