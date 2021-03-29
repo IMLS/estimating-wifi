@@ -7,12 +7,12 @@ import (
 	"os/exec"
 	"strings"
 
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/csp"
-	"gsa.gov/18f/session-counter/model"
 )
 
-func tshark(cfg *model.Config) map[string]int {
+func tshark(cfg *config.Config) []string {
 
 	tsharkCmd := exec.Command(cfg.Wireshark.Path,
 		"-a", fmt.Sprintf("duration:%d", cfg.Wireshark.Duration),
@@ -25,18 +25,19 @@ func tshark(cfg *model.Config) map[string]int {
 	tsharkCmd.Wait()
 	macs := strings.Split(string(tsharkBytes), "\n")
 
-	pkts := make(map[string]int)
+	// Let's not worry about how many packets.
+	// Just track the MAC addresses.
+	// pkts := make(map[string]int)
+	// for _, a_mac := range macs {
+	// 	v, ok := pkts[a_mac]
+	// 	if ok {
+	// 		pkts[a_mac] = v + 1
+	// 	} else {
+	// 		pkts[a_mac] = 1
+	// 	}
+	// }
 
-	for _, a_mac := range macs {
-		v, ok := pkts[a_mac]
-		if ok {
-			pkts[a_mac] = v + 1
-		} else {
-			pkts[a_mac] = 1
-		}
-	}
-
-	return pkts
+	return macs
 }
 
 /* PROCESS runWireshark
@@ -46,7 +47,7 @@ func tshark(cfg *model.Config) map[string]int {
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func RunWireshark(ka *csp.Keepalive, cfg *model.Config, in <-chan bool, out chan<- map[string]int) {
+func RunWireshark(ka *csp.Keepalive, cfg *config.Config, in <-chan bool, out chan []string) {
 	log.Println("Starting runWireshark")
 	// If we have to wait twice the monitor duration, something broke.
 	ping, pong := ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)
@@ -64,18 +65,15 @@ func RunWireshark(ka *csp.Keepalive, cfg *model.Config, in <-chan bool, out chan
 			macmap := tshark(cfg)
 			// Mark and remove too-short MAC addresses
 			// for removal from the tshark findings.
-			var to_remove []string
+			var keepers []string
 			// for `k, _ :=` is the same as `for k :=`
-			for k := range macmap {
-				if len(k) < constants.MACLENGTH {
-					to_remove = append(to_remove, k)
+			for _, k := range macmap {
+				if len(k) >= constants.MACLENGTH {
+					keepers = append(keepers, k)
 				}
 			}
-			for _, s := range to_remove {
-				delete(macmap, s)
-			}
 			// Report out the cleaned MACmap.
-			out <- macmap
+			out <- keepers
 		}
 	}
 }

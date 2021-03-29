@@ -2,121 +2,19 @@ package api
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"runtime"
 	"strconv"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/session-counter/constants"
+	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/model"
 )
-
-// FUNC Mac_to_mfg
-// Looks up a MAC address in the manufactuerer's database.
-// Returns a valid name or "unknown" if the name cannot be found.
-func Mac_to_mfg(cfg *model.Config, mac string) string {
-	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
-	if err != nil {
-		log.Fatal("Failed to open manufacturer database.")
-	}
-	// Close the DB at the end of the function.
-	// If not, it's a resource leak.
-	defer db.Close()
-
-	// We need to try the longest to the shortest MAC address
-	// in order to match.
-	// Start with aa:bb:cc:dd:ee
-	// ... then   aa:bb:cc:dd
-	// ... then   aa:bb:cc
-	lengths := []int{14, 11, 8}
-
-	for _, length := range lengths {
-		// If we're given a short MAC address, don't
-		// try and slice more of the string than exists.
-		if len(mac) >= length {
-			substr := mac[0:length]
-			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
-			rows, err := db.Query(q)
-			// Close the rows down, too...
-			// Another possible leak?
-			if err != nil {
-				log.Println(err)
-				log.Printf("manufactuerer not found: %s", q)
-			} else {
-				var id string
-
-				defer rows.Close()
-
-				for rows.Next() {
-					err = rows.Scan(&id)
-					if err != nil {
-						log.Fatal("Failed in DB result row scanning.")
-					}
-					if id != "" {
-						return id
-					}
-				}
-			}
-		}
-	}
-
-	return "unknown"
-}
-
-// FUNC Get_token
-// Fetches a token from Directus for authenticating
-// subsequent interactions with the service.
-// Requires environment variables to be set
-func Get_token(cfg *model.Config) (tok *model.Token, err error) {
-	user := os.Getenv(constants.EnvUsername)
-	pass := os.Getenv(constants.EnvPassword)
-	var uri string = (cfg.Server.Scheme + "://" +
-		cfg.Server.Host + "/auth/login")
-
-	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
-
-	reqBody, err := json.Marshal(map[string]string{
-		"email":    user,
-		"password": pass,
-	})
-
-	if err != nil {
-		return nil, errors.New("api: could not authenticate to Directus")
-	}
-
-	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
-	req.Header.Set("Content-type", "application/json")
-	if err != nil {
-		return nil, errors.New("api: unable to construct URI for authentication")
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, errors.New("api: error in client request to Directus /auth")
-	}
-	// Closes the connection at function exit.
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.New("api: unable to read body of response from Directus /auth")
-	}
-	res := model.Token{}
-	json.Unmarshal(body, &res)
-
-	return &res, nil
-}
 
 // FUNC bToMb
 // Internal. Converts bytes to MB for reporting telemetry.
@@ -126,10 +24,8 @@ func bToMb(b uint64) uint64 {
 
 // FUNC post_ram_usage
 // Part of telemetry. Posts RAM usage.
-func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
-	var uri string = (cfg.Server.Scheme + "://" +
-		cfg.Server.Host + "/items/" +
-		"memory_usage")
+func Report_telemetry(cfg *config.Server, tok *model.Auth) (err error) {
+	var uri string = (cfg.Host + "/items/memory_usage")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -158,7 +54,7 @@ func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
 	}
 
 	req.Header.Set("Content-type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Token))
 
 	resp, err := client.Do(req)
 
@@ -171,10 +67,8 @@ func Report_telemetry(cfg *model.Config, tok *model.Token) (err error) {
 
 // FUNC post_manufactuerer_count
 // Posts the manufactuerer count to Directus.
-func Report_mfg(cfg *model.Config, tok *model.Token, e model.Entry) (err error) {
-	var uri string = (cfg.Server.Scheme + "://" +
-		cfg.Server.Host + "/items/" +
-		cfg.Server.Collection)
+func Report_mfg(cfg *config.Server, tok *model.Auth, e model.Entry) (err error) {
+	var uri string = (cfg.Host + "/items/people2")
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -197,9 +91,10 @@ func Report_mfg(cfg *model.Config, tok *model.Token, e model.Entry) (err error) 
 	if err != nil {
 		return errors.New("api: unable to construct request for manufactuerer POST")
 	}
+
 	req.Header.Set("Content-type", "application/json")
-	// log.Printf("Using access token: %v\n", tok.Data.AccessToken)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Data.AccessToken))
+	// log.Printf("Using access token: %v\n", tok.Token)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok.Token))
 
 	// log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)

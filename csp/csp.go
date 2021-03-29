@@ -25,3 +25,12 @@ func delta_map(in chan map[string]int, o1 chan map[string]int, o2 chan map[strin
 		go func() { o2 <- v }()
 	}
 }
+
+func Delta_par_three(in <-chan map[string]int, o1 chan<- map[string]int, o2 chan<- map[string]int, o3 chan<- map[string]int) {
+	for {
+		v := <-in
+		go func() { o1 <- v }()
+		go func() { o2 <- v }()
+		go func() { o3 <- v }()
+	}
+}

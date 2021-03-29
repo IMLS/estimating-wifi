@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/session-counter/config"
 )
 
+// This should be much higher, like 2000
+// But, it slows down practical testing... :/
+const dbIterations = 10
+
 func Test_get_manufactuerer(t *testing.T) {
-	cfg := model.Config{}
+	cfg := config.Config{}
 	cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
 
 	var tests = []struct {
@@ -25,7 +29,7 @@ func Test_get_manufactuerer(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(fmt.Sprintf("Get Manufactuerer = %v", tc.mfgs), func(t *testing.T) {
-			got := Mac_to_mfg(&cfg, tc.mac)
+			got := MacToMfg(&cfg, tc.mac)
 			if got != tc.mfgs {
 				t.Fatalf("got [ %v ] want [ %v ]", got, tc.mfgs)
 			} else {
@@ -40,12 +44,13 @@ func Test_get_manufactuerer(t *testing.T) {
 // this loop will find it. When the DB isn't closed properly,
 // this will fail around 1078ish connections.
 func Test_thrash_db(t *testing.T) {
-	cfg := model.Config{}
-	cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
+	// cfg := config.Config{}
+	// cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
+	cfg := config.ReadConfig()
 
-	for ndx := 0; ndx < 2000; ndx++ {
+	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
-			got := Mac_to_mfg(&cfg, "aa:bb:cc")
+			got := MacToMfg(cfg, "aa:bb:cc")
 			if got != "unknown" {
 				t.Fatalf("got %v; want %v", got, "unknown")
 			} else {
@@ -54,4 +59,70 @@ func Test_thrash_db(t *testing.T) {
 
 		})
 	}
+}
+
+func Test_ReadAuth(t *testing.T) {
+	a, e := config.ReadAuth()
+	if e != nil {
+		t.Fatal("failure in reading auth")
+	}
+	if a == nil {
+		t.Fatal("auth is nil")
+	}
+
+}
+
+func Test_GetToken(t *testing.T) {
+	cfg := config.ReadConfig()
+	// authcfg, _ := config.ReadAuth()
+
+	for _, server := range []string{"directus", "reval"} {
+		s := config.GetServer(cfg, server)
+
+		auth, err := GetToken(s)
+
+		if err != nil {
+			t.Log(err)
+			t.Fatal("Failed to get token.")
+		}
+
+		if len(auth.Token) < 2 {
+			t.Log(auth)
+			t.Fatal("Failed to get auth token.")
+		}
+
+	}
+
+}
+
+func Test_StoreContent(t *testing.T) {
+	cfg := config.ReadConfig()
+	// Fill in the rest of the config.
+	cfg.SessionId = config.CreateSessionId()
+	cfg.Serial = config.GetSerial()
+
+	for _, server := range []string{"directus", "reval"} {
+		svr := config.GetServer(cfg, server)
+		auth, _ := GetToken(svr)
+		t.Log("auth", auth)
+		StoreDeviceCount(cfg, svr, auth, 42, "Next:0", 1)
+	}
+}
+
+func Test_LogEvent(t *testing.T) {
+	cfg := config.ReadConfig()
+	// Fill in the rest of the config.
+	cfg.SessionId = config.CreateSessionId()
+	cfg.Serial = config.GetSerial()
+	svr := config.GetServer(cfg, "directus")
+	auth, _ := GetToken(svr)
+	t.Log("auth", auth)
+
+	// Create a new logger
+
+	el := NewEventLogger(cfg, svr)
+	el.Log("startup", map[string]string{"msg": "starting session-counter"})
+	el.Log("empty", map[string]string{})
+	el.Log("nil", nil)
+
 }
