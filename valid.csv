@@ -1,3 +1,4 @@
-mac,mfgs,count
-60:38:e0,Belkin,5
-0a:de:be,unknown,1
+event_id,device_uuid,lib_user,localtime,servertime,session_id,device_id,last_seen
+-1,0000,james@test.gov,,,abcd,valid:0,1
+-1,0000,james@test.gov,,,abcd,valid:1,2
+-1,0000,james@test.gov,,,abcd,valid:1,3

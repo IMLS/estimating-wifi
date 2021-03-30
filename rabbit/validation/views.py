@@ -55,7 +55,7 @@ def wifi_interceptor(request):
     # either store the validated data or the data with errors.
     if result["valid"]:
         for item in request.data["source"]:
-            proxy_data(token, 'wifi_validated', item)
+            proxy_data(token, 'pls_data', item)
     else:
         for table in result["tables"]:
             proxy_data(token, 'wifi_review', table)
