@@ -10,18 +10,12 @@ import (
 
 // PROC We need some state.
 type EventLogger struct {
-	Cfg    *config.Config
-	Server *config.Server
+	Cfg *config.Config
 }
 
-func (el *EventLogger) init(cfg *config.Config, svr *config.Server) {
-	el.Server = svr
-	el.Cfg = cfg
-}
-
-func NewEventLogger(cfg *config.Config, svr *config.Server) *EventLogger {
+func NewEventLogger(cfg *config.Config) *EventLogger {
 	el := new(EventLogger)
-	el.init(cfg, svr)
+	el.Cfg = cfg
 	return el
 }
 
@@ -36,9 +30,9 @@ func NewEventLogger(cfg *config.Config, svr *config.Server) *EventLogger {
 // 		"last_seen":  strconv.Itoa(count),
 
 func (el *EventLogger) Log(tag string, info map[string]string) int {
-	var uri string = (el.Server.Host + el.Server.Eventpath)
+	uri := FormatUri(el.Cfg.Umbrella.Scheme, el.Cfg.Umbrella.Host, el.Cfg.Umbrella.Logging)
 	log.Println("event log uri:", uri)
-	tok, _ := GetToken(el.Server)
+	tok, _ := config.ReadAuth()
 
 	// ALWAYS log a hash table. Makes processing easier later.
 	var asJson []byte
@@ -51,14 +45,14 @@ func (el *EventLogger) Log(tag string, info map[string]string) int {
 
 	data := map[string]string{
 		"device_uuid": config.GetSerial(),
-		"lib_user":    tok.User,
+		"lib_user":    tok.Umbrella.Email,
 		"session_id":  el.Cfg.SessionId,
 		"localtime":   time.Now().Format(time.RFC3339),
 		"servertime":  time.Now().Format(time.RFC3339),
 		"tag":         tag,
 		"info":        string(asJson),
 	}
-	ndx, _ := postJSON(el.Server, tok, uri, data)
+	ndx, _ := postJSON(el.Cfg, tok, uri, data)
 	return ndx
 
 }

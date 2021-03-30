@@ -18,23 +18,15 @@ monitoring:
   # and require a device to be present 8 out of 10 minutes.
   # rounds of 60 and threshold of 30 would watch for an hour, and then 
   # consider any device that was present for 30 minutes to be 
-servers: 
-  - name: directus
-    host: https://directus-demo2.app.cloud.gov
-    # host: http://192.168.1.146:8055
-    authpath: /auth/login
-    bearer: Bearer
-    datapath: /items/pls_data
-    eventpath: /items/pls_events
-    user: email
-    pass: password
-  - name: reval
-    host: https://10x-rabbit-demo.app.cloud.gov
-    authpath: /api-token-auth
-    bearer: Token
-    datapath: /validate
-    user: username
-    pass: password
+
+# These are two different endpoints.
+# They will both go through umbrella...
+# So only the path should be
+umbrella:
+  scheme: https
+  host: localhost
+  data: /data
+  logging: /logging
 wireshark:
   path: /usr/bin/tshark
   adapter: wlan1

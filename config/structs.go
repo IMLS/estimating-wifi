@@ -1,31 +1,6 @@
 package config
 
-import "log"
-
-func GetServer(cfg *Config, which string) *Server {
-	// log.Println("cfg:", cfg)
-	// log.Println("servers: ", cfg.Servers)
-	for _, s := range cfg.Servers {
-		// log.Printf("config: considering: %v", s)
-		if s.Name == which {
-			return &s
-		}
-	}
-	log.Printf("model: could not retrieve server matching name '%v'", which)
-	return nil
-}
-
-type Server struct {
-	Name      string `yaml:"name"`
-	Host      string `yaml:"host"`
-	Authpath  string `yaml:"authpath"`
-	Bearer    string `yaml:"bearer"`
-	Datapath  string `yaml:"datapath"`
-	Eventpath string `yaml:"eventpath"`
-	User      string `yaml:"user"`
-	Pass      string `yaml:"pass"`
-}
-
+// At /etc/session-counter/config.yaml
 type Config struct {
 	Monitoring struct {
 		PingInterval          int `yaml:"pinginterval"`
@@ -35,7 +10,12 @@ type Config struct {
 		Rounds                int `yaml:"rounds"`
 		Threshold             int `yaml:"threshold"`
 	} `yaml:"monitoring"`
-	Servers   []Server `yaml:"servers"`
+	Umbrella struct {
+		Scheme  string `yaml:"scheme"`
+		Host    string `yaml:"host"`
+		Data    string `yaml:"data"`
+		Logging string `yaml:"logging"`
+	} `yaml:"umbrella"`
 	Wireshark struct {
 		Duration int    `yaml:"duration"`
 		Adapter  string `yaml:"adapter"`
@@ -50,12 +30,8 @@ type Config struct {
 
 // Located at /etc/session-counter/auth.yaml
 type AuthConfig struct {
-	Directus struct {
+	Umbrella struct {
 		Token string `yaml:"token"`
-		User  string `yaml:"username"`
-	} `yaml:"directus"`
-	Reval struct {
-		Token string `yaml:"token"`
-		User  string `yaml:"username"`
-	} `yaml:"reval"`
+		Email string `yaml:"email"`
+	}
 }

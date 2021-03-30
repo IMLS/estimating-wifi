@@ -11,10 +11,9 @@ import (
 	"time"
 
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/model"
 )
 
-func postJSON(svr *config.Server, tok *model.Auth, uri string, data map[string]string) (int, error) {
+func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data map[string]string) (int, error) {
 	log.Println("storing JSON to", uri)
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -22,39 +21,52 @@ func postJSON(svr *config.Server, tok *model.Auth, uri string, data map[string]s
 	}
 	var reqBody []byte
 	var err error
-	switch svr.Name {
-	case "directus":
-		reqBody, err = json.Marshal(data)
-	case "reval":
-		source := map[string][]map[string]string{"source": {data}}
-		reqBody, err = json.Marshal(source)
-	}
+	// FIXME
+	// Directus takes posted data directly.
+	// ReVal is currently looking for it to be "wrapped" in a struct.
+	// We should modify ReVal so that it takes the exact same POSTed data
+	// as Directus, so that we cannot tell the difference from the client-side.
+	// switch svr.Name {
+	// case "directus":
+	// 	reqBody, err = json.Marshal(data)
+	// case "reval":
+	// 	source := map[string][]map[string]string{"source": {data}}
+	// 	reqBody, err = json.Marshal(source)
+	// }
+
+	reqBody, err = json.Marshal(data)
 
 	if err != nil {
-		return -1, errors.New("api: unable to marshal post of mfg count to JSON")
+		return -1, errors.New("api: unable to marshal post of data to JSON")
 	}
 
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return -1, errors.New("api: unable to construct request for manufactuerer POST")
+		return -1, errors.New("api: unable to construct request for data POST")
 	}
 
 	req.Header.Set("Content-type", "application/json")
 	if tok != nil {
-		log.Printf("Using access token: %v\n", tok.Token)
-		req.Header.Set("Authorization", fmt.Sprintf("%s %s", svr.Bearer, tok.Token))
+		log.Printf("Using access token: %v\n", tok.Umbrella.Token)
+		req.Header.Set("Authorization", fmt.Sprintf("X-Api-Key %s", tok.Umbrella.Token))
+	} else {
+		log.Printf("api: failed to set headers for authorization.")
 	}
+
+	// The first thing we do is post an event. This will return a "magic index"
+	// or a foreign key, that we will use in our post of the data. This associates
+	// every piece of data entered with a session, and indexes the post in that session.
+	// That way, we can say "this set of data was entry 293 of session ABC."
+	magic_index := -1
 
 	log.Printf("req:\n%v\n", req)
 	resp, err := client.Do(req)
 	log.Printf("resp: %v\n", resp)
-
-	magic_index := -1
-
 	if err != nil {
 		log.Printf("err resp: %v\n", resp)
-		return -1, fmt.Errorf("api: failure in client manufactuerer POST to %v", svr.Name)
+		return -1, fmt.Errorf("api: failure in client attempt to POST to %v", uri)
 	} else {
+		// If we get things back, the errors will be encoded within the JSON.
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
 			log.Printf("api: bad status on POST to: %v\n", uri)
 			log.Printf("api: bad status on POST response: [ %v ]\n", resp.Status)

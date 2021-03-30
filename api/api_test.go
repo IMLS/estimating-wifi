@@ -73,24 +73,16 @@ func Test_ReadAuth(t *testing.T) {
 }
 
 func Test_GetToken(t *testing.T) {
-	cfg := config.ReadConfig()
-	// authcfg, _ := config.ReadAuth()
+	auth, err := config.ReadAuth()
 
-	for _, server := range []string{"directus", "reval"} {
-		s := config.GetServer(cfg, server)
+	if err != nil {
+		t.Log(err)
+		t.Fatal("Failed to read token.")
+	}
 
-		auth, err := GetToken(s)
-
-		if err != nil {
-			t.Log(err)
-			t.Fatal("Failed to get token.")
-		}
-
-		if len(auth.Token) < 2 {
-			t.Log(auth)
-			t.Fatal("Failed to get auth token.")
-		}
-
+	if len(auth.Umbrella.Token) < 2 {
+		t.Log(auth)
+		t.Fatal("Failed to find token in auth struct.")
 	}
 
 }
@@ -101,12 +93,9 @@ func Test_StoreContent(t *testing.T) {
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
 
-	for _, server := range []string{"directus", "reval"} {
-		svr := config.GetServer(cfg, server)
-		auth, _ := GetToken(svr)
-		t.Log("auth", auth)
-		StoreDeviceCount(cfg, svr, auth, 42, "Next:0", 1)
-	}
+	auth, _ := config.ReadAuth()
+	t.Log("auth", auth)
+	StoreDeviceCount(cfg, auth, 42, "Next:0", 1)
 }
 
 func Test_LogEvent(t *testing.T) {
@@ -114,13 +103,12 @@ func Test_LogEvent(t *testing.T) {
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
-	svr := config.GetServer(cfg, "directus")
-	auth, _ := GetToken(svr)
+	auth, _ := config.ReadAuth()
 	t.Log("auth", auth)
 
 	// Create a new logger
 
-	el := NewEventLogger(cfg, svr)
+	el := NewEventLogger(cfg)
 	el.Log("startup", map[string]string{"msg": "starting session-counter"})
 	el.Log("empty", map[string]string{})
 	el.Log("nil", nil)

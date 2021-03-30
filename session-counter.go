@@ -46,9 +46,8 @@ func main() {
 	cfg.SessionId = config.CreateSessionId()
 	// Store this so we don't keep hitting /proc/cpuinfo
 	cfg.Serial = config.GetSerial()
-	svr := config.GetServer(cfg, "directus")
 
-	el := api.NewEventLogger(cfg, svr)
+	el := api.NewEventLogger(cfg)
 	el.Log("startup", nil)
 
 	ka := csp.NewKeepalive(cfg)

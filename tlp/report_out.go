@@ -11,8 +11,7 @@ import (
 )
 
 func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
-	svr := config.GetServer(cfg, service)
-	tok, errGT := api.GetToken(svr)
+	tok, errGT := config.ReadAuth()
 	http_error_count = 0
 
 	if errGT != nil {
@@ -23,7 +22,7 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 		for uid, count := range h {
 			go func(id string, cnt int) {
 				time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-				err := api.StoreDeviceCount(cfg, svr, tok, session_id, id, cnt)
+				err := api.StoreDeviceCount(cfg, tok, session_id, id, cnt)
 				if err != nil {
 					log.Println("report:", service, "results POST failure")
 					log.Println(err)
@@ -42,7 +41,7 @@ func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[strin
 	http_error_count := 0
 
 	// For event logging
-	el := api.NewEventLogger(cfg, config.GetServer(cfg, "directus"))
+	el := api.NewEventLogger(cfg)
 
 	for {
 		select {
