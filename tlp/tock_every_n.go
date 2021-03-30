@@ -2,8 +2,6 @@ package tlp
 
 import (
 	"log"
-
-	"gsa.gov/18f/session-counter/api"
 )
 
 /* PROCESS tockEveryN
@@ -13,7 +11,7 @@ import (
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func TockEveryN(ka *api.Keepalive, n int, in <-chan bool, out chan<- bool) {
+func TockEveryN(ka *Keepalive, n int, in <-chan bool, out chan<- bool) {
 	log.Println("Starting tockEveryN")
 	// We timeout one second beyond the number of ticks we're waiting for
 	ping, pong := ka.Subscribe("tock", 2)

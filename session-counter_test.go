@@ -5,7 +5,6 @@ import (
 	"sync"
 	"testing"
 
-	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
@@ -171,7 +170,7 @@ func assertValueEqual(t *testing.T, a *model.UserMapping, b *model.UserMapping, 
 func TestRawToUid(t *testing.T) {
 	cfg := new(config.Config)
 	cfg.Manufacturers.Db = "/etc/session-counter/manufacturers.sqlite"
-	ka := api.NewKeepalive(cfg)
+	ka := tlp.NewKeepalive(cfg)
 
 	// var buf bytes.Buffer
 	// log.SetOutput(&buf)

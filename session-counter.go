@@ -10,7 +10,7 @@ import (
 	"gsa.gov/18f/session-counter/tlp"
 )
 
-func run(ka *api.Keepalive, cfg *config.Config) {
+func run(ka *tlp.Keepalive, cfg *config.Config) {
 	log.Println("Starting run")
 	// Create channels for process network
 	ch_sec := make(chan bool)
@@ -28,7 +28,7 @@ func run(ka *api.Keepalive, cfg *config.Config) {
 	go tlp.ReportOut(ka, cfg, ch_macs_counted)
 }
 
-func keepalive(ka *api.Keepalive, cfg *config.Config) {
+func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 	log.Println("Starting keepalive")
 	var counter int64 = 0
 	for {
@@ -49,7 +49,7 @@ func main() {
 	el := api.NewEventLogger(cfg)
 	el.Log("startup", nil)
 
-	ka := api.NewKeepalive(cfg)
+	ka := tlp.NewKeepalive(cfg)
 	go ka.Start()
 	go keepalive(ka, cfg)
 	go run(ka, cfg)

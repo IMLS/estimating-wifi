@@ -3,15 +3,13 @@ package tlp
 import (
 	"log"
 	"time"
-
-	"gsa.gov/18f/session-counter/api"
 )
 
 /* PROCESS tick
  * communicates out on the channel `ch` once
  * per second.
  */
-func Tick(ka *api.Keepalive, ch chan<- bool) {
+func Tick(ka *Keepalive, ch chan<- bool) {
 	log.Println("Starting tick")
 	ping, pong := ka.Subscribe("tick", 2)
 

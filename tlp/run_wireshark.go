@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/constants"
 )
@@ -47,7 +46,7 @@ func tshark(cfg *config.Config) []string {
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func RunWireshark(ka *api.Keepalive, cfg *config.Config, in <-chan bool, out chan []string) {
+func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []string) {
 	log.Println("Starting runWireshark")
 	// If we have to wait twice the monitor duration, something broke.
 	ping, pong := ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)

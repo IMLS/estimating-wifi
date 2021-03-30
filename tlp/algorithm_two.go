@@ -110,7 +110,7 @@ func (umdb uniqueMappingDB) asUserMappings() map[string]int {
  * 5. Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *api.Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, kill <-chan bool) {
+func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, kill <-chan bool) {
 	log.Println("Starting AlgorithmTwo")
 	// This is our "tracking database"
 	umdb := newUMDB()

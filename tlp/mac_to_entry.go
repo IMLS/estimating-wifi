@@ -13,7 +13,7 @@ import (
  * of manufacturer IDs and counts.
  * Uses "unknown" for all unknown manufacturers.
  */
-func MacToEntry(ka *api.Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
+func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
 	log.Println("Starting macToEntry")
 	ping, pong := ka.Subscribe("macToEntry", 5)
 

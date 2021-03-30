@@ -1,4 +1,4 @@
-package api
+package tlp
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
 )
 
@@ -22,11 +23,11 @@ type resp struct {
 type Keepalive struct {
 	publishCh   chan interface{}
 	subCh       chan resp
-	eventLogger *EventLogger
+	eventLogger *api.EventLogger
 }
 
 func NewKeepalive(cfg *config.Config) *Keepalive {
-	el := NewEventLogger(cfg)
+	el := api.NewEventLogger(cfg)
 
 	return &Keepalive{
 		publishCh:   make(chan interface{}, 1),
