@@ -18,9 +18,9 @@ func startsWithSlash(uri string) string {
 	return "/" + uri
 }
 
-func endsWithSlash(uri string) string {
-	return uri + "/"
-}
+// func endsWithSlash(uri string) string {
+// 	return uri + "/"
+// }
 
 func FormatUri(scheme string, host string, path string) string {
 	var uri string = (scheme + "://" +

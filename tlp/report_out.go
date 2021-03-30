@@ -7,7 +7,6 @@ import (
 
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/csp"
 )
 
 func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
@@ -35,7 +34,7 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 	return http_error_count, nil
 }
 
-func ReportOut(ka *csp.Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]int) {
+func ReportOut(ka *api.Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]int) {
 	log.Println("Starting ReportOut")
 	ping, pong := ka.Subscribe("ReportOut", 30)
 	http_error_count := 0

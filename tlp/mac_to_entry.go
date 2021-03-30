@@ -5,7 +5,6 @@ import (
 
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/csp"
 	"gsa.gov/18f/session-counter/model"
 )
 
@@ -14,7 +13,7 @@ import (
  * of manufacturer IDs and counts.
  * Uses "unknown" for all unknown manufacturers.
  */
-func MacToEntry(ka *csp.Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
+func MacToEntry(ka *api.Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry) {
 	log.Println("Starting macToEntry")
 	ping, pong := ka.Subscribe("macToEntry", 5)
 
