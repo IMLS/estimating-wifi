@@ -1,4 +1,3 @@
-from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import decorators, response
@@ -31,9 +30,8 @@ def proxy_data(token, collection, what):
         "Authorization": f"Bearer {token}",
     }
     response = requests.post(url, data=json.dumps(what), headers=headers)
-    result = response.json()
-    if "errors" in result:
-        raise Http404("Directus collection error")
+    if response.status_code != 200:
+        raise Exception(f"Directus collection error: {response.content}")
 
 
 @csrf_exempt
