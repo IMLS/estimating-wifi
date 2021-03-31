@@ -24,9 +24,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
-if DEBUG:
-    ALLOWED_HOSTS = ['localhost']
-else:
+if not DEBUG:
     ALLOWED_HOSTS = ['10x-rabbit-demo.app.cloud.gov']
 
 DIRECTUS_HOST = os.environ.get('DIRECTUS_HOST')
