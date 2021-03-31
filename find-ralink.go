@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/jedib0t/go-pretty/v6/text"
 	"gsa.gov/18f/find-ralink/constants"
 )
 
@@ -110,9 +111,21 @@ func getField(v *RAlink, field string) reflect.Value {
 
 func main() {
 	fieldPtr := flag.String("descriptor", "logicalName", "Descriptor to extract from device.")
+	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	flag.Parse()
 
+	if os.Getenv("USER") != "root" {
+		fmt.Println(text.FgRed.Sprint("find-ralink *really* needs to be run as root."))
+	}
+
+	// Essentially a shortcut...
+	// Overrides the --descriptor field.
+	if *existsPtr {
+		*fieldPtr = "exists"
+	}
+
 	device := getRAlinkDevice()
+
 	if device.exists {
 		res := getField(&device, *fieldPtr)
 		if reflect.TypeOf(res).Kind() == reflect.Bool {
