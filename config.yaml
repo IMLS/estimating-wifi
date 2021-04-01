@@ -25,8 +25,8 @@ monitoring:
 umbrella:
   scheme: https
   host: localhost
-  data: /data
-  logging: /logging
+  data: /data # reporting what would have been pls_data
+  logging: /logging # pls_events
 wireshark:
   path: /usr/bin/tshark
   adapter: wlan1

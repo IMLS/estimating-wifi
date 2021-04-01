@@ -30,8 +30,6 @@ type Config struct {
 
 // Located at /etc/session-counter/auth.yaml
 type AuthConfig struct {
-	Umbrella struct {
-		Token string `yaml:"token"`
-		Email string `yaml:"email"`
-	}
+	Token string `yaml:"token"`
+	Email string `yaml:"email"`
 }

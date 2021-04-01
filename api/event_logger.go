@@ -45,7 +45,7 @@ func (el *EventLogger) Log(tag string, info map[string]string) int {
 
 	data := map[string]string{
 		"device_uuid": config.GetSerial(),
-		"lib_user":    tok.Umbrella.Email,
+		"lib_user":    tok.Email,
 		"session_id":  el.Cfg.SessionId,
 		"localtime":   time.Now().Format(time.RFC3339),
 		"servertime":  time.Now().Format(time.RFC3339),

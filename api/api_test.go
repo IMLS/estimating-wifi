@@ -80,7 +80,7 @@ func Test_GetToken(t *testing.T) {
 		t.Fatal("Failed to read token.")
 	}
 
-	if len(auth.Umbrella.Token) < 2 {
+	if len(auth.Token) < 2 {
 		t.Log(auth)
 		t.Fatal("Failed to find token in auth struct.")
 	}

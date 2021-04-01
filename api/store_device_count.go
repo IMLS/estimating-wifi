@@ -16,7 +16,7 @@ func StoreDeviceCount(cfg *config.Config, tok *config.AuthConfig, session_id int
 		// FIXME: This needs to be captured first and passed in.
 		"event_id":    strconv.Itoa(session_id),
 		"device_uuid": config.GetSerial(),
-		"lib_user":    tok.Umbrella.Email,
+		"lib_user":    tok.Email,
 		"localtime":   time.Now().Format(time.RFC3339),
 		// FIXME: The server needs to auto-set this
 		"servertime": time.Now().Format(time.RFC3339),

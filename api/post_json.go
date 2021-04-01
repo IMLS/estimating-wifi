@@ -47,8 +47,8 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data map[s
 
 	req.Header.Set("Content-type", "application/json")
 	if tok != nil {
-		log.Printf("Using access token: %v\n", tok.Umbrella.Token)
-		req.Header.Set("Authorization", fmt.Sprintf("X-Api-Key %s", tok.Umbrella.Token))
+		log.Printf("Using access token: %v\n", tok.Token)
+		req.Header.Set("X-Api-Key", tok.Token)
 	} else {
 		log.Printf("api: failed to set headers for authorization.")
 	}
