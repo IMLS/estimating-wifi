@@ -1,4 +1,4 @@
-# session-counter-playbook-prod
+# imls-client-pi-playbook
 
 This playbook is pulled repeatedly on the production machines, and is our primary mechanism for updating them "live."
 
