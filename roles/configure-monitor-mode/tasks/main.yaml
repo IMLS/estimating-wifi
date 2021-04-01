@@ -29,16 +29,41 @@
   register: ralink_exists
   become: yes
 
-- name: check ... not done...
-  debug: 
-    msg: "{{ ralink_exists.stdout }}"
-
-- name: debug if found
-  debug:
-    msg: i found an ralink adapter!
+- name: get the mac address if it exists
+  ansible.builtin.command:
+    cmd: "{{ findralink.bin }} --descriptor mac"
+  register: ralink_mac
+  become: yes
   when: "'true' in ralink_exists.stdout"
 
-- name: debug if not found
-  debug:
-    msg: CANNOT FIND!
-  when: "'false' in ralink_exists.stdout"
+# If we find an adapter, then we can proceed to update 
+# some global config files. 
+- name: write wlan1 into udev rules
+  ansible.builtin.lineinfile:
+    path: /etc/udev/rules.d/75-persistent-wifi-mapping.rules
+    state: present
+    line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ralink_mac.stdout }}", NAME="wlan1"'
+    create: true
+  become: yes
+  when: "'true' in ralink_exists.stdout"
+
+- name: do we find the default broadcom adapter?
+  ansible.builtin.command:
+    cmd: "{{ findralink.bin }} --exists --search brc"
+  register: brc_exists
+  become: yes
+
+- name: get the mac address of the broadcom adapter if it exists
+  ansible.builtin.command:
+    cmd: "{{ findralink.bin }} --search brc --descriptor mac"
+  register: brc_mac
+  become: yes
+  when: "'true' in brc_exists.stdout"
+
+- name: write wlan0 into udev rules
+  ansible.builtin.lineinfile:
+    path: /etc/udev/rules.d/75-persistent-wifi-mapping.rules
+    state: present
+    line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ brc_mac.stdout }}", NAME="wlan0"'
+  become: yes
+  when: "'true' in brc_exists.stdout"
