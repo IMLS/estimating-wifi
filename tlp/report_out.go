@@ -18,16 +18,20 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 		log.Println(errGT)
 		http_error_count = http_error_count + 1
 	} else {
-		for uid, count := range h {
-			go func(id string, cnt int) {
-				time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-				err := api.StoreDeviceCount(cfg, tok, session_id, id, cnt)
-				if err != nil {
-					log.Println("report:", service, "results POST failure")
-					log.Println(err)
-					http_error_count = http_error_count + 1
-				}
-			}(uid, count)
+		for uid, last_seen := range h {
+			// Only report devices that we saw *this past minute*
+			// That means we saw them `zero minutes ago`.
+			if last_seen == 0 {
+				go func(id string) {
+					time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
+					err := api.StoreDeviceCount(cfg, tok, session_id, id)
+					if err != nil {
+						log.Println("report:", service, "results POST failure")
+						log.Println(err)
+						http_error_count = http_error_count + 1
+					}
+				}(uid)
+			}
 		}
 	}
 

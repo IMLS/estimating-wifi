@@ -9,7 +9,7 @@ import (
 
 // FUNC StoreDeviceCount
 // Stores the device count JSON via Umbrella
-func StoreDeviceCount(cfg *config.Config, tok *config.AuthConfig, session_id int, uid string, count int) error {
+func StoreDeviceCount(cfg *config.Config, tok *config.AuthConfig, session_id int, uid string) error {
 	uri := FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
 
 	data := map[string]string{
@@ -22,7 +22,6 @@ func StoreDeviceCount(cfg *config.Config, tok *config.AuthConfig, session_id int
 		"servertime": time.Now().Format(time.RFC3339),
 		"session_id": cfg.SessionId,
 		"device_id":  uid,
-		"last_seen":  strconv.Itoa(count),
 	}
 
 	postJSON(cfg, tok, uri, data)

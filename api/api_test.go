@@ -95,7 +95,7 @@ func Test_StoreContent(t *testing.T) {
 
 	auth, _ := config.ReadAuth()
 	t.Log("auth", auth)
-	StoreDeviceCount(cfg, auth, 42, "Next:0", 1)
+	StoreDeviceCount(cfg, auth, 42, "Next:0")
 }
 
 func Test_LogEvent(t *testing.T) {
