@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/text"
 	"gsa.gov/18f/find-ralink/constants"
@@ -21,8 +22,9 @@ const (
 	DONE_READING    = iota
 )
 
-type RAlink struct {
+type Device struct {
 	exists        bool
+	searchString  string
 	physicalId    int
 	description   string
 	busInfo       string
@@ -32,8 +34,7 @@ type RAlink struct {
 	configuration string
 }
 
-func getRAlinkDevice() RAlink {
-	wlan := RAlink{}
+func getRAlinkDevice(wlan *Device, verbose bool) {
 	wlan.exists = false
 
 	cmd := exec.Command("/usr/bin/lshw", "-class", "network")
@@ -49,11 +50,13 @@ func getRAlinkDevice() RAlink {
 	}
 
 	scanner := bufio.NewScanner(stdout)
-	hash := make(map[string]string)
-	usbSecRe := regexp.MustCompile(`^\s+\*-usb`)
+	hash := make(map[string]string, 0)
+	usbSecRe := regexp.MustCompile(`^\s+\*-(usb|network).*`)
 	newSecRe := regexp.MustCompile(`^\s+\*-.*`)
 	hashRe := regexp.MustCompile(`^\s+(.*?): (.*)`)
 	state := LOOKING_FOR_USB
+
+	devices := make([]map[string]string, 0)
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -61,17 +64,25 @@ func getRAlinkDevice() RAlink {
 		case LOOKING_FOR_USB:
 			match := usbSecRe.MatchString(line)
 			if match {
-				// fmt.Println("-> READING_HASH")
+				if verbose {
+					fmt.Println("-> READING_HASH")
+				}
+				// Create a new hash.
+				hash = make(map[string]string)
 				state = READING_HASH
 			}
 		case READING_HASH:
-			// fmt.Printf("checking: [ %v ]\n", line)
+			if verbose {
+				fmt.Printf("checking: [ %v ]\n", line)
+			}
 			newSecMatch := newSecRe.MatchString(line)
 			hashMatch := hashRe.MatchString(line)
 			hashPieces := hashRe.FindStringSubmatch(line)
 
 			if newSecMatch {
-				// fmt.Println("-> DONE_READING")
+				if verbose {
+					fmt.Println("-> DONE_READING")
+				}
 				state = DONE_READING
 			} else if hashMatch {
 				// fmt.Printf("%v <- %v\n", hashPieces[1], hashPieces[2])
@@ -79,37 +90,71 @@ func getRAlinkDevice() RAlink {
 				hash[hashPieces[1]] = hashPieces[2]
 			}
 		case DONE_READING:
-			// SKIP
+			state = LOOKING_FOR_USB
+			devices = append(devices, hash)
+			if verbose {
+				fmt.Println("devices len", len(devices))
+			}
 		}
 	}
+	// Don't lose the last hash.
+	devices = append(devices, hash)
 
-	v, _ := regexp.MatchString("Ralink", hash["vendor"])
-	if v {
-		wlan.exists = true
-	}
+	for _, hash := range devices {
 
-	wlan.physicalId, _ = strconv.Atoi(hash["physical id"])
-	wlan.description = hash["description"]
-	wlan.busInfo = hash["bus info"]
-	wlan.logicalName = hash["logical name"]
-	wlan.serial = hash["serial"]
-	if len(hash["serial"]) >= constants.MACLENGTH {
-		wlan.mac = hash["serial"][0:constants.MACLENGTH]
-	} else {
-		wlan.mac = hash["serial"]
+		if verbose {
+			fmt.Println("---------")
+			for k, v := range hash {
+				fmt.Println(k, "<-", v)
+			}
+		}
+
+		// NOTE: Do the searches case insensitive.
+		// For this application, it should be fine.
+		v, _ := regexp.MatchString(strings.ToLower(wlan.searchString), strings.ToLower(hash["vendor"]))
+		if v {
+			wlan.exists = true
+		}
+
+		v, _ = regexp.MatchString(strings.ToLower(wlan.searchString), strings.ToLower(hash["configuration"]))
+		if v {
+			if verbose {
+				fmt.Println("Found config matching", wlan.searchString)
+			}
+			wlan.exists = true
+		}
+
+		if wlan.exists {
+			wlan.physicalId, _ = strconv.Atoi(hash["physical id"])
+			wlan.description = hash["description"]
+			wlan.busInfo = hash["bus info"]
+			wlan.logicalName = hash["logical name"]
+			wlan.serial = hash["serial"]
+
+			if len(hash["serial"]) >= constants.MACLENGTH {
+				wlan.mac = hash["serial"][0:constants.MACLENGTH]
+			} else {
+				wlan.mac = hash["serial"]
+			}
+			wlan.configuration = hash["configuration"]
+
+			// Once we populate something in this loop, break out.
+			// This will return us to the caller with a populated structure.
+			break
+		}
 	}
-	wlan.configuration = hash["configuration"]
-	return wlan
 }
 
 // https://stackoverflow.com/questions/18930910/access-struct-property-by-name
-func getField(v *RAlink, field string) reflect.Value {
+func getField(v *Device, field string) reflect.Value {
 	r := reflect.ValueOf(v)
 	f := reflect.Indirect(r).FieldByName(field)
 	return f
 }
 
 func main() {
+	verbosePtr := flag.Bool("verbose", false, "Verbose output.")
+	mfgPtr := flag.String("search", "Ralink", "Search string to use in hardware listing.")
 	fieldPtr := flag.String("descriptor", "logicalName", "Descriptor to extract from device.")
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	flag.Parse()
@@ -124,10 +169,12 @@ func main() {
 		*fieldPtr = "exists"
 	}
 
-	device := getRAlinkDevice()
+	device := new(Device)
+	device.searchString = *mfgPtr
+	getRAlinkDevice(device, *verbosePtr)
 
 	if device.exists {
-		res := getField(&device, *fieldPtr)
+		res := getField(device, *fieldPtr)
 		if reflect.TypeOf(res).Kind() == reflect.Bool {
 			fmt.Println(res.Interface())
 		} else {
