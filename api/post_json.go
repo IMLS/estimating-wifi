@@ -21,9 +21,10 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data map[s
 	}
 	var reqBody []byte
 	var err error
+
 	// FIXME
 	// Directus takes posted data directly.
-	// ReVal is currently looking for it to be "wrapped" in a struct.
+	// ReVal is currently looking for it to be "wrapped" in an array.
 	// We should modify ReVal so that it takes the exact same POSTed data
 	// as Directus, so that we cannot tell the difference from the client-side.
 	// switch svr.Name {
@@ -34,7 +35,16 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data map[s
 	// 	reqBody, err = json.Marshal(source)
 	// }
 
-	reqBody, err = json.Marshal(data)
+	// UPDATE 20210401 MCJ
+	// We are now sending an object that has a single key, "source"
+	// That is keyed to an array of objects. We're still sending a singleton.
+	// But, it's wrapped in an object and an array.
+	// We can no longer post directly to Directus.
+	// source := map[string][]map[string]string{"source": {data}}
+	// UPDATE 20210401 MCJ a little while later...
+	// We don't need the source key, but we do need an array of objects.
+	arr := []map[string]string{data}
+	reqBody, err = json.Marshal(arr)
 
 	if err != nil {
 		return -1, errors.New("api: unable to marshal post of data to JSON")
@@ -57,6 +67,8 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data map[s
 	// or a foreign key, that we will use in our post of the data. This associates
 	// every piece of data entered with a session, and indexes the post in that session.
 	// That way, we can say "this set of data was entry 293 of session ABC."
+	// If it isn't an event object, we won't get a magic_index back, and it will
+	// be returned as -1. Hopefully, we'll be ignoring it in those cases...
 	magic_index := -1
 
 	log.Printf("req:\n%v\n", req)

@@ -1,12 +1,16 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/tlp"
 )
 
@@ -38,7 +42,20 @@ func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 	}
 }
 
+func handleVersionCheck() {
+	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
+	flag.Parse()
+
+	// If they just want the version, print and exit.
+	if *versionPtr {
+		fmt.Println("Version", constants.VERSION)
+		os.Exit(0)
+	}
+}
+
 func main() {
+	handleVersionCheck()
+
 	// Read in a config
 	cfg := config.ReadConfig()
 	// Set the session ID for this entire run
