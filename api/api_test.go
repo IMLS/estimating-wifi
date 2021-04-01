@@ -89,6 +89,7 @@ func Test_GetToken(t *testing.T) {
 
 func Test_StoreContent(t *testing.T) {
 	cfg := config.ReadConfig()
+	t.Log("CFG:", cfg)
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
