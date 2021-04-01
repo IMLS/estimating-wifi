@@ -47,12 +47,12 @@ def wifi_interceptor(request):
         "content_type": request.content_type
     })
 
-    result = apply_validators_to(request.data, request.content_type)
+    result = apply_validators_to(dict(source=request.data), request.content_type)
     # DESTINATION_FORMAT is not flexible enough in ReVal, so we proxy
     # the data manually -- we want to keep the raw data around and
     # either store the validated data or the data with errors.
     if result["valid"]:
-        for item in request.data["source"]:
+        for item in request.data:
             proxy_data(token, 'pls_data', item)
     else:
         for table in result["tables"]:
