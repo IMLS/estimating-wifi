@@ -34,11 +34,6 @@
       "name": "device_id",
       "type": "string",
       "description": "Device ID"
-    },
-    {
-      "name": "last_seen",
-      "type": "number",
-      "description": "How often device has shown up in the last monitoring period"
     }
   ]
 }
