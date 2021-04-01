@@ -165,7 +165,15 @@ func main() {
 	mfgPtr := flag.String("search", "Ralink", "Search string to use in hardware listing.")
 	fieldPtr := flag.String("descriptor", "logicalName", "Descriptor to extract from device.")
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
+	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
+
 	flag.Parse()
+
+	// If they just want the version, print and exit.
+	if *versionPtr {
+		fmt.Println("Version ", constants.VERSION)
+		os.Exit(0)
+	}
 
 	if os.Getenv("USER") != "root" {
 		fmt.Println(text.FgRed.Sprint("find-ralink *really* needs to be run as root."))
