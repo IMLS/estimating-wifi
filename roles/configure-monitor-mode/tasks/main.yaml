@@ -1,3 +1,13 @@
+# WHY?
+# If this is first boot, this file will not exist.
+# We will want to reboot after writing this file, as it guarantees the wifi 
+# adapter mapping. So, we check, run our code, and at the end of this set of
+# plays, we reboot if the file was *not* present.
+- name: find out if the rules exist already (is this first boot?)
+  ansible.builtin.stat:
+    path: "{{ persistent_rules }}"
+  register: rules_file
+
 - name: install find-ralink tool binary
   ansible.builtin.get_url:
     url: "{{ findralink.binary_url }}"
@@ -62,8 +72,33 @@
 
 - name: write wlan0 into udev rules
   ansible.builtin.lineinfile:
-    path: /etc/udev/rules.d/75-persistent-wifi-mapping.rules
+    path: "{{ persistent_rules }}"
     state: present
     line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ brc_mac.stdout }}", NAME="wlan0"'
   become: yes
   when: "'true' in brc_exists.stdout"
+
+## REBOOT
+# If we just wrote the persistent rules for the first time, we should reboot. 
+# Next time, we won't reboot. Or, that's the theory.
+- name: first-time reboot
+  ansible.builtin.reboot:
+  when: not rules_file.stat.exists
+  become: yes
+
+# Take the interface down, set it in monitor mode, and 
+# then bring it back up.
+- name: take down wlan1
+  ansible.builtin.command:
+    cmd: ip link set wlan1 down
+  become: yes
+
+- name: set wlan1 into monitor mode
+  ansible.builtin.command:
+    cmd: iw wlan1 set monitor none
+  become: yes
+
+- name: bring up down wlan1
+  ansible.builtin.command:
+    cmd: ip link set wlan1 up
+  become: yes

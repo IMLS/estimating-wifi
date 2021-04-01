@@ -2,27 +2,11 @@ monitoring:
   pinginterval: 10
   max_http_error_count: 10
   http_error_interval_mins: 60
-  uniqueness_window: 10
-  disconnection_window: 5
-servers: 
-  - name: directus
-    host: directus-demo.app.cloud.gov
-    authpath: /auth/login
-    user: email
-    pass: password
-  - name: reval
-    host: 10x-rabbit-demo.app.cloud.gov
-    authpath: /api-token-auth
-    user: username
-    pass: password
-wireshark:
-  path: /usr/bin/tshark
-  adapter: wlan1
-  # duration is the number of seconds that wireshark
-  # will listen to the adapter before reporting out.
-  # best if this is below one minute.
-  # FIXME: this should not be configurable.
-  duration: 45
+  # How long we maintain a MAC -> UID mapping.
+  # If we don't see a device for this many minutes, then
+  # we drop the mapping. If the device shows up again, it will
+  # be a "new" device.
+  uniqueness_window: 120
   # rounds is the number of listening rounds we do before
   # reporting up to the server. 
   rounds: 3
@@ -34,5 +18,24 @@ wireshark:
   # and require a device to be present 8 out of 10 minutes.
   # rounds of 60 and threshold of 30 would watch for an hour, and then 
   # consider any device that was present for 30 minutes to be 
+
+# These are two different endpoints.
+# They will both go through umbrella...
+# So only the path should be
+umbrella:
+  scheme: https
+  host: api.data.gov
+  # Goes through ReVal and ends up in pls_data
+  data: /TEST/10x-imls/validate 
+  # Goes through ReVal and ends up in pls_events
+  logging: /TEST/10x-imls-2/items/pls_events 
+wireshark:
+  path: /usr/bin/tshark
+  adapter: wlan1
+  # duration is the number of seconds that wireshark
+  # will listen to the adapter before reporting out.
+  # best if this is below one minute.
+  # FIXME: this should not be configurable.
+  duration: 45
 manufacturers:
-  db: /home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite
+  db: /etc/session-counter/manufacturers.sqlite
