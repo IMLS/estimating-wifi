@@ -24,9 +24,9 @@ monitoring:
 # So only the path should be
 umbrella:
   scheme: https
-  host: localhost
-  data: /data # reporting what would have been pls_data
-  logging: /logging # pls_events
+  host: api.data.gov
+  data: /TEST/10x-imls/ # reporting what would have been pls_data
+  logging: /TEST/10x-imls-2/items/pls_events # pls_events
 wireshark:
   path: /usr/bin/tshark
   adapter: wlan1

@@ -45,6 +45,8 @@ func main() {
 	cfg.SessionId = config.CreateSessionId()
 	// Store this so we don't keep hitting /proc/cpuinfo
 	cfg.Serial = config.GetSerial()
+	// Make sure the mfg database is in place and can be loaded.
+	api.CheckMfgDatabaseExists(cfg)
 
 	el := api.NewEventLogger(cfg)
 	el.Log("startup", nil)

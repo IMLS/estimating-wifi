@@ -4,9 +4,26 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
+	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/session-counter/config"
 )
+
+func CheckMfgDatabaseExists(cfg *config.Config) {
+	_, err := os.Stat(cfg.Manufacturers.Db)
+
+	if os.IsNotExist(err) {
+		log.Fatal("cannot find mfg database: ", cfg.Manufacturers.Db)
+	}
+
+	db, dberr := sql.Open("sqlite3", cfg.Manufacturers.Db)
+	if err != nil {
+		log.Println("Failed to open manufacturer database:", cfg.Manufacturers.Db)
+		log.Fatal(dberr)
+	}
+	defer db.Close()
+}
 
 // FUNC Mac_to_mfg
 // Looks up a MAC address in the manufactuerer's database.
@@ -14,7 +31,7 @@ import (
 func MacToMfg(cfg *config.Config, mac string) string {
 	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
-		log.Fatal("Failed to open manufacturer database.")
+		log.Fatal("Failed to open manufacturer database:", cfg.Manufacturers.Db)
 	}
 	// Close the DB at the end of the function.
 	// If not, it's a resource leak.
