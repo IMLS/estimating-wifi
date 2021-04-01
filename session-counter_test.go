@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 )
 
@@ -153,19 +152,19 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
 }
 
-func assertNotEqual(t *testing.T, a interface{}, b interface{}, message string) {
-	if a != b {
-		return
-	}
-	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
-}
+// func assertNotEqual(t *testing.T, a interface{}, b interface{}, message string) {
+// 	if a != b {
+// 		return
+// 	}
+// 	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
+// }
 
-func assertValueEqual(t *testing.T, a *model.UserMapping, b *model.UserMapping, message string) {
-	if (a.Id == b.Id) && (a.Mfg == b.Mfg) {
-		return
-	}
-	t.Fatal(message, "\n\texpected: ", &a, "\n\treceived: ", &b)
-}
+// func assertValueEqual(t *testing.T, a *model.UserMapping, b *model.UserMapping, message string) {
+// 	if (a.Id == b.Id) && (a.Mfg == b.Mfg) {
+// 		return
+// 	}
+// 	t.Fatal(message, "\n\texpected: ", &a, "\n\treceived: ", &b)
+// }
 
 func TestRawToUid(t *testing.T) {
 	cfg := new(config.Config)
@@ -223,8 +222,6 @@ func TestRawToUid(t *testing.T) {
 
 		if e.passfail {
 			assertEqual(t, expected, received, "not equal")
-		} else {
-			//assertValueNotEqual(t, expected, received, "incorrectly equal")
 		}
 	} // end for over tests
 }
