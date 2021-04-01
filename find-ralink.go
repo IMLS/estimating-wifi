@@ -171,7 +171,7 @@ func main() {
 
 	// If they just want the version, print and exit.
 	if *versionPtr {
-		fmt.Println("Version ", constants.VERSION)
+		fmt.Println("Version", constants.VERSION)
 		os.Exit(0)
 	}
 
