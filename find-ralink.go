@@ -56,6 +56,8 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 	hashRe := regexp.MustCompile(`^\s+(.*?): (.*)`)
 	state := LOOKING_FOR_USB
 
+	// Build up an array of hashes. Instead of looking for the device here,
+	// we'll instead collect all the devices into hashes, and hold them for a moment.
 	devices := make([]map[string]string, 0)
 
 	for scanner.Scan() {
@@ -97,9 +99,14 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 			}
 		}
 	}
-	// Don't lose the last hash.
+
+	// Don't lose the last hash!
 	devices = append(devices, hash)
 
+	// Now, go through the devices and find the one that matches our criteria.
+	// Either we're looking for a vendor or for something in the config string.
+	// A more general search could be implemented, but I'll keep it limited to prevent
+	// spurious matches that were unexpected/surprising in practice. (I hope.)
 	for _, hash := range devices {
 
 		if verbose {
@@ -110,7 +117,6 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 		}
 
 		// NOTE: Do the searches case insensitive.
-		// For this application, it should be fine.
 		v, _ := regexp.MatchString(strings.ToLower(wlan.searchString), strings.ToLower(hash["vendor"]))
 		if v {
 			wlan.exists = true
@@ -124,6 +130,8 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 			wlan.exists = true
 		}
 
+		// If we find something, proceed.
+		// Back in 'main', we'll handle the case where wlan.exists is false.
 		if wlan.exists {
 			wlan.physicalId, _ = strconv.Atoi(hash["physical id"])
 			wlan.description = hash["description"]
