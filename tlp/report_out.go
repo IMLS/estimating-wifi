@@ -3,7 +3,6 @@ package tlp
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"time"
 
 	"gsa.gov/18f/session-counter/api"
@@ -11,39 +10,6 @@ import (
 )
 
 func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
-	tok, errGT := config.ReadAuth()
-	http_error_count = 0
-
-	if errGT != nil {
-		log.Println("report:", service, "error in token fetch")
-		log.Println(errGT)
-		http_error_count = http_error_count + 1
-	} else {
-		for uid, last_seen := range h {
-			// Only report devices that we saw *this past minute*
-			// That means we saw them `zero minutes ago`.
-			if last_seen == 0 {
-				go func(id string) {
-					time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-					err := api.StoreDeviceCount(cfg, tok, session_id, id)
-					if err != nil {
-						log.Println("report:", service, "results POST failure")
-						log.Println(err)
-						http_error_count = http_error_count + 1
-					}
-				}(uid)
-			}
-		}
-	}
-
-	var resultErr error = nil
-	if http_error_count > 0 {
-		resultErr = fmt.Errorf("error count is now %d", http_error_count)
-	}
-	return http_error_count, resultErr
-}
-
-func report2(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
 	tok, errGT := config.ReadAuth()
 	http_error_count = 0
 
@@ -98,7 +64,7 @@ func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]in
 
 			// This used to loop over "directus" and "reval"
 			// We decided we will log only to reval, and it will handle validation and logging.
-			errCount, err := report2("reval", cfg, event_ndx, h)
+			errCount, err := report("reval", cfg, event_ndx, h)
 			if err != nil {
 				log.Println("reportout: error in reporting to reval")
 				log.Println(err)
