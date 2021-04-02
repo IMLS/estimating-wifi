@@ -1,7 +1,9 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"testing"
 
 	"gsa.gov/18f/session-counter/config"
@@ -104,14 +106,55 @@ func Test_LogEvent(t *testing.T) {
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
-	auth, _ := config.ReadAuth()
-	t.Log("auth", auth)
-
 	// Create a new logger
-
 	el := NewEventLogger(cfg)
 	el.Log("startup", map[string]string{"msg": "starting session-counter"})
 	el.Log("empty", map[string]string{})
 	el.Log("nil", nil)
 
+}
+
+func Test_RevalResponseUnmarshall(t *testing.T) {
+	testString := `{
+		"tables": [
+		  {
+			"headers": [
+			  "event_id",
+			  "device_uuid",
+			  "lib_user",
+			  "localtime",
+			  "servertime",
+			  "session_id",
+			  "device_id"
+			],
+			"whole_table_errors": [],
+			"rows": [
+			  {
+				"row_number": 2,
+				"errors": [],
+				"data": {
+				  "event_id": "-1",
+				  "device_uuid": "1000000089bbf88b",
+				  "lib_user": "matthew.jadud@gsa.gov",
+				  "localtime": "2021-04-02T10:46:53-04:00",
+				  "servertime": "2021-04-02T10:46:53-04:00",
+				  "session_id": "9475068c05fea81f",
+				  "device_id": "unknown:6"
+				}
+			  }
+			],
+			"valid_row_count": 1,
+			"invalid_row_count": 0
+		  }
+		],
+		"valid": true
+	  }`
+
+	var rev RevalResponse
+	err := json.Unmarshal([]byte(testString), &rev)
+	if err != nil {
+		log.Println("unmarshalling error:", err)
+	} else {
+		log.Println(rev)
+	}
 }

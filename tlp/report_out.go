@@ -1,6 +1,7 @@
 package tlp
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -35,7 +36,35 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 		}
 	}
 
-	return http_error_count, nil
+	var resultErr error = nil
+	if http_error_count > 0 {
+		resultErr = fmt.Errorf("error count is now %d", http_error_count)
+	}
+	return http_error_count, resultErr
+}
+
+func report2(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
+	tok, errGT := config.ReadAuth()
+	http_error_count = 0
+
+	if errGT != nil {
+		log.Println("report2:", service, "error in token fetch")
+		log.Println(errGT)
+		http_error_count = http_error_count + 1
+	} else {
+		err := api.StoreDevicesCount(cfg, tok, session_id, h)
+		if err != nil {
+			log.Println("report2:", service, "results POST failure")
+			log.Println(err)
+			http_error_count = http_error_count + 1
+		}
+	}
+
+	var resultErr error = nil
+	if http_error_count > 0 {
+		resultErr = fmt.Errorf("error count is now %d", http_error_count)
+	}
+	return http_error_count, resultErr
 }
 
 func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]int) {
@@ -65,11 +94,12 @@ func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]in
 			// This used to loop over "directus" and "reval"
 			// We decided we will log only to reval, and it will handle validation and logging.
 			service := "reval"
-			errCount, err := report(service, cfg, event_ndx, h)
+			errCount, err := report2(service, cfg, event_ndx, h)
 			if err != nil {
 				log.Println("reportout: error in reporting to", service)
 				log.Println(err)
 				http_error_count += errCount
+				log.Println("reportout: error count is now ", http_error_count)
 			}
 
 		case <-time.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):

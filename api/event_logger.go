@@ -52,7 +52,7 @@ func (el *EventLogger) Log(tag string, info map[string]string) int {
 		"tag":         tag,
 		"info":        string(asJson),
 	}
-	ndx, _ := postJSON(el.Cfg, tok, uri, data)
+	ndx, _ := postJSON(el.Cfg, tok, uri, []map[string]string{data})
 	return ndx
 
 }
