@@ -3,11 +3,13 @@ package tlp
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/session-counter/constants"
 )
 
 // Inspired by the broker pattern found here:
@@ -36,19 +38,25 @@ func NewKeepalive(cfg *config.Config) *Keepalive {
 	}
 }
 
+// UPDATE 20210402 MCJ
+// We're just going to exit(-1) if things go bad.
+// systemd notify does not seem to be working.
+// Given that the github repos has build failures...
+// I'm going to stop trying to debug this.
 func (b *Keepalive) Start() {
 
 	// Internal state for the broker.
 	procs := make(map[chan interface{}]resp)
+	// We'll check once every 5 seconds to see if we've died.
+	interval := 5 * time.Second
 
 	// Notify that we are ready.
 	// https://vincent.bernat.ch/en/blog/2017-systemd-golang
 	daemon.SdNotify(false, daemon.SdNotifyReady)
-	interval, err := daemon.SdWatchdogEnabled(false)
-	if err != nil {
-		log.Println("monitor: unable to enable watchdog")
-		log.Fatal(err)
-	}
+	// Even though the watchdog does not seem to be working,
+	// this does tell systemd we're here when running as a simple
+	// service. So, we need to keep it.
+
 	processTimedOut := false
 
 	for {
@@ -83,10 +91,12 @@ func (b *Keepalive) Start() {
 					}
 				}(ch)
 			}
-		case <-time.After(interval / 3):
-			if !processTimedOut {
-				// log.Println("... kicking the dog")
-				daemon.SdNotify(false, daemon.SdNotifyWatchdog)
+		// Lets check
+		case <-time.After(interval):
+			if processTimedOut {
+				// If we timed out, exit. Hope systemd restarts us.
+				log.Println("Exiting after", interval, "seconds. Bye!")
+				os.Exit(constants.ExitProcessTimeout)
 			}
 		} // end select
 	}

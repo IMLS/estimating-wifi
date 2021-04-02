@@ -78,81 +78,82 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 	client := http.Client{
 		Timeout: timeout,
 	}
-	var reqBody []byte
-	var err error
 
-	// FIXME
-	// Directus takes posted data directly.
-	// ReVal is currently looking for it to be "wrapped" in an array.
-	// We should modify ReVal so that it takes the exact same POSTed data
-	// as Directus, so that we cannot tell the difference from the client-side.
-	// switch svr.Name {
-	// case "directus":
-	// 	reqBody, err = json.Marshal(data)
-	// case "reval":
-	// 	source := map[string][]map[string]string{"source": {data}}
-	// 	reqBody, err = json.Marshal(source)
-	// }
-
-	// UPDATE 20210401 MCJ
-	// We are now sending an object that has a single key, "source"
-	// That is keyed to an array of objects. We're still sending a singleton.
-	// But, it's wrapped in an object and an array.
-	// We can no longer post directly to Directus.
-	// source := map[string][]map[string]string{"source": {data}}
-	// UPDATE 20210401 MCJ a little while later...
-	// We don't need the source key, but we do need an array of objects.
-	// arr := []map[string]string{data}
-	reqBody, err = json.Marshal(data)
-
-	if err != nil {
-		return -1, errors.New("postjson: unable to marshal post of data to JSON")
-	}
-
-	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return -1, errors.New("postjson: unable to construct request for data POST")
-	}
-
-	req.Header.Set("Content-type", "application/json")
-	if tok != nil {
-		log.Printf("Access token length: %v\n", len(tok.Token))
-		req.Header.Set("X-Api-Key", tok.Token)
-	} else {
-		log.Printf("postjson: failed to set headers for authorization.")
-	}
-
-	// Clean up the log string... no tokens in the log
-	reqLogString := strings.Replace(fmt.Sprint(req), tok.Token, "APITOKEN", -1)
-
-	log.Printf("postjson:req:\n%v\n", reqLogString)
-	resp, err := client.Do(req)
-	log.Printf("postjson:resp: %v\n", resp)
-	if err != nil {
-		log.Printf("postjson:err resp: %v\n", resp)
-		return -1, fmt.Errorf("api: failure in client attempt to POST to %v", uri)
-	} else {
-		// If we get things back, the errors will be encoded within the JSON.
-		if resp.StatusCode < 200 || resp.StatusCode > 299 {
-			log.Printf("postjson: bad status on POST to: %v\n", uri)
-			log.Printf("postjson: bad status on POST response: [ %v ]\n", resp.Status)
-		} else {
-			// Bump the index on success
-			magic_index += 1
-			var dat RevalResponse
-			body, _ := ioutil.ReadAll(resp.Body)
-			err := json.Unmarshal(body, &dat)
-			if err != nil {
-				return magic_index, fmt.Errorf("postjson: could not unmarshal response body")
-			}
-			// 2021/03/26 14:00:18 resp.Body {"data":{"magic_index":12,"device_uuid":"1000000089bbf88b","lib_user":"10x@gsa.gov","session_id":"effc67d0068b4e7f","localtime":"2021-03-26T18:00:17Z","servertime":"2021-03-26T18:00:17Z","tag":"nil","info":"{}"}}
-			// 20210420 MCJ UPDATE
-			// We're now going through ReVal. This returns a different format...
-			log.Println("postjson: resp.Body", string(body))
+	// Lets not send too much data at once. So, we'll walk through the data array in steps of 20 elements.
+	chunkSize := 20
+	var divided [][]map[string]string
+	for i := 0; i < len(data); i += chunkSize {
+		end := i + chunkSize
+		if end > len(data) {
+			end = len(data)
 		}
-	}
-	// Close the body at function exit.
-	defer resp.Body.Close()
 
+		divided = append(divided, data[i:end])
+	}
+
+	// Now that the incoming array has been chopped up into subarrays of length chunkSize,
+	// lets send those out into the world.
+	for _, arr := range divided {
+		var reqBody []byte
+		var err error
+
+		// First, try marshalling the data.
+		// We have to give up if this doesn't work.
+		reqBody, err = json.Marshal(arr)
+		if err != nil {
+			return -1, errors.New("postjson: unable to marshal post of data to JSON")
+		}
+
+		// Next, it's time to create a request object. Again, fail if it doesn't work.
+		req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
+		if err != nil {
+			return -1, errors.New("postjson: unable to construct request for data POST")
+		}
+
+		// Lets set some headers. Perhaps we should quit here... but, we'll try and keep going
+		// if anything fails.
+		req.Header.Set("Content-type", "application/json")
+		if tok != nil {
+			log.Printf("Access token length: %v\n", len(tok.Token))
+			req.Header.Set("X-Api-Key", tok.Token)
+		} else {
+			log.Printf("postjson: failed to set headers for authorization.")
+		}
+
+		// Clean up the log string... no tokens in the log
+		reqLogString := strings.Replace(fmt.Sprint(req), tok.Token, "APITOKEN", -1)
+		log.Printf("postjson:req:\n%v\n", reqLogString)
+
+		// MAKE THE REQUEST
+		resp, err := client.Do(req)
+		// Show the response from the server. Helpful in debugging.
+		log.Printf("postjson:resp: %v\n", resp)
+		// If there was an error in the post, log it, and exit the function.
+		if err != nil {
+			log.Printf("postjson:err resp: %v\n", resp)
+			return -1, fmt.Errorf("postjson: failure in client attempt to POST to %v", uri)
+		} else {
+			// If we get things back, the errors will be encoded within the JSON.
+			if resp.StatusCode < 200 || resp.StatusCode > 299 {
+				log.Printf("postjson: bad status on POST to: %v\n", uri)
+				log.Printf("postjson: bad status on POST response: [ %v ]\n", resp.Status)
+				return magic_index, fmt.Errorf("postjson: bad status on POST response: [ %v ]\n", resp.Status)
+			} else {
+				// Parse the response. Everything comes from ReVal in our current formulation.
+				var dat RevalResponse
+				body, _ := ioutil.ReadAll(resp.Body)
+				err := json.Unmarshal(body, &dat)
+				if err != nil {
+					// If we can't parse the response, return a valid index but also include an error.
+					return magic_index, fmt.Errorf("postjson: could not unmarshal response body")
+				}
+				log.Println("postjson: resp.Body", string(body))
+			}
+		}
+		// Close the body at function exit.
+		defer resp.Body.Close()
+	}
+
+	magic_index += 1
 	return magic_index, nil
 }

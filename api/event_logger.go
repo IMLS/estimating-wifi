@@ -19,17 +19,7 @@ func NewEventLogger(cfg *config.Config) *EventLogger {
 	return el
 }
 
-// "event_id":    strconv.Itoa(session_id),
-// 		"device_uuid": config.GetSerial(),
-// 		"lib_user":    tok.User,
-// 		"localtime":   time.Now().Format(time.RFC3339),
-// 		// FIXME: The server needs to auto-set this
-// 		"servertime": time.Now().Format(time.RFC3339),
-// 		"session_id": cfg.SessionId,
-// 		"device_id":  uid,
-// 		"last_seen":  strconv.Itoa(count),
-
-func (el *EventLogger) Log(tag string, info map[string]string) int {
+func (el *EventLogger) Log(tag string, info map[string]string) (int, error) {
 	uri := FormatUri(el.Cfg.Umbrella.Scheme, el.Cfg.Umbrella.Host, el.Cfg.Umbrella.Logging)
 	log.Println("event log uri:", uri)
 	tok, _ := config.ReadAuth()
@@ -52,7 +42,7 @@ func (el *EventLogger) Log(tag string, info map[string]string) int {
 		"tag":         tag,
 		"info":        string(asJson),
 	}
-	ndx, _ := postJSON(el.Cfg, tok, uri, []map[string]string{data})
-	return ndx
+	ndx, err := postJSON(el.Cfg, tok, uri, []map[string]string{data})
+	return ndx, err
 
 }

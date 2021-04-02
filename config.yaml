@@ -1,6 +1,6 @@
 monitoring:
   pinginterval: 10
-  max_http_error_count: 10
+  max_http_error_count: 2
   http_error_interval_mins: 60
   # How long we maintain a MAC -> UID mapping.
   # If we don't see a device for this many minutes, then
