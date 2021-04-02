@@ -1,28 +1,25 @@
 [Unit]
 Description=Session Counter Service
 After=network.target
- 
+
+
 [Service]
 Type=simple
+Restart=always
+RestartSec=10
+
 User=pi
 Group=pi
 LimitNOFILE=1024
-
-Restart=on-failure
-RestartSec=10
-startLimitIntervalSec=60
 
 WorkingDirectory=/home/pi/session-counter
 ExecStart="{{ session_counter.install_path }}/session-counter"
 
 # make sure log directory exists and owned by syslog
 PermissionsStartOnly=true
-ExecStartPre=/bin/mkdir -p {{ session_counter.logdir }}
-ExecStartPre=/bin/chown syslog:adm {{ session_counter.logdir }}
-ExecStartPre=/bin/chmod 755 {{ session_counter.logdir }}
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=session-counter
- 
+
 [Install]
 WantedBy=multi-user.target

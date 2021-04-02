@@ -22,6 +22,15 @@
     mode: 0755
   become: no
 
+- name: make sure the logdir (is this needed?) is set up
+  ansible.builtin.file:
+    path: "{{ session_counter.logdir }}"
+    state: directory
+    owner: syslog
+    group: adm
+    mode: 0755
+  become: yes
+
 # We will update the config file in the ansible repository
 # when we want a new config to be used. This will have to update
 # lockstep with a new binary.
@@ -54,15 +63,33 @@
 - name: template out the systemd unit
   ansible.builtin.template:
     src: files/lib/systemd/session-counter.service.j2
-    dest: /lib/systemd/session-counter.service
+    dest: /etc/systemd/system/session-counter.service
     owner: root
     group: root
     mode: 0644
   become: yes
 
-- name: start and enable it
-  ansible.builtin.service:
-    name: session-counter
-    state: started
-    enabled: yes
+# Should we use commands, or the module?
+- name: stop session-counter unit
+  ansible.builtin.command:
+    cmd: systemctl stop session-counter
   become: yes
+- name: enable unit
+  ansible.builtin.command:
+    cmd: systemctl enable session-counter
+  become: yes
+- name: reload units
+  ansible.builtin.command:
+    cmd: systemctl daemon-reload
+  become: yes
+- name: start session-counter unit
+  ansible.builtin.command:
+    cmd: systemctl start session-counter
+  become: yes
+
+# - name: start and enable it
+#   ansible.builtin.service:
+#     name: session-counter
+#     state: started
+#     enabled: yes
+#   become: yes
