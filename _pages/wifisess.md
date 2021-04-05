@@ -85,6 +85,8 @@ Yes. The code, data, and process by which we engage in this work will all be pub
 
 ## Who are you again?
 
-We're a team of engineers at 18F (James Tranovich and Matt Jadud), a small digital services unit in the GSA. We work to make government more open and people-centered. 
+We're team of engineers at <a href="https://18f.gsa.gov">18F</a> (James Tranovich and Matt Jadud), a small digital services unit in the GSA. We work to make government more open and people-centered. 
 
+The project overall has a much larger cast. There are many colleagues at 18F, <a href="https://10x.gsa.gov">10x</a>, and <a href="https://imls.gov">IMLS</a> who are essential to the project overall.
+ 
 If you have questions, feel free to drop Matt a note (matthew.jadud@gsa.gov).
