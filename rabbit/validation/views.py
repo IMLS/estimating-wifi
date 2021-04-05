@@ -41,24 +41,27 @@ def wifi_interceptor(request, collection=None):
     if not collection:
         raise Http404("Collection not found")
 
-    if not isinstance(request.data, list):
+    if not request.data or not isinstance(request.data, list):
         return HttpResponseBadRequest("Data is malformed")
 
-    host = request.META.get("X_DIRECTUS_HOST", None)
-    email = request.META.get("X_DIRECTUS_EMAIL", None)
-    password = request.META.get("X_DIRECTUS_PASSWORD", None)
+    host = request.META.get("HTTP_X_DIRECTUS_HOST", None)
+    email = request.META.get("HTTP_X_DIRECTUS_EMAIL", None)
+    password = request.META.get("HTTP_X_DIRECTUS_PASSWORD", None)
     if not host or not email or not password:
         return HttpResponseBadRequest("Directus headers not found")
 
     token = get_directus_token(host, email, password)
     if not token:
-        raise HttpResponseBadRequest("Directus authentication error")
+        return HttpResponseBadRequest("Directus authentication error")
+
+    # TODO: grab json validation and use that instead of wifi.json
 
     # before we do anything else, save the raw data to directus.
     raw = {
         "collection": collection,
         "data": request.data,
-        "content_type": request.content_type
+        "content_type": request.content_type,
+        # TODO: validation
     }
     proxy_data(host, token, 'rabbit_raw', raw)
 
