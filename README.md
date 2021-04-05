@@ -1,3 +1,25 @@
+# For the Busy Devteam
+
+After you check out the site:
+
+```
+docker-compose run node npm install
+docker-compose build
+docker-compose up
+```
+
+Build, not host:
+
+```
+docker-compose run ruby bundle exec jekyll build .
+```
+
+Testing:
+
+```
+docker-compose run ruby bundle exec htmlproofer _site; npx a11y '_site/**/*.html'
+```
+
 <!--
   Federalist recommends you use Continuous Integration to automatically test
   and validate any new changes to your site. CircleCI is free for open source
