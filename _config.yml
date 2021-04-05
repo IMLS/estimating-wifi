@@ -75,8 +75,8 @@ ga:
 primary_navigation:
   - name: Home
     url: /
-  - name: Public demos
-    url: /demos/
+  - name: WIFISESS Pilot
+    url: /wifisess/
 
 secondary_navigation:
 
