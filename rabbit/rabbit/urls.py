@@ -12,5 +12,5 @@ urlpatterns = [
     url('accounts/', include('django.contrib.auth.urls')),
 
     url(r"^api-token-auth", authtoken_views.obtain_auth_token),
-    url(r'^validate', wifi_interceptor, name="interceptor"),
+    url(r'^validate/(?P<collection>[a-zA-Z0-9_]+)/$', wifi_interceptor, name="interceptor"),
 ]

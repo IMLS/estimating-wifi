@@ -27,10 +27,6 @@ DEBUG = os.environ.get('DEBUG', False)
 if not DEBUG:
     ALLOWED_HOSTS = ['10x-rabbit-demo.app.cloud.gov']
 
-DIRECTUS_HOST = os.environ.get('DIRECTUS_HOST')
-DIRECTUS_USERNAME = os.environ.get('DIRECTUS_USERNAME')
-DIRECTUS_PASSWORD = os.environ.get('DIRECTUS_PASSWORD')
-
 # Application definition
 DATA_INGEST = {
     'VALIDATORS': {
