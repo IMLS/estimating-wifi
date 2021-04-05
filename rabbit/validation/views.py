@@ -38,6 +38,10 @@ def proxy_data(host, token, collection, what):
 @decorators.parser_classes((JSONParser,)) # TODO: support CSV
 def wifi_interceptor(request, collection=None):
 
+    magic = request.META.get("HTTP_X_MAGIC_HEADER", None)
+    if magic != settings.MAGIC_HEADER:
+        raise Http404("Magic header not found")
+
     if not collection:
         raise Http404("Collection not found")
 
