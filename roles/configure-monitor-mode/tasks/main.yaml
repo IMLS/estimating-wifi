@@ -58,7 +58,7 @@
 # some global config files. 
 - name: write wlan1 into udev rules
   ansible.builtin.lineinfile:
-    path: /etc/udev/rules.d/75-persistent-wifi-mapping.rules
+    path: "{{ persistent_rules }}"
     state: present
     line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ralink_mac.stdout }}", NAME="wlan1"'
     create: true
