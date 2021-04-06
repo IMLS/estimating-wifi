@@ -1,5 +1,5 @@
 ---
-- hosts: pi
+- hosts: localhost
   connection: local
   roles:
     - packages
