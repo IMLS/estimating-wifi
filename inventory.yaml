@@ -1,8 +1,11 @@
 all:
   hosts:
-    pi: 
-      ansible_host: 127.0.0.1
+    localhost:
+      ansible_connection: local
       ansible_python_interpreter: /usr/bin/python
+    # pi: 
+    #   ansible_host: 127.0.0.1
+    #   ansible_python_interpreter: /usr/bin/python
   vars:
     # We might change the default user.
     default_user: pi
