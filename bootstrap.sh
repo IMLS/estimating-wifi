@@ -142,8 +142,10 @@ ansible_pull_playbook () {
         popd
     popd
     _status "Done running playbook."
-    if ! $ANSIBLE_EXIT_STATUS ; then
-        _err "Ansible playbook failed. Check the logs!"
+    if [ $ANSIBLE_EXIT_STATUS -ne 0 ]; then
+        _err "Ansible playbook failed."
+        _err "Exit code: ${ANSIBLE_EXIT_STATUS}"
+        _err "Check the log: ${SETUP_LOGFILE}"
     fi
 }
 

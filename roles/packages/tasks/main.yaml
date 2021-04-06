@@ -5,6 +5,5 @@
       - python-apt
       - vim
       - lshw
-      - thisfails
     state: latest
   become: yes
