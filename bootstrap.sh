@@ -17,6 +17,11 @@ REPOS_ROOT="https://github.com/jadudm"
 PLAYBOOK_REPOS="imls-client-pi-playbook"
 PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 
+# A GLOBAL CATCH
+# If something goes wrong, set this to 1.
+# If the _err function is ever used, it sets this automatically.
+SOMETHING_WENT_WRONG=0
+
 # PURPOSE
 # Creates a temporary logfile in a way that lets the OS
 # decide where it should go. 
@@ -73,6 +78,7 @@ _debug () {
 }
 
 _err () {
+    SOMETHING_WENT_WRONG=1
     MSG="$1"
     _msg "ERROR" "${RED}" "${MSG}"
 }
@@ -155,7 +161,12 @@ main () {
     bootstrap_ansible
     install_prerequisites
     ansible_pull_playbook
-    _status "All done!"
+    if [ $SOMETHING_WENT_WRONG -ne 0 ]; then
+        _err "Things finished with errors."
+        _err "We may need to see the logs: ${SETUP_LOGFILE}"
+    else 
+        _status "All done!"
+    fi
 }
 
 main
