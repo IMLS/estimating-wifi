@@ -22,6 +22,18 @@ def get_directus_token(host, email, password):
     return result["data"]["access_token"]
 
 
+def get_directus_validator(host, token, collection):
+    url = f"https://{host}/items/validators/{collection}"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Directus validation error: {response.content}")
+    return response.json()
+
+
 def proxy_data(host, token, collection, what):
     url = f"https://{host}/items/{collection}"
     headers = {
@@ -58,6 +70,7 @@ def wifi_interceptor(request, collection=None):
     if not token:
         return HttpResponseBadRequest("Directus authentication error")
 
+    # TODO: get tests working
     # TODO: grab json validation and use that instead of wifi.json
 
     # before we do anything else, save the raw data to directus.
