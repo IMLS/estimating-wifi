@@ -4,5 +4,6 @@
       - iw
       - python-apt
       - vim
+      - lshw
     state: latest
   become: yes
