@@ -39,6 +39,14 @@
   register: ralink_exists
   become: yes
 
+- name: what is going on
+  debug:
+    msg: ralink_exists
+
+- name: what is going on also
+  debug:
+    msg: ralink_exists.stdout
+
 - name: get the mac address if it exists
   ansible.builtin.command:
     cmd: "{{ findralink.bin }} --descriptor mac"

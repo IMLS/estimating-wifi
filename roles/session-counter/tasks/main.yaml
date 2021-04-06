@@ -26,7 +26,7 @@
   ansible.builtin.file:
     path: "{{ session_counter.logdir }}"
     state: directory
-    owner: syslog
+    owner: root
     group: adm
     mode: 0755
   become: yes
