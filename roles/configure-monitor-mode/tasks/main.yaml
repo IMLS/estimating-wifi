@@ -35,7 +35,7 @@
 # (Short of catestrophic errors/failures.)
 - name: do we find an ralink adapter?
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --exists"
+    cmd: "{{ findralink.bin }} --discover --exists"
   register: ralink_exists
   become: yes
 
@@ -49,7 +49,7 @@
 
 - name: get the mac address if it exists
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --descriptor mac"
+    cmd: "{{ findralink.bin }} --discover --descriptor mac"
   register: ralink_mac
   become: yes
   when: "'true' in ralink_exists.stdout"
@@ -67,7 +67,7 @@
 
 - name: do we find the default broadcom adapter?
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --exists --search brc"
+    cmd: "{{ findralink.bin }} --search brc --exists"
   register: brc_exists
   become: yes
 
