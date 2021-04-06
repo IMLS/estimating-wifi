@@ -28,6 +28,7 @@ SOMETHING_WENT_WRONG=0
 create_logfile () {
     export SETUP_LOGFILE=$(mktemp -t "setup-log-XXX")
     export SETUP_TEMPDIR=/tmp/$(mktemp -d "setup-dir-XXX")
+    mkdir -p ${SETUP_TEMPDIR}
     # NOTE: Can't log here, yet. Things aren't set up.
 }
 
@@ -45,7 +46,6 @@ setup_logging () {
     exec 1>> "${SETUP_LOGFILE}" 2>&1
     _status "Logfile started. It can be accessed for debugging purposes."
 
-    mkdir -p $SETUP_TEMPDIR
     _variable "SETUP_LOGFILE"
     _variable "SETUP_TEMPDIR"
 }
