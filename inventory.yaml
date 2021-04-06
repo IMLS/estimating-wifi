@@ -1,8 +1,5 @@
 all:
   hosts:
-    raspberrypi:
-      ansible_connection: local
-      ansible_python_interpreter: /usr/bin/python
     localhost:
       ansible_connection: local
       ansible_python_interpreter: /usr/bin/python
