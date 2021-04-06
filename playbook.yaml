@@ -1,6 +1,5 @@
 ---
-- hosts: pi
-  connection: local
+- connection: local
   roles:
     - packages
     - unattended-upgrades
