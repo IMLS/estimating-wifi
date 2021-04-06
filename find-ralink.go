@@ -16,6 +16,8 @@ import (
 	"gsa.gov/18f/find-ralink/constants"
 )
 
+var possibilities = [...]string{"ralink", "rt2800usb"}
+
 const (
 	LOOKING_FOR_USB = iota
 	READING_HASH    = iota
@@ -34,7 +36,7 @@ type Device struct {
 	configuration string
 }
 
-func getRAlinkDevice(wlan *Device, verbose bool) {
+func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
 	wlan.exists = false
 
 	cmd := exec.Command("/usr/bin/lshw", "-class", "network")
@@ -103,6 +105,14 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 	// Don't lose the last hash!
 	devices = append(devices, hash)
 
+	return devices
+}
+
+func findMatchingDevice(wlan *Device, verbose bool) {
+
+	devices := getDeviceHash(wlan, verbose)
+	found := false
+
 	// Now, go through the devices and find the one that matches our criteria.
 	// Either we're looking for a vendor or for something in the config string.
 	// A more general search could be implemented, but I'll keep it limited to prevent
@@ -116,6 +126,7 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 			}
 		}
 
+		// We'll search the vendor and configuration strings.
 		// NOTE: Do the searches case insensitive.
 		v, _ := regexp.MatchString(strings.ToLower(wlan.searchString), strings.ToLower(hash["vendor"]))
 		if v {
@@ -130,9 +141,10 @@ func getRAlinkDevice(wlan *Device, verbose bool) {
 			wlan.exists = true
 		}
 
-		// If we find something, proceed.
+		// If we find something, proceed. But only keep the first thing we find.
 		// Back in 'main', we'll handle the case where wlan.exists is false.
-		if wlan.exists {
+		if wlan.exists && !found {
+			found = true
 			wlan.physicalId, _ = strconv.Atoi(hash["physical id"])
 			wlan.description = hash["description"]
 			wlan.busInfo = hash["bus info"]
@@ -162,7 +174,8 @@ func getField(v *Device, field string) reflect.Value {
 
 func main() {
 	verbosePtr := flag.Bool("verbose", false, "Verbose output.")
-	mfgPtr := flag.String("search", "Ralink", "Search string to use in hardware listing.")
+	discoverPtr := flag.Bool("discover", false, "Attempt to discover the device.")
+	searchPtr := flag.String("search", "Ralink", "Search string to use in hardware listing.")
 	fieldPtr := flag.String("descriptor", "logicalName", "Descriptor to extract from device.")
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
@@ -185,9 +198,22 @@ func main() {
 		*fieldPtr = "exists"
 	}
 
+	// We populate this via calls.
 	device := new(Device)
-	device.searchString = *mfgPtr
-	getRAlinkDevice(device, *verbosePtr)
+
+	// If we ask for auto-discovery, try it and exit.
+	if *discoverPtr {
+		for _, s := range possibilities {
+			device.searchString = s
+			findMatchingDevice(device, *verbosePtr)
+			if device.exists {
+				break
+			}
+		}
+	} else {
+		device.searchString = *searchPtr
+		findMatchingDevice(device, *verbosePtr)
+	}
 
 	if device.exists {
 		res := getField(device, *fieldPtr)
