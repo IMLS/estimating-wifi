@@ -13,6 +13,10 @@
 (fact 10)
 (fact 9)
 
+;; Wordlist public domain
+;; Sourced from
+;; https://github.com/MichaelWehar/Public-Domain-Word-Lists/blob/master/5000-more-common.txt
+
 (define combos '(a b c d e f g j k m o r s t v w x y))
 (define combos2 '(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19))
 (define libcombos
@@ -5073,6 +5077,9 @@
   #:mode 'text
   #:exists 'replace
   (thunk
+   (printf "// Public domain wordlist used as source.~n")
+   (printf "// https://github.com/MichaelWehar/Public-Domain-Word-Lists/blob/master/5000-more-common.txt~n")
+   (printf "~n")
    (printf "const wordlist = [\n")
    (for ([p paired])
      (printf "\t\"~a ~a\",~n"
