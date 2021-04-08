@@ -1,6 +1,8 @@
-# Setup Directus
+# Deploy Directus
 
-Edit [vars.yml](./app/vars.yml) first. You will want to change, at a minimum, the app name, database name, and route.
+We suggest deploying a [Directus docker image to cloud.gov](https://cloud.gov/docs/deployment/docker/).
+
+Edit [vars.yml](./app/vars.yml) first. You will want to change, at a minimum, the app name, database name, and route. Then, run:
 
     cf create-service aws-rds small-psql <directus database name here>
 
@@ -36,4 +38,15 @@ Disable the cache:
 
 Finally, `cf restage <directus name here>`.
 
-# Setup Rabbit
+# Deploy Rabbit
+
+A [manifest.yml](../manifest.yml) file is provided for cloud.gov deployment. You will want to set two environment variables when pushing:
+
+    cf push -f manifest.yml --var secret_key="<your secret key here>" --var
+rabbit_magic_header="<rabbit magic header>"
+
+## Miscellany
+
+Even though we use a pipenv environment (`Pipfile`) for local development, we still need to generate a `requirements.txt` file so that cloud.gov can pick the required ReVal dependency up properly. So, if you update any dependencies, re-generate `requirements.txt`:
+
+    pipenv lock -r > requirements.txt

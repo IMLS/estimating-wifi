@@ -47,3 +47,7 @@ Assuming the above header is set to 4, in the example above, the `validators_v4`
 # Directus schema
 
 - [directus_tables.sql](./directus_tables.sql) holds the raw SQL schema.
+
+# Deployment
+
+Please see [the cloud.gov README](./cloud.gov/README).
