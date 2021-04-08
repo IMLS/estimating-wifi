@@ -6,13 +6,13 @@ from rest_framework.parsers import JSONParser
 
 import json
 import requests
-from data_ingest.ingestors import apply_validators_to
+from data_ingest.ingestors import GoodtablesValidator
 
 from rabbit import settings
 
 
 def get_directus_validator(host, token, collection, version):
-    url = f"https://{host}/items/validators/{collection}_v{version}"
+    url = f"https://{host}/items/validators_v{version}/{collection}"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
@@ -20,7 +20,8 @@ def get_directus_validator(host, token, collection, version):
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
         raise Exception(f"Directus validation error: {response.content}")
-    return response.json()
+    result = response.json()
+    return result["data"]["validator"]
 
 
 def proxy_data(host, token, collection, what, version):
@@ -66,11 +67,17 @@ def wifi_interceptor(request, collection=None):
     }
     proxy_data(host, token, 'rabbit_raw', raw, version)
 
-    # TODO: get tests working
+    # get the validator object.
     validator_json = get_directus_validator(host, token, collection, version)
 
-    # TODO use validator_json
-    result = apply_validators_to(dict(source=request.data), request.content_type)
+    # bypass ReVal file checks.
+    class InMemoryValidator(GoodtablesValidator):
+        def load_file(self):
+            return validator_json
+    validator = InMemoryValidator('rabbit', 'temporary.csv')
+
+    # TODO: SQL
+    result = validator.validate(dict(source=request.data), request.content_type)
 
     # DESTINATION_FORMAT is not flexible enough in ReVal, so we proxy
     # the data manually -- we want to keep the raw data around and

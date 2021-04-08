@@ -30,9 +30,7 @@ if not DEBUG:
 
 # Application definition
 DATA_INGEST = {
-    'VALIDATORS': {
-        'wifi.json': 'data_ingest.ingestors.GoodtablesValidator',
-    },
+    'VALIDATORS': {},
 }
 
 INSTALLED_APPS = [
