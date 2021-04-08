@@ -13,10 +13,9 @@ import (
 	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/text"
+	"gsa.gov/18f/find-ralink/config"
 	"gsa.gov/18f/find-ralink/constants"
 )
-
-var possibilities = [...]string{"ralink", "rt2800usb"}
 
 const (
 	LOOKING_FOR_USB = iota
@@ -26,14 +25,16 @@ const (
 
 type Device struct {
 	exists        bool
-	searchString  string
-	physicalId    int
+	search        config.Search
+	physicalid    int
 	description   string
-	busInfo       string
-	logicalName   string
+	businfo       string
+	logicalname   string
 	serial        string
 	mac           string
 	configuration string
+	vendor        string
+	extract       string
 }
 
 func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
@@ -126,37 +127,44 @@ func findMatchingDevice(wlan *Device, verbose bool) {
 			}
 		}
 
-		// We'll search the vendor and configuration strings.
-		// NOTE: Do the searches case insensitive.
-		v, _ := regexp.MatchString(strings.ToLower(wlan.searchString), strings.ToLower(hash["vendor"]))
-		if v {
-			wlan.exists = true
-		}
-
-		v, _ = regexp.MatchString(strings.ToLower(wlan.searchString), strings.ToLower(hash["configuration"]))
-		if v {
-			if verbose {
-				fmt.Println("Found config matching", wlan.searchString)
+		// The default is to search all the fields
+		// lowercase pattern matching
+		if wlan.search.Field == "ALL" {
+			for k := range hash {
+				v, _ := regexp.MatchString(strings.ToLower(wlan.search.Query), strings.ToLower(hash[k]))
+				if v {
+					wlan.exists = true
+				}
+				// Stop searching if we find something.
+				if wlan.exists {
+					break
+				}
 			}
-			wlan.exists = true
+		} else {
+			// Otherwise, search the field specified.
+			v, _ := regexp.MatchString(strings.ToLower(wlan.search.Query), strings.ToLower(hash[wlan.search.Field]))
+			if v {
+				wlan.exists = true
+			}
 		}
 
 		// If we find something, proceed. But only keep the first thing we find.
 		// Back in 'main', we'll handle the case where wlan.exists is false.
 		if wlan.exists && !found {
 			found = true
-			wlan.physicalId, _ = strconv.Atoi(hash["physical id"])
-			wlan.description = hash["description"]
-			wlan.busInfo = hash["bus info"]
-			wlan.logicalName = hash["logical name"]
-			wlan.serial = hash["serial"]
+			wlan.vendor = strings.ToLower(hash["vendor"])
+			wlan.physicalid, _ = strconv.Atoi(hash["physical id"])
+			wlan.description = strings.ToLower(hash["description"])
+			wlan.businfo = strings.ToLower(hash["bus info"])
+			wlan.logicalname = strings.ToLower(hash["logical name"])
+			wlan.serial = strings.ToLower(hash["serial"])
 
 			if len(hash["serial"]) >= constants.MACLENGTH {
-				wlan.mac = hash["serial"][0:constants.MACLENGTH]
+				wlan.mac = strings.ToLower(hash["serial"][0:constants.MACLENGTH])
 			} else {
-				wlan.mac = hash["serial"]
+				wlan.mac = strings.ToLower(hash["serial"])
 			}
-			wlan.configuration = hash["configuration"]
+			wlan.configuration = strings.ToLower(hash["configuration"])
 
 			// Once we populate something in this loop, break out.
 			// This will return us to the caller with a populated structure.
@@ -175,8 +183,9 @@ func getField(v *Device, field string) reflect.Value {
 func main() {
 	verbosePtr := flag.Bool("verbose", false, "Verbose output.")
 	discoverPtr := flag.Bool("discover", false, "Attempt to discover the device.")
-	searchPtr := flag.String("search", "Ralink", "Search string to use in hardware listing.")
-	fieldPtr := flag.String("descriptor", "logicalName", "Descriptor to extract from device.")
+	searchPtr := flag.String("search", "ralink", "Search string to use in hardware listing. Must use with `field`.")
+	fieldPtr := flag.String("field", "ALL", "Field to search.")
+	extractPtr := flag.String("extract", "logicalname", "Field to extract from device data.")
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 
@@ -200,23 +209,25 @@ func main() {
 
 	// We populate this via calls.
 	device := new(Device)
+	device.extract = *extractPtr
 
 	// If we ask for auto-discovery, try it and exit.
 	if *discoverPtr {
-		for _, s := range possibilities {
-			device.searchString = s
+		for _, s := range config.GetSearches() {
+			device.search = s
 			findMatchingDevice(device, *verbosePtr)
 			if device.exists {
 				break
 			}
 		}
 	} else {
-		device.searchString = *searchPtr
+		s := &config.Search{Field: *fieldPtr, Query: *searchPtr}
+		device.search = *s
 		findMatchingDevice(device, *verbosePtr)
 	}
 
 	if device.exists {
-		res := getField(device, *fieldPtr)
+		res := getField(device, *extractPtr)
 		if reflect.TypeOf(res).Kind() == reflect.Bool {
 			fmt.Println(res.Interface())
 		} else {
