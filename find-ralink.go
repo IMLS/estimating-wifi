@@ -37,7 +37,7 @@ type Device struct {
 	extract       string
 }
 
-func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
+func getDeviceHash(wlan *Device) []map[string]string {
 	wlan.exists = false
 
 	cmd := exec.Command("/usr/bin/lshw", "-class", "network")
@@ -69,7 +69,7 @@ func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
 		case LOOKING_FOR_USB:
 			match := usbSecRe.MatchString(line)
 			if match {
-				if verbose {
+				if config.Verbose {
 					fmt.Println("-> READING_HASH")
 				}
 				// Create a new hash.
@@ -77,7 +77,7 @@ func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
 				state = READING_HASH
 			}
 		case READING_HASH:
-			if verbose {
+			if config.Verbose {
 				fmt.Printf("checking: [ %v ]\n", line)
 			}
 			newSecMatch := newSecRe.MatchString(line)
@@ -85,7 +85,7 @@ func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
 			hashPieces := hashRe.FindStringSubmatch(line)
 
 			if newSecMatch {
-				if verbose {
+				if config.Verbose {
 					fmt.Println("-> DONE_READING")
 				}
 				state = DONE_READING
@@ -97,7 +97,7 @@ func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
 		case DONE_READING:
 			state = LOOKING_FOR_USB
 			devices = append(devices, hash)
-			if verbose {
+			if config.Verbose {
 				fmt.Println("devices len", len(devices))
 			}
 		}
@@ -109,9 +109,9 @@ func getDeviceHash(wlan *Device, verbose bool) []map[string]string {
 	return devices
 }
 
-func findMatchingDevice(wlan *Device, verbose bool) {
+func findMatchingDevice(wlan *Device) {
 
-	devices := getDeviceHash(wlan, verbose)
+	devices := getDeviceHash(wlan)
 	found := false
 
 	// Now, go through the devices and find the one that matches our criteria.
@@ -120,7 +120,7 @@ func findMatchingDevice(wlan *Device, verbose bool) {
 	// spurious matches that were unexpected/surprising in practice. (I hope.)
 	for _, hash := range devices {
 
-		if verbose {
+		if config.Verbose {
 			fmt.Println("---------")
 			for k, v := range hash {
 				fmt.Println(k, "<-", v)
@@ -142,7 +142,7 @@ func findMatchingDevice(wlan *Device, verbose bool) {
 			}
 		} else {
 			// Otherwise, search the field specified.
-			if verbose {
+			if config.Verbose {
 				fmt.Println("query", wlan.search.Query, "field", wlan.search.Field)
 			}
 			v, _ := regexp.MatchString(strings.ToLower(wlan.search.Query), strings.ToLower(hash[wlan.search.Field]))
@@ -194,6 +194,8 @@ func main() {
 
 	flag.Parse()
 
+	config.Verbose = *verbosePtr
+
 	// If they just want the version, print and exit.
 	if *versionPtr {
 		fmt.Println("Version", constants.VERSION)
@@ -223,7 +225,7 @@ func main() {
 	if *discoverPtr {
 		for _, s := range config.GetSearches() {
 			device.search = s
-			findMatchingDevice(device, *verbosePtr)
+			findMatchingDevice(device)
 			if device.exists {
 				break
 			}
@@ -231,7 +233,7 @@ func main() {
 	} else {
 		s := &config.Search{Field: *fieldPtr, Query: *searchPtr}
 		device.search = *s
-		findMatchingDevice(device, *verbosePtr)
+		findMatchingDevice(device)
 	}
 
 	if *existsPtr {
