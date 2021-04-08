@@ -19,7 +19,7 @@ def get_directus_validator(host, token, collection, version):
     }
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        raise Exception(f"Directus validation error: {response.content}")
+        raise Exception(f"Directus validation error at {url}: {response.content}")
     result = response.json()
     return result["data"]["validator"]
 
@@ -32,7 +32,7 @@ def proxy_data(host, token, collection, what, version):
     }
     response = requests.post(url, data=json.dumps(what), headers=headers)
     if response.status_code != 200:
-        raise Exception(f"Directus collection error: {response.content}")
+        raise Exception(f"Directus collection error at {url}: {response.content}")
     return response.json()
 
 
@@ -76,7 +76,7 @@ def wifi_interceptor(request, collection=None):
             return validator_json
     validator = InMemoryValidator('rabbit', 'temporary.csv')
 
-    # TODO: SQL
+    # validate!
     result = validator.validate(dict(source=request.data), request.content_type)
 
     # DESTINATION_FORMAT is not flexible enough in ReVal, so we proxy

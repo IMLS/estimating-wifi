@@ -24,7 +24,7 @@ To validate a collection of `baz` objects:
 
 - Rabbit will:
   - Authenticate against the Directus instance given the host and credentials
-  - Retrieve the validation object from its `validation` table, given `baz` as a collection name.
+  - Retrieve the validation object from its `validators` table, given `baz` as a collection name.
      - Currently this validation object must be a ReVal GoodtablesValidator object.
   - Write the incoming request to `rabbit_raw` for debugging purposes
   - Validate the data
@@ -42,8 +42,8 @@ To set the version, pass in the following header:
 
 - `X-Directus-Schema-Version`: directus schema version (defaults to 1)
 
-Assuming the above header is set to 4, in the example above, the `validation_v4`, `rabbit_raw_v4`, `baz_v4`, and `rabbit_review_v4` tables will be used.
+Assuming the above header is set to 4, in the example above, the `validators_v4`, `rabbit_raw_v4`, `baz_v4`, and `rabbit_review_v4` tables will be used.
 
-# Directus SQL
+# Directus schema
 
-Forthcoming.
+- [directus_tables.sql](./directus_tables.sql) holds the raw SQL schema.
