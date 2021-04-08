@@ -1,6 +1,6 @@
-app-name: directus-demo2
-route: directus-demo2.app.cloud.gov
-database: directus-database2
+app-name: <directus name here>
+route: <directus name here>.app.cloud.gov
+database: <directus database name here>
 instances: 1
 disk_quota: 1GB
 memory: 512MB
