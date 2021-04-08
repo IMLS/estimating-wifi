@@ -6,7 +6,7 @@ An experimental validation server for the 10x shared components phase 3 project.
 
 Rabbit serves as a stand-alone API proxy for [Directus](https://directus.io/).
 
-There is only one endpoint provided: `/validate/<collection>/`. The only action is `POST`. This endpoint takes an arbitrary array of JSON data, grabs the corresponding validation schema for that collection from directus, and returns the result.
+There is only one endpoint provided: `/validate/<collection>/`. The only action is `POST`. This endpoint takes an arbitrary array of JSON data, grabs the corresponding validation schema for that collection from directus, validates given data against the schema, and returns the result of validation, successful or otherwise.
 
 Three HTTP headers are required to make this call:
 
@@ -24,9 +24,9 @@ To validate a collection of `baz` objects:
 
 - Rabbit will:
   - Authenticate against the Directus instance given the host and credentials
+  - Write the incoming request to `rabbit_raw` for debugging purposes
   - Retrieve the validation object from its `validators` table, given `baz` as a collection name.
      - Currently this validation object must be a ReVal GoodtablesValidator object.
-  - Write the incoming request to `rabbit_raw` for debugging purposes
   - Validate the data
   - If validation passes:
     - Write validated objects to the `baz` table
