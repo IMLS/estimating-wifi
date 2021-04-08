@@ -142,6 +142,9 @@ func findMatchingDevice(wlan *Device, verbose bool) {
 			}
 		} else {
 			// Otherwise, search the field specified.
+			if verbose {
+				fmt.Println("query", wlan.search.Query, "field", wlan.search.Field)
+			}
 			v, _ := regexp.MatchString(strings.ToLower(wlan.search.Query), strings.ToLower(hash[wlan.search.Field]))
 			if v {
 				wlan.exists = true
@@ -185,7 +188,7 @@ func main() {
 	discoverPtr := flag.Bool("discover", false, "Attempt to discover the device.")
 	searchPtr := flag.String("search", "ralink", "Search string to use in hardware listing. Must use with `field`.")
 	fieldPtr := flag.String("field", "ALL", "Field to search.")
-	extractPtr := flag.String("extract", "logicalname", "Field to extract from device data.")
+	extractPtr := flag.String("extract", "", "Field to extract from device data.")
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 
@@ -201,10 +204,15 @@ func main() {
 		fmt.Println(text.FgRed.Sprint("find-ralink *really* needs to be run as root."))
 	}
 
-	// Essentially a shortcut...
-	// Overrides the --descriptor field.
-	if *existsPtr {
-		*fieldPtr = "exists"
+	// If they didn't tell us what to extract, then
+	// extract the field they're searching for
+	if *extractPtr == "" {
+		// If it is the default "ALL" value, choose the logicalname
+		if *fieldPtr == "ALL" {
+			*extractPtr = "logicalname"
+		} else {
+			*extractPtr = *fieldPtr
+		}
 	}
 
 	// We populate this via calls.
@@ -226,7 +234,16 @@ func main() {
 		findMatchingDevice(device, *verbosePtr)
 	}
 
-	if device.exists {
+	if *existsPtr {
+		// If we're explicitly asking to see if it exists, say no, and
+		// return a zero error code.
+		if device.exists {
+			fmt.Println("true")
+		} else {
+			fmt.Println("false")
+		}
+		os.Exit(0)
+	} else if device.exists {
 		res := getField(device, *extractPtr)
 		if reflect.TypeOf(res).Kind() == reflect.Bool {
 			fmt.Println(res.Interface())
@@ -235,15 +252,8 @@ func main() {
 		}
 		os.Exit(0)
 	} else {
-		// If we're explicitly asking to see if it exists, say no, and
-		// return a zero error code.
-		if *fieldPtr == "exists" {
-			fmt.Println("false")
-			os.Exit(0)
-		} else {
-			// Otherwise... this is bad. Exit with error.
-			fmt.Println("Device not found")
-			os.Exit(-1)
-		}
+		// Otherwise... this is bad. Exit with error.
+		fmt.Println("Device not found")
+		os.Exit(-1)
 	}
 }
