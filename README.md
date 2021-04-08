@@ -8,12 +8,11 @@ Rabbit serves as a stand-alone API proxy for [Directus](https://directus.io/).
 
 There is only one endpoint provided: `/validate/<collection>/`. The only action is `POST`. This endpoint takes an arbitrary array of JSON data, grabs the corresponding validation schema for that collection from directus, and returns the result.
 
-Four HTTP headers are required to make this call:
+Three HTTP headers are required to make this call:
 
 - `X-Magic-Header`: secret key for the rabbit instance
 - `X-Directus-Host`: directus host
-- `X-Directus-Email`: directus user
-- `X-Directus-Password`: directus password
+- `X-Directus-Token`: directus token
 
 Errors from the Directus instance (if any) will be returned verbatim. Otherwise, the endpoint returns a standard [ReVal](https://github.com/18F/ReVAL) validation object in JSON.
 
@@ -34,6 +33,16 @@ To validate a collection of `baz` objects:
   - If validation does _not_ pass:
     - Write validation errors to the `rabbit_review` table for manual inspection
   - Return validation result.
+
+## Versioning
+
+We version Directus tables with a suffix of `_v{number}` to preserve backwards compatibility with older clients when we change the schema.
+
+To set the version, pass in the following header:
+
+- `X-Directus-Schema-Version`: directus schema version (defaults to 1)
+
+Assuming the above header is set to 4, in the example above, the `validation_v4`, `rabbit_raw_v4`, `baz_v4`, and `rabbit_review_v4` tables will be used.
 
 # Directus SQL
 

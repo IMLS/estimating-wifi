@@ -11,19 +11,8 @@ from data_ingest.ingestors import apply_validators_to
 from rabbit import settings
 
 
-def get_directus_token(host, email, password):
-    url = f"https://{host}/auth/login"
-    data = {"email": email, "password": password}
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(url, data=json.dumps(data), headers=headers)
-    result = response.json()
-    if "errors" in result:
-        return None
-    return result["data"]["access_token"]
-
-
-def get_directus_validator(host, token, collection):
-    url = f"https://{host}/items/validators/{collection}"
+def get_directus_validator(host, token, collection, version):
+    url = f"https://{host}/items/validators/{collection}_v{version}"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
@@ -34,8 +23,8 @@ def get_directus_validator(host, token, collection):
     return response.json()
 
 
-def proxy_data(host, token, collection, what):
-    url = f"https://{host}/items/{collection}"
+def proxy_data(host, token, collection, what, version):
+    url = f"https://{host}/items/{collection}_v{version}"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
@@ -43,15 +32,16 @@ def proxy_data(host, token, collection, what):
     response = requests.post(url, data=json.dumps(what), headers=headers)
     if response.status_code != 200:
         raise Exception(f"Directus collection error: {response.content}")
+    return response.json()
 
 
 @csrf_exempt
 @decorators.api_view(["POST"])
-@decorators.parser_classes((JSONParser,)) # TODO: support CSV
+@decorators.parser_classes((JSONParser,))
 def wifi_interceptor(request, collection=None):
 
     magic = request.META.get("HTTP_X_MAGIC_HEADER", None)
-    if magic != settings.MAGIC_HEADER:
+    if magic != settings.RABBIT_MAGIC_HEADER:
         raise Http404("Magic header not found")
 
     if not collection:
@@ -61,27 +51,25 @@ def wifi_interceptor(request, collection=None):
         return HttpResponseBadRequest("Data is malformed")
 
     host = request.META.get("HTTP_X_DIRECTUS_HOST", None)
-    email = request.META.get("HTTP_X_DIRECTUS_EMAIL", None)
-    password = request.META.get("HTTP_X_DIRECTUS_PASSWORD", None)
-    if not host or not email or not password:
+    token = request.META.get("HTTP_X_DIRECTUS_TOKEN", None)
+    if not host or not token:
         return HttpResponseBadRequest("Directus headers not found")
 
-    token = get_directus_token(host, email, password)
-    if not token:
-        return HttpResponseBadRequest("Directus authentication error")
-
-    # TODO: get tests working
-    # TODO: grab json validation and use that instead of wifi.json
+    # optional, defaults to 1
+    version = request.META.get("HTTP_X_DIRECTUS_SCHEMA_VERSION", 1)
 
     # before we do anything else, save the raw data to directus.
     raw = {
         "collection": collection,
         "data": request.data,
         "content_type": request.content_type,
-        # TODO: validation
     }
-    proxy_data(host, token, 'rabbit_raw', raw)
+    proxy_data(host, token, 'rabbit_raw', raw, version)
 
+    # TODO: get tests working
+    validator_json = get_directus_validator(host, token, collection, version)
+
+    # TODO use validator_json
     result = apply_validators_to(dict(source=request.data), request.content_type)
 
     # DESTINATION_FORMAT is not flexible enough in ReVal, so we proxy
@@ -89,9 +77,9 @@ def wifi_interceptor(request, collection=None):
     # either store the validated data or the data with errors.
     if result["valid"]:
         for item in request.data:
-            proxy_data(host, token, collection, item)
+            proxy_data(host, token, collection, item, version)
     else:
         for table in result["tables"]:
-            proxy_data(host, token, 'rabbit_review', table)
+            proxy_data(host, token, 'rabbit_review', table, version)
 
     return response.Response(result)
