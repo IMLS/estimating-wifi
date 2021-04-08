@@ -72,24 +72,5 @@ If you're willing to chat with the 18F team (Matt & James) when we're done, we w
 
 # Expression of Interest
 
-<b>If you're interested, please [complete this quick Google Form](https://forms.gle/coefDn3RQLeeeMyh6).</b>
+If you're interested, <b>please [complete this quick Google Form]({{site.questionformurl}}).</b>
 
-# Questions you might have
-
-We can imagine a question or two you might have. If more questions are asked, we'll update this list. 
-
-## Will I be compensated?
-
-No. The GSA has some policy on that, and sadly, we can't. We don't think that's right, but we don't have scissors big enough to cut that particular bit of red tape.
-
-## Will the results of this work be open?
-
-Yes. The code, data, and process by which we engage in this work will all be public domain/freely licensed. 
-
-## Who are you again?
-
-We're team of engineers at <a href="https://18f.gsa.gov">18F</a> (James Tranovich and Matt Jadud), a small digital services unit in the GSA. We work to make government more open and people-centered. 
-
-The project overall has a much larger cast. There are many colleagues at 18F, <a href="https://10x.gsa.gov">10x</a>, and <a href="https://imls.gov">IMLS</a> who are essential to the project overall.
- 
-If you have questions, feel free to drop Matt a note (matthew.jadud@gsa.gov).

@@ -75,10 +75,16 @@ ga:
 primary_navigation:
   - name: Home
     url: /
-  - name: WIFISESS Pilot
+  - name: Setup
+    url: /setup/
+  - name: About
     url: /wifisess/
+  - name: FAQ
+    url: /faq/
 
 secondary_navigation:
+
+questionformurl: https://forms.gle/coefDn3RQLeeeMyh6
 
 # Search.gov configuration
 #
