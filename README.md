@@ -23,10 +23,9 @@ To validate a collection of `baz` objects:
 - POST data to `/validate/baz/` with the appropriate headers
 
 - Rabbit will:
-  - Authenticate against the Directus instance given the host and credentials
   - Write the incoming request to `rabbit_raw` for debugging purposes
-  - Retrieve the validation object from its `validators` table, given `baz` as a collection name.
-     - Currently this validation object must be a ReVal GoodtablesValidator object.
+  - Retrieve the validation object from the `validators` table, given `baz` as a collection name.
+     - Currently this validation object must be a ReVal [GoodtablesValidator](https://specs.frictionlessdata.io/table-schema/#field-descriptors) object.
   - Validate the data
   - If validation passes:
     - Write validated objects to the `baz` table
