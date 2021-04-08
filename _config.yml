@@ -78,7 +78,7 @@ primary_navigation:
   - name: Setup
     url: /setup/
   - name: About
-    url: /wifisess/
+    url: /about/
   - name: FAQ
     url: /faq/
 
