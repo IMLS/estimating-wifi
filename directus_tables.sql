@@ -39,13 +39,14 @@ DROP TABLE IF EXISTS public.wifi_v1;
 CREATE TABLE public.wifi_v1 (
     id serial PRIMARY KEY,
     event_id integer,
-    device_uuid character varying(255),
-    lib_user character varying(255),
+    device_uuid character varying(16),
+    fcfs_id character varying(6),
+    building_id character varying(32),
+    device_tag character varying(32),
     "localtime" timestamp with time zone,
     servertime timestamp with time zone DEFAULT current_timestamp,
     session_id character varying(255),
-    device_id character varying(255),
-    last_seen integer
+    anon_device character varying(32)
 );
 
 -- events:
@@ -53,11 +54,13 @@ CREATE TABLE public.wifi_v1 (
 DROP TABLE IF EXISTS public.events_v1;
 CREATE TABLE public.events_v1 (
     id serial PRIMARY KEY,
-    device_uuid character varying(255),
-    lib_user character varying(255),
+    device_uuid character varying(16),
+    fcfs_id character varying(6),
+    building_id character varying(32),
+    device_tag character varying(32),
     session_id character varying(255),
     "localtime" timestamp with time zone,
     servertime timestamp with time zone DEFAULT current_timestamp,
     tag character varying(255),
-    info character varying(255)
+    info text
 );
