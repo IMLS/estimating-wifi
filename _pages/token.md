@@ -86,7 +86,7 @@ This involves more typing than just entering your key, but we thought this would
     // we can represent each character with 6 bits.
     function stringToDec (s) {
         var result = 0;
-        console.log(s)
+        // console.log(s)
         for (var ndx = 0 ; ndx < 3 ; ndx++) {
             var ascii = 63
             if (s[ndx]) {
@@ -104,17 +104,17 @@ This involves more typing than just entering your key, but we thought this would
             // Keep only the six rightmost bits.
             // That's all we should have at this point.
             ascii = ascii & (Math.pow(2, 6) - 1);
-            console.log("result in", result.toString(2))
-            console.log("ascii", ascii, ascii.toString(2));
+            // console.log("result in", result.toString(2))
+            // console.log("ascii", ascii, ascii.toString(2));
             // Shift the values
             shifted = (ascii << (6*(3 - ndx - 1)));
-            console.log("shifted", shifted.toString(2));
+            // console.log("shifted", shifted.toString(2));
             // Or with the result
             result = result | shifted;
-            console.log("result", result.toString(2));
+            // console.log("result", result.toString(2));
         }
         
-        console.log("chunk", s, "dec", result, "bin", result.toString(2));
+        // console.log("chunk", s, "dec", result, "bin", result.toString(2));
 
         return result;
     } 
@@ -225,9 +225,11 @@ This involves more typing than just entering your key, but we thought this would
     function tests () {
         var keys = ["2LVtzHrVMC4u0lRPDpWg", "svHDmjmFLCUxJQxlP3qy", "YylHLkeoR1HT3uctu4Jc"];
         var valid = [
-            ["state term", "native harmony", "forward metallic", "water case", "measure return", "reason spiritual", "natural lake"],
-            ["front bishop", "moderate movement", "secure depression", "distance turning", "surface like", "play shallow", "order sense"],
-            ["transfer forth", "bearing ornament", "interval trouble", "form nature", "ground strain", "soldier learning", "practice discourse"],
+            ["state term", "native harmony", "forward metallic", "water case", "measure return", "reason spiritual", "external call"],
+            ["chamber follow", "double question", "enter exhibit", "distance attack",
+            "surface regular", "that intimate", "backward attend"],
+            ["shoulder joint", "bearing uniform", "country weather", "form nature",
+            "power language", "instrument northern", "surface belief"],
         ];
 
         for (var ndx = 0 ; ndx < keys.length ; ndx++) {
