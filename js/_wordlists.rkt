@@ -5086,3 +5086,26 @@
              (first p) (second p)))
    (printf "];\n")
    ))
+
+#;(with-output-to-file "wordlist.go"
+  #:mode 'text
+  #:exists 'replace
+  (thunk
+   (printf "// Public domain wordlist used as source.~n")
+   (printf "// https://github.com/MichaelWehar/Public-Domain-Word-Lists/blob/master/5000-more-common.txt~n")
+   (printf "~n")
+   (printf "package wordlist~n")
+   (printf "var Wordlist = []string{\n")
+   (for ([p paired])
+     (printf "\t\"~a ~a\",~n"
+             (first p) (second p)))
+   (printf "}\n")
+   ))
+
+(with-output-to-file "wordlist.txt"
+  #:mode 'text
+  #:exists 'replace
+  (thunk
+   (for ([p paired])
+     (printf "~a ~a~n" (first p) (second p)))
+   ))

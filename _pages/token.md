@@ -86,27 +86,35 @@ This involves more typing than just entering your key, but we thought this would
     // we can represent each character with 6 bits.
     function stringToDec (s) {
         var result = 0;
-
-        for (var ndx = 0 ; ndx < s.length ; ndx++) {
-            var ascii = s[ndx].charCodeAt(0);
-            if (ascii >= zero && ascii <= nine) {
-                ascii = ascii - zero;
-            } else if (ascii >= A && ascii <= Z) {
-                ascii = ascii - A + 10;
-            } else if (ascii >= a && ascii <= z) {
-                ascii = ascii - zero + 10 + 26;
-            } else {
-                console.log("ERROR. Character not in range: ", s[ndx]);
-            }
+        console.log(s)
+        for (var ndx = 0 ; ndx < 3 ; ndx++) {
+            var ascii = 63
+            if (s[ndx]) {
+                ascii = s[ndx].charCodeAt(0);
+                if (ascii >= zero && ascii <= nine) {
+                    ascii = ascii - zero;
+                } else if (ascii >= A && ascii <= Z) {
+                    ascii = ascii - A + 10;
+                } else if (ascii >= a && ascii <= z) {
+                    ascii = ascii - a + 10 + 26;
+                } else {
+                    console.log("ERROR. Character not in range: ", s[ndx]);
+                }
+            } 
             // Keep only the six rightmost bits.
             // That's all we should have at this point.
-            ascii = ascii & 255;
+            ascii = ascii & (Math.pow(2, 6) - 1);
+            console.log("result in", result.toString(2))
+            console.log("ascii", ascii, ascii.toString(2));
             // Shift the values
-            shifted = (ascii << (6*(s.length - ndx - 1)));
+            shifted = (ascii << (6*(3 - ndx - 1)));
+            console.log("shifted", shifted.toString(2));
             // Or with the result
             result = result | shifted;
+            console.log("result", result.toString(2));
         }
-        // console.log("chunk", s, "dec", result, "bin", result.toString(2));
+        
+        console.log("chunk", s, "dec", result, "bin", result.toString(2));
 
         return result;
     } 
@@ -217,7 +225,7 @@ This involves more typing than just entering your key, but we thought this would
     function tests () {
         var keys = ["2LVtzHrVMC4u0lRPDpWg", "svHDmjmFLCUxJQxlP3qy", "YylHLkeoR1HT3uctu4Jc"];
         var valid = [
-            ["state term", "soldier colorless", "staff memory", "water dispute", "order large", "reason volatile", "natural produce"],
+            ["state term", "native harmony", "forward metallic", "water case", "measure return", "reason spiritual", "natural lake"],
             ["front bishop", "moderate movement", "secure depression", "distance turning", "surface like", "play shallow", "order sense"],
             ["transfer forth", "bearing ornament", "interval trouble", "form nature", "ground strain", "soldier learning", "practice discourse"],
         ];

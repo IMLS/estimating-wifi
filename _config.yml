@@ -75,10 +75,10 @@ ga:
 primary_navigation:
   - name: Home
     url: /
-  - name: Setup
-    url: /setup/
   - name: About
     url: /about/
+  - name: Setup
+    url: /setup/
   - name: FAQ
     url: /faq/
 
