@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/acarl005/stripansi"
+	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"gsa.gov/18f/read-initial-configuration/wordlist"
 )
@@ -69,6 +71,46 @@ func readFCFS() string {
 	return fcfsid
 }
 
+func box(c *color.Color, s string) string {
+	// Expand tabs for measurement.
+	s = strings.Replace(s, "\t", "  ", -1)
+	msg := strings.Split(s, "\n")
+	max := 0
+	for _, s := range msg {
+		// String color codes before measuring
+		s = stripansi.Strip(s)
+		if len(s) > max {
+			fmt.Println(s, len(s))
+			max = len(s)
+		}
+	}
+	result := ""
+	result += c.Sprint("╔")
+	for ndx := 0; ndx < max; ndx++ {
+		result += c.Sprint("═")
+	}
+	result += c.Sprint("══╗\n")
+	for _, line := range msg {
+		result += c.Sprint("║ ")
+		result += line
+		// Strip color codes before measuring.
+		line = stripansi.Strip(line)
+		if len(line) < max {
+			for i := 0; i < max-len(line); i++ {
+				result += " "
+			}
+		}
+		result += c.Sprint(" ║\n")
+	}
+	result += c.Sprint("╚")
+	for ndx := 0; ndx < max; ndx++ {
+		result += c.Sprint("═")
+	}
+	result += c.Sprint("══╝\n")
+
+	return result
+}
+
 func readToken() string {
 	wordlist.Init()
 
@@ -77,15 +119,20 @@ func readToken() string {
 	reader := bufio.NewReader(os.Stdin)
 
 	key := ""
+	textc := color.New(color.FgCyan)
+	boxc := color.New(color.FgBlue)
 
-	fmt.Println(text.FgYellow.Sprint("Enter a word pair and press enter."))
-	fmt.Printf(text.FgYellow.Sprint("When you are done, type "))
-	fmt.Printf(text.FgHiWhite.Sprint("DONE"))
-	fmt.Println(text.FgYellow.Sprint(" and press return.\n"))
-	fmt.Println(text.FgHiWhite.Sprint("------------------------------------"))
-
+	msg := "Enter your token word-pairs:\n\n"
+	msg += "\t1) one pair at a time, and\n"
+	msg += "\t2) in order.\n\n"
+	msg += "When you are done, type "
+	msg += textc.Sprint("DONE")
+	msg += " and press return.\n\n"
+	msg += color.New(color.FgYellow).Sprint("There should be 14 word pairs.")
+	fmt.Println(box(boxc, msg))
+	wpndx := 1
 	for reading {
-		fmt.Printf("word pair: ")
+		fmt.Printf("Word pair %d: ", wpndx)
 		pair, _ := reader.ReadString('\n')
 		pair = strings.TrimSpace(pair)
 		if pair == "DONE" || pair == "done" || pair == "quit" || pair == "exit" {
@@ -96,6 +143,7 @@ func readToken() string {
 			if err != nil {
 				fmt.Println(text.FgRed.Sprint("\n[ BAD! ] I can't find that word pair. Please try again, or DONE if you have no more word pairs.\n"))
 			} else {
+				wpndx += 1
 				decoded := decode(ndx)
 				fmt.Println(text.FgGreen.Sprintf("\n[ GOOD! ] `%v` became `%v`\n", pair, decoded))
 				key += decoded
@@ -116,7 +164,7 @@ func writeYAML(cfg *config) {
 func main() {
 
 	versionPtr := flag.Bool("version", false, "Get version and exit.")
-	readFCFSPtr := flag.Bool("FCFS", false, "Read in their FCFS ID.")
+	readFCFSPtr := flag.Bool("fcfs-seq", false, "Read in their FCFS ID.")
 	readTokenPtr := flag.Bool("token", false, "Read in their API token.")
 	// writeFilePtr := flag.String("path", yamlPath, "Write a YAML file with requested fields.")
 	flag.Parse()
