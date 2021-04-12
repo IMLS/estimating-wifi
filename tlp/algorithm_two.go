@@ -1,101 +1,11 @@
 package tlp
 
 import (
-	"fmt"
 	"log"
 
-	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/session-counter/model"
 )
-
-// This probably should be a proper database.
-type uniqueMappingDB struct {
-	lastid *int
-	uid    map[string]int
-	mfg    map[string]int
-	tick   map[string]int
-}
-
-func newUMDB() *uniqueMappingDB {
-	umdb := &uniqueMappingDB{
-		lastid: new(int),
-		uid:    make(map[string]int),
-		mfg:    make(map[string]int),
-		tick:   make(map[string]int)}
-	return umdb
-}
-
-func (umdb uniqueMappingDB) advanceTime() {
-	// Bump all the ticks by one.
-	for mac := range umdb.mfg {
-		umdb.tick[mac] = umdb.tick[mac] + 1
-	}
-}
-
-func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
-
-	_, found := umdb.mfg[mac]
-	// If we didn't find the mac we're supposed to update, then we need to add it.
-	if !found {
-		// Assign the next id.
-		umdb.uid[mac] = *umdb.lastid
-		// Increment for the next found address.
-		*umdb.lastid = *umdb.lastid + 1
-		// 20210412 MCJ
-		// Now manufactuerers are being numbered as they come in.
-		// This makes sure that we don't leak info. If the first device
-		// we see after powerup is an "Apple" device, it will become
-		// mfg "0". If the third device we see is an "Apple" device, then
-		// Apple devices will be mfg 3. Effectively random, and does not
-		// leak any info.
-
-		// Get the actual manufactuerer. This pares down the MAC appropriately.
-		// Grab a manufacturer for this MAC
-		mfg := api.MacToMfg(cfg, mac)
-		// Do we have a mfg mapping?
-		// If we do, use it. If not, create a new mapping.
-		mfgid, found := umdb.mfg[mfg]
-		if !found {
-			mfgid = len(umdb.mfg)
-			// log.Println("mfg", mfg, "id", mfgid)
-			// log.Println("umdb.mfg", umdb.mfg)
-		}
-		umdb.mfg[mfg] = mfgid
-		umdb.tick[mac] = 0
-	} else {
-		// If this address is already known, update
-		// when we last saw it.
-		umdb.tick[mac] = 0
-	}
-}
-
-func (umdb uniqueMappingDB) removeOldMappings(window int) {
-	remove := make([]string, 0)
-	// Find everything we need to remove.
-	for mac := range umdb.mfg {
-		if umdb.tick[mac] >= window {
-			// log.Println(mac, "is old. removing. tick:", umdb.tick[mac])
-			remove = append(remove, mac)
-		}
-	}
-	// Remove everything that's old.
-	for _, mac := range remove {
-		delete(umdb.uid, mac)
-		delete(umdb.tick, mac)
-	}
-}
-
-func (umdb uniqueMappingDB) asUserMappings() map[string]int {
-	h := make(map[string]int)
-	// n := time.Now()
-
-	for mac := range umdb.mfg {
-		userm := fmt.Sprintf("%v:%d", umdb.mfg[mac], umdb.uid[mac])
-		h[userm] = umdb.tick[mac]
-	}
-
-	return h
-}
 
 /*
  * 1. Gather the MAC addresses that were seen.
@@ -110,7 +20,7 @@ func (umdb uniqueMappingDB) asUserMappings() map[string]int {
 func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, kill <-chan bool) {
 	log.Println("Starting AlgorithmTwo")
 	// This is our "tracking database"
-	umdb := newUMDB()
+	umdb := model.NewUMDB(cfg)
 
 	// If we are running live, the kill channel is `nil`.
 	// When we are live, THEN init the ping/pong.
@@ -134,18 +44,18 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 		case arr := <-in:
 
 			// If we consider every message a "tick" of the clock, we need to advance time.
-			umdb.advanceTime()
+			umdb.AdvanceTime()
 
 			// We get in a list of MAC addresses. Create mappings.
 			// Timestamp everything as we see it, new or old.
 			for _, mac := range arr {
 				// log.Println("updating mapping for ", mac)
-				umdb.updateMapping(cfg, mac)
+				umdb.UpdateMapping(mac)
 			}
 			// Now, filter old things out
-			umdb.removeOldMappings(cfg.Monitoring.UniquenessWindow)
+			umdb.RemoveOldMappings(cfg.Monitoring.UniquenessWindow)
 			// Get the mappings as UserMappings, and send them out
-			out <- umdb.asUserMappings()
+			out <- umdb.AsUserMappings()
 		}
 	}
 
