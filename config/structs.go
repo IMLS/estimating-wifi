@@ -7,8 +7,6 @@ type Config struct {
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
 		HTTPErrorIntervalMins int `yaml:"http_error_interval_mins"`
 		UniquenessWindow      int `yaml:"uniqueness_window"`
-		Rounds                int `yaml:"rounds"`
-		Threshold             int `yaml:"threshold"`
 	} `yaml:"monitoring"`
 	Umbrella struct {
 		Scheme  string `yaml:"scheme"`
@@ -30,6 +28,7 @@ type Config struct {
 
 // Located at /etc/session-counter/auth.yaml
 type AuthConfig struct {
-	Token string `yaml:"token"`
-	Email string `yaml:"email"`
+	Token     string `yaml:"api_token"`
+	DeviceTag string `yaml:"tag"`
+	FCFSId    string `yaml:"fcfs_seq_id"`
 }

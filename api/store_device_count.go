@@ -2,6 +2,7 @@ package api
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"gsa.gov/18f/session-counter/config"
@@ -9,19 +10,30 @@ import (
 
 // FUNC StoreDeviceCount
 // Stores the device count JSON via Umbrella
-func StoreDeviceCount(cfg *config.Config, tok *config.AuthConfig, session_id int, uid string) error {
+func StoreDeviceCount(cfg *config.Config, tok *config.AuthConfig, session_id int, anondevice string) error {
 	uri := FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
 
 	data := map[string]string{
-		// FIXME: This needs to be captured first and passed in.
-		"event_id":    strconv.Itoa(session_id),
-		"device_uuid": config.GetSerial(),
-		"lib_user":    tok.Email,
-		"localtime":   time.Now().Format(time.RFC3339),
-		// FIXME: The server needs to auto-set this
-		"servertime": time.Now().Format(time.RFC3339),
+		// event_id
+		// An "event" was registered before the data is inserted. This is
+		// essentially a FK into the events table.
+		"event_id": strconv.Itoa(session_id),
+		// The session id is a unique ID that is generated at powerup.
 		"session_id": cfg.SessionId,
-		"device_id":  uid,
+		// The time on the device.
+		"localtime": time.Now().Format(time.RFC3339),
+		// The serial number of the Pi.
+		"pi_serial": config.GetSerial(),
+		// The FCFS Seq Id entered at setup time.
+		"fcfs_seq_id": tok.FCFSId,
+		// The tag entered at setup time.
+		"device_tag": tok.DeviceTag,
+		// The "anondevice" is now something like "0:32" or "26:384"
+		// We split that into a manufacturer ID and a device ID.
+		// The manufactuerer Ids are consistent for a session (a powerup cycle)
+		// The patron id is tracked for 2 hours (or whatever the config says)
+		"manufacturer_index": strings.Split(anondevice, ":")[0],
+		"patron_index":       strings.Split(anondevice, ":")[1],
 	}
 
 	postJSON(cfg, tok, uri, []map[string]string{data})
@@ -46,18 +58,31 @@ func StoreDevicesCount(cfg *config.Config, tok *config.AuthConfig, session_id in
 
 	// Now, bundle that as an array of hashmaps.
 	reportArr := make([]map[string]string, 0)
-	for k := range h {
+	for anondevice := range h {
+
 		data := map[string]string{
-			// FIXME: This needs to be captured first and passed in.
-			"event_id":    strconv.Itoa(session_id),
-			"device_uuid": config.GetSerial(),
-			"lib_user":    tok.Email,
-			"localtime":   time.Now().Format(time.RFC3339),
-			// FIXME: The server needs to auto-set this
-			"servertime": time.Now().Format(time.RFC3339),
+			// event_id
+			// An "event" was registered before the data is inserted. This is
+			// essentially a FK into the events table.
+			"event_id": strconv.Itoa(session_id),
+			// The session id is a unique ID that is generated at powerup.
 			"session_id": cfg.SessionId,
-			"device_id":  k,
+			// The time on the device.
+			"localtime": time.Now().Format(time.RFC3339),
+			// The serial number of the Pi.
+			"pi_serial": config.GetSerial(),
+			// The FCFS Seq Id entered at setup time.
+			"fcfs_seq_id": tok.FCFSId,
+			// The tag entered at setup time.
+			"device_tag": tok.DeviceTag,
+			// The "anondevice" is now something like "0:32" or "26:384"
+			// We split that into a manufacturer ID and a device ID.
+			// The manufactuerer Ids are consistent for a session (a powerup cycle)
+			// The patron id is tracked for 2 hours (or whatever the config says)
+			"manufacturer_index": strings.Split(anondevice, ":")[0],
+			"patron_index":       strings.Split(anondevice, ":")[1],
 		}
+
 		reportArr = append(reportArr, data)
 	}
 

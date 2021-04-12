@@ -11,8 +11,9 @@ import (
 // This probably should be a proper database.
 type uniqueMappingDB struct {
 	lastid *int
+	mfgmap map[string]int
 	uid    map[string]int
-	mfg    map[string]string
+	mfg    map[string]int
 	// timestamp map[string]string
 	tick map[string]int
 }
@@ -26,7 +27,7 @@ func newUMDB() *uniqueMappingDB {
 	umdb := &uniqueMappingDB{
 		lastid: new(int),
 		uid:    make(map[string]int),
-		mfg:    make(map[string]string),
+		mfg:    make(map[string]int),
 		// timestamp: make(map[string]string),
 		tick: make(map[string]int)}
 	return umdb
@@ -48,11 +49,28 @@ func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
 		umdb.uid[mac] = *umdb.lastid
 		// Increment for the next found address.
 		*umdb.lastid = *umdb.lastid + 1
+		// 20210412 MCJ
+		// Now manufactuerers are being numbered as they come in.
+		// This makes sure that we don't leak info. If the first device
+		// we see after powerup is an "Apple" device, it will become
+		// mfg "0". If the third device we see is an "Apple" device, then
+		// Apple devices will be mfg 3. Effectively random, and does not
+		// leak any info.
+
+		// Get the actual manufactuerer. This pares down the MAC appropriately.
 		// Grab a manufacturer for this MAC
-		umdb.mfg[mac] = api.MacToMfg(cfg, mac)
-		// Say when we saw it.
-		// now := time.Now().Format(time.RFC3339)
-		// umdb.timestamp[mac] = now
+		mfg := api.MacToMfg(cfg, mac)
+		// The default ID will be zero.
+		mfgid := 0
+		// Do we have a mfg mapping?
+		// If we do, use it. If not, create a new mapping.
+		if val, ok := umdb.mfgmap[mfg]; ok {
+			mfgid = val
+		} else {
+			umdb.mfgmap[mfg] = len(umdb.mfgmap) + 1
+			mfgid = umdb.mfgmap[mfg]
+		}
+		umdb.mfg[mac] = mfgid
 		umdb.tick[mac] = 0
 	} else {
 		// If this address is already known, update
