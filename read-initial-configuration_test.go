@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"gsa.gov/18f/read-token/wordlist"
+	"gsa.gov/18f/read-initial-configuration/wordlist"
 )
 
 type test struct {

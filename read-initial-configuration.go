@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/text"
-	"gsa.gov/18f/read-token/wordlist"
+	"gsa.gov/18f/read-initial-configuration/wordlist"
 )
 
 const VERSION = "0.0.1"

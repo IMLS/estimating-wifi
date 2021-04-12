@@ -1,4 +1,4 @@
-module gsa.gov/18f/read-token
+module gsa.gov/18f/read-initial-configuration
 
 go 1.16
 
