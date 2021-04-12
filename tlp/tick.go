@@ -20,6 +20,7 @@ func Tick(ka *Keepalive, ch chan<- bool) {
 
 		case <-time.After(1 * time.Second):
 			// Drive the 1 second ticker
+			// log.Println("tick")
 			ch <- true
 		}
 	}

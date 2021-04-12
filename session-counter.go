@@ -44,7 +44,10 @@ func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 
 func handleVersionCheck() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
+	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
 	flag.Parse()
+
+	config.Verbose = *verbosePtr
 
 	// If they just want the version, print and exit.
 	if *versionPtr {

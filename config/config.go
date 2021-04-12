@@ -10,6 +10,8 @@ import (
 	"gsa.gov/18f/session-counter/constants"
 )
 
+var Verbose bool = false
+
 /* FUNC checkEnvVars
  * Checks to see if the username and password for
  * working with Directus is in memory.

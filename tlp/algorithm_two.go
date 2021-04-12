@@ -11,25 +11,17 @@ import (
 // This probably should be a proper database.
 type uniqueMappingDB struct {
 	lastid *int
-	mfgmap map[string]int
 	uid    map[string]int
 	mfg    map[string]int
-	// timestamp map[string]string
-	tick map[string]int
+	tick   map[string]int
 }
 
 func newUMDB() *uniqueMappingDB {
-	// var umdb uniqueMappingDB
-	// umdb.lastid = 0
-	// umdb.uid = make(map[string]int)
-	// umdb.mfg = make(map[string]string)
-	// umdb.timestamp = make(map[string]time.Time)
 	umdb := &uniqueMappingDB{
 		lastid: new(int),
 		uid:    make(map[string]int),
 		mfg:    make(map[string]int),
-		// timestamp: make(map[string]string),
-		tick: make(map[string]int)}
+		tick:   make(map[string]int)}
 	return umdb
 }
 
@@ -60,45 +52,35 @@ func (umdb uniqueMappingDB) updateMapping(cfg *config.Config, mac string) {
 		// Get the actual manufactuerer. This pares down the MAC appropriately.
 		// Grab a manufacturer for this MAC
 		mfg := api.MacToMfg(cfg, mac)
-		// The default ID will be zero.
-		mfgid := 0
 		// Do we have a mfg mapping?
 		// If we do, use it. If not, create a new mapping.
-		if val, ok := umdb.mfgmap[mfg]; ok {
-			mfgid = val
-		} else {
-			umdb.mfgmap[mfg] = len(umdb.mfgmap) + 1
-			mfgid = umdb.mfgmap[mfg]
+		mfgid, found := umdb.mfg[mfg]
+		if !found {
+			mfgid = len(umdb.mfg)
+			// log.Println("mfg", mfg, "id", mfgid)
+			// log.Println("umdb.mfg", umdb.mfg)
 		}
-		umdb.mfg[mac] = mfgid
+		umdb.mfg[mfg] = mfgid
 		umdb.tick[mac] = 0
 	} else {
 		// If this address is already known, update
 		// when we last saw it.
-		// umdb.timestamp[mac] = time.Now().Format(time.RFC3339)
 		umdb.tick[mac] = 0
 	}
 }
 
 func (umdb uniqueMappingDB) removeOldMappings(window int) {
-	// now := time.Now()
 	remove := make([]string, 0)
 	// Find everything we need to remove.
 	for mac := range umdb.mfg {
-		// storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
-		// diff := now.Sub(storedtime)
-		// Is it further in the past than our window (in minutes)?
-		//if (int(diff.Minutes()) > window) || (umdb.tick[mac] >= window) {
 		if umdb.tick[mac] >= window {
-			log.Println(mac, "is old. removing. tick:", umdb.tick[mac])
+			// log.Println(mac, "is old. removing. tick:", umdb.tick[mac])
 			remove = append(remove, mac)
 		}
 	}
 	// Remove everything that's old.
 	for _, mac := range remove {
 		delete(umdb.uid, mac)
-		delete(umdb.mfg, mac)
-		// delete(umdb.timestamp, mac)
 		delete(umdb.tick, mac)
 	}
 }
@@ -109,9 +91,6 @@ func (umdb uniqueMappingDB) asUserMappings() map[string]int {
 
 	for mac := range umdb.mfg {
 		userm := fmt.Sprintf("%v:%d", umdb.mfg[mac], umdb.uid[mac])
-		// storedtime, _ := time.Parse(time.RFC3339, umdb.timestamp[mac])
-		// diff := n.Sub(storedtime)
-		// h[userm] = int(diff.Minutes())
 		h[userm] = umdb.tick[mac]
 	}
 
@@ -125,7 +104,7 @@ func (umdb uniqueMappingDB) asUserMappings() map[string]int {
  *    3a. If the UID exists, set the timestamp to now.
  *    3b. If the UID does not, insert it.
  * 4. If anything is older than the disconnection_window, remove it.
- * 5. Report this UID:timestamp pairing.
+ * 5. WRONG Report this UID:timestamp pairing.
  */
 
 func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, kill <-chan bool) {
@@ -160,6 +139,7 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 			// We get in a list of MAC addresses. Create mappings.
 			// Timestamp everything as we see it, new or old.
 			for _, mac := range arr {
+				// log.Println("updating mapping for ", mac)
 				umdb.updateMapping(cfg, mac)
 			}
 			// Now, filter old things out

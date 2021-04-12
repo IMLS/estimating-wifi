@@ -114,7 +114,9 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 		// if anything fails.
 		req.Header.Set("Content-type", "application/json")
 		if tok != nil {
-			log.Printf("Access token length: %v\n", len(tok.Token))
+			if config.Verbose {
+				fmt.Printf("Access token length: %v\n", len(tok.Token))
+			}
 			req.Header.Set("X-Api-Key", tok.Token)
 		} else {
 			log.Printf("postjson: failed to set headers for authorization.")
@@ -122,22 +124,29 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 
 		// Clean up the log string... no tokens in the log
 		reqLogString := strings.Replace(fmt.Sprint(req), tok.Token, "APITOKEN", -1)
-		log.Printf("postjson:req:\n%v\n", reqLogString)
+		// reqLogString := fmt.Sprint(req)
+		if config.Verbose {
+			log.Printf("postjson:req:\n%v\n", reqLogString)
+		}
 
 		// MAKE THE REQUEST
 		resp, err := client.Do(req)
 		// Show the response from the server. Helpful in debugging.
-		log.Printf("postjson:resp: %v\n", resp)
+		if config.Verbose {
+			log.Printf("postjson:resp: %v\n", resp)
+		}
 		// If there was an error in the post, log it, and exit the function.
 		if err != nil {
-			log.Printf("postjson:err resp: %v\n", resp)
+			if config.Verbose {
+				log.Printf("postjson:err resp: %v\n", resp)
+			}
 			return -1, fmt.Errorf("postjson: failure in client attempt to POST to %v", uri)
 		} else {
 			// If we get things back, the errors will be encoded within the JSON.
 			if resp.StatusCode < 200 || resp.StatusCode > 299 {
-				log.Printf("postjson: bad status on POST to: %v\n", uri)
+				log.Printf("postjson: bad status on POST uri: %v\n", uri)
 				log.Printf("postjson: bad status on POST response: [ %v ]\n", resp.Status)
-				return magic_index, fmt.Errorf("postjson: bad status on POST response: [ %v ]\n", resp.Status)
+				return magic_index, fmt.Errorf("postjson: bad status on POST response: [ %v ]", resp.Status)
 			} else {
 				// Parse the response. Everything comes from ReVal in our current formulation.
 				var dat RevalResponse
@@ -147,7 +156,9 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 					// If we can't parse the response, return a valid index but also include an error.
 					return magic_index, fmt.Errorf("postjson: could not unmarshal response body")
 				}
-				log.Println("postjson: resp.Body", string(body))
+				if config.Verbose {
+					log.Println("postjson: resp.Body", string(body))
+				}
 			}
 		}
 		// Close the body at function exit.

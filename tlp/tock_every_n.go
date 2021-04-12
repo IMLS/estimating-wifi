@@ -2,6 +2,8 @@ package tlp
 
 import (
 	"log"
+
+	"gsa.gov/18f/session-counter/config"
 )
 
 /* PROCESS tockEveryN
@@ -25,6 +27,9 @@ func TockEveryN(ka *Keepalive, n int, in <-chan bool, out chan<- bool) {
 		case <-in:
 			counter = counter + 1
 			if counter == n {
+				if config.Verbose {
+					log.Println("tickN", counter)
+				}
 				counter = 0
 				out <- true
 			}
