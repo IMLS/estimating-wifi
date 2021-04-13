@@ -47,18 +47,6 @@
     - manufacturers.sqlite
   become: yes
 
-- name: create these files on first run, then leave alone
-  ansible.builtin.copy:
-    src: "files{{session_counter.config_path}}/{{ item }}"
-    dest: "{{session_counter.config_path}}/{{ item }}"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    mode: '0644'
-    force: no
-  loop:
-    - auth.yaml
-  become: yes
-
   # Setup the systemd unit
 - name: template out the systemd unit
   ansible.builtin.template:
@@ -86,10 +74,3 @@
   ansible.builtin.command:
     cmd: systemctl start session-counter
   become: yes
-
-# - name: start and enable it
-#   ansible.builtin.service:
-#     name: session-counter
-#     state: started
-#     enabled: yes
-#   become: yes

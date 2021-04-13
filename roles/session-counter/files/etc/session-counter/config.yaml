@@ -1,34 +1,26 @@
 monitoring:
-  pinginterval: 10
-  max_http_error_count: 10
-  http_error_interval_mins: 60
+  # How often we check health, in seconds.
+  pinginterval: 30
+  # The maximum number of HTTP errors we will tolerate
+  # in a window before crashing out and letting systemd restart us.
+  # The counter is reset at the end of each interval.
+  max_http_error_count: 8
+  http_error_interval_mins: 10
   # How long we maintain a MAC -> UID mapping.
   # If we don't see a device for this many minutes, then
   # we drop the mapping. If the device shows up again, it will
   # be a "new" device.
   uniqueness_window: 120
-  # rounds is the number of listening rounds we do before
-  # reporting up to the server. 
-  rounds: 3
-  # threshold is how many rounds a MAC address must be present
-  # before we consider reporting it to the server.
-  threshold: 2
-  # EXAMPLE:
-  # rounds of 10 and threshold of 8 would have a 10m reporting window
-  # and require a device to be present 8 out of 10 minutes.
-  # rounds of 60 and threshold of 30 would watch for an hour, and then 
-  # consider any device that was present for 30 minutes to be 
-
 # These are two different endpoints.
 # They will both go through umbrella...
 # So only the path should be
 umbrella:
   scheme: https
   host: api.data.gov
-  # Goes through ReVal and ends up in pls_data
-  data: /TEST/10x-imls/validate 
-  # Goes through ReVal and ends up in pls_events
-  logging: /TEST/10x-imls-2/items/pls_events 
+  # Goes through ReVal and ends up in our data table
+  data: /TEST/10x-ilms/v1/validate/wifi
+  # Goes through ReVal and ends up in our events table
+  logging: /TEST/10x-ilms/v1/validate/events 
 wireshark:
   path: /usr/bin/tshark
   adapter: wlan1

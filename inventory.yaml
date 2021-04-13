@@ -10,13 +10,13 @@ all:
     # We might change the default user.
     default_user: pi
     session_counter:
-      binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.0.2/session-counter"
+      binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.0.3/session-counter"
       install_path: /usr/local/bin
       config_path: /etc/session-counter
       workdir: /home/pi/session-counter
       logdir: /var/log/session-counter
     findralink:
-      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.3/find-ralink"
+      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.4/find-ralink"
       install_path: /usr/local/
       bin: /usr/local/find-ralink
     persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules

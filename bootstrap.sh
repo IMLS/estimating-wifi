@@ -119,7 +119,7 @@ restore_console () {
 bootstrap_ansible () {
     _status "Bootstrapping Ansible"
     _status "Updating sources."
-    echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" | tee -a /etc/apt/sources.list
+    echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list
     _status "Installing dirmngr."
     sudo apt-get install dirmngr -y
     _status "Adding local keys."
