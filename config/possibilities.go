@@ -15,14 +15,14 @@ import (
 // The text file is embedded at compile time.
 // https://pkg.go.dev/embed#FS.ReadFile
 
-//go:embed searches.json
-var f embed.FS
-var Verbose bool = false
-
 type Search struct {
 	Field string `json:"field"`
 	Query string `json:"query"`
 }
+
+//go:embed searches.json
+var f embed.FS
+var Verbose bool = false
 
 func GetSearches() []Search {
 	searches := make([]Search, 0)

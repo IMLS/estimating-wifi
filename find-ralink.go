@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"log"
 	"os"
-	"os/exec"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -15,103 +12,13 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 	"gsa.gov/18f/find-ralink/config"
 	"gsa.gov/18f/find-ralink/constants"
+	"gsa.gov/18f/find-ralink/lshw"
+	"gsa.gov/18f/find-ralink/models"
 )
 
-const (
-	LOOKING_FOR_USB = iota
-	READING_HASH    = iota
-	DONE_READING    = iota
-)
+func findMatchingDevice(wlan *models.Device) {
 
-type Device struct {
-	exists        bool
-	search        config.Search
-	physicalid    int
-	description   string
-	businfo       string
-	logicalname   string
-	serial        string
-	mac           string
-	configuration string
-	vendor        string
-	extract       string
-}
-
-func getDeviceHash(wlan *Device) []map[string]string {
-	wlan.exists = false
-
-	cmd := exec.Command("/usr/bin/lshw", "-class", "network")
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Println("cpw: cannot get stdout from lshw")
-		log.Fatal(err)
-	}
-
-	if err := cmd.Start(); err != nil {
-		log.Println("cpw: cannot start `lshw` command")
-		log.Fatal(err)
-	}
-
-	scanner := bufio.NewScanner(stdout)
-	hash := make(map[string]string, 0)
-	usbSecRe := regexp.MustCompile(`^\s+\*-(usb|network).*`)
-	newSecRe := regexp.MustCompile(`^\s+\*-.*`)
-	hashRe := regexp.MustCompile(`^\s+(.*?): (.*)`)
-	state := LOOKING_FOR_USB
-
-	// Build up an array of hashes. Instead of looking for the device here,
-	// we'll instead collect all the devices into hashes, and hold them for a moment.
-	devices := make([]map[string]string, 0)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		switch state {
-		case LOOKING_FOR_USB:
-			match := usbSecRe.MatchString(line)
-			if match {
-				if config.Verbose {
-					fmt.Println("-> READING_HASH")
-				}
-				// Create a new hash.
-				hash = make(map[string]string)
-				state = READING_HASH
-			}
-		case READING_HASH:
-			if config.Verbose {
-				fmt.Printf("checking: [ %v ]\n", line)
-			}
-			newSecMatch := newSecRe.MatchString(line)
-			hashMatch := hashRe.MatchString(line)
-			hashPieces := hashRe.FindStringSubmatch(line)
-
-			if newSecMatch {
-				if config.Verbose {
-					fmt.Println("-> DONE_READING")
-				}
-				state = DONE_READING
-			} else if hashMatch {
-				// fmt.Printf("%v <- %v\n", hashPieces[1], hashPieces[2])
-				// 0 is the full string, 1 the first group, 2 the second.
-				hash[hashPieces[1]] = hashPieces[2]
-			}
-		case DONE_READING:
-			state = LOOKING_FOR_USB
-			devices = append(devices, hash)
-			if config.Verbose {
-				fmt.Println("devices len", len(devices))
-			}
-		}
-	}
-
-	// Don't lose the last hash!
-	devices = append(devices, hash)
-
-	return devices
-}
-
-func findMatchingDevice(wlan *Device) {
-
-	devices := getDeviceHash(wlan)
+	devices := lshw.GetDeviceHash(wlan)
 	found := false
 
 	// Now, go through the devices and find the one that matches our criteria.
@@ -129,45 +36,45 @@ func findMatchingDevice(wlan *Device) {
 
 		// The default is to search all the fields
 		// lowercase pattern matching
-		if wlan.search.Field == "ALL" {
+		if wlan.Search.Field == "ALL" {
 			for k := range hash {
-				v, _ := regexp.MatchString(strings.ToLower(wlan.search.Query), strings.ToLower(hash[k]))
+				v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[k]))
 				if v {
-					wlan.exists = true
+					wlan.Exists = true
 				}
 				// Stop searching if we find something.
-				if wlan.exists {
+				if wlan.Exists {
 					break
 				}
 			}
 		} else {
 			// Otherwise, search the field specified.
 			if config.Verbose {
-				fmt.Println("query", wlan.search.Query, "field", wlan.search.Field)
+				fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
 			}
-			v, _ := regexp.MatchString(strings.ToLower(wlan.search.Query), strings.ToLower(hash[wlan.search.Field]))
+			v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[wlan.Search.Field]))
 			if v {
-				wlan.exists = true
+				wlan.Exists = true
 			}
 		}
 
 		// If we find something, proceed. But only keep the first thing we find.
 		// Back in 'main', we'll handle the case where wlan.exists is false.
-		if wlan.exists && !found {
+		if wlan.Exists && !found {
 			found = true
-			wlan.vendor = strings.ToLower(hash["vendor"])
-			wlan.physicalid, _ = strconv.Atoi(hash["physical id"])
-			wlan.description = strings.ToLower(hash["description"])
-			wlan.businfo = strings.ToLower(hash["bus info"])
-			wlan.logicalname = strings.ToLower(hash["logical name"])
-			wlan.serial = strings.ToLower(hash["serial"])
+			wlan.Vendor = strings.ToLower(hash["vendor"])
+			wlan.Physicalid, _ = strconv.Atoi(hash["physical id"])
+			wlan.Description = strings.ToLower(hash["description"])
+			wlan.Businfo = strings.ToLower(hash["bus info"])
+			wlan.Logicalname = strings.ToLower(hash["logical name"])
+			wlan.Serial = strings.ToLower(hash["serial"])
 
 			if len(hash["serial"]) >= constants.MACLENGTH {
-				wlan.mac = strings.ToLower(hash["serial"][0:constants.MACLENGTH])
+				wlan.Mac = strings.ToLower(hash["serial"][0:constants.MACLENGTH])
 			} else {
-				wlan.mac = strings.ToLower(hash["serial"])
+				wlan.Mac = strings.ToLower(hash["serial"])
 			}
-			wlan.configuration = strings.ToLower(hash["configuration"])
+			wlan.Configuration = strings.ToLower(hash["configuration"])
 
 			// Once we populate something in this loop, break out.
 			// This will return us to the caller with a populated structure.
@@ -177,7 +84,7 @@ func findMatchingDevice(wlan *Device) {
 }
 
 // https://stackoverflow.com/questions/18930910/access-struct-property-by-name
-func getField(v *Device, field string) reflect.Value {
+func getField(v *models.Device, field string) reflect.Value {
 	r := reflect.ValueOf(v)
 	f := reflect.Indirect(r).FieldByName(field)
 	return f
@@ -230,34 +137,34 @@ func main() {
 	}
 
 	// We populate this via calls.
-	device := new(Device)
-	device.extract = *extractPtr
+	device := new(models.Device)
+	device.Extract = *extractPtr
 
 	// If we ask for auto-discovery, try it and exit.
 	if *discoverPtr {
 		for _, s := range config.GetSearches() {
-			device.search = s
+			device.Search = &s
 			findMatchingDevice(device)
-			if device.exists {
+			if device.Exists {
 				break
 			}
 		}
 	} else {
 		s := &config.Search{Field: *fieldPtr, Query: *searchPtr}
-		device.search = *s
+		device.Search = s
 		findMatchingDevice(device)
 	}
 
 	if *existsPtr {
 		// If we're explicitly asking to see if it exists, say no, and
 		// return a zero error code.
-		if device.exists {
+		if device.Exists {
 			fmt.Println("true")
 		} else {
 			fmt.Println("false")
 		}
 		os.Exit(0)
-	} else if device.exists {
+	} else if device.Exists {
 		res := getField(device, *extractPtr)
 		if reflect.TypeOf(res).Kind() == reflect.Bool {
 			fmt.Println(res.Interface())
