@@ -4,7 +4,7 @@ layout: page
 sidenav: false
 ---
 
-These instructions are for setting up a Raspberry Pi for participation in the IMLS/18F/19x WIFISESS pilot. We recommend reading all of the instructions first, and then following them step-by-step.
+These instructions are for setting up a Raspberry Pi for participation in the IMLS/18F/10x WIFISESS pilot. We recommend reading all of the instructions first, and then following them step-by-step.
 
 If the setup fails in any way, please [reach out to the 18F team]({{site.questionformurl}}), and we'll connect with you to help complete the setup.
 
@@ -33,7 +33,7 @@ You should have been mailed a Raspberry Pi kit, a USB wifi adapter, and a short 
 
 ## Assemble the Pi
 
-The video below walks you through assembling the Raspberry Pi. 
+The video below walks you through assembling the Raspberry Pi.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/7rcNjgVgc-I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
@@ -41,7 +41,7 @@ Googling "canakit raspberry pi kit assembly" should turn up additional videos an
 
 ## Download the Raspberry Pi Imager
 
-The [Raspberry Pi Imager](https://www.raspberrypi.org/software/) is a tool provided by the Raspberry Pi Foundation to help in setting up RPis. 
+The [Raspberry Pi Imager](https://www.raspberrypi.org/software/) is a tool provided by the Raspberry Pi Foundation to help in setting up RPis.
 
 Download and install the imager. You may need administrative privileges on your machine in order to do so.
 
@@ -57,7 +57,7 @@ Now, open the RPi Imager. Under **Operating System**, click **Choose** in order 
 
 Next, under **Storage**, click **Choose**. Select your microSD card. It will show up as some kind of *32GB Generic Blah Blah* or something. (We're aware that "or something" conceals a great many sins. However, we're uncertain exactly how it will appear on your computer.)
 
-After selecting the operating system and the microSD card, click **Install**. 
+After selecting the operating system and the microSD card, click **Install**.
 
 This will take a few minutes.
 
@@ -67,7 +67,7 @@ Now, you can exit the imager, remove the microSD card, and get ready for the slo
 
 ## Insert the card
 
-Put the microSD card in the RPi. The slot is on the bottom of the pi. The gold-plated contacts on the card will be facing UP, and the logo on the card will be facing DOWN. 
+Put the microSD card in the RPi. The slot is on the bottom of the pi. The gold-plated contacts on the card will be facing UP, and the logo on the card will be facing DOWN.
 
 Also, it will only go in *one way*, so if it doesn't slot in easily, *do not force it*. Flip it around and try again if you meet resistance.
 
@@ -88,5 +88,3 @@ Now that everything is plugged in, turn it on.
 ## Wait
 
 Wait.
-
-
