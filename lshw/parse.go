@@ -27,59 +27,68 @@ func GetDeviceHash(wlan *models.Device) []map[string]string {
 		log.Fatal(err)
 	}
 
+	arr := make([]string, 0)
 	scanner := bufio.NewScanner(stdout)
-	hash := make(map[string]string, 0)
-	usbSecRe := regexp.MustCompile(`^\s+\*-(usb|network).*`)
-	newSecRe := regexp.MustCompile(`^\s+\*-.*`)
-	hashRe := regexp.MustCompile(`^\s+(.*?): (.*)`)
-	state := constants.LOOKING_FOR_USB
+	for scanner.Scan() {
+		line := scanner.Text()
+		arr = append(arr, line)
+	}
+
+	return ParseLSHW(arr)
+}
+
+func ParseLSHW(string_array []string) []map[string]string {
+	hash := make(map[string]string)
+	sectionHeading := regexp.MustCompile(`^\s*\*-(usb|network)((?:\:\d))?\s*`)
+	entryPattern := regexp.MustCompile(`\s*([a-z ]+):\s+(.*)\s*`)
+
+	// Start looking for a section heading.
+	state := constants.LOOKING_FOR_SECTION_HEADING
 
 	// Build up an array of hashes. Instead of looking for the device here,
 	// we'll instead collect all the devices into hashes, and hold them for a moment.
 	devices := make([]map[string]string, 0)
 
-	for scanner.Scan() {
-		line := scanner.Text()
+	for _, line := range string_array {
 		switch state {
-		case constants.LOOKING_FOR_USB:
-			match := usbSecRe.MatchString(line)
+		case constants.LOOKING_FOR_SECTION_HEADING:
+			// See if we can find a section heading.
+			match := sectionHeading.MatchString(line)
+			//fmt.Printf("LFSH line [%v] match [%v]\n", line, match)
+
+			// If we do, change state.
 			if match {
-				if config.Verbose {
-					fmt.Println("-> READING_HASH")
-				}
 				// Create a new hash.
 				hash = make(map[string]string)
-				state = constants.READING_HASH
+				state = constants.READING_ENTRY
 			}
-		case constants.READING_HASH:
-			if config.Verbose {
-				fmt.Printf("checking: [ %v ]\n", line)
-			}
-			newSecMatch := newSecRe.MatchString(line)
-			hashMatch := hashRe.MatchString(line)
-			hashPieces := hashRe.FindStringSubmatch(line)
+		// Now we're in an lshw entry.
+		case constants.READING_ENTRY:
+			newSecMatch := sectionHeading.MatchString(line)
+			hashMatch := entryPattern.MatchString(line)
+			hashPieces := entryPattern.FindStringSubmatch(line)
+			//fmt.Printf("RE   line [%v] nsm [%v] hm [%v]\n", line, newSecMatch, hashMatch)
 
 			if newSecMatch {
-				if config.Verbose {
-					fmt.Println("-> DONE_READING")
-				}
-				state = constants.DONE_READING
+				state = constants.READING_ENTRY
+				devices = append(devices, hash)
+				// Create a new hash to continue reading into
+				hash = make(map[string]string)
 			} else if hashMatch {
-				// fmt.Printf("%v <- %v\n", hashPieces[1], hashPieces[2])
 				// 0 is the full string, 1 the first group, 2 the second.
-				hash[hashPieces[1]] = hashPieces[2]
-			}
-		case constants.DONE_READING:
-			state = constants.LOOKING_FOR_USB
-			devices = append(devices, hash)
-			if config.Verbose {
-				fmt.Println("devices len", len(devices))
+				key := hashPieces[1]
+				value := hashPieces[2]
+				hash[key] = value
 			}
 		}
 	}
 
 	// Don't lose the last hash!
 	devices = append(devices, hash)
+	if *config.Verbose {
+		fmt.Println("found", len(devices), "devices")
+		fmt.Println("devices\n", devices)
+	}
 
 	return devices
 }

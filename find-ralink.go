@@ -27,7 +27,7 @@ func findMatchingDevice(wlan *models.Device) {
 	// spurious matches that were unexpected/surprising in practice. (I hope.)
 	for _, hash := range devices {
 
-		if config.Verbose {
+		if *config.Verbose {
 			fmt.Println("---------")
 			for k, v := range hash {
 				fmt.Println(k, "<-", v)
@@ -49,7 +49,7 @@ func findMatchingDevice(wlan *models.Device) {
 			}
 		} else {
 			// Otherwise, search the field specified.
-			if config.Verbose {
+			if *config.Verbose {
 				fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
 			}
 			v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[wlan.Search.Field]))
@@ -106,7 +106,7 @@ func main() {
 
 	// Using a "global" indicator of verboseness.
 	// Not sure if there is a more Go-ish way to do this.
-	config.Verbose = *verbosePtr
+	config.Verbose = verbosePtr
 
 	// VERSION
 	// If they just want the version, print it and exit.
@@ -130,7 +130,7 @@ func main() {
 	if *extractPtr == "" {
 		// If it is the default "ALL" value, choose the logicalname
 		if *fieldPtr == "ALL" {
-			*extractPtr = "logicalname"
+			*extractPtr = "Logicalname"
 		} else {
 			*extractPtr = *fieldPtr
 		}

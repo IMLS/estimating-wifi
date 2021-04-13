@@ -22,14 +22,14 @@ type Search struct {
 
 //go:embed searches.json
 var f embed.FS
-var Verbose bool = false
+var Verbose *bool = new(bool)
 
 func GetSearches() []Search {
 	searches := make([]Search, 0)
 
 	// First, look for the file in /etc
 	if _, err := os.Stat(constants.SEARCHES_PATH); err == nil {
-		if Verbose {
+		if *Verbose {
 			fmt.Println("using", constants.SEARCHES_PATH)
 		}
 		// We found the version in /etc. This is probably a live installation.
@@ -45,7 +45,7 @@ func GetSearches() []Search {
 		}
 
 	} else if os.IsNotExist(err) {
-		if Verbose {
+		if *Verbose {
 			fmt.Println("using embedded search data")
 		}
 		// Use the embedded file, which has a limited set of search terms.
