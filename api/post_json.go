@@ -91,6 +91,8 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 		divided = append(divided, data[i:end])
 	}
 
+	// FIXME: If there is no data, throw an event that logs there was no data.
+
 	// Now that the incoming array has been chopped up into subarrays of length chunkSize,
 	// lets send those out into the world.
 	for _, arr := range divided {
@@ -124,7 +126,6 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 
 		// Clean up the log string... no tokens in the log
 		reqLogString := strings.Replace(fmt.Sprint(req), tok.Token, "APITOKEN", -1)
-		// reqLogString := fmt.Sprint(req)
 		if config.Verbose {
 			log.Printf("postjson:req:\n%v\n", reqLogString)
 		}

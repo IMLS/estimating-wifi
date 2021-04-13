@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"log"
@@ -8,6 +9,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 	"gsa.gov/18f/session-counter/constants"
+	"gsa.gov/18f/session-counter/cryptopasta"
 )
 
 var Verbose bool = false
@@ -65,6 +67,22 @@ func ReadAuth() (*AuthConfig, error) {
 		log.Fatalf("readToken: could not decode YAML:\n%v\n", err)
 	}
 
+	// Unencrypt the API token.
+	// It is a B64 encoded string
+	// of the API key encrypted with the device's serial.
+	// This is obscurity, but it is all we can do on a RPi
+	serial := []byte(GetSerial())
+	var key [32]byte
+	copy(key[:], serial)
+	b64, err := base64.StdEncoding.DecodeString(auth.Token)
+	if err != nil {
+		log.Fatal("readToken: cannot b64 decode auth token.")
+	}
+	dec, err := cryptopasta.Decrypt(b64, &key)
+	if err != nil {
+		log.Fatal("readToken: failed to decrypt auth token after decoding")
+	}
+	auth.Token = string(dec)
 	return auth, nil
 }
 
