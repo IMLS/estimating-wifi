@@ -184,6 +184,10 @@ func getField(v *Device, field string) reflect.Value {
 }
 
 func main() {
+	// FLAGS
+	// This thing has a whole mess of flags.
+	// The default values help us make sure that sensible things happen if options
+	// are not explicitly declared.
 	verbosePtr := flag.Bool("verbose", false, "Verbose output.")
 	discoverPtr := flag.Bool("discover", false, "Attempt to discover the device.")
 	searchPtr := flag.String("search", "ralink", "Search string to use in hardware listing. Must use with `field`.")
@@ -191,23 +195,31 @@ func main() {
 	extractPtr := flag.String("extract", "", "Field to extract from device data.")
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
-
 	flag.Parse()
 
+	// Using a "global" indicator of verboseness.
+	// Not sure if there is a more Go-ish way to do this.
 	config.Verbose = *verbosePtr
 
-	// If they just want the version, print and exit.
+	// VERSION
+	// If they just want the version, print it and exit.
 	if *versionPtr {
 		fmt.Println("Version", constants.VERSION)
 		os.Exit(0)
 	}
 
+	// ROOT
+	// We can't do this without root. Some things... might work.
+	// Print a big red warning.
 	if os.Getenv("USER") != "root" {
 		fmt.Println(text.FgRed.Sprint("find-ralink *really* needs to be run as root."))
 	}
 
+	// EXTRACT
 	// If they didn't tell us what to extract, then
-	// extract the field they're searching for
+	// extract the field they're searching for. That is, we use the
+	// extractPtr value to tell us what from the device description to return
+	// at the end of the seach.
 	if *extractPtr == "" {
 		// If it is the default "ALL" value, choose the logicalname
 		if *fieldPtr == "ALL" {
