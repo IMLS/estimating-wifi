@@ -1,0 +1,39 @@
+{
+  "fields": [
+    {
+      "name": "pi_serial",
+      "type": "string",
+      "description": "Raspberry PI serial number"
+    },
+    {
+      "name": "fcfs_seq_id",
+      "type": "string",
+      "description": "PLS library ID"
+    },
+    {
+      "name": "device_tag",
+      "type": "string",
+      "description": "Device tag (user input)"
+    },
+    {
+      "name": "session_id",
+      "type": "string",
+      "description": "Session ID (randomly generated per session)"
+    },
+    {
+      "name": "localtime",
+      "type": "string",
+      "description": "Local time of the device"
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "description": "Event tag"
+    },
+    {
+      "name": "info",
+      "type": "string",
+      "description": "Generic catch-all (JSON)"
+    }
+  ]
+}

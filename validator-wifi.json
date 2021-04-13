@@ -1,0 +1,49 @@
+{
+  "fields": [
+    {
+      "name": "event_id",
+      "type": "number",
+      "description": "Event ID"
+    },
+    {
+      "name": "pi_serial",
+      "type": "string",
+      "description": "Device UUID"
+    },
+    {
+      "name": "fcfs_seq_id",
+      "type": "string",
+      "description": "Library user ID"
+    },
+    {
+      "name": "device_tag",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "localtime",
+      "type": "string",
+      "description": "Local time of the device"
+    },
+    {
+      "name": "session_id",
+      "type": "string",
+      "description": "Session ID"
+    },
+    {
+      "name": "device_id",
+      "type": "string",
+      "description": "Device ID"
+    },
+    {
+      "name": "manufacturer_index",
+      "type": "number",
+      "description": "Event ID"
+    },
+    {
+      "name": "patron_index",
+      "type": "number",
+      "description": "Event ID"
+    }
+  ]
+}
