@@ -86,6 +86,8 @@ func (umdb uniqueMappingDB) RemoveOldMappings(window int) {
 		}
 	}
 	// Remove everything that's old.
+	// But not the mfg anonymization.
+	// That is kept until reset.
 	for _, mac := range remove {
 		delete(umdb.uid, mac)
 		delete(umdb.mfg, mac)
@@ -95,8 +97,6 @@ func (umdb uniqueMappingDB) RemoveOldMappings(window int) {
 
 func (umdb uniqueMappingDB) AsUserMappings() map[string]int {
 	h := make(map[string]int)
-	// n := time.Now()
-
 	for mac := range umdb.mfg {
 		userm := fmt.Sprintf("%v:%d", umdb.anonmfg[api.MacToMfg(umdb.cfg, mac)], umdb.uid[mac])
 		h[userm] = umdb.tick[mac]

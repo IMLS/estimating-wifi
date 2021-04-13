@@ -91,14 +91,12 @@ func Test_GetToken(t *testing.T) {
 
 func Test_StoreContent(t *testing.T) {
 	cfg := config.ReadConfig()
-	t.Log("CFG:", cfg)
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
 
 	auth, _ := config.ReadAuth()
-	t.Log("auth", auth)
-	StoreDevicesCount(cfg, auth, 42, map[string]int{"0": 0})
+	StoreDevicesCount(cfg, auth, 42, map[string]int{"0:42": 0})
 }
 
 func Test_LogEvent(t *testing.T) {

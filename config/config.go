@@ -12,22 +12,6 @@ import (
 
 var Verbose bool = false
 
-/* FUNC checkEnvVars
- * Checks to see if the username and password for
- * working with Directus is in memory.
- * If not, it quits.
- */
-func checkEnvVars() {
-	if os.Getenv(constants.EnvUsername) == "" {
-		fmt.Printf("%s must be set in the env!\n", constants.EnvUsername)
-		os.Exit(constants.ExitNoUsername)
-	}
-	if os.Getenv(constants.EnvPassword) == "" {
-		fmt.Printf("%s must be set in the env!\n", constants.EnvPassword)
-		os.Exit(constants.ExitNoPassword)
-	}
-}
-
 func parseConfigFile(filepath string) (*Config, error) {
 	_, err := os.Stat(filepath)
 
@@ -50,8 +34,8 @@ func parseConfigFile(filepath string) (*Config, error) {
 	}
 	return nil, fmt.Errorf("config: could not find config file [%v]", filepath)
 }
+
 func devConfig() *Config {
-	checkEnvVars()
 	// FIXME consider turning this into an env var
 	cfgPtr := flag.String("config", "config.yaml", "config file")
 	flag.Parse()
@@ -87,12 +71,6 @@ func ReadAuth() (*AuthConfig, error) {
 func ReadConfig() *Config {
 	// We expect config to be here:
 	//   * /etc/session-counter/config.yaml
-	// We expect there to be a token file at
-	//   * /etc/session-counter/access-token
-	//
-	// If neither of those is true, we can check for a
-	// the username and password to be in the ENV, and
-	// for the config to be passed via command line.
 
 	cfg, err := parseConfigFile(constants.ConfigPath)
 	if err != nil {
@@ -100,19 +78,6 @@ func ReadConfig() *Config {
 		fmt.Println("config: loading dev config")
 		return devConfig()
 	}
-
-	// FIXME 20210323 MCJ
-	// ARE THESE USED ANYWHERE?
-
-	// auth, err := ReadAuth()
-	// if err != nil {
-	// 	log.Fatal("readConfig: cannot find auth token")
-	// }
-
-	// Stick the username/token into the environment.
-	// This will be used by the Get_token() auth dance.
-	// os.Setenv(constants.AuthTokenKey, auth.Token)
-	// os.Setenv(constants.AuthEmailKey, auth.User)
 
 	return cfg
 }

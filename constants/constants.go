@@ -2,8 +2,6 @@ package constants
 
 const MACLENGTH = 17
 
-const EnvUsername = "SESSIONCOUNTUSERNAME"
-const EnvPassword = "SESSIONCOUNTPASSWORD"
 const ExitNoUsername = -100
 const ExitNoPassword = -101
 const ExitProcessTimeout = -200

@@ -55,7 +55,7 @@ var tests = []struct {
 		macs(m["next"]),
 		hashes(m["next"]),
 		map[string]int{
-			"Next:0": 0,
+			"0:0": 0,
 		},
 	},
 	// // Two input hashes
@@ -68,8 +68,8 @@ var tests = []struct {
 		// One for beefcafe, because it was only sent once, and
 		// one tick goes by.
 		map[string]int{
-			"Next:0":  0,
-			"Apple:1": 1,
+			"0:0": 0,
+			"1:1": 1,
 		},
 	},
 	// // Two input hashes
@@ -82,8 +82,8 @@ var tests = []struct {
 		// One for beefcafe, because it was only sent once, and
 		// one tick goes by.
 		map[string]int{
-			"Next:0": 0,
-			"Next:1": 1,
+			"0:0": 0,
+			"0:1": 1,
 		},
 	},
 	// Three hashes, three minutes
@@ -94,10 +94,10 @@ var tests = []struct {
 		hashes("de:ad:be:ef", "de:ad:be:ef", "de:ad:be:ef"),
 		// IDs will be assigned by MAC address sort!
 		map[string]int{
-			"Next:0":     3,
-			"Apple:1":    3,
-			"Ericsson:2": 3,
-			"unknown:3":  0,
+			"0:0": 3,
+			"1:1": 3,
+			"2:2": 3,
+			"3:3": 0,
 		},
 	},
 
@@ -117,9 +117,9 @@ var tests = []struct {
 		// One for beefcafe, because it was only sent once, and
 		// one tick goes by.
 		map[string]int{
-			"Apple:1":    1,
-			"Ericsson:2": 0,
-			"unknown:3":  2,
+			"1:1": 1,
+			"2:2": 0,
+			"3:3": 2,
 		},
 	},
 
@@ -139,8 +139,8 @@ var tests = []struct {
 		// One for beefcafe, because it was only sent once, and
 		// one tick goes by.
 		map[string]int{
-			"Next:0":    0,
-			"unknown:3": 1,
+			"0:0": 0,
+			"3:3": 1,
 		},
 	},
 }
