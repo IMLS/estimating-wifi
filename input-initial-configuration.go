@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"log"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
+	"gsa.gov/18f/read-initial-configuration/cryptopasta"
+	"gsa.gov/18f/read-initial-configuration/pi"
 	"gsa.gov/18f/read-initial-configuration/wordlist"
 )
 
@@ -119,7 +122,7 @@ func box(c *color.Color, s string) string {
 	return result
 }
 
-func readToken() string {
+func readWordPairs() string {
 	wordlist.Init()
 
 	// We need to read things until they write DONE.
@@ -149,7 +152,7 @@ func readToken() string {
 		} else {
 			ndx, err := wordlist.GetPairIndex(pair)
 			if err != nil {
-				color.New(color.FgBlue).Println("\n[ BAD! ] I can't find that word pair. Please try again, or DONE if you have no more word pairs.\n")
+				color.New(color.FgBlue).Printf("\n[ BAD! ] I can't find that word pair. Please try again, or DONE if you have no more word pairs.\n\n")
 			} else {
 				wpndx += 1
 				decoded := decode(ndx)
@@ -159,6 +162,23 @@ func readToken() string {
 		}
 	}
 	return key
+}
+
+func readToken() string {
+	fmt.Printf("Enter raw token (dev testing only): ")
+	reader := bufio.NewReader(os.Stdin)
+	tok, _ := reader.ReadString('\n')
+	tok = strings.TrimSpace(tok)
+	serial := []byte(pi.GetSerial())
+	var key [32]byte
+	copy(key[:], serial)
+	enc, err := cryptopasta.Encrypt([]byte(tok), &key)
+	if err != nil {
+		log.Fatal("could not encrypt token.")
+	}
+
+	str := base64.StdEncoding.EncodeToString(enc)
+	return str
 }
 
 func readTag() string {
@@ -186,20 +206,24 @@ func readTag() string {
 	return tag
 }
 
-func writeYAML(cfg *config, path string) {
+func writeYAML(cfg *config, path string, enabled bool) {
 	s := fmt.Sprintf(`api_token: "%v"`, cfg.Token)
 	s += "\n"
 	s += fmt.Sprintf(`fcfs_seq_id: "%v"`, cfg.FCFS)
 	s += "\n"
 	s += fmt.Sprintf(`tag: "%v"`, cfg.Tag)
 	s += "\n"
-	// This will truncate the file if it exists.
-	f, err := os.Create(path)
-	if err != nil {
-		log.Fatal("could not open config for writing")
+	if enabled {
+		// This will truncate the file if it exists.
+		f, err := os.Create(path)
+		if err != nil {
+			log.Fatal("could not open config for writing")
+		}
+		f.WriteString(s)
+		f.Close()
+	} else {
+		fmt.Println(s)
 	}
-	f.WriteString(s)
-	f.Close()
 }
 
 func main() {
@@ -207,10 +231,11 @@ func main() {
 	configPathPtr := flag.String("path", yamlPath, "Where to write the config.")
 	versionPtr := flag.Bool("version", false, "Get version and exit.")
 	readFCFSPtr := flag.Bool("fcfs-seq", false, "Read in their FCFS ID.")
-	readTokenPtr := flag.Bool("token", false, "Read in their API token.")
+	readWordPairPtr := flag.Bool("word-pairs", false, "Read in their API token as word pairs.")
+	readTokenPtr := flag.Bool("plain-token", false, "Read the token directly.")
 	tagPtr := flag.Bool("tag", false, "A local inventory tag or identifier.")
 	allPtr := flag.Bool("all", false, "Enables all values for entry.")
-	// writeFilePtr := flag.String("path", yamlPath, "Write a YAML file with requested fields.")
+	writePtr := flag.Bool("write", false, "Enables writing the config file.")
 	flag.Parse()
 
 	cfg := &config{}
@@ -236,14 +261,23 @@ func main() {
 		cfg.Tag = readTag()
 	}
 
+	if *readWordPairPtr {
+		fmt.Println()
+		cfg.Token = readWordPairs()
+	}
+
 	if *readTokenPtr {
 		fmt.Println()
 		cfg.Token = readToken()
+
+		// unb64, err := base64.StdEncoding.DecodeString(cfg.Token)
+		// unenc, err := cryptopasta.Decrypt(unb64, &s32)
+		// fmt.Println("token", string(unenc))
 	}
 
 	// Writes to the default location, or another location
 	// if overwridden by the flag.
-	writeYAML(cfg, *configPathPtr)
+	writeYAML(cfg, *configPathPtr, *writePtr)
 
 	fmt.Println()
 	fmt.Println(box(color.New(color.FgHiBlue), color.New(color.FgYellow).Sprint("All done!")))
