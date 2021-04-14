@@ -7,3 +7,43 @@
       - lshw
     state: latest
   become: yes
+
+- name: make sure some packages are always removed
+  ansible.builtin.command:
+    cmd: apt-get remove --purge {{item}}
+  loop:
+    - nginx
+    - apache
+    - "^libreoffice.*"
+    - wolfram-engine
+    - scratch2
+    - "^minecraft.*"
+    - sonic-pi
+    - dillo
+    - gpicview
+    - penguinspuzzle
+    - oracle-java8-jdk
+    - openjdk-7-jre
+    - oracle-java7-jdk
+    - openjdk-8-jre
+    - squeak-vm 
+    - squeak-plugins-scratch 
+    - geany
+  ignore_errors: yes
+  args:
+    warn: false
+  become: yes
+
+- name: cleanup packages 
+  ansible.builtin.command:
+    cmd: apt-get clean
+  args:
+    warn: false
+  become: yes
+
+- name: autoremove packages
+  ansible.builtin.command:
+    cmd: apt-get autoremove -y
+  args:
+    warn: false
+  become: yes
