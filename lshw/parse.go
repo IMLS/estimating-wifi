@@ -37,6 +37,15 @@ func GetDeviceHash(wlan *models.Device) []map[string]string {
 	return ParseLSHW(arr)
 }
 
+func deepCopy(h map[string]string) map[string]string {
+	nh := make(map[string]string)
+	for k, v := range h {
+		nh[k] = v
+	}
+
+	return nh
+}
+
 func ParseLSHW(string_array []string) []map[string]string {
 	hash := make(map[string]string)
 	sectionHeading := regexp.MustCompile(`^\s*\*-(usb|network)((?:\:\d))?\s*`)
@@ -71,7 +80,7 @@ func ParseLSHW(string_array []string) []map[string]string {
 
 			if newSecMatch {
 				state = constants.READING_ENTRY
-				devices = append(devices, hash)
+				devices = append(devices, deepCopy(hash))
 				// Create a new hash to continue reading into
 				hash = make(map[string]string)
 			} else if hashMatch {
