@@ -1,6 +1,6 @@
 .PHONY: all
 
-all: clean
+all: clean test
 	go build session-counter.go
 
 clean:
