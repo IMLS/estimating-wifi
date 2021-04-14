@@ -14,9 +14,9 @@ import (
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
-	"gsa.gov/18f/read-initial-configuration/cryptopasta"
-	"gsa.gov/18f/read-initial-configuration/pi"
-	"gsa.gov/18f/read-initial-configuration/wordlist"
+	"gsa.gov/18f/input-initial-configuration/cryptopasta"
+	"gsa.gov/18f/input-initial-configuration/pi"
+	"gsa.gov/18f/input-initial-configuration/wordlist"
 )
 
 const VERSION = "0.0.1"
@@ -141,9 +141,9 @@ func readWordPairs() string {
 	msg += " and press return.\n\n"
 	msg += color.New(color.FgYellow).Sprint("There should be 14 word pairs.")
 	fmt.Println(box(boxc, msg))
-	wpndx := 1
+	wpCounter := 1
 	for reading {
-		fmt.Printf("Word pair %d: ", wpndx)
+		fmt.Printf("Word pair %d: ", wpCounter)
 		pair, _ := reader.ReadString('\n')
 		pair = strings.TrimSpace(pair)
 		if pair == "DONE" || pair == "done" || pair == "quit" || pair == "exit" {
@@ -154,7 +154,7 @@ func readWordPairs() string {
 			if err != nil {
 				color.New(color.FgBlue).Printf("\n[ BAD! ] I can't find that word pair. Please try again, or DONE if you have no more word pairs.\n\n")
 			} else {
-				wpndx += 1
+				wpCounter += 1
 				decoded := decode(ndx)
 				color.New(color.FgGreen).Printf("\n[ GOOD! ] `%v` became `%v`\n\n", pair, decoded)
 				key += decoded
@@ -227,56 +227,67 @@ func writeYAML(cfg *config, path string, enabled bool) {
 }
 
 func main() {
-
-	configPathPtr := flag.String("path", yamlPath, "Where to write the config.")
+	// Shortcuts to exit
 	versionPtr := flag.Bool("version", false, "Get version and exit.")
+	readTokenPtr := flag.Bool("plain-token", false, "Read the token directly.")
+	// Enables fcfs-seq, word-pairs, and tag
+	allPtr := flag.Bool("all", false, "Enables all values for entry.")
 	readFCFSPtr := flag.Bool("fcfs-seq", false, "Read in their FCFS ID.")
 	readWordPairPtr := flag.Bool("word-pairs", false, "Read in their API token as word pairs.")
-	readTokenPtr := flag.Bool("plain-token", false, "Read the token directly.")
 	tagPtr := flag.Bool("tag", false, "A local inventory tag or identifier.")
-	allPtr := flag.Bool("all", false, "Enables all values for entry.")
+	// Controlling output
 	writePtr := flag.Bool("write", false, "Enables writing the config file.")
+	configPathPtr := flag.String("path", yamlPath, "Where to write the config.")
+
 	flag.Parse()
 
 	cfg := &config{}
 
+	// Dump version and exit
 	if *versionPtr {
 		fmt.Println(VERSION)
 		os.Exit(0)
 	}
 
+	// DEV ONLY
+	// This is for testing. It will take the key given, encrypt it, and
+	// print it to the command line. The encryption will *only* be meaningful
+	// ON THE RASPBERRY PI WHERE THE KEY WILL BE USED. So, to get an encrypted
+	// version of the key for a given Pi, this must be run ON THAT Pi.
+	if *readTokenPtr {
+		fmt.Println()
+		cfg.Token = readToken()
+		fmt.Println(cfg.Token)
+		os.Exit(0)
+	}
+
+	// Enable all the inputs.
 	if *allPtr {
 		*readFCFSPtr = true
 		*tagPtr = true
 		*readTokenPtr = true
 	}
 
+	// Read in the FCFS Seq Id
 	if *readFCFSPtr {
 		fmt.Println()
 		cfg.FCFS = readFCFS()
 	}
 
+	// Read in the hardware tag
 	if *tagPtr {
 		fmt.Println()
 		cfg.Tag = readTag()
 	}
 
+	// Read in the word pairs
 	if *readWordPairPtr {
 		fmt.Println()
 		cfg.Token = readWordPairs()
 	}
 
-	if *readTokenPtr {
-		fmt.Println()
-		cfg.Token = readToken()
-
-		// unb64, err := base64.StdEncoding.DecodeString(cfg.Token)
-		// unenc, err := cryptopasta.Decrypt(unb64, &s32)
-		// fmt.Println("token", string(unenc))
-	}
-
 	// Writes to the default location, or another location
-	// if overwridden by the flag.
+	// if overwridden by the flag. Only writes if --write is set to `true`
 	writeYAML(cfg, *configPathPtr, *writePtr)
 
 	fmt.Println()

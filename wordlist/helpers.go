@@ -1,31 +1,28 @@
 package wordlist
 
-import "errors"
+import (
+	"fmt"
+)
 
-// golang really doesn't have `member`?
-func contains(str string) bool {
-	for _, s := range Wordlist {
-		if str == s {
-			return true
-		}
-	}
-	return false
+// These are thin wrappers around the hash.
+// They are legacy from when it was an array instead of a hash.
+// They're nice names, though, so we'll keep the interface,
+// since the other code relies on them.
+
+// PURPOSE
+// A helper to see if a wordpair is in the hash.
+func contains(wp string) bool {
+	_, found := Wordhash[wp]
+	return found
 }
 
-func GetPairIndex(str string) (int, error) {
-	for ndx, s := range Wordlist {
-		if str == s {
-			return ndx, nil
-		}
-	}
-	return -1, errors.New("wordpair not found")
-}
-
-func CheckWordpair(pair string) error {
-
-	if contains(pair) {
-		return nil
+// PURPOSE
+// Checks to see if the value is in the map, and
+// if so, returns the index.
+func GetPairIndex(wp string) (int, error) {
+	if contains(wp) {
+		return Wordhash[wp], nil
 	} else {
-		return errors.New("not found")
+		return -1, fmt.Errorf("wordpair [%v] not found", wp)
 	}
 }

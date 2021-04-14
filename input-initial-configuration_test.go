@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"gsa.gov/18f/read-initial-configuration/wordlist"
+	"gsa.gov/18f/input-initial-configuration/wordlist"
 )
 
 type test struct {
@@ -41,8 +41,8 @@ func TestDecode(t *testing.T) {
 		// {have: "", want: ""},
 	}
 
+	wordlist.Init()
 	for _, test := range tests {
-		wordlist.Init()
 		ndx, _ := wordlist.GetPairIndex(strings.TrimSpace(test.have))
 		result := decode(ndx)
 		if result != test.want {
