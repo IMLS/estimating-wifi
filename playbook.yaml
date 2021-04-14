@@ -1,8 +1,12 @@
 ---
 - hosts: localhost
   connection: local
+  collections:
+    - devsec.hardening
   roles:
     - packages
     - unattended-upgrades
     - session-counter
     - configure-monitor-mode
+    - input-initial-configuration
+    - devsec.hardening.os_hardening

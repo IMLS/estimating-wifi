@@ -17,12 +17,11 @@
     mode: 0755
   become: yes
 
-# find-ralink options for -descriptor
 # exists bool
-# physicalId    int
+# physical id    int
 # description   string
-# busInfo       string
-# logicalName   string
+# bus info       string
+# logical name   string
 # serial        string
 # mac           string
 # configuration string
@@ -54,17 +53,35 @@
   become: yes
   when: "'true' in ralink_exists.stdout"
 
+- name: get the logical name of the adapter if it exists
+  ansible.builtin.command:
+    cmd: "{{ findralink.bin }} --discover --extract logicalname"
+  register: ralink_logicalname
+  become: yes
+  when: "'true' in ralink_exists.stdout"
+
 # If we find an adapter, then we can proceed to update 
 # some global config files. 
 - name: write wlan1 into udev rules
   ansible.builtin.lineinfile:
     path: "{{ persistent_rules }}"
+    regexp: "{{ ralink_mac.stdout }}"
     state: present
-    line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ralink_mac.stdout }}", NAME="wlan1"'
+    line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ralink_mac.stdout }}", NAME="{{ ralink_logicalname.stdout }}"'
     create: true
   become: yes
   when: "'true' in ralink_exists.stdout"
 
+###############
+# WARNING
+# This may, or may not, work for older RPis. We know this works for:
+#
+#   * Raspberry Pi 4B
+#   * Raspberry Pi 3B
+# 
+# In short, it has to be a device that uses the brc driver, and we need to know that there
+# isn't more than one device that does this. We may want to improve the search field, or 
+# ideally, test on more hardware. For the pilot, though, we constrained to the 4B.
 - name: do we find the default broadcom adapter?
   ansible.builtin.command:
     cmd: "{{ findralink.bin }} --search brc --field configuration --exists"
@@ -78,35 +95,52 @@
   become: yes
   when: "'true' in brc_exists.stdout"
 
-- name: write wlan0 into udev rules
-  ansible.builtin.lineinfile:
-    path: "{{ persistent_rules }}"
-    state: present
-    line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ brc_mac.stdout }}", NAME="wlan0"'
+- name: get the logical name of the broadcom adapter if it exists
+  ansible.builtin.command:
+    cmd: "{{ findralink.bin }} --search brc --field configuration --extract logicalname"
+  register: brc_logicalname
   become: yes
   when: "'true' in brc_exists.stdout"
 
-## REBOOT
-# If we just wrote the persistent rules for the first time, we should reboot. 
-# Next time, we won't reboot. Or, that's the theory.
-- name: first-time reboot
-  ansible.builtin.reboot:
-  when: not rules_file.stat.exists
+- name: write the built-in wifi into udev rules
+  ansible.builtin.lineinfile:
+    path: "{{ persistent_rules }}"
+    regexp: "{{ brc_mac.stdout }}"
+    state: present
+    line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ brc_mac.stdout }}", NAME="{{ brc_logicalname.stdout }}"'
+  become: yes
+  when: "'true' in brc_exists.stdout"
+
+## Reload the rules
+# Regardless of whether anything changed, reload the rules.
+# It is a two-step process.
+# https://unix.stackexchange.com/questions/39370/how-to-reload-udev-rules-without-reboot/39371
+- name: reload the rules
+  ansible.builtin.command:
+    cmd: udevadm control --reload-rules
   become: yes
 
-# Take the interface down, set it in monitor mode, and 
+- name: trigger the... newly reloaded rules...
+  ansible.builtin.command:
+    cmd: udevadm trigger
+  become: yes
+
+# Take the USB wifi interface down, set it in monitor mode, and 
 # then bring it back up.
-- name: take down wlan1
+- name: take down USB wifi
   ansible.builtin.command:
-    cmd: ip link set wlan1 down
+    cmd: "ip link set {{ ralink_logicalname.stdout }} down"
   become: yes
+  when: "'true' in ralink_exists.stdout"
 
-- name: set wlan1 into monitor mode
+- name: set USB wifi into monitor mode
   ansible.builtin.command:
-    cmd: iw wlan1 set monitor none
+    cmd: "iw {{ ralink_logicalname.stdout }} set monitor none"
   become: yes
+  when: "'true' in ralink_exists.stdout"
 
-- name: bring up down wlan1
+- name: bring up down USB wifi
   ansible.builtin.command:
-    cmd: ip link set wlan1 up
+    cmd: "ip link set {{ ralink_logicalname.stdout }} up"
   become: yes
+  when: "'true' in ralink_exists.stdout"

@@ -3,11 +3,7 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: /usr/bin/python
-    # pi: 
-    #   ansible_host: 127.0.0.1
-    #   ansible_python_interpreter: /usr/bin/python
   vars:
-    # We might change the default user.
     default_user: pi
     session_counter:
       binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.0.3/session-counter"
@@ -16,7 +12,11 @@ all:
       workdir: /home/pi/session-counter
       logdir: /var/log/session-counter
     findralink:
-      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.4/find-ralink"
+      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.5/find-ralink"
       install_path: /usr/local/
       bin: /usr/local/find-ralink
+    inputinitial:
+      binary_url: "https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.2/input-initial-configuration"
+      install_path: /usr/local/
+      bin: /usr/local/input-initial-configuration
     persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules

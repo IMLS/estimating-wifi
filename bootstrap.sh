@@ -138,6 +138,9 @@ install_prerequisites () {
 # This clones and runs the playbook for configuring the
 # RPi for the IMLS/10x/18F data collection pilot.
 ansible_pull_playbook () {
+    _status "Installing hardening playbook."
+    ansible-galaxy collection install devsec.hardening
+
     pushd $SETUP_TEMPDIR
         _status "Cloning the playbook: ${PLAYBOOK_URL}"
         git clone $PLAYBOOK_URL
