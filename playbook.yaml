@@ -9,4 +9,12 @@
     - session-counter
     - configure-monitor-mode
     - input-initial-configuration
-    - devsec.hardening.os_hardening
+  tasks:
+    - name: run hardening as root
+      include_role:
+        - devsec.hardening.os_hardening
+      become: yes
+    - name: lockdown conditionally
+      include_role:
+        name: lockdown
+      when: "lockdown"

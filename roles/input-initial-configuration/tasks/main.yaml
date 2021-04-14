@@ -6,8 +6,3 @@
     group: root
     mode: 0755
   become: yes
-
-- name: run input script
-  ansible.builtin.command:
-    cmd: "{{ inputinitial.bin }} --all --write"
-  
