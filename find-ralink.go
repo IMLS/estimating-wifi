@@ -17,14 +17,13 @@ import (
 )
 
 func findMatchingDevice(wlan *models.Device) {
-
+	// GetDeviceHash calls out to `lshw`.
 	devices := lshw.GetDeviceHash(wlan)
+
+	// We start by assuming that we have not found the device.
 	found := false
 
 	// Now, go through the devices and find the one that matches our criteria.
-	// Either we're looking for a vendor or for something in the config string.
-	// A more general search could be implemented, but I'll keep it limited to prevent
-	// spurious matches that were unexpected/surprising in practice. (I hope.)
 	for _, hash := range devices {
 
 		if *config.Verbose {
@@ -35,11 +34,13 @@ func findMatchingDevice(wlan *models.Device) {
 		}
 
 		// The default is to search all the fields
-		// lowercase pattern matching
 		if wlan.Search.Field == "ALL" {
 			for k := range hash {
+				// Lowercase everything for purposes of pattern matching.
 				v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[k]))
 				if v {
+					// If we find it, set the fact that it exists. This will be picked up
+					// back out in main() for the final act of printing a message to the user.
 					wlan.Exists = true
 				}
 				// Stop searching if we find something.
@@ -48,7 +49,8 @@ func findMatchingDevice(wlan *models.Device) {
 				}
 			}
 		} else {
-			// Otherwise, search the field specified.
+			// If we aren't doing a full search, then this is the alternative: check just
+			// one field. It will still be a lowercase search, but it will be against one field only.
 			if *config.Verbose {
 				fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
 			}
@@ -84,9 +86,18 @@ func findMatchingDevice(wlan *models.Device) {
 }
 
 // https://stackoverflow.com/questions/18930910/access-struct-property-by-name
+// PURPOSE
+// This reflects on the Device structure and attempts to pull values out by
+// name (passed in as a string). The alternative would be some kind of case statement,
+// I think, where we pattern match on what is passed in, and extract the correct
+// field as a result. The case statement might be safer, but for now, we'll do this
+// fancy thing. If it becomes a problem in practice, we can always do if/else if/else...
 func getField(v *models.Device, field string) reflect.Value {
 	r := reflect.ValueOf(v)
-	f := reflect.Indirect(r).FieldByName(field)
+	// Replace all strings, and titlecase the word. This matches
+	// the way the fields are named in the data structure.
+	adjusted := strings.Title(strings.ReplaceAll(field, " ", ""))
+	f := reflect.Indirect(r).FieldByName(adjusted)
 	return f
 }
 
@@ -96,11 +107,23 @@ func main() {
 	// The default values help us make sure that sensible things happen if options
 	// are not explicitly declared.
 	verbosePtr := flag.Bool("verbose", false, "Verbose output.")
-	discoverPtr := flag.Bool("discover", false, "Attempt to discover the device.")
-	searchPtr := flag.String("search", "ralink", "Search string to use in hardware listing. Must use with `field`.")
-	fieldPtr := flag.String("field", "ALL", "Field to search.")
-	extractPtr := flag.String("extract", "", "Field to extract from device data.")
+	// The default behavior is for the tool to --discover a compatible adapter.
+	discoverPtr := flag.Bool("discover", true, "Attempt to discover the device. Default.")
+	// If either --search or --field are used, we disable --discover as a mode.
+	// We don't require both to be set, but do provide sensible defaults in the event that the user
+	// forgets. This may not be preferable to throwing an error, but the goal is to make sure the tool
+	// runs, even if it doesn't work. We'd rather not have the ansible script crashing.
+	searchPtr := flag.String("search", "", "Search string to use in hardware listing. Must use with `field`.")
+	fieldPtr := flag.String("field", "", "Field to search.")
+	// By default, we're always looking for the logical name of the device. But, we might want other fields.
+	extractPtr := flag.String("extract", "logical name", "Field to extract from device data.")
+	// Instead of a exit(-1), we might want to have this print true/false, which is important for
+	// ansible integration.
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
+	// It is possible, but unlikely, that the location of lshw will change.
+	lshwPtr := flag.String("lshw-path", config.LSHW_EXE, "Path to the `lshw` binary.")
+	searchesPtr := flag.String("searchjson-path", config.SEARCHES_PATH, "Path to a JSON file containing default searches.")
+	// In case we care about versioning.
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	flag.Parse()
 
@@ -108,12 +131,9 @@ func main() {
 	// Not sure if there is a more Go-ish way to do this.
 	config.Verbose = verbosePtr
 
-	// VERSION
-	// If they just want the version, print it and exit.
-	if *versionPtr {
-		fmt.Println("Version", constants.VERSION)
-		os.Exit(0)
-	}
+	// Override configuration if needed, in case things move/change names.
+	config.LSHW_EXE = *lshwPtr
+	config.SEARCHES_PATH = *searchesPtr
 
 	// ROOT
 	// We can't do this without root. Some things... might work.
@@ -122,39 +142,54 @@ func main() {
 		fmt.Println(text.FgRed.Sprint("find-ralink *really* needs to be run as root."))
 	}
 
-	// EXTRACT
-	// If they didn't tell us what to extract, then
-	// extract the field they're searching for. That is, we use the
-	// extractPtr value to tell us what from the device description to return
-	// at the end of the seach.
-	if *extractPtr == "" {
-		// If it is the default "ALL" value, choose the logicalname
-		if *fieldPtr == "ALL" {
-			*extractPtr = "Logicalname"
-		} else {
-			*extractPtr = *fieldPtr
-		}
+	// VERSION
+	// If they just want the version, print it and exit.
+	if *versionPtr {
+		fmt.Println("Version", constants.VERSION)
+		os.Exit(0)
 	}
 
 	// We populate this via calls.
 	device := new(models.Device)
 	device.Extract = *extractPtr
 
+	// If either --field or --search are used, then we need to do two things
+	//  1. disable --discovery
+	//  2. make sure there are sensible defaults for both flags, because they operate together.
+	if *fieldPtr != "" || *searchPtr != "" {
+		*discoverPtr = false
+		if *fieldPtr == "" {
+			*fieldPtr = "ALL"
+		}
+		if *searchPtr == "" {
+			*searchPtr = "ralink"
+		}
+	}
+
 	// If we ask for auto-discovery, try it and exit.
 	if *discoverPtr {
+		// We either have searches in /etc, or a few held in reserve
+		// that are compiled in via `embed`. GetSearches pulls the "live"
+		// searches if it can, and falls back to the embedded if needed.
+		// It goes through each one-by-one.
 		for _, s := range config.GetSearches() {
 			device.Search = &s
+			// findMatchingDevice populates device.Exists if something is found.
 			findMatchingDevice(device)
+			// We can stop searching if we find something.
 			if device.Exists {
 				break
 			}
 		}
 	} else {
+		// The alternative is we're not doing an exhaustive/discovery search.
+		// Therefore, we should use the field/search ptrs.
 		s := &config.Search{Field: *fieldPtr, Query: *searchPtr}
 		device.Search = s
 		findMatchingDevice(device)
 	}
 
+	// If we asked for a true/false value, print that.
 	if *existsPtr {
 		// If we're explicitly asking to see if it exists, say no, and
 		// return a zero error code.
@@ -165,6 +200,9 @@ func main() {
 		}
 		os.Exit(0)
 	} else if device.Exists {
+		// Otherwise, we're going to use reflection to look into the device structure
+		// and try and extract the field they asked for. If they named the field incorrectly,
+		// this will fail in a pretty gruesome way.
 		res := getField(device, *extractPtr)
 		if reflect.TypeOf(res).Kind() == reflect.Bool {
 			fmt.Println(res.Interface())

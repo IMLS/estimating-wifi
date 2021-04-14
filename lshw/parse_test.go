@@ -130,7 +130,7 @@ func TestParse(t *testing.T) {
 		{lshw: t4, hashndx: 0, field: "bus info", regexp: "usb@1:1.1.1"},
 		{lshw: t4, hashndx: 1, field: "bus info", regexp: "usb@1:1.2"},
 		{lshw: t1, hashndx: 1, field: "serial", regexp: "b8:27:eb:3b:ff:f8"},
-		{lshw: t1, hashndx: 1, field: "serial", regexp: "00:c0:ca:89:19:60"},
+		{lshw: t1, hashndx: 2, field: "serial", regexp: "00:c0:ca:89:19:60"},
 	}
 
 	for _, test := range tests {
