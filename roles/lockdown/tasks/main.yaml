@@ -15,4 +15,4 @@
   ansible.builtin.command:
     cmd: ufw allow OpenSSH
   become: yes
-  when: "not {{ lockdown }}"
+  when: lockdown is not defined
