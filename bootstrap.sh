@@ -146,7 +146,7 @@ ansible_pull_playbook () {
         git clone $PLAYBOOK_URL
         pushd $PLAYBOOK_REPOS
             _status "Running the playbook. This will take a while."
-            ansible-playbook -i inventory.yaml playbook.yaml
+            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
             ANSIBLE_EXIT_STATUS=$?
         popd
     popd
