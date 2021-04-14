@@ -59,6 +59,9 @@ func GetSearches() []Search {
 		// Use the embedded file, which has a limited set of search terms.
 		data, _ := f.ReadFile("searches.json")
 		err := json.Unmarshal(data, &searches)
+		if *Verbose {
+			fmt.Println("searches.json", searches)
+		}
 		if err != nil {
 			log.Fatal("could not unmarshal search strings from embedded data.")
 		}

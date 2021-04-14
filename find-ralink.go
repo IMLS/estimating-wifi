@@ -35,9 +35,13 @@ func findMatchingDevice(wlan *models.Device) {
 
 		// The default is to search all the fields
 		if wlan.Search.Field == "ALL" {
+
 			for k := range hash {
 				// Lowercase everything for purposes of pattern matching.
 				v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[k]))
+				if *config.Verbose {
+					fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
+				}
 				if v {
 					// If we find it, set the fact that it exists. This will be picked up
 					// back out in main() for the final act of printing a message to the user.
@@ -173,6 +177,9 @@ func main() {
 		// searches if it can, and falls back to the embedded if needed.
 		// It goes through each one-by-one.
 		for _, s := range config.GetSearches() {
+			if *config.Verbose {
+				fmt.Println("search", s)
+			}
 			device.Search = &s
 			// findMatchingDevice populates device.Exists if something is found.
 			findMatchingDevice(device)
