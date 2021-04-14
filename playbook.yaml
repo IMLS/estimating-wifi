@@ -4,20 +4,15 @@
   collections:
     - devsec.hardening
   roles:
-    - lockdown
     - packages
     - unattended-upgrades
     - session-counter
     - configure-monitor-mode
     - input-initial-configuration
+    - { role: lockdown, when: lockdown is defined }
     # There are some mmap_rnd_bits errors being thrown that we want to ignore.
-    # - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes }
-    # - { role: dev-sec.ssh_hardening, ignore_errors: yes, become: yes }
+    - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes }
+    - { role: devsec.hardening.ssh_hardening, ignore_errors: yes, become: yes }
   vars:
     sysctl_overwrite:
       vm.mmap_rnd_bits: 16
-  tasks:
-    - name: lockdown the pi. end of the road.
-      include_role:
-        name: lockdown
-      when: lockdown is defined

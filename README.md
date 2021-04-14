@@ -12,3 +12,9 @@ Therefore, it must be enabled on the command line. The `bootstrap.sh` can includ
 ```
 ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
 ```
+
+Run with `preserve_ssh` so that SSH access is preserved while testing lockdown
+
+```
+ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, preserve_ssh=yes"
+```

@@ -11,8 +11,14 @@
     cmd: ufw default deny incoming
   become: yes
 
+- name: disable logging; we'll never see it
+  ansible.builtin.command:
+    cmd: ufw logging off
+  become: yes
+
+# FIXME: This needs to be removed when testing is complete.
 - name: allow SSH when lockdown is not enabled
   ansible.builtin.command:
     cmd: ufw allow OpenSSH
   become: yes
-  when: lockdown is not defined
+  when: preserve_ssh is defined
