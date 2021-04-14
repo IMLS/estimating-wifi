@@ -1,1 +1,18 @@
 # This role hardens the pi. 
+- name: make sure ufw is installed
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  become: yes
+
+# This is it. Once this runs, nothing gets in.
+- name: block all incoming traffic
+  ansible.builtin.command:
+    cmd: ufw default deny incoming
+  become: yes
+
+- name: allow SSH when lockdown is not enabled
+  ansible.builtin.command:
+    cmd: ufw allow OpenSSH
+  become: yes
+  when: "not {{ lockdown }}"

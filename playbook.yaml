@@ -9,9 +9,15 @@
     - session-counter
     - configure-monitor-mode
     - input-initial-configuration
-    - { role: devsec.hardening.os_hardening, become: yes }
+    # There are some mmap_rnd_bits errors being thrown that we want to ignore.
+    - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes }
+    - { role: dev-sec.ssh_hardening, ignore_errors: yes, become: yes }
+  vars:
+    sysctl_overwrite:
+      vm.mmap_rnd_bits: 16
   tasks:
-    - name: lockdown conditionally
+    - name: lockdown the pi. end of the road.
       include_role:
         name: lockdown
-      when: "lockdown"
+      # Some of this can be run while testing
+      # when: "{{ lockdown }}"
