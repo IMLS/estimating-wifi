@@ -59,10 +59,13 @@ def wifi_interceptor(request, collection=None):
     # optional, defaults to 1
     version = request.META.get("HTTP_X_DIRECTUS_SCHEMA_VERSION", 1)
 
+    # force sorting of JSON keys
+    data = json.loads(json.dumps(request.data, sort_keys=True))
+
     # before we do anything else, save the raw data to directus.
     raw = {
         "collection": collection,
-        "data": request.data,
+        "data": data,
         "content_type": request.content_type,
     }
     proxy_data(host, token, 'rabbit_raw', raw, version)
@@ -77,11 +80,11 @@ def wifi_interceptor(request, collection=None):
     validator = InMemoryValidator('rabbit', 'temporary.csv')
 
     # validate!
-    result = validator.validate(dict(source=request.data), request.content_type)
+    result = validator.validate(dict(source=data), request.content_type)
 
     # store the data _or_ the validation failure.
     if result["valid"]:
-        proxy_data(host, token, collection, request.data, version)
+        proxy_data(host, token, collection, data, version)
     else:
         proxy_data(host, token, 'rabbit_review', result["tables"], version)
 
