@@ -49,6 +49,7 @@ func devConfig() *Config {
 	return cfg
 }
 
+
 func ReadAuth() (*AuthConfig, error) {
 	_, err := os.Stat(constants.AuthPath)
 	if err != nil {

@@ -42,9 +42,10 @@ func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 	}
 }
 
-func handleVersionCheck() {
+func handleFlags() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
+	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
 	flag.Parse()
 
 	config.Verbose = *verbosePtr
@@ -54,10 +55,16 @@ func handleVersionCheck() {
 		fmt.Println("Version", constants.VERSION)
 		os.Exit(0)
 	}
+
+	if *showKeyPtr {
+		auth, _ := config.ReadAuth() 
+		fmt.Println(auth.Token)
+		os.Exit(0)
+	}
 }
 
 func main() {
-	handleVersionCheck()
+	handleFlags()
 
 	// Read in a config
 	cfg := config.ReadConfig()
