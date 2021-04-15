@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -72,8 +73,17 @@ type RevalResponse struct {
 // be returned as -1. Hopefully, we'll be ignoring it in those cases...
 var magic_index int = 0
 
+var slash_warned bool = false
+
 func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map[string]string) (int, error) {
 	log.Println("postjson: storing JSON to", uri)
+
+	matched, _ := regexp.MatchString(".*/$", uri) 
+	if !slash_warned && !matched {
+		slash_warned = true
+		log.Println("WARNING: api.data.gov wants a trailing slash on URIs")
+	}
+
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
