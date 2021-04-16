@@ -12,7 +12,7 @@ all:
       workdir: /home/pi/session-counter
       logdir: /var/log/session-counter
     findralink:
-      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.5/find-ralink"
+      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.6/find-ralink"
       install_path: /usr/local/bin
       bin: /usr/local/bin/find-ralink
     inputinitial:
