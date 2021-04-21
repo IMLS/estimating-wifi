@@ -1,5 +1,6 @@
 [Unit]
 Description=Clone the IMLS playbook if not already extant.
+ConditionPathExists=!/opt/imls/imls-client-pi-playbook
 
 [Service]
 ExecStartPre=sh -c "mkdir -p /opt/imls"
