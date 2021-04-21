@@ -1,0 +1,10 @@
+[Unit]
+Description=Clone the IMLS playbook if not already extant.
+
+[Service]
+ExecStartPre=sh -c "mkdir -p /opt/imls"
+ExecStart=sh -c "cd /opt/imls && git clone --depth 1 https://github.com/jadudm/imls-client-pi-playbook"
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

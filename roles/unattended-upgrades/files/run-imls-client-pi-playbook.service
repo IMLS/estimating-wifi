@@ -1,0 +1,8 @@
+[Unit]
+Description=Run the IMLS playbook.
+
+[Service]
+WorkingDirectory=/opt/imls/imls-client-pi-playbook
+ExecStart=sh -c "git pull origin main"
+ExecStart=sh -c 'ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"'
+Type=oneshot

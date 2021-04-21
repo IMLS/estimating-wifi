@@ -6,7 +6,7 @@
 # It is for configuring a Raspberry Pi to be part of a pilot data collection effort.
 # That pilot is being run in partnership between 10x/18F/IMLS.
 # If you are not one of the people taking part in that pilot, then this
-# software will *not* be useful to you. 
+# software will *not* be useful to you.
 # It will do things to your Raspberry Pi.
 # Things you might not want.
 # You have been warned.
@@ -16,6 +16,7 @@
 REPOS_ROOT="https://github.com/jadudm"
 PLAYBOOK_REPOS="imls-client-pi-playbook"
 PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
+PLAYBOOK_WORKING_DIR="/opt/imls"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
@@ -24,17 +25,14 @@ SOMETHING_WENT_WRONG=0
 
 # PURPOSE
 # Creates a temporary logfile in a way that lets the OS
-# decide where it should go. 
+# decide where it should go.
 create_logfile () {
     export SETUP_LOGFILE=$(mktemp -t "setup-log-XXX")
-    export SETUP_TEMPDIR=/tmp/$(mktemp -d "setup-dir-XXX")
-    mkdir -p ${SETUP_TEMPDIR}
-    # NOTE: Can't log here, yet. Things aren't set up.
 }
 
 # PURPOSE
-# Sets up redirects so that STDOUT and STDERR make their way to 
-# a temporary logfile. 
+# Sets up redirects so that STDOUT and STDERR make their way to
+# a temporary logfile.
 setup_logging () {
     # https://serverfault.com/questions/103501/how-can-i-fully-log-all-bash-scripts-actions
     # Save all the pipes.
@@ -47,7 +45,6 @@ setup_logging () {
     _status "Logfile started. It can be accessed for debugging purposes."
 
     _variable "SETUP_LOGFILE"
-    _variable "SETUP_TEMPDIR"
 }
 
 
@@ -101,7 +98,7 @@ command_exists () {
 command_does_not_exist () {
     if command_exists "$1"; then
         return 1
-    else 
+    else
         return 0
     fi
 }
@@ -141,7 +138,8 @@ ansible_pull_playbook () {
     _status "Installing hardening playbook."
     ansible-galaxy collection install devsec.hardening
 
-    pushd $SETUP_TEMPDIR
+    mkdir -p $PLAYBOOK_WORKING_DIR
+    pushd $PLAYBOOK_WORKING_DIR
         _status "Cloning the playbook: ${PLAYBOOK_URL}"
         git clone $PLAYBOOK_URL
         pushd $PLAYBOOK_REPOS
@@ -167,7 +165,7 @@ main () {
     if [ $SOMETHING_WENT_WRONG -ne 0 ]; then
         _err "Things finished with errors."
         _err "We may need to see the logs: ${SETUP_LOGFILE}"
-    else 
+    else
         _status "All done!"
         _status "We're rebooting in one minute!"
         sleep 60
