@@ -169,6 +169,9 @@ main () {
         _err "We may need to see the logs: ${SETUP_LOGFILE}"
     else 
         _status "All done!"
+        _status "We're rebooting in one minute!"
+        sleep 60
+        reboot
     fi
 }
 
