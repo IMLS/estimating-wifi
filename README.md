@@ -14,8 +14,8 @@ Therefore, lockdown must be enabled on the command line. The `bootstrap.sh` incl
 ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
 ```
 
-Run with `preserve_ssh` so that SSH access is preserved while testing lockdown:
+Run with `preserve_ssh` and `preserve_users` so that users and SSH access are preserved while testing lockdown:
 
 ```
-ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, preserve_ssh=yes"
+ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, preserve_ssh=yes, preserve_users=yes"
 ```

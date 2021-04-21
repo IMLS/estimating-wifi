@@ -1,4 +1,4 @@
-# This role hardens the pi. 
+# This role hardens the pi.
 - name: make sure ufw is installed
   ansible.builtin.package:
     name: ufw
@@ -15,6 +15,25 @@
   ansible.builtin.command:
     cmd: ufw logging off
   become: yes
+
+- name: explicitly disable ssh daemon
+  service:
+    name: ssh
+    enabled: no
+    state: stopped
+  when: preserve_ssh is undefined
+
+- name: Disable root login
+  user:
+    name: root
+    password_lock: true
+  when: preserve_users is undefined
+
+- name: Disable pi login
+  user:
+    name: pi
+    password_lock: true
+  when: preserve_users is undefined
 
 # FIXME: This needs to be removed when testing is complete.
 - name: allow SSH when lockdown is not enabled
