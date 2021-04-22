@@ -169,7 +169,7 @@ main () {
         _status "All done!"
         _status "We're rebooting in one minute!"
         sleep 60
-        reboot
+        sudo reboot
     fi
 }
 
