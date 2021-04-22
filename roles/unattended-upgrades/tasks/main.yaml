@@ -3,6 +3,35 @@
     name: unattended-upgrades
   become: yes
 
+- name: Copy IMLS client pi systemd service files
+  copy:
+    src: "{{ item }}"
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+  loop:
+    - run-imls-client-pi-playbook.service
+    - run-imls-client-pi-playbook.timer
+    - setup-imls-client-pi-playbook.service
+  become: yes
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: Pull the playbook
+  systemd:
+    name: setup-imls-client-pi-playbook
+    state: started
+  become: yes
+
+- name: Start a daily timer to pull the playbook
+  systemd:
+    name: run-imls-client-pi-playbook.timer
+    state: started
+  become: yes
+
 - name: enable reboots
   # /etc/apt/apt.conf.d/50unattended-upgrades
   # //Unattended-Upgrade::Automatic-Reboot "false";

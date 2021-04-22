@@ -19,3 +19,11 @@ Run with `preserve_ssh` and `preserve_users` so that users and SSH access are pr
 ```
 ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, preserve_ssh=yes, preserve_users=yes"
 ```
+
+## dependencies
+
+This repository depends on the ansible [`devsec.hardening`](https://github.com/dev-sec/ansible-collection-hardening) repository.
+
+This dependency is installed when starting up via [bootstrap.sh](./bootstrap.sh) _and_ in the [IMLS systemd service](./roles/unattended-upgrades/files/run-imls-client-pi-playbook.service).
+
+Further dependencies should also be installed in both places.
