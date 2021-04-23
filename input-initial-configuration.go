@@ -265,7 +265,7 @@ func main() {
 	if *allPtr {
 		*readFCFSPtr = true
 		*tagPtr = true
-		*readTokenPtr = true
+		*readWordPairPtr = true
 	}
 
 	// Read in the FCFS Seq Id
