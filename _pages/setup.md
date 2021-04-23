@@ -146,7 +146,7 @@ That is a *very* exciting URL. Or, better yet:
 
 [https://imls.gov/](https://imls.gov/)
 
-If you are able to see these web pages, you are ready to proceed. [We have another page for installing the data collection software]({% link _pages/install.md %}).
+If you are able to see these web pages, you are ready to proceed. [We have another page for installing the data collection software]({{ "install/" | prepend: site.baseurl }}).
 
 If you cannot see these web pages, it means something is not working. Specifically, something involving your network. (See points of failure, below.) You now need to start trying to figure out what you may have done wrong, asking for help from colleagues, or reaching out to us. 
 
