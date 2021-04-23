@@ -117,7 +117,7 @@ restore_console () {
 read_initial_configuration () {
     # Fetch the binary.
     pushd /tmp
-        curl -s ${INITIAL_CONFIGURATION_BINARY_URL}
+        curl -L -s ${INITIAL_CONFIGURATION_BINARY_URL}
         sudo ./input-initial-configuration --fcfs-seq --tag --word-pairs --write
     popd
 }
