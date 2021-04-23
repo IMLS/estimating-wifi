@@ -20,11 +20,11 @@ To complete the setup **you'll need roughly 1 hour**, assuming you have everythi
 
 You can do this step at any time; that said, it will prevent you from moving past step {{page.blockerstep}} in these instructions, so you might as well do it in advance. 
 
-We have a separate page that describes how to [set up the microSD card]({% link _pages/preppingthesdcard.md | prepend: site.baseurl %}). It takes roughly 15 minutes, and you will need to do it on a computer or laptop where you have administrative access.
+We have a separate page that describes how to [set up the microSD card]({{ "preppingthesdcard/" | prepend: site.baseurl }}). It takes roughly 15 minutes, and you will need to do it on a computer or laptop where you have administrative access.
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Request an api.data.gov key
 
-We have [a separate page for this]({% link _pages/requestkey.md | prepend: site.baseurl  %}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
+We have [a separate page for this]({{ "requestkey/" | prepend: site.baseurl }}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Things you must have
 
 There are a few things you **must** have for this to work.
@@ -94,10 +94,10 @@ When you are done, you will have stuck on the heatsinks and fan, inserted it int
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Prepare the microSD card
 
-We have a separate page that describes how to [set up the microSD card]({% link _pages/preppingthesdcard.md | prepend: site.baseurl %}) 
+We have a separate page that describes how to [set up the microSD card]({{ "preppingthesdcard/" | prepend: site.baseurl }}) 
 
 If you haven't done this yet, now is a good time to do it. You cannot proceed until you set up your card.
-
+ 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Insert the card
 
 Put the microSD card in the RPi. The slot is on the bottom of the pi. The gold-plated contacts on the card will be facing UP, and the logo on the card will be facing DOWN. Here, "UP" means "toward the top of the RPi case," and "DOWN" means "toward the bottom of the RPI case."
