@@ -17,6 +17,7 @@ REPOS_ROOT="https://github.com/jadudm"
 PLAYBOOK_REPOS="imls-client-pi-playbook"
 PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 PLAYBOOK_WORKING_DIR="/opt/imls"
+INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.2/input-initial-configuration"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
@@ -113,6 +114,15 @@ restore_console () {
     exec 1>&3 3>&-
 }
 
+read_initial_configuration () {
+    # Fetch the binary.
+    pushd /tmp
+        _status "Fetching the config helper."
+        curl -s ${INITIAL_CONFIGURATION_BINARY_URL}
+        sudo ./input-initial-configuration --fcfs-seq --tag --word-pairs --write
+    popd
+}
+
 bootstrap_ansible () {
     _status "Bootstrapping Ansible"
     _status "Updating sources."
@@ -159,6 +169,7 @@ ansible_pull_playbook () {
 main () {
     create_logfile
     setup_logging
+    read_initial_configuration
     bootstrap_ansible
     install_prerequisites
     ansible_pull_playbook

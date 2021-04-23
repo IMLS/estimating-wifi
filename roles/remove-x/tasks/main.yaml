@@ -1,0 +1,36 @@
+# https://raspberrypi.stackexchange.com/questions/4745/how-to-uninstall-x-server-and-desktop-manager-when-running-as-headless-server
+# TL;DR or "just scorch my Pi"
+- name: purge x11 and friends
+  ansible.builtin.command:
+    cmd: apt-get remove --auto-remove --purge 'libx11-.*'
+  become: yes
+
+- name: autoremove to cleanup
+  ansible.builtin.command:
+    cmd: apt-get autoremove --purge
+  become: yes
+
+- name: for reals, purge x11
+  ansible.builtin.command:
+    cmd: apt-get remove --auto-remove --purge 'libx11-.*'
+  become: yes
+
+- name: autoremove again to cleanup again
+  ansible.builtin.command:
+    cmd: apt-get autoremove --purge
+  become: yes
+
+- name: lets check for orphans
+  ansible.builtin.command:
+    cmd: apt-get install deborphan
+  become: yes
+
+- name: remove the orphans
+  ansible.builtin.command:
+    cmd: apt-get remove --purge $(deborphan)
+  become: yes
+
+- name: and one final autoremove
+  ansible.builtin.command:
+    cmd: apt-get autoremove
+  become: yes
