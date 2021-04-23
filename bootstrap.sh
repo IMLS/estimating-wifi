@@ -117,7 +117,6 @@ restore_console () {
 read_initial_configuration () {
     # Fetch the binary.
     pushd /tmp
-        _status "Fetching the config helper."
         curl -s ${INITIAL_CONFIGURATION_BINARY_URL}
         sudo ./input-initial-configuration --fcfs-seq --tag --word-pairs --write
     popd
@@ -167,9 +166,9 @@ ansible_pull_playbook () {
 }
 
 main () {
+    read_initial_configuration
     create_logfile
     setup_logging
-    read_initial_configuration
     bootstrap_ansible
     install_prerequisites
     ansible_pull_playbook
