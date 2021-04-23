@@ -18,9 +18,9 @@ umbrella:
   scheme: https
   host: api.data.gov
   # Goes through ReVal and ends up in our data table
-  data: /TEST/10x-ilms/v1/wifi/
+  data: /TEST/10x-imls/v1/wifi/
   # Goes through ReVal and ends up in our events table
-  logging: /TEST/10x-ilms/v1/events/
+  logging: /TEST/10x-imls/v1/events/
 wireshark:
   path: /usr/bin/tshark
   adapter: wlan1
