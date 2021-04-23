@@ -108,6 +108,7 @@
     regexp: "{{ brc_mac.stdout }}"
     state: present
     line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ brc_mac.stdout }}", NAME="{{ brc_logicalname.stdout }}"'
+    create: yes
   become: yes
   when: "'true' in brc_exists.stdout"
 
