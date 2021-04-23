@@ -1,7 +1,7 @@
 - name: install input-initial-configuration binary from github
   ansible.builtin.get_url:
     url: "{{ inputinitial.binary_url }}"
-    dest: "{{ inputinitial.install_path }}/session-counter"
+    dest: "{{ inputinitial.bin }}"
     owner: root
     group: root
     mode: 0755

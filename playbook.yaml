@@ -6,13 +6,15 @@
   roles:
     - packages
     - unattended-upgrades
+    - install-initial-configuration-helper
+    - run-initial-configuration-helper
     - session-counter
     - configure-monitor-mode
-    - input-initial-configuration
-    - { role: lockdown, when: lockdown is defined }
     # There are some mmap_rnd_bits errors being thrown that we want to ignore.
     - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes }
     - { role: devsec.hardening.ssh_hardening, ignore_errors: yes, become: yes }
+    - { role: lockdown, when: lockdown is defined }
+    
   vars:
     sysctl_overwrite:
       vm.mmap_rnd_bits: 16
