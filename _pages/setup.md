@@ -130,11 +130,13 @@ Wait.
 
 On one hand, we would like to encourage you to select the language that is most appropriate for you. On the other, we have not tested what will happen to the data collection code if we run this with Spanish language settings (for example). Everything *should* work, but we have not *tested* it at the time of this writing. So, please choose English as the language, and you can then pick your keyboard type (it is probably a US keyboard), and your timezone.
 
+Do not set up wifi. Do not run the update. (Our tools will do the update later.) In short, once you get the keyboard/language/timezone set up, you can cancel/skip all the other steps in the Raspberry Pi OS setup process.
+
 When you're done, you should be presented with a desktop.
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Test things out
 
-Before we go further, you can test things out.
+Before we go further, you should test things out.
 
 In the upper-left-hand corner is a little globe. Click on it. This is a shortcut for a web browser. In particular, *Chromium*, the open source core of Google Chrome. It will probably look familiar.
 
@@ -146,12 +148,17 @@ That is a *very* exciting URL. Or, better yet:
 
 [https://imls.gov/](https://imls.gov/)
 
-If you are able to see these web pages, you are ready to proceed. [We have another page for installing the data collection software]({{ "install/" | prepend: site.baseurl }}).
+If you are able to see these web pages, you are ready to proceed. 
 
 If you cannot see these web pages, it means something is not working. Specifically, something involving your network. (See points of failure, below.) You now need to start trying to figure out what you may have done wrong, asking for help from colleagues, or reaching out to us. 
 
 This is, in a way, part of the pilot. How hard is it to set these things up? How many hurdles will we run in to? What kinds of challenges will we encounter? Each is something to be understood, tackled, and solved. So, don't get frustrated; it's just part of the process. We're here for you.
 
+# Continuing On!
+
+If everything has worked, [you can continue on to the software installation portion of the documentation.]({{ "/install/" | prepend: site.baseurl }}). If things didn't work... we'll probably be hearing from you. 
+
+It's a learning process. *No stress*. At our end, we *know* things will go wrong, and we'll be happily surprised when/if this complex process works.
 
 # Possible points of failure
 

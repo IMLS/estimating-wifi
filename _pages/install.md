@@ -5,7 +5,7 @@ sidenav: false
 ---
 {% assign counter = 0 %}
 
-{{page.title}}
+# {{page.title}}
 
 Here we go! You have an RPi, it is set up, and it can talk to the internet! This is very, *very* exciting.
 
