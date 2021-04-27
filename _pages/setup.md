@@ -11,6 +11,8 @@ These instructions are for setting up a Raspberry Pi for participation in the IM
 
 If the setup fails in any way, please [reach out to the 18F team]({{site.questionformurl}}), and we'll connect with you to help complete the setup.
 
+We strongly recommend you [request an api.data.gov access key]({{ "/requestkey/" | prepend: site.baseurl }}) before you do anything else. It takes 2 minutes (really), but we have to push buttons in the background. So, go ahead and get that process started right away.
+
 {% assign counter = 0 %}
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Read through the setup instructions
 
@@ -22,11 +24,12 @@ You can do this step at any time; that said, it will prevent you from moving pas
 
 We have a separate page that describes how to [set up the microSD card]({{ "/preppingthesdcard/" | prepend: site.baseurl }}). It takes roughly 15 minutes, and you will need to do it on a computer or laptop where you have administrative access.
 
-## Step {% assign counter = counter | plus: 1  %}{{counter}}: Request an api.data.gov key
-
 <a name="continuehere"></a>
 
-We have [a separate page for this]({{ "/requestkey/" | prepend: site.baseurl }}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
+## Step {% assign counter = counter | plus: 1  %}{{counter}}: Request an api.data.gov key
+
+
+We have [a separate page for this as well]({{ "/requestkey/" | prepend: site.baseurl }}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Things you must have
 
 There are a few things you **must** have for this to work.
@@ -69,6 +72,8 @@ In my house, this means I would probably be doing the setup *in the living room*
 7. I have a laptop I can use to read these directions while I sit on the floor/couch and swear at whomever wrote these instructions.
 
 You might rather do this setup at the library. Note the [possible points of failure](#possible-points-of-failure) at the end of this document. Point #1 highlights that *things might go wrong* if you do this in the library. We know enough about networks to know that *something might not work*, but we don't know *exactly what*. If you have network issues during setup, you will probably need to talk to your local IT team. If you do not have a local IT team, then please feel free to reach out to the 18F team, and we will do our best to see you through to success.
+
+(Note... if you have network issues during setup, the RPi won't be able to do data collection. So, at some point, the challenges will need to be addressed.)
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Ready yourself
 
@@ -114,7 +119,7 @@ Now it is time to plug everything in.
 2. **HDMI**. Plug one end of the micro-HDMI cable into the RPi (the little end) and the other end into your monitor or TV.
 3. **Keyboard**. Plug your keyboard in.
 4. **Mouse**. Plug your mouse in.
-5. **Wifi**. Plug in the USB wifi adapter.
+5. **Wifi**. Plug in the PAU06 USB wifi adapter. (This is the little one.)
 6. **Power**. Plug the power adapter into the switch cable (it has a cute, clicky button), and the other end of the switch cable into the RPi.
 
 When you're done, plug the power adapter into a wall socket. *If the electrons don't flow, the Pi won't go*.
@@ -130,11 +135,15 @@ Wait.
 
 [In Wagner's video, at approximately 7:30m, you can see what the boot process should look like](https://youtu.be/7rcNjgVgc-I?t=448). 
 
-On one hand, we would like to encourage you to select the language that is most appropriate for you. On the other, we have not tested what will happen to the data collection code if we run this with Spanish language settings (for example). Everything *should* work, but we have not *tested* it at the time of this writing. So, please choose English as the language, and you can then pick your keyboard type (it is probably a US keyboard), and your timezone.
+First, select language, keyboard, and timezone. While you may consider another language your native language, please select "US English" for the language, and in all likelihood, "US keyboard" as well. (We have not yet tested  the setup with other language settings. It *shouldn't* make a difference, but it is untested. This is a pilot, and we're moving fast.)
 
-Do not set up wifi. Do not run the update. (Our tools will do the update later.) In short, once you get the keyboard/language/timezone set up, you can cancel/skip all the other steps in the Raspberry Pi OS setup process.
+Skip changing the default password. Our automated setup will change this for you.
 
-When you're done, you should be presented with a desktop.
+Ignore the question about the screen. Just click "Next." Once you're done, you will not be plugging this into a monitor ever again.
+
+Do not select a wifi network. Just click "next." 
+
+Skip the software update. We will be running a software update later in the setup process.
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Test things out
 
