@@ -148,12 +148,13 @@ ansible_pull_playbook () {
     _status "Installing hardening playbook."
     ansible-galaxy collection install devsec.hardening
 
-    mkdir -p $PLAYBOOK_WORKING_DIR
+    # 20210427 MCJ Make sure the working dir is always fresh
+    sudo rm -rf $PLAYBOOK_WORKING_DIR
+    sudo mkdir -p $PLAYBOOK_WORKING_DIR
+    sudo chown -R pi:pi $PLAYBOOK_WORKING_DIR
+
     pushd $PLAYBOOK_WORKING_DIR
         _status "Cloning the playbook: ${PLAYBOOK_URL}"
-        # 20210427 MCJ Wipe out the playbook in case it already exists.
-        # This only comes up in dev/testing, but is safe to do in the general case.
-        rm -rf $PLAYBOOK_REPOS
         # 20210427 MCJ Adding a shallow clone.
         git clone --depth=1 $PLAYBOOK_URL
         pushd $PLAYBOOK_REPOS
