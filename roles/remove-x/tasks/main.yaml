@@ -40,6 +40,7 @@
     cmd: apt-get remove --purge -y {{ item }}
     warn: false
   loop: "{{ orphans.stdout_lines }}"
+  become: yes
 
 - name: and one final autoremove
   ansible.builtin.command:
