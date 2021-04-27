@@ -161,7 +161,19 @@ func readWordPairs() string {
 			}
 		}
 	}
-	return key
+
+	// 20210427 Encrypt the key before handing it back.
+	serial := []byte(pi.GetSerial())
+	var enckey [32]byte
+	copy(enckey[:], serial)
+	enc, err := cryptopasta.Encrypt([]byte(key), &enckey)
+	if err != nil {
+		log.Fatal("could not encrypt token.")
+	}
+
+	encandb64 := base64.StdEncoding.EncodeToString(enc)
+
+	return encandb64
 }
 
 func readToken() string {
