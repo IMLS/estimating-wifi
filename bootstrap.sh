@@ -117,6 +117,8 @@ restore_console () {
 read_initial_configuration () {
     # Fetch the binary.
     pushd /tmp
+        # 20210427 MCJ Again, in dev/testing conditions, wipe things out.
+        rm -f iic
         curl -L -s -o iic ${INITIAL_CONFIGURATION_BINARY_URL}
         chmod 755 iic
         sudo ./iic --fcfs-seq --tag --word-pairs --write
@@ -176,7 +178,7 @@ main () {
         # If NOREAD is undefined, we should read in the config.
         read_initial_configuration
     else
-        echo " -- SKIPPING CONFIG ENTRY FOR CONFIG PURPOSES --"
+        echo " -- SKIPPING CONFIG ENTRY FOR TESTING PURPOSES --"
     fi
     create_logfile
     setup_logging
