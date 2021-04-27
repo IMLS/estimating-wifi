@@ -31,19 +31,26 @@
     - geany
   ignore_errors: yes
   args:
-    warn: false
+    warn: no
   become: yes
 
 - name: cleanup packages
   ansible.builtin.command:
     cmd: apt-get clean
   args:
-    warn: false
+    warn: no
   become: yes
 
 - name: autoremove packages
   ansible.builtin.command:
     cmd: apt-get autoremove -y
   args:
-    warn: false
+    warn: no
+  become: yes
+
+- name: force an upgrade so it doesn't run automatically during our setup
+  ansible.builtin.command:
+    cmd: apt-get upgrade -y
+  args:
+    warn: no
   become: yes
