@@ -3,34 +3,34 @@
 - name: purge x11 and friends
   ansible.builtin.command:
     cmd: apt-get remove --auto-remove --purge -y 'libx11-.*'
-  warn: false
+    warn: false
 
 - name: autoremove to cleanup
   ansible.builtin.command:
     cmd: apt-get autoremove --purge
-  warn: false
+    warn: false
 
 - name: for reals, purge x11
   ansible.builtin.command:
     cmd: apt-get remove --auto-remove --purge -y 'libx11-.*'
-  warn: false
+    warn: false
 
 - name: autoremove again to cleanup again
   ansible.builtin.command:
     cmd: apt-get autoremove --purge -
-  warn: false
+    warn: false
 
 - name: lets check for orphans
   ansible.builtin.command:
     cmd: apt-get install -y deborphan
-  warn: false
+    warn: false
 
 - name: remove the orphans
   ansible.builtin.command:
     cmd: apt-get remove --purge -y $(deborphan)
-  warn: false
+    warn: false
 
 - name: and one final autoremove
   ansible.builtin.command:
     cmd: apt-get autoremove -y
-  warn: false
+    warn: false
