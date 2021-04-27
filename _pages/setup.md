@@ -24,6 +24,8 @@ We have a separate page that describes how to [set up the microSD card]({{ "/pre
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Request an api.data.gov key
 
+<a name="continuehere"></a>
+
 We have [a separate page for this]({{ "/requestkey/" | prepend: site.baseurl }}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Things you must have
 
