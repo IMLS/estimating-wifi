@@ -31,6 +31,26 @@ docker-compose run ruby bundle exec htmlproofer _site; npx a11y '_site/**/*.html
 
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=18F/federalist-uswds-jekyll)](https://dependabot.com)
 
+# For the docs subsite
+
+The docs subsite is intended to be detail about the building and maintaining of the software stack itself. This could live elsewhere, but is integrated with this site for pilot/dev purposes. You will need `mkdocs` installed. On a Mac, `brew install mkdocs` will pull this tool in; on *NIX systems, `apt get` or `yum` should do the trick.
+
+To pull the docs submodule:
+
+```
+make update
+```
+
+which will pull the docs (a separate repos) as a submodule. Then,
+
+```
+make docs
+```
+
+will rebuild the docs subsite. 
+
+
+
 # Federalist + U.S. Web Design System + Jekyll
 
 This [Jekyll theme](https://jekyllrb.com/docs/themes/) is developed using the [U.S. Web Design System v 2.0](https://v2.designsystem.digital.gov) and is focused on providing developers a starter kit and reference implementation for Federalist websites.

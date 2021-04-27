@@ -20,11 +20,11 @@ To complete the setup **you'll need roughly 1 hour**, assuming you have everythi
 
 You can do this step at any time; that said, it will prevent you from moving past step {{page.blockerstep}} in these instructions, so you might as well do it in advance. 
 
-We have a separate page that describes how to [set up the microSD card]({{ "preppingthesdcard/" | prepend: site.baseurl }}). It takes roughly 15 minutes, and you will need to do it on a computer or laptop where you have administrative access.
+We have a separate page that describes how to [set up the microSD card]({{ "/preppingthesdcard/" | prepend: site.baseurl }}). It takes roughly 15 minutes, and you will need to do it on a computer or laptop where you have administrative access.
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Request an api.data.gov key
 
-We have [a separate page for this]({{ "requestkey/" | prepend: site.baseurl }}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
+We have [a separate page for this]({{ "/requestkey/" | prepend: site.baseurl }}). This is an easy process, but may take a day or two in the background. Go ahead and do this in advance of anything else.
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Things you must have
 
 There are a few things you **must** have for this to work.
