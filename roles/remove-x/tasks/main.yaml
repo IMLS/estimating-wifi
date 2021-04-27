@@ -2,35 +2,28 @@
 # TL;DR or "just scorch my Pi"
 - name: purge x11 and friends
   ansible.builtin.command:
-    cmd: apt-get remove --auto-remove --purge 'libx11-.*'
-  become: yes
+    cmd: apt-get remove --auto-remove --purge -y 'libx11-.*'
 
 - name: autoremove to cleanup
   ansible.builtin.command:
     cmd: apt-get autoremove --purge
-  become: yes
 
 - name: for reals, purge x11
   ansible.builtin.command:
-    cmd: apt-get remove --auto-remove --purge 'libx11-.*'
-  become: yes
+    cmd: apt-get remove --auto-remove --purge -y 'libx11-.*'
 
 - name: autoremove again to cleanup again
   ansible.builtin.command:
-    cmd: apt-get autoremove --purge
-  become: yes
+    cmd: apt-get autoremove --purge -y
 
 - name: lets check for orphans
   ansible.builtin.command:
-    cmd: apt-get install deborphan
-  become: yes
+    cmd: apt-get install -y deborphan 
 
 - name: remove the orphans
   ansible.builtin.command:
-    cmd: apt-get remove --purge $(deborphan)
-  become: yes
+    cmd: apt-get remove --purge -y $(deborphan)
 
 - name: and one final autoremove
   ansible.builtin.command:
-    cmd: apt-get autoremove
-  become: yes
+    cmd: apt-get autoremove -y

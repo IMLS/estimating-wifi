@@ -11,7 +11,7 @@
     # There are some mmap_rnd_bits errors being thrown that we want to ignore.
     - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes }
     - { role: devsec.hardening.ssh_hardening, ignore_errors: yes, become: yes }
-    - { role: lockdown, when: lockdown is defined }
+    - { role: lockdown, ignore_errors: yes, become: yes, when: lockdown is defined  }
     - remove-x
   vars:
     sysctl_overwrite:
