@@ -19,7 +19,7 @@ import (
 	"gsa.gov/18f/input-initial-configuration/wordlist"
 )
 
-const VERSION = "0.0.2"
+const VERSION = "0.0.3"
 const lookup = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const yamlPath = "/etc/session-counter/auth.yaml"
 
