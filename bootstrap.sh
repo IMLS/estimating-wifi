@@ -172,7 +172,9 @@ ansible_pull_playbook () {
 }
 
 main () {
-    read_initial_configuration
+    if [ "$NOREAD" != 1 ]; then
+        read_initial_configuration
+    fi
     create_logfile
     setup_logging
     bootstrap_ansible
