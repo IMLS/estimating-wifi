@@ -16,7 +16,7 @@ all:
       install_path: /usr/local/bin
       bin: /usr/local/bin/find-ralink
     inputinitial:
-      binary_url: "https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.2/input-initial-configuration"
+      binary_url: "https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.3/input-initial-configuration"
       install_path: /usr/local/bin
       bin: /usr/local/bin/input-initial-configuration
     persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules
