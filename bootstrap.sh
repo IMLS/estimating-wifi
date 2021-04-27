@@ -173,6 +173,13 @@ ansible_pull_playbook () {
     fi
 }
 
+disable_interactive_login () {
+    # https://www.raspberrypi.org/forums/viewtopic.php?t=21632
+    # Disables console and desktop login using the builtin script.
+    sudo /usr/bin/raspi-config nonint do_boot_behaviour B1
+    sudo /usr/bin/raspi-config nonint do_boot_behaviour B3
+}
+
 main () {
     if [[ -z "${NOREAD}" ]]; then 
         # If NOREAD is undefined, we should read in the config.
@@ -185,6 +192,7 @@ main () {
     bootstrap_ansible
     install_prerequisites
     ansible_pull_playbook
+    disable_interactive_login
     if [ $SOMETHING_WENT_WRONG -ne 0 ]; then
         _err "Things finished with errors."
         _err "We may need to see the logs: ${SETUP_LOGFILE}"
