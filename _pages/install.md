@@ -93,11 +93,7 @@ Your API key has been transformed into a list of "word pairs."
 
 You'll read each word-pair (perhaps off your phone, or a laptop off to the side) and type them into the Raspberry Pi one pair at a time. The Pi will make sure that you're typing "correct" word pairs. (There's a limited set; if you make a typo, we'll ask you to try again.) You should end up entering 14 word pairs.
 
-As you type your word pairs, the Raspberry Pi will "translate" those words back into pieces of your API key. There's some fun mathematics happening behind the scenes here, but we don't want to tell you too much... you might get so excited, you forget what you're doing!
-
-No. Probably not.
-
-So, type the fourteen word pairs. 
+As you type your word pairs, the Raspberry Pi will "translate" those words back into pieces of your API key. 
 
 When you are done, you can type `DONE`. Or, `done`. 
 
