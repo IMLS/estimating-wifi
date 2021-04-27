@@ -18,6 +18,7 @@ PLAYBOOK_REPOS="imls-client-pi-playbook"
 PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 PLAYBOOK_WORKING_DIR="/opt/imls"
 INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.3/input-initial-configuration"
+SESSION_COUNTER_CONFIG_DIR="/etc/session-counter"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
@@ -115,6 +116,8 @@ restore_console () {
 }
 
 read_initial_configuration () {
+    # Create a place for it to go
+    sudo mkdir -p $SESSION_COUNTER_CONFIG_DIR
     # Fetch the binary.
     pushd /tmp
         # 20210427 MCJ Again, in dev/testing conditions, wipe things out.
