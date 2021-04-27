@@ -30,11 +30,16 @@
     warn: false
   become: yes
 
+- name: get the orphans
+  ansible.builtin.command:
+      cmd: deborphan
+  register: orphans
+
 - name: remove the orphans
   ansible.builtin.command:
-    cmd: apt-get remove --purge -y $(deborphan)
+    cmd: apt-get remove --purge -y {{ item }}
     warn: false
-  become: yes
+  loop: "{{ orphans.stdout_lines }}"
 
 - name: and one final autoremove
   ansible.builtin.command:
