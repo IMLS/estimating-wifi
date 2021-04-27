@@ -105,7 +105,7 @@ At this point, the Pi is going to do a whole bunch of things on its own. This pr
 
 What is happening? This is where we take the friendly Raspberry Pi that you were sent, and we turn it into a secure device. Amongst other things, we are:
 
-1. Installing software to do the WIFISESS data collection. (å) 
+1. Installing software to do the WIFISESS data collection. 
 2. Making sure the RPi gets security and software updates. 
 3. Disabling the ability for anyone to connect to the RPi via the network.
 4. Disabling the ability for anyone to log into the RPi with a keyboard and mouse.
