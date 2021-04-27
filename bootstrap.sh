@@ -154,7 +154,8 @@ ansible_pull_playbook () {
         # 20210427 MCJ Wipe out the playbook in case it already exists.
         # This only comes up in dev/testing, but is safe to do in the general case.
         rm -rf $PLAYBOOK_REPOS
-        git clone $PLAYBOOK_URL
+        # 20210427 MCJ Adding a shallow clone.
+        git clone --depth=1 $PLAYBOOK_URL
         pushd $PLAYBOOK_REPOS
             _status "Running the playbook. This will take a while."
             ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
