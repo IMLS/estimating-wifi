@@ -176,7 +176,7 @@ main () {
         # If NOREAD is undefined, we should read in the config.
         read_initial_configuration
     else
-        # Skip. This is in testing configurations only.
+        _debug "Skipping config entry for dev purposes."
     fi
     create_logfile
     setup_logging
