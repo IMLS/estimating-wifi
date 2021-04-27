@@ -8,11 +8,23 @@ sidenav: false
 # {{page.title}}
 
 Here we go! You have an RPi, it is set up, and it can talk to the internet! This is very, *very* exciting.
+
+##  Step {% assign counter = counter | plus: 1  %}{{counter}}: Visit this page on the RPi
+
+You really need this page open on the Raspberry Pi. We've given you a short URL you can type in:
+
+[https://go.usa.gov/xHQYj](https://go.usa.gov/xHQYj)
+
+That's `https://`, then `go.usa.gov`, a slash, and then `x` `H` `Q` `Y` and `j`. 
+
+Because the next step involves some copy-paste work, you need to have this page open on the Pi. 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Open the terminal
 
 In the upper-left corner of the screen is a little black box with a blue bar at the top. This icon is intended to represent a command terminal. It should open up a window that looks like this:
 
 {% asset "pi-command-prompt.png" alt="location of pi command prompt icon" %}
+
+Go ahead and grab the bottom-right corner and make the window a bit bigger before continuing.
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Copy the line below
 
@@ -48,7 +60,7 @@ We intend this field either as a "hardware tag" (so you might enter `RPi 001`), 
 
 This is a tedious part.
 
-First, note: you should never, ever give anyone your API key. You should not paste it into websites. You should not mail it to your friends. (They keys are free... they can go get their own.) But, we're going to ask you to violate that rule right now.
+First, note: **you should never, ever give anyone your API key**. You should not paste it into websites. You should not mail it to your friends. (They keys are free... they can go get their own.) But, we're going to ask you to violate that rule right now.
 
 On your other computer (not the Pi), you'll want to find the email where you received your API key from api.data.gov. Then, you'll want to visit this page. (Yes, this one, right here.) Then, you'll want to paste your key into the text box below:
 
@@ -97,7 +109,7 @@ At this point, the Pi is going to do a whole bunch of things on its own. This pr
 
 What is happening? This is where we take the friendly Raspberry Pi that you were sent, and we turn it into a secure device. Amongst other things, we are:
 
-1. Installing software to do the WIFISESS data collection. (This is open source software that was developed in collaboration with IMLS specifically for this pilot.) 
+1. Installing software to do the WIFISESS data collection. (å) 
 2. Making sure the RPi gets security and software updates. 
 3. Disabling the ability for anyone to connect to the RPi via the network.
 4. Disabling the ability for anyone to log into the RPi with a keyboard and mouse.
@@ -105,7 +117,11 @@ What is happening? This is where we take the friendly Raspberry Pi that you were
 
 And a few more things. When we're done, you really have no idea if it worked, save for the fact that it will reboot, and then quietly do its job. 
 
-How do you know if it is working? We'll have to check and see if it is logging data! (FIXME. To be written.)
+##  Step {% assign counter = counter | plus: 1  %}{{counter}}: Is it working?
+
+FIXME
+
+*THIS WOULD BE A GREAT PLACE TO EMBED A JAVASCRIPT DEMO*
 
 
 
