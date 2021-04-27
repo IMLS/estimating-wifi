@@ -172,8 +172,11 @@ ansible_pull_playbook () {
 }
 
 main () {
-    if [ "$NOREAD" != 1 ]; then
+    if [[ -z "${NOREAD}" ]]; then 
+        # If NOREAD is undefined, we should read in the config.
         read_initial_configuration
+    else
+        # Skip. This is in testing configurations only.
     fi
     create_logfile
     setup_logging
