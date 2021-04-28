@@ -5,6 +5,7 @@
       - python-apt
       - vim
       - lshw
+      - tshark
     state: latest
   become: yes
 
