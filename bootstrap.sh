@@ -260,11 +260,13 @@ main () {
     else
         _status "All done!"
         _status "We're rebooting in one minute!"
+
+        # If the NOREBOOT flag is NOT set, then reboot.
         if [[ -z "${NOREBOOT}" ]]; then 
-            _status "Reboot prevented by env flag."
-        else 
             sleep 60
             sudo reboot
+        else             
+            _status "Reboot prevented by env flag."
         fi
     fi
 }
