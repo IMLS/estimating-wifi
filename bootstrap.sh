@@ -141,8 +141,8 @@ check_for_usb_wifi () {
         curl -L -s -o find-ralink ${RALNK_BINARY}
         chmod 755 find-ralink
         
-        restore_console
         if [[ "$(./find-ralink --exists)" =~ "false" ]]; then
+            restore_console
             echo "********************* PANIC OH NOES! *********************"
             echo "We think you did not plug in the USB wifi adapter!"
             echo "Please do the following:"
