@@ -41,7 +41,7 @@ create_logfile () {
     export SETUP_LOGFILE=$(mktemp -t "setup-log-XXX")
 }
 
-mangle_consle () {
+mangle_console () {
     # https://serverfault.com/questions/103501/how-can-i-fully-log-all-bash-scripts-actions
     # Save all the pipes.
     # 3 is Stdout. 4 is stderr.
