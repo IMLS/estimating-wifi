@@ -19,6 +19,8 @@ PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 PLAYBOOK_WORKING_DIR="/opt/imls"
 INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.3/input-initial-configuration"
 SESSION_COUNTER_CONFIG_DIR="/etc/session-counter"
+RALINK_DIR="/tmp/ralink"
+RALNK_BINARY="https://github.com/jadudm/find-ralink/releases/download/v0.0.7/find-ralink"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
@@ -115,6 +117,30 @@ restore_console () {
     exec 1>&3 3>&-
 }
 
+check_for_usb_wifi () {
+    rm -rf ${RALINK_DIR}
+    mkdir -p ${RALINK_DIR}
+    pushd ${RALINK_DIR}
+        rm -f find-ralink
+        curl -L -s -o find-ralink ${RALNK_BINARY}
+        chmod 755 find-ralink
+        if [[ "$(./find-ralink --exists)" =~ "false" ]]; then
+            echo "********************* PANIC OH NOES! *********************"
+            echo "We think you did not plug in the USB wifi adapter!"
+            echo "Please do the following:"
+            echo ""
+            echo " 1. Plug in the USB wifi adapter."
+            echo " 2. Push the up arrow. (This brings back the bash command.)"
+            echo " 3. Press enter."
+            echo ""
+            echo "This will start the setup process again."
+            echo "********************* PANIC OH NOES! *********************"
+            echo ""
+            exit
+        fi
+    popd
+}
+
 read_initial_configuration () {
     # Create a place for it to go
     sudo mkdir -p $SESSION_COUNTER_CONFIG_DIR
@@ -179,11 +205,13 @@ ansible_pull_playbook () {
 disable_interactive_login () {
     # https://www.raspberrypi.org/forums/viewtopic.php?t=21632
     # Disables console and desktop login using the builtin script.
+    # This tells the pi to boot to the console login, but not to auto-login `pi`
+    # https://github.com/RPi-Distro/raspi-config/blob/master/raspi-config#L1308
     sudo /usr/bin/raspi-config nonint do_boot_behaviour B1
-    sudo /usr/bin/raspi-config nonint do_boot_behaviour B3
 }
 
 main () {
+    check_for_usb_wifi
     if [[ -z "${NOREAD}" ]]; then 
         # If NOREAD is undefined, we should read in the config.
         read_initial_configuration
