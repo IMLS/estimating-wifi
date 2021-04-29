@@ -129,11 +129,30 @@ restore_console () {
     exec 1>&3 3>&-
 }
 
-check_for_usb_wifi () {
-    mangle_console
+initial_update () {
     # This will need lshw
+    echo "Doing an initial software update."
+    mangle_console
     sudo apt update
+    restore_console
+}
+
+fix_the_time () {
+    echo "Setting the time."
+    mangle_console
+    sudo apt install -y ntpdate
+    sudo /etc/init.d/ntp stop
+    sudo ntpd -q -g
+    sudo /etc/init.d/ntp start
+    restore_console
+}
+
+check_for_usb_wifi () {
+    echo "Checking for wifi..."
+    mangle_console
     sudo apt install -y lshw
+    # We need better time.
+
 
     rm -rf ${RALINK_DIR}
     mkdir -p ${RALINK_DIR}
@@ -241,6 +260,8 @@ disable_interactive_login () {
 }
 
 main () {
+    initial_update
+    fix_the_time
     check_for_usb_wifi
     if [[ -z "${NOKEYREAD}" ]]; then 
         # If NOREAD is undefined, we should read in the config.
