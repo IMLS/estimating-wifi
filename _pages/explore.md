@@ -3,8 +3,9 @@ title: Exploring the data
 layout: wide
 sidenav: false
 ---
- 
-<form id="das-form" style="margin-bottom: 2em;" method="post">
+
+<iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+<form id="das-form" style="margin-bottom: 2em;" target="dummyframe">
     <div class="grid-container">
         <div class="grid-row">
             <h2>Is it working?</h2>
@@ -43,6 +44,7 @@ sidenav: false
     <div class="grid-row">
         <div class="grid-col-9">
             <p>The device <span id="device_tag"></span> last started up on <span id="last_reboot_date"></span> at <span id="last_reboot_time"></span>.</p>
+            <p>The last wifi observation was <span id="last_wifi_obs"></span>.</p>
             <p>How many devices have been seen recently?</p>
         </div>
     </div>
@@ -82,25 +84,40 @@ sidenav: false
     }
 
     function setResultText(arr) {
-        var lastSeen = arr[arr.length - 1];
-        var tagElem = document.getElementById("device_tag");
-        var dateElem = document.getElementById("last_reboot_date");
-        var timeElem = document.getElementById("last_reboot_time");
-                
-        var localtime = lastSeen["localtime"];
-        var dt = DateTime.fromISO(localtime);
+        // Data is sorted by the query, so first event is newest
+        if (arr != null) {
+            console.log("startup events", arr);
+            var lastSeen = arr[0];
+            var tagElem = document.getElementById("device_tag");
+            var dateElem = document.getElementById("last_reboot_date");
+            var timeElem = document.getElementById("last_reboot_time");
+                    
+            var localtime = lastSeen["localtime"];
+            var dt = DateTime.fromISO(localtime);
 
-        tagElem.innerHTML = "<b>" + lastSeen["device_tag"] + "</b>";
-        dateElem.innerHTML = "<b>" + dt.weekdayLong + ", " + Info.months()[dt.month - 1] +  " " + dt.day + "</b>";
-        timeElem.innerHTML = "<b>" + dt.hour + ":" + pad(dt.minute) + "</b>";
+            tagElem.innerHTML = "<b>" + lastSeen["device_tag"] + "</b>";
+            dateElem.innerHTML = "<b>" + dt.weekdayLong + ", " + Info.months()[dt.month - 1] +  " " + dt.day + "</b>";
+            timeElem.innerHTML = "<b>" + dt.hour + ":" + pad(dt.minute) + "</b>";
+        }
     }
 
-    chartData = null;
-    chartOptions = null;
+    function setLastWifiObsText(arr) {
+        if (arr != null) {
+            var lastSeen = arr[0];
+            var tagElem = document.getElementById("last_wifi_obs");
+            var localtime = lastSeen["localtime"];
+            var dt = DateTime.fromISO(localtime);
+            tagElem.innerHTML = ("<b>" + dt.weekdayLong + ", " + Info.months()[dt.month - 1] +  " " + dt.day + 
+                                 " at " + dt.hour + ":" + pad(dt.minute) + "</b>"
+                                 );
+        }
+    }
 
     function drawResultChart(arr) {
         event_ids = arr.map(o => o.event_id);
         
+        // The array is in reverse order. This means the most
+        // recent events are first.
 
         current_eid = -1;
         count = 0;
@@ -127,20 +144,20 @@ sidenav: false
         labels = []
         for (var ndx = 0; ndx < counts.length - 1; ndx++) {
             if (ndx == 0) {
-                labels.push(`-${counts.length - (ndx + 1)} mins ago`);
+                labels.push("just now");
             } else if ((ndx % 5) == 0) {
                 labels.push(`-${counts.length - (ndx + 1)}`);
             } else {
                 labels.push(" ");
             }
         }
-        labels.push("just now");
+        labels.push(`-${counts.length - 1} mins ago`);
 
         chartData = {
             // A labels array that can contain any sort of values
-            labels: labels.reverse(),
+            labels: labels,
             // Our series array that contains series objects or in this case series data arrays
-            series: [ counts.reverse() ]
+            series: [ counts ]
         };
         chartOptions = {
             fullWidth: true,
@@ -160,13 +177,17 @@ sidenav: false
         // What comes back, if successful, looks like:
         // {data : { items : { events_v1 : [ obj ... ]}}}
         // where objects are keyed with the fields requested in the GraphQL query.
-        var arr = data["data"]["items"]["events_v1"]
+        var arr = data.data.items.events_v1
         setResultText(arr);
     }
 
     function wifiResult(data) {
         console.log(data);
         var arr = data.data.items.wifi_v1
+        console.log("first event", arr[0]);
+        console.log("last event", arr[arr.length - 1]);
+
+        setLastWifiObsText(arr);
         drawResultChart(arr);
     }
 
@@ -181,10 +202,12 @@ sidenav: false
     var ERROR = 0;
     function eventFailHandler(e) {
         ERROR=1;
+        console.log("eventHandler", e);
     }
 
     function wifiFailHandler(e) {
         ERROR=1;
+        console.log("wifiHandler", e);
     }
 
     async function handleSubmit(event) {
@@ -202,7 +225,11 @@ sidenav: false
         var eventQuery = `
         {
             items {
-                events_v1(filter: {fcfs_seq_id:{_eq: "${fcfs_seq_id}"}, device_tag: {_eq: "${device_tag}"}, tag:{_eq:"startup"}}) {
+                events_v1(filter: { fcfs_seq_id: {_eq: "${fcfs_seq_id}"}, 
+                                    device_tag: {_eq: "${device_tag}"}, 
+                                    tag:{_eq:"startup"}},
+                            sort: ["-id"]) {
+                    id
                     servertime
                     localtime
                     session_id
@@ -215,7 +242,13 @@ sidenav: false
         var wifiQuery = `
         {
             items {
-                wifi_v1(limit: ${SEARCH_LIMIT}, filter: {fcfs_seq_id:{_eq:"${fcfs_seq_id}"}, device_tag: {_eq: "${device_tag}"}}) {
+                wifi_v1(limit: ${SEARCH_LIMIT}, 
+                        filter: { fcfs_seq_id: {_eq:"${fcfs_seq_id}"}, 
+                                  device_tag: {_eq: "${device_tag}"}
+                                },
+                        sort: ["-id"] 
+                        ) {
+                    id
                     device_tag
                     session_id
                     event_id
