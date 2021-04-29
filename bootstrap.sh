@@ -3,6 +3,7 @@
 # TESTING ENV VARS
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
 # NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
+# NOREBOOT - prevents reboot at end of bootstrap.sh
 # 
 # Usage:
 # NOKEYREAD=1 NOLOCKDOWN=1 bash <(curl -s ...)
@@ -259,8 +260,12 @@ main () {
     else
         _status "All done!"
         _status "We're rebooting in one minute!"
-        sleep 60
-        sudo reboot
+        if [[ -z "${NOREBOOT}" ]]; then 
+            _status "Reboot prevented by env flag."
+        else 
+            sleep 60
+            sudo reboot
+        fi
     fi
 }
 
