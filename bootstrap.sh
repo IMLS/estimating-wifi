@@ -133,7 +133,6 @@ check_for_usb_wifi () {
     # This will need lshw
     sudo apt update
     sudo apt install -y lshw
-    restore_console
 
     rm -rf ${RALINK_DIR}
     mkdir -p ${RALINK_DIR}
@@ -141,7 +140,9 @@ check_for_usb_wifi () {
         rm -f find-ralink
         curl -L -s -o find-ralink ${RALNK_BINARY}
         chmod 755 find-ralink
+        
         if [[ "$(./find-ralink --exists)" =~ "false" ]]; then
+            restore_console
             echo "********************* PANIC OH NOES! *********************"
             echo "We think you did not plug in the USB wifi adapter!"
             echo "Please do the following:"
@@ -156,6 +157,7 @@ check_for_usb_wifi () {
             exit
         fi
     popd
+    restore_console
 }
 
 read_initial_configuration () {
