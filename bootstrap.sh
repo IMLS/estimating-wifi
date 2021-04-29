@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# TESTING ENV VARS
+# NOKEYREAD - set this to 1 to prevent the key from being read in.
+# NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
+
 # We assume this script will be curl'd in.
 # We assume it will be curl'd in and sudo will prompt for a password.
 
@@ -190,7 +194,14 @@ ansible_pull_playbook () {
         git clone --depth=1 $PLAYBOOK_URL
         pushd $PLAYBOOK_REPOS
             _status "Running the playbook. This will take a while."
-            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
+            # For testing/dev purposes, we might not want to lock things down
+            # when we're done. The lockdown flag is required to run the 
+            # hardening and lockdown roles.
+            if [[ -z "${NOLOCKDOWN}" ]]; then
+                ansible-playbook -i inventory.yaml playbook.yaml
+            else
+                ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
+            fi
             ANSIBLE_EXIT_STATUS=$?
         popd
     popd
@@ -212,7 +223,7 @@ disable_interactive_login () {
 
 main () {
     check_for_usb_wifi
-    if [[ -z "${NOREAD}" ]]; then 
+    if [[ -z "${NOKEYREAD}" ]]; then 
         # If NOREAD is undefined, we should read in the config.
         read_initial_configuration
     else

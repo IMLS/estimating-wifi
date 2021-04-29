@@ -11,8 +11,8 @@
     # There are some mmap_rnd_bits errors being thrown that we want to ignore.
     - { role: lockdown, ignore_errors: yes, when: lockdown is defined  }
     # The lockdown removes us from passwordless sudo... so it has to come last.
-    - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes }
-    - { role: devsec.hardening.ssh_hardening, ignore_errors: yes, become: yes }
+    - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes, when: lockdown is defined }
+    - { role: devsec.hardening.ssh_hardening, ignore_errors: yes, become: yes, when: lockdown is defined }
     
   vars:
     sysctl_overwrite:
