@@ -48,8 +48,6 @@ mangle_console () {
     exec 3>&1 4>&2
     # Restore some.
     trap 'exec 2>&4 1>&3' 0 1 2 3
-    # Redirect stdout/stderr to a logfile.
-    exec 1>> "${SETUP_LOGFILE}" 2>&1
 }
 
 # PURPOSE
@@ -57,6 +55,8 @@ mangle_console () {
 # a temporary logfile.
 setup_logging () {
     mangle_console
+    # Redirect stdout/stderr to a logfile.
+    exec 1>> "${SETUP_LOGFILE}" 2>&1
     _status "Logfile started. It can be accessed for debugging purposes."
     _variable "SETUP_LOGFILE"
 }
