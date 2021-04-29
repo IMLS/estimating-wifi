@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>ReVal (Rabbit) - IMLS WIFISESS</title>
+  <title>Test your key - IMLS WIFISESS</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ReVal (Rabbit)";
-    var mkdocs_page_input_path = "stack/reval.md";
+    var mkdocs_page_name = "Test your key";
+    var mkdocs_page_input_path = "queries/testkey.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -79,31 +79,27 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Server Stack</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../apidatagov/">api.data.gov</a>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../stack/apidatagov/">api.data.gov</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">ReVal (Rabbit)</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../stack/reval/">ReVal (Rabbit)</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../directus/">Directus</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../stack/directus/">Directus</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Querying Data</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../queries/obtainkey/">Obtain a key</a>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../obtainkey/">Obtain a key</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../queries/testkey/">Test your key</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Test your key</a>
+    <ul class="current">
+    </ul>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../queries/usinggql/">Using GraphQL</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../usinggql/">Using GraphQL</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../queries/viarest/">Using REST</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../viarest/">Using REST</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../queries/summary/">Summary</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../summary/">Summary</a>
                     </li>
                 </ul>
       </div>
@@ -127,11 +123,11 @@
     
       
         
-          <li>Server Stack &raquo;</li>
+          <li>Querying Data &raquo;</li>
         
       
     
-    <li>ReVal (Rabbit)</li>
+    <li>Test your key</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -142,24 +138,8 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="reval">ReVal</h1>
-<p><a href="https://github.com/18F/ReVAL">ReVal</a> (Reusable Validation Library) is a <a href="https://www.djangoproject.com/">Django</a> application for validating data via an API and web interface. ReVal was originally  developed for the USDA FNS (Food and Nutrition Service) Data Validation Service in order to <a href="https://18f.gsa.gov/2020/04/23/saving-time-and-improving-data-quality-for-the-national-school-lunch-breakfast-program/">validate National School Lunch and Breakfast data</a>.</p>
-<p>We have configured our ReVal instance, called <a href="https://github.com/cantsin/10x-rabbit/">Rabbit</a>, to be a stateless validation application deployed on <a href="https://cloud.gov/">cloud.gov</a> at <code>10x-rabbit-demo.app.cloud.gov</code>.</p>
-<h2 id="configuration">Configuration</h2>
-<p>Rabbit provides one endpoint: <code>/validate/&lt;collection&gt;/</code>. The only action allowed is <code>POST</code>. This endpoint takes an arbitrary array of JSON data, grabs the corresponding <a href="https://github.com/18F/ReVAL/blob/master/docs/customize.md">validation schema</a> for that collection from the <a href="https://directus.io/">Directus</a> host given, validates data against the schema, and returns the result of validation, successful or otherwise.</p>
-<p>Rabbit requires three HTTP headers:</p>
-<ul>
-<li><code>X-Magic-Header</code>: secret key for the rabbit instance</li>
-<li><code>X-Directus-Host</code>: Directus host (currently <code>10x-rabbit-data.app.cloud.gov</code>)</li>
-<li><code>X-Directus-Token</code>: Directus token</li>
-</ul>
-<p>Errors from the Directus instance (if any) will be returned verbatim. Otherwise, the endpoint returns a standard <a href="https://github.com/18F/ReVAL/blob/master/docs/api.md#validation">ReVal validation object in JSON</a>.</p>
-<h2 id="usage">Usage</h2>
-<p>We proxy all <code>api.data.gov</code> requests through Rabbit for validation purposes: the data must be a JSON array of predefined objects.</p>
-<p>We use the following validation schemas: <a href="https://github.com/cantsin/10x-rabbit/blob/main/validator-events.json"><code>events</code></a> and <a href="https://github.com/cantsin/10x-rabbit/blob/main/validator-wifi.json"><code>wifi</code></a>.</p>
-<p>All Rabbit requests are also logged to a separate, generic Directus table. Should the data not pass validation, the resulting validation errors are also stored in a separate table.</p>
-<p>The current <code>v1</code> schema is defined <a href="https://github.com/cantsin/10x-rabbit/blob/main/directus_tables.sql">here</a>.</p>
-<p>To avoid abuse of any Rabbit endpoint, we mandate a secret key to be passed in via the <code>X-Magic-Header</code>. This header is set on the <code>api.data.gov</code> backend configuration.</p>
+                <h2 id="test-your-key">Test your key</h2>
+<p>FIXME the explore page</p>
               
             </div>
           </div>
@@ -167,10 +147,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../directus/" class="btn btn-neutral float-right" title="Directus">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../usinggql/" class="btn btn-neutral float-right" title="Using GraphQL">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../apidatagov/" class="btn btn-neutral" title="api.data.gov"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../obtainkey/" class="btn btn-neutral" title="Obtain a key"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -196,10 +176,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../apidatagov/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../obtainkey/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../directus/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../usinggql/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

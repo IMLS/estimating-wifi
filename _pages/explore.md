@@ -26,6 +26,16 @@ sidenav: false
                 <button type="submit" class="usa-button">Check what's up</button>    
             </div>
         </div>
+        <div class="grid-row" style="margin-top: 2em;">
+            <div class="usa-alert usa-alert--error" role="alert" id="errormsg" style="display:none">
+                <div class="usa-alert__body">
+                    <h4 class="usa-alert__heading">OH NOES!</h4>
+                    <p class="usa-alert__text">Either you entered something incorrectly, or something is broken elsewhere.</p>
+                    <p class="usa-alert__text">It is beyond the abilities of this simple webpage to tell which is true.</p>
+                    <p class="usa-alert__text">Try again; if problems persist, reach out to the team for support.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 
@@ -51,6 +61,8 @@ sidenav: false
     var Info = luxon.Info;
 
     const form = document.getElementById("das-form");
+
+    const SEARCH_LIMIT = 1000;
 
     function gqlUrl (key) {
         return `https://api.data.gov/TEST/10x-imls/v1/graphql/?api_key=${key}`;
@@ -94,6 +106,10 @@ sidenav: false
         count = 0;
         counts = [];
 
+        // Walk the list of event IDs.
+        // Count the number of objects with each event ID.
+        // Keep the list of counts. Each event is essentially
+        // one minute.
         for (var ndx = 0; ndx < event_ids.length; ndx++) {
             if (ndx == 0) {
                 current_eid = event_ids[ndx];
@@ -112,8 +128,10 @@ sidenav: false
         for (var ndx = 0; ndx < counts.length - 1; ndx++) {
             if (ndx == 0) {
                 labels.push(`-${counts.length - (ndx + 1)} mins ago`);
-            } else {
+            } else if ((ndx % 5) == 0) {
                 labels.push(`-${counts.length - (ndx + 1)}`);
+            } else {
+                labels.push(" ");
             }
         }
         labels.push("just now");
@@ -160,11 +178,21 @@ sidenav: false
         }
     }
 
+    var ERROR = 0;
+    function eventFailHandler(e) {
+        ERROR=1;
+    }
+
+    function wifiFailHandler(e) {
+        ERROR=1;
+    }
+
     async function handleSubmit(event) {
         event.preventDefault();
-        // Toggle visibility now, so that the chart draws
-        var elem = document.getElementById("toggleme");
-        elem.style.display = "block";
+        // RESET ERROR FLAG
+        ERROR=0;
+        var errelem = document.getElementById("errormsg");
+        errelem.style.display = "none";
 
         const key = 1;
         const device_tag = document.getElementById("device-tag-text").value;
@@ -187,7 +215,7 @@ sidenav: false
         var wifiQuery = `
         {
             items {
-                wifi_v1(limit: 500, filter: {fcfs_seq_id:{_eq:"${fcfs_seq_id}"}, device_tag: {_eq: "${device_tag}"}}) {
+                wifi_v1(limit: ${SEARCH_LIMIT}, filter: {fcfs_seq_id:{_eq:"${fcfs_seq_id}"}, device_tag: {_eq: "${device_tag}"}}) {
                     device_tag
                     session_id
                     event_id
@@ -200,14 +228,25 @@ sidenav: false
         // Do the events query
         await fetch(gqlUrl(api_key), gqlOptions(eventQuery))
             .then(res => res.json())
-            .then(eventsResult);
+            .then(eventsResult)
+            .catch(eventFailHandler);
 
         // Now the wifi query
         await fetch(gqlUrl(api_key), gqlOptions(wifiQuery))
             .then(res => res.json())
             .then(wifiResult)
+            .catch(wifiFailHandler);
 
-        document.querySelector('.ct-chart-1').__chartist__.update()
+        // If we navigated HTTPS without error...
+        if (ERROR == 0) {
+            // Toggle visibility now, so that the chart draws
+            var elem = document.getElementById("toggleme");
+            elem.style.display = "block";
+            document.querySelector('.ct-chart-1').__chartist__.update()
+        } else {
+            var errelem = document.getElementById("errormsg");
+            errelem.style.display = "block";
+        }
 
     } // end wifiQuery
 
