@@ -221,6 +221,8 @@ sidenav: false
                     event_id
                     manufacturer_index
                     patron_index
+                    servertime
+                    localtime
                 }
             }
         }`;
