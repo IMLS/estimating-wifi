@@ -79,6 +79,8 @@ primary_navigation:
     url: /about/
   - name: Setup
     url: /setup/
+  - name: Explore
+    url: /explore/
   - name: FAQ
     url: /faq/
 
