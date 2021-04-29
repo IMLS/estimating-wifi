@@ -3,6 +3,9 @@
 # TESTING ENV VARS
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
 # NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
+# 
+# Usage:
+# NOKEYREAD=1 NOLOCKDOWN=1 bash <(curl -s ...)
 
 # We assume this script will be curl'd in.
 # We assume it will be curl'd in and sudo will prompt for a password.
