@@ -125,10 +125,12 @@ restore_console () {
 }
 
 check_for_usb_wifi () {
+    setup_logging
     # This will need lshw
     sudo apt update
     sudo apt install -y lshw
-
+    restore_console
+    
     rm -rf ${RALINK_DIR}
     mkdir -p ${RALINK_DIR}
     pushd ${RALINK_DIR}
