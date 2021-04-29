@@ -212,10 +212,13 @@ ansible_pull_playbook () {
             # For testing/dev purposes, we might not want to lock things down
             # when we're done. The lockdown flag is required to run the 
             # hardening and lockdown roles.
-            if [[ -z "${NOLOCKDOWN}" ]]; then
-                ansible-playbook -i inventory.yaml playbook.yaml
-            else
+
+            # -z checks if the var is UNSET.
+            if [[ -z "${NOLOCKDOWN}" ]]; then            
                 ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
+            else
+                _status "Running playbook WITHOUT lockdown"
+                ansible-playbook -i inventory.yaml playbook.yaml
             fi
             ANSIBLE_EXIT_STATUS=$?
         popd
