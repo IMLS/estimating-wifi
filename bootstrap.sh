@@ -41,10 +41,7 @@ create_logfile () {
     export SETUP_LOGFILE=$(mktemp -t "setup-log-XXX")
 }
 
-# PURPOSE
-# Sets up redirects so that STDOUT and STDERR make their way to
-# a temporary logfile.
-setup_logging () {
+mangle_consle () {
     # https://serverfault.com/questions/103501/how-can-i-fully-log-all-bash-scripts-actions
     # Save all the pipes.
     # 3 is Stdout. 4 is stderr.
@@ -53,8 +50,14 @@ setup_logging () {
     trap 'exec 2>&4 1>&3' 0 1 2 3
     # Redirect stdout/stderr to a logfile.
     exec 1>> "${SETUP_LOGFILE}" 2>&1
-    _status "Logfile started. It can be accessed for debugging purposes."
+}
 
+# PURPOSE
+# Sets up redirects so that STDOUT and STDERR make their way to
+# a temporary logfile.
+setup_logging () {
+    mangle_console
+    _status "Logfile started. It can be accessed for debugging purposes."
     _variable "SETUP_LOGFILE"
 }
 
@@ -125,12 +128,12 @@ restore_console () {
 }
 
 check_for_usb_wifi () {
-    setup_logging
+    mangle_console
     # This will need lshw
     sudo apt update
     sudo apt install -y lshw
     restore_console
-    
+
     rm -rf ${RALINK_DIR}
     mkdir -p ${RALINK_DIR}
     pushd ${RALINK_DIR}
