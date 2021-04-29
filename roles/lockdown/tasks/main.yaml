@@ -44,3 +44,26 @@
     cmd: ufw allow OpenSSH
   become: yes
   when: preserve_ssh is defined
+
+# https://raspberrypi.stackexchange.com/questions/109422/how-to-disable-logs
+- name: stop rsyslog
+  ansible.builtin.command:
+    cmd: systemctl stop rsyslog
+  become: yes
+
+- name: disable rsyslog
+  ansible.builtin.command:
+    cmd: systemctl disable rsyslog
+  become: yes
+
+- name: limit journald
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    state: present
+    line: "{{ item }}"
+    create: true
+  become: yes
+  loop:
+    - "Storage=volatile"
+    - "RuntimeMaxUse=64M"
+    - "SystemMaxUse=0M"
