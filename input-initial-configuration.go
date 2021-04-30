@@ -92,17 +92,16 @@ func box(c *color.Color, s string) string {
 		s = stripansi.Strip(s)
 		if len(s) > max {
 			// fmt.Println(s, len(s))
-			max = len(s)
+			max = len(s) + 3
 		}
 	}
 	result := ""
-	result += c.Sprint("╔")
 	for ndx := 0; ndx < max; ndx++ {
-		result += c.Sprint("═")
+		result += c.Sprint("*")
 	}
-	result += c.Sprint("══╗\n")
+	result += c.Sprint("****\n")
 	for _, line := range msg {
-		result += c.Sprint("║ ")
+		result += c.Sprint("* ")
 		result += line
 		// Strip color codes before measuring.
 		line = stripansi.Strip(line)
@@ -111,13 +110,12 @@ func box(c *color.Color, s string) string {
 				result += " "
 			}
 		}
-		result += c.Sprint(" ║\n")
+		result += c.Sprint(" *\n")
 	}
-	result += c.Sprint("╚")
 	for ndx := 0; ndx < max; ndx++ {
-		result += c.Sprint("═")
+		result += c.Sprint("*")
 	}
-	result += c.Sprint("══╝\n")
+	result += c.Sprint("****\n")
 
 	return result
 }
