@@ -6,8 +6,8 @@ const ExitNoUsername = -100
 const ExitNoPassword = -101
 const ExitProcessTimeout = -200
 
-const ConfigPath = "/etc/session-counter/config.yaml"
-const AuthPath = "/etc/session-counter/auth.yaml"
+const ConfigPath = "/opt/imls/config.yaml"
+const AuthPath = "/opt/imls/auth.yaml"
 
 const AuthTokenKey = "AUTHTOKEN"
 const AuthEmailKey = "AUTHEMAIL"

@@ -89,7 +89,7 @@ func ReadAuth() (*AuthConfig, error) {
 
 func ReadConfig() *Config {
 	// We expect config to be here:
-	//   * /etc/session-counter/config.yaml
+	//   * /opt/imls/config.yaml
 
 	cfg, err := parseConfigFile(constants.ConfigPath)
 	if err != nil {
