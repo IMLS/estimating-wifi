@@ -9,7 +9,7 @@
 
 - name: create a place for the config file.
   ansible.builtin.file:
-    path: /etc/session-counter
+    path: /opt/imls
     state: directory
   become: yes
 

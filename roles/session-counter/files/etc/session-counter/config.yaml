@@ -30,4 +30,4 @@ wireshark:
   # FIXME: this should not be configurable.
   duration: 45
 manufacturers:
-  db: /etc/session-counter/manufacturers.sqlite
+  db: /opt/imls/manufacturers.sqlite
