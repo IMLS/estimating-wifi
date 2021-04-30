@@ -92,7 +92,7 @@ func box(c *color.Color, s string) string {
 		s = stripansi.Strip(s)
 		if len(s) > max {
 			// fmt.Println(s, len(s))
-			max = len(s) + 3
+			max = len(s)
 		}
 	}
 	result := ""
