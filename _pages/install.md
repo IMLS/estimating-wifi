@@ -61,15 +61,23 @@ Type this in when prompted. You will need to use caps for the state abbreviation
 
 This is a free-form text entry that will accept up to 255 characters. It *will* become part of the dataset, so please do not put any personally identifiable information into this field. Email addresses are considered PII.
 
-We intend this field either as a "hardware tag" (so you might enter `RPi 001`), or it could be a reminder where you put it. In the latter case, you might enter `reference desk`, or `networking closet`, or (if it is in the bookmobile)... er, perhaps `glovebox`? Point being, this is mostly for you. This will become part of the dataset, so something simple but descriptive is best.
+We require this to be only lowercase letters, numbers, and possibly hyphens (but no spaces). So:
+
+* `rpi-001` is acceptable, but `RPi 001` is not.
+* `reference-desk` is acceptable, but `reference desk` is not.
+* `networkingcloset` is acceptable, but `Networking Closet!` is not.
+
+We intend this field either as a "hardware tag," or just a reminder where you put it. This will become part of the dataset, so something simple but descriptive is best.
+
+The tool will check your input, and suggest alternatives if you try something fancy that we don't allow.
 
 ## Step {% assign counter = counter | plus: 1 %}{{counter}}: Enter your api.data.gov key
 
 This is a tedious part.
 
-First, note: **you should never, ever give anyone your API key**. You should not paste it into websites. You should not mail it to your friends. (These keys are free... they can go get their own.) But, we're going to ask you to violate that rule right now.
+First, note: **you should never, ever give anyone your API key**. You should not mail it to your friends. (These keys are free... they can go get their own.) Generally, you should not paste it into websites (except, maybe, this one).
 
-On your other computer (not the Pi), you'll want to find the email where you received your API key from api.data.gov. Then, you'll want to visit this page. (Yes, this one, right here.) Then, you'll want to paste your key into the text box below:
+On your other computer (not the Pi), you'll want to find the email where you received your API key from api.data.gov. Then, you'll want to visit *this* page. (Yes, *this* one, right here.) Once you're here, paste your key into the text box below:
 
 <script type="text/javascript" src="{{ '/js/wordlist.js' | prepend: site.baseurl }}"></script>
 
@@ -102,7 +110,7 @@ You'll read each word-pair (perhaps off your phone, or a laptop off to the side)
 
 As you type your word pairs, the Raspberry Pi will "translate" those words back into pieces of your API key.
 
-When you are done, you can type `DONE`. Or, `done`.
+When you are done, you can type `DONE`. Or, `done`. There should only be 14 word pairs, and the tool will suggest (when you hit the 15th entry) that you should probably type `done`.
 
 This will now save the API key on the Raspberry Pi.
 
