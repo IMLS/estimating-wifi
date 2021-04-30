@@ -141,6 +141,9 @@ func readWordPairs() string {
 	fmt.Println(box(boxc, msg))
 	wpCounter := 1
 	for reading {
+		if wpCounter > 14 {
+			fmt.Printf("(It looks like we have the full API key now. Please type in DONE.)\n")
+		}
 		fmt.Printf("Word pair %d: ", wpCounter)
 		pair, _ := reader.ReadString('\n')
 		pair = strings.TrimSpace(pair)
