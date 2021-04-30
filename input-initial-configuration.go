@@ -200,7 +200,7 @@ func readTag() string {
 	msg += "\t2) " + color.New(color.FgYellow).Sprint("in collections") + "\n"
 	msg += "\t3) " + color.New(color.FgYellow).Sprint("on first floor") + "\n\n"
 	msg += "The purpose is to allow you to uniquely identify this Pi.\n\n"
-	msg += color.New(color.FgYellow).Sprint("We will truncate this at 255 characters.")
+	msg += color.New(color.FgYellow).Sprint("We will truncate this at 32 characters.")
 	fmt.Print(box(color.New(color.FgBlue), msg))
 
 	fmt.Print("Device tag: ")
