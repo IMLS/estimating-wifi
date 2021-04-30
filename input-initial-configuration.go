@@ -199,17 +199,30 @@ func readTag() string {
 	msg += "Enter your device tag.\n\n"
 	msg += "This will end up in the data, and will help you identify the device.\n\n"
 	msg += "Examples:\n\n"
-	msg += "\t1) " + color.New(color.FgYellow).Sprint("behind refdesk") + "\n"
-	msg += "\t2) " + color.New(color.FgYellow).Sprint("in collections") + "\n"
-	msg += "\t3) " + color.New(color.FgYellow).Sprint("on first floor") + "\n\n"
+	msg += "\t1) " + color.New(color.FgYellow).Sprint("behind-refdesk") + "\n"
+	msg += "\t2) " + color.New(color.FgYellow).Sprint("in-collections") + "\n"
+	msg += "\t3) " + color.New(color.FgYellow).Sprint("on-first-floor") + "\n\n"
 	msg += "The purpose is to allow you to uniquely identify this Pi.\n\n"
-	msg += color.New(color.FgYellow).Sprint("We will truncate this at 32 characters.")
+	msg += color.New(color.FgYellow).Sprint("Only lowercase letters and hyphens (-) are allowed. We will truncate this at 32 characters.")
 	fmt.Print(box(color.New(color.FgBlue), msg))
 
-	fmt.Print("Device tag: ")
 	reader := bufio.NewReader(os.Stdin)
-	tag, _ := reader.ReadString('\n')
-	tag = strings.TrimSpace(tag)
+	re := regexp.MustCompile("^[-0-9a-z]+$")
+	tag := ""
+
+	matched := false
+	for !matched {
+		fmt.Print("Device tag: ")
+		tag, _ := reader.ReadString('\n')
+		tag = strings.TrimSpace(tag)
+
+		if re.MatchString(tag) {
+			matched = true
+		} else {
+			color.New(color.FgRed).Println("\nThat does not seem to be a tag.")
+			fmt.Printf("Please try again.\n\n")
+		}
+	}
 
 	fmt.Println()
 	yay := box(color.New(color.FgHiGreen), color.New(color.FgGreen).Sprint("Awesome!"))
