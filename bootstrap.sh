@@ -4,7 +4,7 @@
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
 # NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
 # NOREBOOT - prevents reboot at end of bootstrap.sh
-# 
+#
 # Usage:
 # NOKEYREAD=1 NOLOCKDOWN=1 bash <(curl -s ...)
 
@@ -26,7 +26,6 @@ PLAYBOOK_REPOS="imls-client-pi-playbook"
 PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 PLAYBOOK_WORKING_DIR="/opt/imls"
 INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.3/input-initial-configuration"
-SESSION_COUNTER_CONFIG_DIR="/opt/imls"
 RALINK_DIR="/tmp/ralink"
 RALNK_BINARY="https://github.com/jadudm/find-ralink/releases/download/v0.0.7/find-ralink"
 
@@ -160,7 +159,7 @@ check_for_usb_wifi () {
         rm -f find-ralink
         curl -L -s -o find-ralink ${RALNK_BINARY}
         chmod 755 find-ralink
-        
+
         if [[ "$(./find-ralink --exists)" =~ "false" ]]; then
             restore_console
             echo "********************* PANIC OH NOES! *********************"
@@ -181,15 +180,13 @@ check_for_usb_wifi () {
 }
 
 read_initial_configuration () {
-    # Create a place for it to go
-    sudo mkdir -p $SESSION_COUNTER_CONFIG_DIR
     # Fetch the binary.
     pushd /tmp
         # 20210427 MCJ Again, in dev/testing conditions, wipe things out.
         rm -f iic
         curl -L -s -o iic ${INITIAL_CONFIGURATION_BINARY_URL}
         chmod 755 iic
-        sudo ./iic --fcfs-seq --tag --word-pairs --write
+        sudo ./iic --path ${PLAYBOOK_WORKING_DIR}/auth.yaml --fcfs-seq --tag --word-pairs --write
     popd
 }
 
@@ -211,17 +208,18 @@ install_prerequisites () {
     sudo apt-get install -y git
 }
 
+setup_playbook_dir () {
+    sudo rm -rf $PLAYBOOK_WORKING_DIR
+    sudo mkdir -p $PLAYBOOK_WORKING_DIR
+    sudo chown -R pi:pi $PLAYBOOK_WORKING_DIR
+}
+
 # PURPOSE
 # This clones and runs the playbook for configuring the
 # RPi for the IMLS/10x/18F data collection pilot.
 ansible_pull_playbook () {
     _status "Installing hardening playbook."
     ansible-galaxy collection install devsec.hardening
-
-    # 20210427 MCJ Make sure the working dir is always fresh
-    sudo rm -rf $PLAYBOOK_WORKING_DIR
-    sudo mkdir -p $PLAYBOOK_WORKING_DIR
-    sudo chown -R pi:pi $PLAYBOOK_WORKING_DIR
 
     pushd $PLAYBOOK_WORKING_DIR
         _status "Cloning the playbook: ${PLAYBOOK_URL}"
@@ -230,11 +228,11 @@ ansible_pull_playbook () {
         pushd $PLAYBOOK_REPOS
             _status "Running the playbook. This will take a while."
             # For testing/dev purposes, we might not want to lock things down
-            # when we're done. The lockdown flag is required to run the 
+            # when we're done. The lockdown flag is required to run the
             # hardening and lockdown roles.
 
             # -z checks if the var is UNSET.
-            if [[ -z "${NOLOCKDOWN}" ]]; then            
+            if [[ -z "${NOLOCKDOWN}" ]]; then
                 ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
             else
                 _status "Running playbook WITHOUT lockdown"
@@ -263,7 +261,8 @@ main () {
     initial_update
     fix_the_time
     check_for_usb_wifi
-    if [[ -z "${NOKEYREAD}" ]]; then 
+    setup_playbook_dir
+    if [[ -z "${NOKEYREAD}" ]]; then
         # If NOREAD is undefined, we should read in the config.
         read_initial_configuration
     else
@@ -283,10 +282,10 @@ main () {
         _status "We're rebooting in one minute!"
 
         # If the NOREBOOT flag is NOT set, then reboot.
-        if [[ -z "${NOREBOOT}" ]]; then 
+        if [[ -z "${NOREBOOT}" ]]; then
             sleep 60
             sudo reboot
-        else             
+        else
             _status "Reboot prevented by env flag."
         fi
     fi
