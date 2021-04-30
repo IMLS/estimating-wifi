@@ -140,10 +140,10 @@ initial_update () {
 fix_the_time () {
     echo "Setting the time."
     mangle_console
-    sudo apt install -y ntpdate
-    sudo /etc/init.d/ntp stop
-    sudo ntpd -q -g
-    sudo /etc/init.d/ntp start
+    sudo apt install -y ntp ntpdate
+    sudo service ntp stop
+    sudo ntpdate 0.us.pool.ntp.org
+    sudo service ntp start
     restore_console
 }
 
