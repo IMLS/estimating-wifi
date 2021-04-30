@@ -168,7 +168,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 
 func TestRawToUid(t *testing.T) {
 	cfg := new(config.Config)
-	cfg.Manufacturers.Db = "/etc/session-counter/manufacturers.sqlite"
+	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
 	ka := tlp.NewKeepalive(cfg)
 
 	// var buf bytes.Buffer

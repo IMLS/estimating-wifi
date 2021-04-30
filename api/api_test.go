@@ -15,7 +15,7 @@ const dbIterations = 10
 
 func Test_get_manufactuerer(t *testing.T) {
 	cfg := config.Config{}
-	cfg.Manufacturers.Db = "/etc/session-counter/manufacturers.sqlite"
+	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
 
 	var tests = []struct {
 		mac  string

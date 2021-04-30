@@ -1,6 +1,6 @@
 package config
 
-// At /etc/session-counter/config.yaml
+// At /opt/imls/config.yaml
 type Config struct {
 	Monitoring struct {
 		PingInterval          int `yaml:"pinginterval"`
@@ -26,7 +26,7 @@ type Config struct {
 	Serial    string
 }
 
-// Located at /etc/session-counter/auth.yaml
+// Located at /opt/imls/auth.yaml
 type AuthConfig struct {
 	Token     string `yaml:"api_token"`
 	DeviceTag string `yaml:"tag"`
