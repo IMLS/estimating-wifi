@@ -28,8 +28,14 @@ Go ahead and grab the bottom-right corner and make the window a bit bigger befor
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Copy the line below
 
+{% comment %}
 ```
 bash <(curl -s https://raw.githubusercontent.com/jadudm/imls-client-pi-playbook/main/bootstrap.sh)
+```
+{% endcomment %}
+
+```
+bash <(curl -s -L https://git.io/J3GCG)
 ```
 
 Highlight that line, right-click, and say **Copy**. 
