@@ -4,7 +4,7 @@ Requires=run-imls-client-pi-playbook.service
 
 [Timer]
 Unit=run-imls-client-pi-playbook.service
-OnCalendar=daily
+OnCalendar=*-*-* 2:00:00
 Persistent=true
 
 [Install]

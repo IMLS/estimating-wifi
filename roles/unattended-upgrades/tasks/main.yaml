@@ -27,7 +27,7 @@
     state: started
   become: yes
 
-- name: Start a daily timer to pull the playbook
+- name: Start a daily 2am timer to pull the playbook
   systemd:
     name: run-imls-client-pi-playbook.timer
     state: started
@@ -42,7 +42,7 @@
     state: present
   become: yes
   loop:
-    - Unattended-Upgrade::Automatic-Reboot-Time "02:00";
+    - Unattended-Upgrade::Automatic-Reboot-Time "03:00";
     - Unattended-Upgrade::Automatic-Reboot "true";
     - Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
     - Unattended-Upgrade::SyslogEnable "true";
