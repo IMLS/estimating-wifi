@@ -258,6 +258,11 @@ disable_interactive_login () {
 }
 
 main () {
+    echo "*****************************************************************"
+    echo "* Thank you for participating in the IMLS pilot project.        *"
+    echo "* We are going to configure this Raspberry Pi as a wifi sensor. *"
+    echo "* Expect this process to take about 20 to 30 minutes.           *"
+    echo "****************************************************************"
     initial_update
     fix_the_time
     check_for_usb_wifi
