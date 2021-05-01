@@ -1,5 +1,7 @@
 github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf h1:iW4rZ826su+pqaw19uhpSCzhj44qo35pNgKFGqzDKkU=
 github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
+github.com/jadudm/imls-wifi-adapter-search v0.0.0-20210430152215-15310c169eaa h1:8KHdMfBLFq1CzAsHkjxWhcezEJ/XZ9BcjhVhCBASCsc=
+github.com/jadudm/imls-wifi-adapter-search v0.0.0-20210430152215-15310c169eaa/go.mod h1:EqETZbwV6IRil+PRaDbKp7dZpl28h+OM8cJZvYBykPU=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.1.1/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=

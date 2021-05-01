@@ -5,8 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"strconv"
 	"strings"
 
+	"github.com/jadudm/imls-wifi-adapter-search/models"
+	"github.com/jadudm/imls-wifi-adapter-search/search"
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/constants"
 )
@@ -51,6 +54,10 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 	// If we have to wait twice the monitor duration, something broke.
 	ping, pong := ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)
 
+	// Adapter count... every "ac" ticks, we look up the adapter.
+	// (ac % 0) guarantees that we look it up the first time.
+	adapter_count := 0
+
 	for {
 		select {
 
@@ -60,6 +67,24 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			pong <- "wireshark"
 
 		case <-in:
+
+			// Look up the adapter. Use the find-ralink library.
+			minutes_interval, _ := strconv.Atoi(cfg.Wireshark.CheckWlan)
+			if (adapter_count % minutes_interval) == 0 {
+				dev := new(models.Device)
+				for _, s := range search.GetSearches() {
+					dev.Search = &s
+					// findMatchingDevice populates device.Exists if something is found.
+					search.FindMatchingDevice(dev)
+					if dev.Exists {
+						cfg.Wireshark.Adapter = dev.Logicalname
+						break
+					}
+				}
+			}
+			// Bump our ticker
+			adapter_count += 1
+
 			// This will block for [cfg.Wireshark.Duration] seconds.
 			macmap := tshark(cfg)
 			// Mark and remove too-short MAC addresses
