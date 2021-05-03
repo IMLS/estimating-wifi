@@ -25,7 +25,7 @@ REPOS_ROOT="https://github.com/jadudm"
 PLAYBOOK_REPOS="imls-client-pi-playbook"
 PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 PLAYBOOK_WORKING_DIR="/opt/imls"
-INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.3/input-initial-configuration"
+INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.4/input-initial-configuration"
 RALINK_DIR="/tmp/ralink"
 RALNK_BINARY="https://github.com/jadudm/find-ralink/releases/download/v0.0.7/find-ralink"
 
