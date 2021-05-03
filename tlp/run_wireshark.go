@@ -56,7 +56,8 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 
 	// Adapter count... every "ac" ticks, we look up the adapter.
 	// (ac % 0) guarantees that we look it up the first time.
-	adapter_count := 0
+	ticker := 0
+	minutes_interval, _ := strconv.Atoi(cfg.Wireshark.CheckWlan)
 
 	for {
 		select {
@@ -67,37 +68,41 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			pong <- "wireshark"
 
 		case <-in:
-
 			// Look up the adapter. Use the find-ralink library.
-			minutes_interval, _ := strconv.Atoi(cfg.Wireshark.CheckWlan)
-			if (adapter_count % minutes_interval) == 0 {
-				dev := new(models.Device)
-				for _, s := range search.GetSearches() {
-					dev.Search = &s
-					// findMatchingDevice populates device.Exists if something is found.
-					search.FindMatchingDevice(dev)
-					if dev.Exists {
-						cfg.Wireshark.Adapter = dev.Logicalname
-						break
+			// The % will trigger first time through, which we want.
+			var dev *models.Device = nil
+			// If the config doesn't have this in it, we get a divide by zero.
+			if (ticker % minutes_interval) == 0 {
+				dev = search.SearchForMatchingDevice()
+				log.Println(dev)
+			}
+
+			// Only do a reading and continue the pipeline
+			// if we find an adapter.
+			if dev != nil && dev.Exists {
+				// Load the config for use.
+				cfg.Wireshark.Adapter = dev.Logicalname
+				// This will block for [cfg.Wireshark.Duration] seconds.
+				macmap := tshark(cfg)
+				// Mark and remove too-short MAC addresses
+				// for removal from the tshark findings.
+				var keepers []string
+				// for `k, _ :=` is the same as `for k :=`
+				for _, k := range macmap {
+					if len(k) >= constants.MACLENGTH {
+						keepers = append(keepers, k)
 					}
 				}
+				// Report out the cleaned MACmap.
+				out <- keepers
+			} else {
+				log.Println("No wifi device found. No scanning carried out.")
+				// Report an empty array of keepers
+				out <- make([]string, 0)
 			}
-			// Bump our ticker
-			adapter_count += 1
 
-			// This will block for [cfg.Wireshark.Duration] seconds.
-			macmap := tshark(cfg)
-			// Mark and remove too-short MAC addresses
-			// for removal from the tshark findings.
-			var keepers []string
-			// for `k, _ :=` is the same as `for k :=`
-			for _, k := range macmap {
-				if len(k) >= constants.MACLENGTH {
-					keepers = append(keepers, k)
-				}
-			}
-			// Report out the cleaned MACmap.
-			out <- keepers
+			// Bump our ticker
+			ticker += 1
 		}
 	}
 }
