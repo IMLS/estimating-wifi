@@ -213,7 +213,7 @@ func readTag() string {
 	matched := false
 	for !matched {
 		fmt.Print("Device tag: ")
-		tag, _ := reader.ReadString('\n')
+		tag, _ = reader.ReadString('\n')
 		tag = strings.TrimSpace(tag)
 
 		if re.MatchString(tag) {
