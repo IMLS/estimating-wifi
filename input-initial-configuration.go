@@ -21,7 +21,7 @@ import (
 
 const VERSION = "0.0.3"
 const lookup = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-const yamlPath = "/etc/session-counter/auth.yaml"
+const yamlPath = "/opt/imls/auth.yaml"
 
 const states = "(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|AS|DC|FM|GU|MH|MP|PW|PR|VI)"
 
@@ -96,13 +96,12 @@ func box(c *color.Color, s string) string {
 		}
 	}
 	result := ""
-	result += c.Sprint("╔")
 	for ndx := 0; ndx < max; ndx++ {
-		result += c.Sprint("═")
+		result += c.Sprint("*")
 	}
-	result += c.Sprint("══╗\n")
+	result += c.Sprint("****\n")
 	for _, line := range msg {
-		result += c.Sprint("║ ")
+		result += c.Sprint("* ")
 		result += line
 		// Strip color codes before measuring.
 		line = stripansi.Strip(line)
@@ -111,13 +110,12 @@ func box(c *color.Color, s string) string {
 				result += " "
 			}
 		}
-		result += c.Sprint(" ║\n")
+		result += c.Sprint(" *\n")
 	}
-	result += c.Sprint("╚")
 	for ndx := 0; ndx < max; ndx++ {
-		result += c.Sprint("═")
+		result += c.Sprint("*")
 	}
-	result += c.Sprint("══╝\n")
+	result += c.Sprint("****\n")
 
 	return result
 }
@@ -143,6 +141,9 @@ func readWordPairs() string {
 	fmt.Println(box(boxc, msg))
 	wpCounter := 1
 	for reading {
+		if wpCounter > 14 {
+			fmt.Printf("(It looks like we have the full API key now. Please type in DONE.)\n")
+		}
 		fmt.Printf("Word pair %d: ", wpCounter)
 		pair, _ := reader.ReadString('\n')
 		pair = strings.TrimSpace(pair)
@@ -198,17 +199,30 @@ func readTag() string {
 	msg += "Enter your device tag.\n\n"
 	msg += "This will end up in the data, and will help you identify the device.\n\n"
 	msg += "Examples:\n\n"
-	msg += "\t1) " + color.New(color.FgYellow).Sprint("behind refdesk") + "\n"
-	msg += "\t2) " + color.New(color.FgYellow).Sprint("in collections") + "\n"
-	msg += "\t3) " + color.New(color.FgYellow).Sprint("on first floor") + "\n\n"
+	msg += "\t1) " + color.New(color.FgYellow).Sprint("behind-refdesk") + "\n"
+	msg += "\t2) " + color.New(color.FgYellow).Sprint("in-collections") + "\n"
+	msg += "\t3) " + color.New(color.FgYellow).Sprint("on-first-floor") + "\n\n"
 	msg += "The purpose is to allow you to uniquely identify this Pi.\n\n"
-	msg += color.New(color.FgYellow).Sprint("We will truncate this at 255 characters.")
+	msg += color.New(color.FgYellow).Sprint("Only lowercase letters and hyphens (-) are allowed. We will truncate this at 32 characters.")
 	fmt.Print(box(color.New(color.FgBlue), msg))
 
-	fmt.Print("Device tag: ")
 	reader := bufio.NewReader(os.Stdin)
-	tag, _ := reader.ReadString('\n')
-	tag = strings.TrimSpace(tag)
+	re := regexp.MustCompile("^[-0-9a-z]+$")
+	tag := ""
+
+	matched := false
+	for !matched {
+		fmt.Print("Device tag: ")
+		tag, _ = reader.ReadString('\n')
+		tag = strings.TrimSpace(tag)
+
+		if re.MatchString(tag) {
+			matched = true
+		} else {
+			color.New(color.FgRed).Println("\nThat does not seem to be a tag.")
+			fmt.Printf("Please try again.\n\n")
+		}
+	}
 
 	fmt.Println()
 	yay := box(color.New(color.FgHiGreen), color.New(color.FgGreen).Sprint("Awesome!"))
