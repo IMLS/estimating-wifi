@@ -15,9 +15,10 @@ type Config struct {
 		Logging string `yaml:"logging"`
 	} `yaml:"umbrella"`
 	Wireshark struct {
-		Duration int    `yaml:"duration"`
-		Adapter  string `yaml:"adapter"`
-		Path     string `yaml:"path"`
+		Duration  int    `yaml:"duration"`
+		Adapter   string `yaml:"adapter"`
+		Path      string `yaml:"path"`
+		CheckWlan string `yaml:"check_wlan"`
 	} `yaml:"wireshark"`
 	Manufacturers struct {
 		Db string `yaml:"db"`

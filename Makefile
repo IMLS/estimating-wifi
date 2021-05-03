@@ -14,3 +14,6 @@ test:
 	go test *.go
 	go test config/*.go
 	go test api/*.go
+
+crossbuild: clean
+	GOOS=linux GOARCH=arm GOARM=7 go build

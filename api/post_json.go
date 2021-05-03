@@ -78,7 +78,7 @@ var slash_warned bool = false
 func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map[string]string) (int, error) {
 	log.Println("postjson: storing JSON to", uri)
 
-	matched, _ := regexp.MatchString(".*/$", uri) 
+	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slash_warned && !matched {
 		slash_warned = true
 		log.Println("WARNING: api.data.gov wants a trailing slash on URIs")
@@ -135,6 +135,8 @@ func postJSON(cfg *config.Config, tok *config.AuthConfig, uri string, data []map
 		}
 
 		// Clean up the log string... no tokens in the log
+		// FIXME This makes a mess if there is no token in the `tok` structure...
+		// APITOKEN&APITOKEN{APITOKENPAPITOKENOAPITOKENSAPITOKENTAPITOKEN A
 		reqLogString := strings.Replace(fmt.Sprint(req), tok.Token, "APITOKEN", -1)
 		if config.Verbose {
 			log.Printf("postjson:req:\n%v\n", reqLogString)
