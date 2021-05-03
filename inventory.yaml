@@ -6,7 +6,7 @@ all:
   vars:
     default_user: pi
     session_counter:
-      binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.0.9/session-counter"
+      binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.1.0/session-counter"
       install_path: /usr/local/bin
       config_path: /opt/imls
       workdir: /home/pi/session-counter
