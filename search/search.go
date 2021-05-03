@@ -38,6 +38,22 @@ func GetSearches() []models.Search {
 }
 
 // PURPOSE
+// Find any matching device. Returns the device structure
+func SearchForMatchingDevice() *models.Device {
+	dev := new(models.Device)
+	dev.Exists = false
+	for _, s := range GetSearches() {
+		dev.Search = &s
+		// findMatchingDevice populates device.Exists if something is found.
+		FindMatchingDevice(dev)
+		if dev.Exists {
+			break
+		}
+	}
+	return dev
+}
+
+// PURPOSE
 // Takes a Device structure and, using the Search fields of that structure,
 // attempts to find a matching WLAN device.
 func FindMatchingDevice(wlan *models.Device) {
