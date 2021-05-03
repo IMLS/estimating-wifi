@@ -24,6 +24,8 @@ umbrella:
 wireshark:
   path: /usr/bin/tshark
   adapter: wlan1
+  # How long to go between wlan checks (minutes)
+  check_wlan: 3
   # duration is the number of seconds that wireshark
   # will listen to the adapter before reporting out.
   # best if this is below one minute.
