@@ -44,7 +44,7 @@ func SearchForMatchingDevice() *models.Device {
 	dev.Exists = false
 	for _, s := range GetSearches() {
 		dev.Search = &s
-		// findMatchingDevice populates device.Exists if something is found.
+		// findMatchingDevice populates device. Exits if something is found.
 		FindMatchingDevice(dev)
 		if dev.Exists {
 			break
