@@ -1,0 +1,15 @@
+- name: enable the watchdog hardware
+  ansible.builtin.lineinfile:
+    line: dtparam=watchdog=on
+    path: /boot/config.txt
+    state: present
+    create: yes
+  become: yes
+
+- name: install the watchdog package
+  ansible.builtin.package:
+    name: watchdog
+    state: latest
+  become: yes
+
+#- name: check if everything is set up
