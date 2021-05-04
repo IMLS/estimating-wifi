@@ -11,7 +11,7 @@ import (
 
 // This should be much higher, like 2000
 // But, it slows down practical testing... :/
-const dbIterations = 10
+const dbIterations = 2000
 
 func Test_get_manufactuerer(t *testing.T) {
 	cfg := config.Config{}
@@ -63,7 +63,7 @@ func Test_thrash_db(t *testing.T) {
 	}
 }
 
-func Test_ReadAuth(t *testing.T) {
+func _Test_ReadAuth(t *testing.T) {
 	a, e := config.ReadAuth()
 	if e != nil {
 		t.Fatal("failure in reading auth")
@@ -74,7 +74,7 @@ func Test_ReadAuth(t *testing.T) {
 
 }
 
-func Test_GetToken(t *testing.T) {
+func _Test_GetToken(t *testing.T) {
 	auth, err := config.ReadAuth()
 
 	if err != nil {
@@ -89,7 +89,7 @@ func Test_GetToken(t *testing.T) {
 
 }
 
-func Test_StoreContent(t *testing.T) {
+func _Test_StoreContent(t *testing.T) {
 	cfg := config.ReadConfig()
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()
@@ -99,7 +99,7 @@ func Test_StoreContent(t *testing.T) {
 	StoreDevicesCount(cfg, auth, 42, map[string]int{"0:42": 0})
 }
 
-func Test_LogEvent(t *testing.T) {
+func _Test_LogEvent(t *testing.T) {
 	cfg := config.ReadConfig()
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()

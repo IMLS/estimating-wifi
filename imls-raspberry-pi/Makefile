@@ -12,7 +12,10 @@ session-counter: deps
 wifi-hardware-search-cli: deps
 	GOPATH=$$PWD/release go install gsa.gov/18f/find-ralink
 
-# not working at present.
 test:
 	go test ./internal/wifi-hardware-search/lshw/*.go
 	go test ./internal/wifi-hardware-search/search/*.go
+	go test ./cmd/input-configuration/*.go
+	go test ./cmd/session-counting/*.go
+	go test ./cmd/session-counting/api/*.go
+	go test ./cmd/session-counting/config/*.go
