@@ -48,6 +48,11 @@ sidenav: false
             <p>How many devices have been seen recently?</p>
         </div>
     </div>
+    <div class="grid-row">
+        <div class="grid-col-9">
+            <button type="download" id="downloadbutton" class="usa-button">Grab this data as a CSV file</button>
+        </div>
+    </div>
 </div>
 
 <div class="grid-container" >
@@ -65,6 +70,8 @@ sidenav: false
     const form = document.getElementById("das-form");
 
     const SEARCH_LIMIT = 1000;
+
+    var TheWifiData = [];
 
     function gqlUrl (key) {
         return `https://api.data.gov/TEST/10x-imls/v1/graphql/?api_key=${key}`;
@@ -116,6 +123,10 @@ sidenav: false
     function drawResultChart(arr) {
         event_ids = arr.map(o => o.event_id);
         
+
+        // Store this for CSV generation
+        TheWifiData = arr;
+
         // The array is in reverse order. This means the most
         // recent events are first.
 
@@ -139,6 +150,7 @@ sidenav: false
                 count += 1;
             }
         }
+
 
         // Create some cute labels.
         labels = []
@@ -210,22 +222,12 @@ sidenav: false
         console.log("wifiHandler", e);
     }
 
-    async function handleSubmit(event) {
-        event.preventDefault();
-        // RESET ERROR FLAG
-        ERROR=0;
-        var errelem = document.getElementById("errormsg");
-        errelem.style.display = "none";
-
-        const key = 1;
-        const device_tag = document.getElementById("device-tag-text").value;
-        const fcfs_seq_id = document.getElementById("fcfs-text").value;
-        const api_key = document.getElementById("api-key-text").value;
-
-        var eventQuery = `
+    function buildEventQuery(fcfs_seq_id, device_tag) {
+        return `
         {
             items {
-                events_v1(filter: { fcfs_seq_id: {_eq: "${fcfs_seq_id}"}, 
+                events_v1(limit: ${SEARCH_LIMIT},
+                            filter: { fcfs_seq_id: {_eq: "${fcfs_seq_id}"}, 
                                     device_tag: {_eq: "${device_tag}"}, 
                                     tag:{_eq:"startup"}},
                             sort: ["-id"]) {
@@ -238,8 +240,10 @@ sidenav: false
                 }
             }
         }`;
+    }
 
-        var wifiQuery = `
+    function buildWifiQuery(fcfs_seq_id, device_tag) {
+        return `
         {
             items {
                 wifi_v1(limit: ${SEARCH_LIMIT}, 
@@ -250,6 +254,7 @@ sidenav: false
                         ) {
                     id
                     device_tag
+                    fcfs_seq_id
                     session_id
                     event_id
                     manufacturer_index
@@ -258,7 +263,24 @@ sidenav: false
                     localtime
                 }
             }
-        }`;
+        }`
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        // RESET ERROR FLAG
+        ERROR=0;
+        var errelem = document.getElementById("errormsg");
+        errelem.style.display = "none";
+
+        const key = 1;
+        const device_tag = document.getElementById("device-tag-text").value;
+        const fcfs_seq_id = document.getElementById("fcfs-text").value;
+        const api_key = document.getElementById("api-key-text").value;
+
+        var eventQuery = buildEventQuery(fcfs_seq_id, device_tag);
+
+        var wifiQuery = buildWifiQuery(fcfs_seq_id, device_tag);
 
         // Do the events query
         await fetch(gqlUrl(api_key), gqlOptions(eventQuery))
@@ -285,6 +307,39 @@ sidenav: false
 
     } // end wifiQuery
 
+    // See
+    // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+    async function handleDownload(event) {
+        event.preventDefault();
+        let csvContent = "data:text/csv;charset=utf-8,";
+        var seq_id = "";
+        var tag = "";
+
+        // Add a header row. Make sure it aligns with the fields below.
+        headerRow = "fcfs_seq_id,device_tag,session_id,event_id,manufacturer_index,patron_index,localtime,servertime\r\n";
+        csvContent += headerRow;
+        
+        // The wifi objs contain the fields from the GQL
+        TheWifiData.forEach(function(obj) {
+            rowArray = [ obj.fcfs_seq_id, obj.device_tag, obj.session_id, obj.event_id, obj.manufacturer_index, obj.patron_index, obj.localtime, obj.servertime ]
+            let row = rowArray.join(",");
+            csvContent += row + "\r\n";
+            // This happens many times, but it should all be the same,
+            // so multiple assignments won't matter...
+            seq_id = obj.fcfs_seq_id;
+            tag = obj.device_tag
+        });
+
+        console.log(csvContent);
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", seq_id + "_" + tag + ".csv");
+        document.body.appendChild(link); // Required for FF
+        link.click()
+    }
+
     form.addEventListener("submit", handleSubmit);
+    document.getElementById("downloadbutton").onclick = handleDownload;
 
 </script>
