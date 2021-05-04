@@ -3,7 +3,10 @@ LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 
 all: input-configuration session-counter wifi-hardware-search-cli
 
-deps:
+versioning:
+	@echo $(VERSION) > version.txt
+
+deps: versioning
 	go mod download
 
 input-configuration: deps
