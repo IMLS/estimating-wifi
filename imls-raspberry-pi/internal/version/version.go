@@ -1,7 +1,8 @@
 package version
 
-const version = "v0.0.0"
+// Set this with -ldflags at build time.
+var Semver string
 
 func GetVersion() string {
-	return version;
+	return Semver
 }

@@ -10,7 +10,8 @@ session-counter: deps
 	GOPATH=$$PWD/release go install gsa.gov/18f/session-counter
 
 wifi-hardware-search-cli: deps
-	GOPATH=$$PWD/release go install gsa.gov/18f/find-ralink
+	rm -f release/bin/find-ralink
+	GOPATH=$$PWD/release go install -ldflags "-X gsa.gov/18f/version.Semver=v1.0.0" gsa.gov/18f/find-ralink 
 
 test:
 	go test ./internal/wifi-hardware-search/lshw/*.go
