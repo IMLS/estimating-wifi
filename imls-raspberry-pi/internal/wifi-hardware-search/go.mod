@@ -1,3 +1,3 @@
-module github.com/jadudm/imls-wifi-adapter-search
+module gsa.gov/18f/wifi-hardware-search
 
 go 1.16

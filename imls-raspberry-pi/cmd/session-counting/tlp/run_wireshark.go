@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jadudm/imls-wifi-adapter-search/models"
-	"github.com/jadudm/imls-wifi-adapter-search/search"
+	"gsa.gov/18f/wifi-hardware-search/models"
+	"gsa.gov/18f/wifi-hardware-search/search"
 	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/constants"
 )

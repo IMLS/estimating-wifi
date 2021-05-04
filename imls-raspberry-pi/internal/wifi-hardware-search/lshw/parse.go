@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"regexp"
 
-	"github.com/jadudm/imls-wifi-adapter-search/config"
-	"github.com/jadudm/imls-wifi-adapter-search/models"
+	"gsa.gov/18f/wifi-hardware-search/config"
+	"gsa.gov/18f/wifi-hardware-search/models"
 )
 
 // PURPOSE

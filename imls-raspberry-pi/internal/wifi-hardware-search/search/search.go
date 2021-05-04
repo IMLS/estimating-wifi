@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jadudm/imls-wifi-adapter-search/config"
-	"github.com/jadudm/imls-wifi-adapter-search/lshw"
-	"github.com/jadudm/imls-wifi-adapter-search/models"
+	"gsa.gov/18f/wifi-hardware-search/config"
+	"gsa.gov/18f/wifi-hardware-search/lshw"
+	"gsa.gov/18f/wifi-hardware-search/models"
 )
 
 // The text file is embedded at compile time.
