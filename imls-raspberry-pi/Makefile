@@ -10,13 +10,17 @@ deps: versioning
 	go mod download
 
 input-configuration: deps
-	GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/input-initial-configuration
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/input-initial-configuration
 
 session-counter: deps
-	GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/session-counter
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/session-counter
 
 wifi-hardware-search-cli: deps
-	GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink 
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink
+
+clean:
+	chmod +w -R release/{bin,pkg}*
+	rm -rf release/{bin,pkg}
 
 test:
 	go test ./internal/wifi-hardware-search/lshw/*.go
