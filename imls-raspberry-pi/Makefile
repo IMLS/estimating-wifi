@@ -18,6 +18,9 @@ session-counter: deps
 wifi-hardware-search-cli: deps
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink
 
+release: all
+	gh release --title '${VERSION} binaries' create ${VERSION} release/bin/linux_arm/*
+
 clean:
 	chmod +w -R release/{bin,pkg}*
 	rm -rf release/{bin,pkg}
