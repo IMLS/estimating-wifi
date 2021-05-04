@@ -17,9 +17,9 @@ import (
 	"gsa.gov/18f/input-initial-configuration/cryptopasta"
 	"gsa.gov/18f/input-initial-configuration/pi"
 	"gsa.gov/18f/input-initial-configuration/wordlist"
+	"gsa.gov/18f/version"
 )
 
-const VERSION = "0.0.3"
 const lookup = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const yamlPath = "/opt/imls/auth.yaml"
 
@@ -271,7 +271,7 @@ func main() {
 
 	// Dump version and exit
 	if *versionPtr {
-		fmt.Println(VERSION)
+		fmt.Println(version.GetVersion())
 		os.Exit(0)
 	}
 

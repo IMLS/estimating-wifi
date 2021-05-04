@@ -14,6 +14,7 @@ import (
 	"gsa.gov/18f/find-ralink/constants"
 	"gsa.gov/18f/find-ralink/lshw"
 	"gsa.gov/18f/find-ralink/models"
+	"gsa.gov/18f/version"
 )
 
 func findMatchingDevice(wlan *models.Device) {
@@ -149,7 +150,7 @@ func main() {
 	// VERSION
 	// If they just want the version, print it and exit.
 	if *versionPtr {
-		fmt.Println("Version", constants.VERSION)
+		fmt.Println(version.GetVersion())
 		os.Exit(0)
 	}
 

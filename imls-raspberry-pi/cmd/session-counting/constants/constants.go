@@ -11,5 +11,3 @@ const AuthPath = "/opt/imls/auth.yaml"
 
 const AuthTokenKey = "AUTHTOKEN"
 const AuthEmailKey = "AUTHEMAIL"
-
-const VERSION = "v0.0.2"

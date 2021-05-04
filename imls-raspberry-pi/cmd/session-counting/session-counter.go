@@ -10,8 +10,8 @@ import (
 
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/tlp"
+	"gsa.gov/18f/version"
 )
 
 func run(ka *tlp.Keepalive, cfg *config.Config) {
@@ -52,7 +52,7 @@ func handleFlags() {
 
 	// If they just want the version, print and exit.
 	if *versionPtr {
-		fmt.Println("Version", constants.VERSION)
+		fmt.Println(version.GetVersion())
 		os.Exit(0)
 	}
 
