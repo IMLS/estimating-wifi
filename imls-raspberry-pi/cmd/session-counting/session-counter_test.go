@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"testing"
 
@@ -168,7 +170,10 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 
 func TestRawToUid(t *testing.T) {
 	cfg := new(config.Config)
-	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
+	_, filename, _, _ := runtime.Caller(0)
+	fmt.Println(filename)
+	path := filepath.Dir(filename)
+	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	ka := tlp.NewKeepalive(cfg)
 
 	// var buf bytes.Buffer

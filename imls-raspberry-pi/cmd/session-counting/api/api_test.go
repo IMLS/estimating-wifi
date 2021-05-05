@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"gsa.gov/18f/session-counter/config"
@@ -15,7 +17,9 @@ const dbIterations = 2000
 
 func Test_get_manufactuerer(t *testing.T) {
 	cfg := config.Config{}
-	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 
 	var tests = []struct {
 		mac  string
@@ -46,8 +50,10 @@ func Test_get_manufactuerer(t *testing.T) {
 // this loop will find it. When the DB isn't closed properly,
 // this will fail around 1078ish connections.
 func Test_thrash_db(t *testing.T) {
-	// cfg := config.Config{}
-	// cfg.Manufacturers.Db = "/home/pi/git/imls/session-counter/manufacturer-db/manufacturers.sqlite"
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	config.SetConfigPath(filepath.Join(path, "..", "test", "config.yaml"))
+
 	cfg := config.ReadConfig()
 
 	for ndx := 0; ndx < dbIterations; ndx++ {
@@ -90,6 +96,10 @@ func _Test_GetToken(t *testing.T) {
 }
 
 func _Test_StoreContent(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	config.SetConfigPath(filepath.Join(path, "..", "test", "config.yaml"))
+
 	cfg := config.ReadConfig()
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()
@@ -100,6 +110,10 @@ func _Test_StoreContent(t *testing.T) {
 }
 
 func _Test_LogEvent(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	config.SetConfigPath(filepath.Join(path, "..", "test", "config.yaml"))
+
 	cfg := config.ReadConfig()
 	// Fill in the rest of the config.
 	cfg.SessionId = config.CreateSessionId()

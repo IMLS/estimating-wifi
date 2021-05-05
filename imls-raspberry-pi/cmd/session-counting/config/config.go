@@ -49,7 +49,6 @@ func devConfig() *Config {
 	return cfg
 }
 
-
 func ReadAuth() (*AuthConfig, error) {
 	_, err := os.Stat(constants.AuthPath)
 	if err != nil {
@@ -99,4 +98,12 @@ func ReadConfig() *Config {
 	}
 
 	return cfg
+}
+
+func SetConfigPath(path string) {
+	constants.ConfigPath = path
+}
+
+func SetAuthPath(path string) {
+	constants.AuthPath = path
 }
