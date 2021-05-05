@@ -1,6 +1,7 @@
-VERSION = $(shell git describe --tags --abbrev=0)
+VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 ENVVARS = CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7
+
 all: input-configuration session-counter wifi-hardware-search-cli
 
 versioning:
@@ -19,7 +20,12 @@ wifi-hardware-search-cli: deps
 	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink
 
 release: all
-	gh release --title '${VERSION} binaries' create ${VERSION} release/bin/linux_arm/*
+	git tag ${VERSION}
+	git push origin --tags
+	gh release create \
+		--title '${VERSION} binaries' \
+		--notes "Release by $(shell git config user.email) on $(shell date)" \
+		${VERSION} release/bin/linux_arm/*
 
 clean:
 	mkdir -p release/bin release/pkg
