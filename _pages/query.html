@@ -122,7 +122,47 @@
                     document.body.appendChild(link); // Required for FF
                     link.click()
                 }
-                
+
+                return handler;
+            }
+
+            function tableHandler(data) {
+                console.log("outer");
+                function handler (data) {
+                    console.log("inner");
+                    var seq_id = parts["fcfs_seq_id"];
+                    var tag = parts["device_tag"];
+                    var arr = data.data.items.wifi_v1
+
+                    // Add a header row. Make sure it aligns with the fields below.
+                    //headerRow = "fcfs_seq_id,device_tag,session_id,event_id,manufacturer_index,patron_index,localtime,servertime\r\n";
+                    //csvContent += headerRow;
+                    
+                    tab = document.createElement("table");
+                    headers = rowArray = [ "fcfs_seq_id", "device_tag", "session_id", "event_id", "manufacturer_index", "patron_index", "localtime", "servertime" ];
+                    tr = document.createElement("tr");
+                    headers.forEach(function (s) {
+                        td = document.createElement("td");
+                        td.innerText = s;
+                        tr.appendChild(td);
+                    });
+                    tab.appendChild(tr);
+
+                    // The wifi objs contain the fields from the GQL
+                    arr.forEach(function(obj) {
+                        tr = document.createElement("tr");
+                        rowArray = [ obj.fcfs_seq_id, obj.device_tag, obj.session_id, obj.event_id, obj.manufacturer_index, obj.patron_index, obj.localtime, obj.servertime ]
+                        rowArray.forEach(function (o) {
+                            td = document.createElement("td");
+                            td.innerText = o;
+                            tr.appendChild(td);
+                        });
+                        tab.appendChild(tr);
+                    });
+
+                    console.log(tab);
+                    document.body.appendChild(tab);
+                }
                 return handler;
             }
 
@@ -134,11 +174,10 @@
 
             // Now the wifi query
             var wifiQuery = buildWifiQuery(parts["fcfs_seq_id"], parts["device_tag"]);
-            console.log("query", wifiQuery);
-
+            
             fetch(gqlUrl(parts["key"]), gqlOptions(wifiQuery))
                 .then(res => res.json())
-                .then(returnCSVHandler(parts))
+                .then(tableHandler(parts))
                 .catch(failHandler);
         </script>
     </body>
