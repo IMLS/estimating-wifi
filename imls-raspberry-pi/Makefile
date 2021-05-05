@@ -1,6 +1,6 @@
-VERSION = $(shell git describe --abbrev=0)
+VERSION = $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
-
+ENVVARS = CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7
 all: input-configuration session-counter wifi-hardware-search-cli
 
 versioning:
@@ -10,13 +10,13 @@ deps: versioning
 	go mod download
 
 input-configuration: deps
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/input-initial-configuration
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/input-initial-configuration
 
 session-counter: deps
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/session-counter
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/session-counter
 
 wifi-hardware-search-cli: deps
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink
 
 release: all
 	gh release --title '${VERSION} binaries' create ${VERSION} release/bin/linux_arm/*
