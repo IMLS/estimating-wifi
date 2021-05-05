@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><title>query</title></head>
+    <body>
+        <script>
+            SEARCH_LIMIT = 100;
+
+            function queryComponents (query) {
+                query = query.replace("?", "");
+                split = query.split("&");
+                console.log("split", split);
+                parts = {}
+                for (ndx = 0 ; ndx < split.length ; ndx++) {
+                    // Each part needs to be of the form a=b
+                    // This could all be some cool dictionary thing.
+                    let re_seq = /^fcfs_seq_id=([A-Z]{2}[0-9]{4}-[0-9]{3})$/
+                    let re_tag = /^device_tag=([-a-zA-Z0-9]{0,32})$/
+                    let re_key = /^key=([a-zA-Z0-9]{40})$/
+                    let re_query = /^query=([a-zA-Z0-9\{\}\:]{0,1024})$/
+
+                    if (split[ndx].match(re_seq)) {
+                        let matched = split[ndx].match(re_seq);
+                        parts["fcfs_seq_id"] = matched[1]
+                    } 
+                    
+                    if (split[ndx].match(re_tag)) {
+                        let matched = split[ndx].match(re_tag);
+                        parts["device_tag"] = matched[1]
+                    }
+                    
+                    if (split[ndx].match(re_key)) {
+                        let matched = split[ndx].match(re_key);
+                        parts["key"] = matched[1]
+
+                    }
+                    
+                    if (split[ndx].match(re_query)) {
+                        let matched = split[ndx].match(re_query);
+                        parts["query"] = matched[1]
+
+                    }
+
+                }
+
+                return parts;
+            }
+
+
+            function gqlUrl (key) {
+                return `https://api.data.gov/TEST/10x-imls/v1/graphql/?api_key=${key}`;
+            }
+
+            function gqlOptions(query) {
+                const options = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        query: query
+                    })
+                };
+                return options;
+            }
+
+
+            function buildWifiQuery(fcfs_seq_id, device_tag) {
+                return `
+                {
+                    items {
+                        wifi_v1(limit: ${SEARCH_LIMIT}, 
+                                filter: { fcfs_seq_id: {_eq:"${fcfs_seq_id}"}, 
+                                        device_tag: {_eq: "${device_tag}"}
+                                        },
+                                sort: ["-id"] 
+                                ) {
+                            id
+                            device_tag
+                            fcfs_seq_id
+                            session_id
+                            event_id
+                            manufacturer_index
+                            patron_index
+                            servertime
+                            localtime
+                        }
+                    }
+                }`
+            }
+
+            function failHandler(e) {
+                console.log("fail", e);
+            }
+
+            function returnCSVHandler(parts) {
+                function handler (data) {
+                    let csvContent = "data:text/csv;charset=utf-8,";
+                    var seq_id = parts["fcfs_seq_id"];
+                    var tag = parts["device_tag"];
+                    var arr = data.data.items.wifi_v1
+
+                    // Add a header row. Make sure it aligns with the fields below.
+                    //headerRow = "fcfs_seq_id,device_tag,session_id,event_id,manufacturer_index,patron_index,localtime,servertime\r\n";
+                    //csvContent += headerRow;
+                    
+                    // The wifi objs contain the fields from the GQL
+                    arr.forEach(function(obj) {
+                        rowArray = [ obj.fcfs_seq_id, obj.device_tag, obj.session_id, obj.event_id, obj.manufacturer_index, obj.patron_index, obj.localtime, obj.servertime ]
+                        let row = rowArray.join(",");
+                        csvContent += row + "\r\n";
+                        // This happens many times, but it should all be the same,
+                        // so multiple assignments won't matter...
+                        seq_id = obj.fcfs_seq_id;
+                        tag = obj.device_tag
+                    });
+
+                    console.log(csvContent);
+                    var encodedUri = encodeURI(csvContent);
+                    var link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", seq_id + "_" + tag + ".csv");
+                    document.body.appendChild(link); // Required for FF
+                    link.click()
+                }
+                
+                return handler;
+            }
+
+            console.log(window.location.search);
+            parts = queryComponents(window.location.search);
+            console.log("parts", parts);
+
+            // Now that the URL is split...
+
+            // Now the wifi query
+            var wifiQuery = buildWifiQuery(parts["fcfs_seq_id"], parts["device_tag"]);
+            console.log("query", wifiQuery);
+
+            fetch(gqlUrl(parts["key"]), gqlOptions(wifiQuery))
+                .then(res => res.json())
+                .then(returnCSVHandler(parts))
+                .catch(failHandler);
+        </script>
+    </body>
+</html>
