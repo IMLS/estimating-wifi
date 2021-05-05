@@ -11,6 +11,7 @@ BINARY_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION"
 for bin in "find-ralink" "input-initial-configuration" "session-counter"
 do
     curl -L -s "$BINARY_URL/$bin" -o /usr/local/bin/$bin
+    chmod +x /usr/local/bin/$bin
 done
 
 # unpack playbook into /opt/imls/source.
