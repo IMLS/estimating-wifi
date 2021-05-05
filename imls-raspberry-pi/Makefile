@@ -22,7 +22,8 @@ release: all
 	gh release --title '${VERSION} binaries' create ${VERSION} release/bin/linux_arm/*
 
 clean:
-	chmod +w -R release/{bin,pkg}*
+	mkdir -p release/bin release/pkg
+	chmod -R +w release/{bin,pkg}*
 	rm -rf release/{bin,pkg}
 
 test:
