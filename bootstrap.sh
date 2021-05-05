@@ -4,9 +4,10 @@
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
 # NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
 # NOREBOOT - prevents reboot at end of bootstrap.sh
+# DEVELOP - sets NOLOCKDOWN, NOREBOOT and pulls from development branch instead of production versions.
 #
 # Usage:
-# NOKEYREAD=1 NOLOCKDOWN=1 bash <(curl -s ...)
+# DEVELOP=1 bash <(curl -s ...)
 
 # We assume this script will be curl'd in.
 # We assume it will be curl'd in and sudo will prompt for a password.
@@ -21,13 +22,7 @@
 # Here be krackens.
 
 # CRITICAL GLOBALS
-REPOS_ROOT="https://github.com/jadudm"
-PLAYBOOK_REPOS="imls-client-pi-playbook"
-PLAYBOOK_URL="${REPOS_ROOT}/${PLAYBOOK_REPOS}"
 PLAYBOOK_WORKING_DIR="/opt/imls"
-INITIAL_CONFIGURATION_BINARY_URL="https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.9/input-initial-configuration"
-RALINK_DIR="/tmp/ralink"
-RALNK_BINARY="https://github.com/jadudm/find-ralink/releases/download/v0.0.9/find-ralink"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
@@ -146,48 +141,42 @@ fix_the_time () {
     restore_console
 }
 
+shim () {
+    echo "Setting up the environment."
+    if [[ -z "${DEVELOP}" ]]; then
+        _err "Development shim not implemented yet."
+        exit 1
+    else
+        sudo bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim)
+    fi
+}
+
 check_for_usb_wifi () {
     echo "Checking for wifi..."
     mangle_console
     sudo apt install -y lshw
-    # We need better time.
-
-
-    rm -rf ${RALINK_DIR}
-    mkdir -p ${RALINK_DIR}
-    pushd ${RALINK_DIR}
-        rm -f find-ralink
-        curl -L -s -o find-ralink ${RALNK_BINARY}
-        chmod 755 find-ralink
-
-        if [[ "$(./find-ralink --exists)" =~ "false" ]]; then
-            restore_console
-            echo "********************* PANIC OH NOES! *********************"
-            echo "We think you did not plug in the USB wifi adapter!"
-            echo "Please do the following:"
-            echo ""
-            echo " 1. Plug in the USB wifi adapter."
-            echo " 2. Push the up arrow. (This brings back the bash command.)"
-            echo " 3. Press enter."
-            echo ""
-            echo "This will start the setup process again."
-            echo "********************* PANIC OH NOES! *********************"
-            echo ""
-            exit
-        fi
-    popd
+    if [[ "$(/usr/local/bin/find-ralink --exists)" =~ "false" ]]; then
+        restore_console
+        echo "********************* PANIC OH NOES! *********************"
+        echo "We think you did not plug in the USB wifi adapter!"
+        echo "Please do the following:"
+        echo ""
+        echo " 1. Plug in the USB wifi adapter."
+        echo " 2. Push the up arrow. (This brings back the bash command.)"
+        echo " 3. Press enter."
+        echo ""
+        echo "This will start the setup process again."
+        echo "********************* PANIC OH NOES! *********************"
+        echo ""
+        exit 1
+    fi
     restore_console
 }
 
 read_initial_configuration () {
-    # Fetch the binary.
-    pushd /tmp
-        # 20210427 MCJ Again, in dev/testing conditions, wipe things out.
-        rm -f iic
-        curl -L -s -o iic ${INITIAL_CONFIGURATION_BINARY_URL}
-        chmod 755 iic
-        sudo ./iic --path ${PLAYBOOK_WORKING_DIR}/auth.yaml --fcfs-seq --tag --word-pairs --write
-    popd
+    # just in case
+    mkdir -p $PLAYBOOK_WORKING_DIR
+    sudo /usr/local/bin/input-initial-configuration --path ${PLAYBOOK_WORKING_DIR}/auth.yaml --fcfs-seq --tag --word-pairs --write
 }
 
 bootstrap_ansible () {
@@ -204,16 +193,6 @@ bootstrap_ansible () {
     sudo apt-get install -y ansible
 }
 
-install_prerequisites () {
-    sudo apt-get install -y git
-}
-
-setup_playbook_dir () {
-    sudo rm -rf $PLAYBOOK_WORKING_DIR
-    sudo mkdir -p $PLAYBOOK_WORKING_DIR
-    sudo chown -R pi:pi $PLAYBOOK_WORKING_DIR
-}
-
 # PURPOSE
 # This clones and runs the playbook for configuring the
 # RPi for the IMLS/10x/18F data collection pilot.
@@ -221,25 +200,20 @@ ansible_pull_playbook () {
     _status "Installing hardening playbook."
     ansible-galaxy collection install devsec.hardening
 
-    pushd $PLAYBOOK_WORKING_DIR
-        _status "Cloning the playbook: ${PLAYBOOK_URL}"
-        # 20210427 MCJ Adding a shallow clone.
-        git clone --depth=1 $PLAYBOOK_URL
-        pushd $PLAYBOOK_REPOS
-            _status "Running the playbook. This will take a while."
-            # For testing/dev purposes, we might not want to lock things down
-            # when we're done. The lockdown flag is required to run the
-            # hardening and lockdown roles.
+    pushd $PLAYBOOK_WORKING_DIR/source/imls-playbook
+        _status "Running the playbook. This will take a while."
+        # For testing/dev purposes, we might not want to lock things down
+        # when we're done. The lockdown flag is required to run the
+        # hardening and lockdown roles.
 
-            # -z checks if the var is UNSET.
-            if [[ -z "${NOLOCKDOWN}" ]]; then
-                ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes"
-            else
-                _status "Running playbook WITHOUT lockdown"
-                ansible-playbook -i inventory.yaml playbook.yaml
-            fi
-            ANSIBLE_EXIT_STATUS=$?
-        popd
+        # -z checks if the var is UNSET.
+        if [[ -z "${NOLOCKDOWN}" || -v "${DEVELOP}" ]]; then
+            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=`cat ../prod-version.txt`"
+        else
+            _status "Running playbook WITHOUT lockdown"
+            ansible-playbook -i inventory.yaml playbook.yaml
+        fi
+        ANSIBLE_EXIT_STATUS=$?
     popd
     _status "Done running playbook."
     if [ $ANSIBLE_EXIT_STATUS -ne 0 ]; then
@@ -265,10 +239,11 @@ main () {
     echo "*****************************************************************"
     initial_update
     fix_the_time
+    # set up the staging area (binaries and playbook).
+    production_shim
     check_for_usb_wifi
-    setup_playbook_dir
     if [[ -z "${NOKEYREAD}" ]]; then
-        # If NOREAD is undefined, we should read in the config.
+        # If NOKEYREAD is undefined, we should read in the config.
         read_initial_configuration
     else
         echo " -- SKIPPING CONFIG ENTRY FOR TESTING PURPOSES --"
@@ -276,7 +251,6 @@ main () {
     create_logfile
     setup_logging
     bootstrap_ansible
-    install_prerequisites
     ansible_pull_playbook
     disable_interactive_login
     if [ $SOMETHING_WENT_WRONG -ne 0 ]; then
@@ -286,8 +260,8 @@ main () {
         _status "All done!"
         _status "We're rebooting in one minute!"
 
-        # If the NOREBOOT flag is NOT set, then reboot.
-        if [[ -z "${NOREBOOT}" ]]; then
+        # If the NOREBOOT or DEVELOP flags are NOT set, then reboot.
+        if [[ -z "${NOREBOOT}" && -z "${DEVELOP}" ]]; then
             sleep 60
             sudo reboot
         else

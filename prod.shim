@@ -18,6 +18,7 @@ done
 DEST="/opt/imls"
 VLESS_VERSION=`echo $VERSION | cut -b2-`  # remove leading v.
 SOURCE_URL="https://github.com/$GITHUB_REPO/archive/refs/tags/$VERSION.tar.gz"
+mkdir -p $DEST
 pushd $DEST
 curl -L -s $SOURCE_URL | tar xvz
 if [ -d source/ ]
