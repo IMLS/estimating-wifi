@@ -4,9 +4,6 @@ ENVVARS = CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7
 
 all: input-configuration session-counter wifi-hardware-search-cli
 
-versioning:
-	@echo $(VERSION) > version.txt
-
 deps: versioning
 	go mod download
 
