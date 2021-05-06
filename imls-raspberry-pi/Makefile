@@ -4,7 +4,7 @@ ENVVARS = CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7
 
 all: input-configuration session-counter wifi-hardware-search-cli
 
-deps: versioning
+deps: 
 	go mod download
 
 input-configuration: deps
@@ -24,8 +24,11 @@ release: all
 		--notes "Release by $(shell git config user.email) on $(shell date)" \
 		${VERSION} release/bin/linux_arm/*
 
+# 2020506 MCJ Do we do anything different in dev? 
+dev: release
+
 clean:
-	mkdir -p release/bin release/pkg
+	mkdir -p release/{bin,pkg}
 	chmod -R +w release/{bin,pkg}*
 	rm -rf release/{bin,pkg}
 

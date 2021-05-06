@@ -1,6 +1,11 @@
 .PHONY: test
 
-test:
+dev:
 	ansible-playbook -i inventory.yaml playbook.yaml \
-        --extra-vars "lockdown=yes, preserve_ssh=yes, preserve_users=yes" \
+        --extra-vars "preserve_ssh=yes, preserve_users=yes" \
+        --extra-vars "version=<<VERSION>>"
+
+release:
+    ansible-playbook -i inventory.yaml playbook.yaml \
+        --extra-vars "lockdown=yes, preserve_ssh=no, preserve_users=no" \
         --extra-vars "version=<<VERSION>>"
