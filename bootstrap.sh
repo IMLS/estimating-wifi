@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # TESTING ENV VARS
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
@@ -124,7 +124,6 @@ restore_console () {
 }
 
 initial_update () {
-    # This will need lshw
     echo "Doing an initial software update."
     mangle_console
     sudo apt update
@@ -143,11 +142,14 @@ fix_the_time () {
 
 shim () {
     echo "Setting up the environment."
-    if [[ -z "${DEVELOP}" ]]; then
+    mangle_console
+    if [[ ! -z "${DEVELOP}" ]]; then
+        restore_console
         _err "Development shim not implemented yet."
         exit 1
     else
-        sudo bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim)
+        bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim)
+        restore_console
     fi
 }
 
@@ -240,7 +242,7 @@ main () {
     initial_update
     fix_the_time
     # set up the staging area (binaries and playbook).
-    production_shim
+    shim
     check_for_usb_wifi
     if [[ -z "${NOKEYREAD}" ]]; then
         # If NOKEYREAD is undefined, we should read in the config.

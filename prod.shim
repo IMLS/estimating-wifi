@@ -10,20 +10,17 @@ BINARY_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION"
 # install binaries into /usr/local/bin.
 for bin in "find-ralink" "input-initial-configuration" "session-counter"
 do
-    curl -L -s "$BINARY_URL/$bin" -o /usr/local/bin/$bin
-    chmod +x /usr/local/bin/$bin
+    sudo curl -L -s "$BINARY_URL/$bin" -o /usr/local/bin/$bin
+    sudo chmod +x /usr/local/bin/$bin
 done
 
 # unpack playbook into /opt/imls/source.
 DEST="/opt/imls"
 VLESS_VERSION=`echo $VERSION | cut -b2-`  # remove leading v.
 SOURCE_URL="https://github.com/$GITHUB_REPO/archive/refs/tags/$VERSION.tar.gz"
-mkdir -p $DEST
+sudo mkdir -p $DEST
 pushd $DEST
-curl -L -s $SOURCE_URL | tar xvz
-if [ -d source/ ]
-then
-    rm -rf source/
-fi
-mv "$REPO_NAME-$VLESS_VERSION" source
+sudo curl -L -s $SOURCE_URL | tar xvz
+[ -d source/ ] && sudo rm -rf source/
+sudo mv "$REPO_NAME-$VLESS_VERSION" source
 popd
