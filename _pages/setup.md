@@ -9,9 +9,32 @@ blockerstep: 10
 
 These instructions are for setting up a Raspberry Pi for participation in the IMLS/18F/10x WIFISESS pilot. We recommend reading all of the instructions first, and then following them step-by-step.
 
-If the setup fails in any way, please [reach out to the 18F team]({{site.questionformurl}}), and we'll connect with you to help complete the setup.
+If the setup fails in any way, please [reach out to the 18F team]({{site.questionformurl}}), and we'll connect with you to help complete the setup. **Remember: you can't hurt the Pi, and you can always start over if things go wrong**. The worst that can happen is that you have to do it again. (Trust us... we've gone through this process *dozens* of times.) 
 
 We strongly recommend you [request an api.data.gov access key]({{ "/requestkey/" | prepend: site.baseurl }}) before you do anything else. It takes 2 minutes (really), but we have to push buttons in the background. So, go ahead and get that process started right away.
+
+## Summary
+
+This is a summary of the setup process that follows. We **highly recommend** you read the full instructions carefully in full before proceeding, and follow them carefully when you do the setup.
+
+1. Read the instructions.
+2. Request an [api.data.gov](https://api.data.gov/signup/) key.
+3. Email the team (or [use the form]({{site.questionformurl}})) to let us know that you created your key.
+4. Image the Raspberry Pi using the Raspberry Pi imager. Select the 32-bit, full desktop system.
+5. Insert the SD card into the RPi.
+6. Plug the RPi into an ethernet jack, monitor, keyboard, and mouse, and turn it on.
+7. Select language/keyboard.
+8. Select a timezone.
+9. Skip all other steps. 
+10. On the Pi, open the terminal.
+11. Type `bash <(curl -s -L https://git.io/J3GCG)`
+12. Enter your FCFS Seq Id.
+13. Enter a device tag.
+14. Enter the 14 word pairs that represent your API key.<br>[Convert your key to word pairs on this page]({{"/install/" | prepend: site.baseurl}}).
+15. Wait for the setup to complete. The Pi should reboot.
+16. [Check to see if it is working]({{"/explore/" | prepend: site.baseurl}}). 
+
+What follows is the detailed, step-by-step version of these instructions.
 
 {% assign counter = 0 %}
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Read through the setup instructions
