@@ -38,7 +38,7 @@ The `manufacturer_index` is a number that we assign to each device manufacturer 
 
 The `patron_index` is the same. If you walk into the library, and you are carrying the 37th device we've seen so far, then you become "patron 37." If you leave for more than 2 hours, when you come back, you'll become "patron 392". This resets whenever the device resets. Again, this cannot be traced back to an individual, as there is nothing personally identifiable about the index.
 
-# What does this tells us?
+# What does this tell us?
 
 With this logging, we can do some nifty filtering and (accurate) estimating as to how many people used your wifi for how long. Do we want to filter out devices we saw for 2 minutes or less? We can do that! Do we want to only count devices that were present for 15 minutes or more? We can do that! Are we dictating policy or determining how the WIFISESS element will change in the future by saying these things? **ABSOLUTELY NOT!**
 
