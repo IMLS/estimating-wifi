@@ -1,6 +1,6 @@
 # WHY?
 # If this is first boot, this file will not exist.
-# We will want to reboot after writing this file, as it guarantees the wifi 
+# We will want to reboot after writing this file, as it guarantees the wifi
 # adapter mapping. So, we check, run our code, and at the end of this set of
 # plays, we reboot if the file was *not* present.
 - name: find out if the rules exist already (is this first boot?)
@@ -11,7 +11,7 @@
 - name: install find-ralink tool binary
   ansible.builtin.get_url:
     url: "{{ findralink.binary_url }}"
-    dest: "{{ findralink.install_path }}"
+    dest: "{{ install_path }}"
     owner: root
     group: root
     mode: 0755
@@ -34,7 +34,7 @@
 # (Short of catestrophic errors/failures.)
 - name: do we find an ralink adapter?
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --discover --exists"
+    cmd: "{{ install_path }}/find-ralink --discover --exists"
   register: ralink_exists
   become: yes
 
@@ -48,20 +48,20 @@
 
 - name: get the mac address if it exists
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --discover --extract mac"
+    cmd: "{{ install_path }}/find-ralink --discover --extract mac"
   register: ralink_mac
   become: yes
   when: "'true' in ralink_exists.stdout"
 
 - name: get the logical name of the adapter if it exists
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --discover --extract logicalname"
+    cmd: "{{ install_path }}/find-ralink --discover --extract logicalname"
   register: ralink_logicalname
   become: yes
   when: "'true' in ralink_exists.stdout"
 
-# If we find an adapter, then we can proceed to update 
-# some global config files. 
+# If we find an adapter, then we can proceed to update
+# some global config files.
 - name: write wlan1 into udev rules
   ansible.builtin.lineinfile:
     path: "{{ persistent_rules }}"
@@ -78,26 +78,26 @@
 #
 #   * Raspberry Pi 4B
 #   * Raspberry Pi 3B
-# 
+#
 # In short, it has to be a device that uses the brc driver, and we need to know that there
-# isn't more than one device that does this. We may want to improve the search field, or 
+# isn't more than one device that does this. We may want to improve the search field, or
 # ideally, test on more hardware. For the pilot, though, we constrained to the 4B.
 - name: do we find the default broadcom adapter?
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --search brc --field configuration --exists"
+    cmd: "{{ install_path }}/find-ralink --search brc --field configuration --exists"
   register: brc_exists
   become: yes
 
 - name: get the mac address of the broadcom adapter if it exists
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --search brc --field configuration --extract mac"
+    cmd: "{{ install_path }}/find-ralink --search brc --field configuration --extract mac"
   register: brc_mac
   become: yes
   when: "'true' in brc_exists.stdout"
 
 - name: get the logical name of the broadcom adapter if it exists
   ansible.builtin.command:
-    cmd: "{{ findralink.bin }} --search brc --field configuration --extract logicalname"
+    cmd: "{{ install_path }}/find-ralink --search brc --field configuration --extract logicalname"
   register: brc_logicalname
   become: yes
   when: "'true' in brc_exists.stdout"
@@ -126,7 +126,7 @@
     cmd: udevadm trigger
   become: yes
 
-# Take the USB wifi interface down, set it in monitor mode, and 
+# Take the USB wifi interface down, set it in monitor mode, and
 # then bring it back up.
 - name: take down USB wifi
   ansible.builtin.command:

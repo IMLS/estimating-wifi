@@ -1,7 +1,7 @@
 - name: install session counter binary from github
   ansible.builtin.get_url:
     url: "{{ session_counter.binary_url }}"
-    dest: "{{ session_counter.install_path }}/session-counter"
+    dest: "{{ install_path }}/session-counter"
     owner: root
     group: root
     mode: 0755
@@ -13,31 +13,13 @@
     state: directory
   become: yes
 
-- name: create a working directory (largely unneeded?)
-  ansible.builtin.file:
-    path: "{{ session_counter.workdir }}"
-    state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    mode: 0755
-  become: no
-
-- name: make sure the logdir (is this needed?) is set up
-  ansible.builtin.file:
-    path: "{{ session_counter.logdir }}"
-    state: directory
-    owner: root
-    group: adm
-    mode: 0755
-  become: yes
-
 # We will update the config file in the ansible repository
 # when we want a new config to be used. This will have to update
 # lockstep with a new binary.
 - name: always update these files
   ansible.builtin.copy:
-    src: "files{{session_counter.config_path}}/{{ item }}"
-    dest: "{{session_counter.config_path}}/{{ item }}"
+    src: "files{{config_path}}/{{ item }}"
+    dest: "{{config_path}}/{{ item }}"
     owner: "{{ default_user }}"
     group: "{{ default_user }}"
     mode: '0644'

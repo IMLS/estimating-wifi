@@ -1,5 +1,5 @@
 - name: run input initial configuration
   ansible.builtin.command:
-    cmd: "{{ inputinitial.bin }} --fcfs-seq --tag --word-pairs --write"
+    cmd: "{{ install_path }}/input-initial-configuration --fcfs-seq --tag --word-pairs --write"
   become: yes
-  when: 
+  when:

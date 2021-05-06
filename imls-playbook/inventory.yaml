@@ -5,18 +5,12 @@ all:
       ansible_python_interpreter: /usr/bin/python
   vars:
     default_user: pi
+    install_path: /usr/local/bin
+    config_path: /opt/imls
     session_counter:
-      binary_url: "https://github.com/jadudm/go-session-counter/releases/download/v0.1.0/session-counter"
-      install_path: /usr/local/bin
-      config_path: /opt/imls
-      workdir: /home/pi/session-counter
-      logdir: /var/log/session-counter
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/session-counter"
     findralink:
-      binary_url: "https://github.com/jadudm/find-ralink/releases/download/v0.0.9/find-ralink"
-      install_path: /usr/local/bin
-      bin: /usr/local/bin/find-ralink
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/find-ralink"
     inputinitial:
-      binary_url: "https://github.com/jadudm/input-initial-configuration/releases/download/v0.0.9/input-initial-configuration"
-      install_path: /usr/local/bin
-      bin: /usr/local/bin/input-initial-configuration
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/input-initial-configuration"
     persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules

@@ -1,5 +1,4 @@
 
 - name: run input script
   ansible.builtin.command:
-    cmd: "{{ inputinitial.bin }} --all --write"
-  
+    cmd: "{{ install_path }}/input-initial-configuration --all --write"
