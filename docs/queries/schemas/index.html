@@ -168,7 +168,7 @@
     device_tag character varying(32),
     &quot;localtime&quot; timestamp with time zone,
     servertime timestamp with time zone DEFAULT current_timestamp,
-    -- session_id: the unique identifier for session, randomly generated when session-counter starts
+    session-counter starts
     session_id character varying(255),
     manufacturer_index integer,
     patron_index integer
