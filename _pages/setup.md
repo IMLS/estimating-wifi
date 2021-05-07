@@ -124,7 +124,7 @@ When you are done, you will have stuck on the heatsinks and fan, inserted it int
 
 ## Step {% assign counter = counter | plus: 1  %}{{counter}}: Prepare the microSD card
 
-We have a separate page that describes how to [set up the microSD card]({{ "preppingthesdcard/" | prepend: site.baseurl }}) 
+We have a separate page that describes how to [set up the microSD card]({{ "/preppingthesdcard/" | prepend: site.baseurl }}) 
 
 If you haven't done this yet, now is a good time to do it. You cannot proceed until you set up your card.
  
