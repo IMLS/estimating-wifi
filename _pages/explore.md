@@ -156,18 +156,18 @@ sidenav: false
         labels = []
         for (var ndx = 0; ndx < counts.length - 1; ndx++) {
             if (ndx == 0) {
-                labels.push("just now");
+                labels.push(`-${counts.length - 1} mins ago`);
             } else if ((ndx % 5) == 0) {
                 labels.push(`-${counts.length - (ndx + 1)}`);
             } else {
                 labels.push(" ");
             }
         }
-        labels.push(`-${counts.length - 1} mins ago`);
+        labels.push("just now");
 
         chartData = {
             // A labels array that can contain any sort of values
-            labels: labels,
+            labels: labels.reverse(),
             // Our series array that contains series objects or in this case series data arrays
             series: [ counts ]
         };
