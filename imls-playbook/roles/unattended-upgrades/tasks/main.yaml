@@ -46,3 +46,10 @@
     - Unattended-Upgrade::Automatic-Reboot "true";
     - Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
     - Unattended-Upgrade::SyslogEnable "true";
+
+- name: force a reboot at 3am every morning
+  ansible.builtin.cron:
+    name: "reboot_daily"
+    minute: "0"
+    hour: "3"
+    job: "reboot"
