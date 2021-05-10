@@ -43,7 +43,7 @@ sidenav: false
 <div class="grid-container" id="toggleme" style="display:none">
     <div class="grid-row">
         <div class="grid-col-9">
-            <p>The device <span id="device_tag"></span> last started up on <span id="last_reboot_date"></span> at <span id="last_reboot_time"></span>.</p>
+            <!-- <p>The device <span id="device_tag"></span> last started up on <span id="last_reboot_date"></span> at <span id="last_reboot_time"></span>.</p> -->
             <p>The last wifi observation was <span id="last_wifi_obs"></span>.</p>
             <p>How many devices have been seen recently?</p>
         </div>
@@ -190,7 +190,7 @@ sidenav: false
         // {data : { items : { events_v1 : [ obj ... ]}}}
         // where objects are keyed with the fields requested in the GraphQL query.
         var arr = data.data.items.events_v1
-        setResultText(arr);
+        // setResultText(arr);
     }
 
     function wifiResult(data) {
