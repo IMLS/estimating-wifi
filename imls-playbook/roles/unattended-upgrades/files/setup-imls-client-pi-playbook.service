@@ -3,8 +3,8 @@ Description=Install binaries and the IMLS playbook.
 
 [Service]
 ExecStartPre=sh -c "mkdir -p /opt/imls"
-ExecStartPre=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim -o /opt/imls/prod.shim"
-ExecStart="bash /opt/imls/prod.shim"
+ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim -o /opt/imls/prod.shim"
+ExecStart=bash /opt/imls/prod.shim
 Type=oneshot
 
 [Install]

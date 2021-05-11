@@ -4,5 +4,5 @@ Description=Run the IMLS playbook.
 [Service]
 WorkingDirectory=/opt/imls/source/imls-playbook
 ExecStart=sh -c "ansible-galaxy collection install devsec.hardening"
-ExecStart=sh -c 'ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=`cat ../prod-version.txt`"'
+ExecStart=sh -c 'ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=`cat /opt/imls/source/prod-version.txt`"'
 Type=oneshot
