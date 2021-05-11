@@ -35,7 +35,8 @@ clean:
 test:
 	go test ./internal/wifi-hardware-search/lshw/*.go
 	go test ./internal/wifi-hardware-search/search/*.go
+	go test ./internal/config/*.go
 	go test ./cmd/input-configuration/*.go
 	go test ./cmd/session-counting/*.go
 	go test ./cmd/session-counting/api/*.go
-	go test ./cmd/session-counting/config/*.go
+	

@@ -1,4 +1,4 @@
-module gsa.gov/18f/find-ralink
+module gsa.gov/18f/wifi-hardware-search-cli
 
 go 1.16
 

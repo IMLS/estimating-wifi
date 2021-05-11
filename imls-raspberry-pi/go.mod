@@ -10,9 +10,19 @@ replace gsa.gov/18f/session-counter v0.0.0 => ./cmd/session-counting
 
 replace gsa.gov/18f/version v0.0.0 => ./internal/version
 
+replace gsa.gov/18f/config v0.0.0 => ./internal/config
+
+replace gsa.gov/18f/http v0.0.0 => ./internal/http
+
+replace gsa.gov/18f/cryptopasta v0.0.0 => ./internal/cryptopasta
+
 replace gsa.gov/18f/wifi-hardware-search v0.0.0 => ./internal/wifi-hardware-search
 
 require (
-	gopkg.in/yaml.v2 v2.4.0
-	gsa.gov/18f/session-counter v0.0.0
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
+	github.com/fatih/color v1.10.0 // indirect
+	gsa.gov/18f/input-initial-configuration v0.0.0 // indirect
+	gsa.gov/18f/session-counter v0.0.0 // indirect
+	gsa.gov/18f/version v0.0.0 // indirect
+	gsa.gov/18f/wifi-hardware-search v0.0.0 // indirect
 )
