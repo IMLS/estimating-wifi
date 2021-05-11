@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -44,27 +43,13 @@ func parseConfigFile(path string) (*Config, error) {
 	return nil, fmt.Errorf("config: could not find config file [%v]", path)
 }
 
-func devConfig() *Config {
-	// FIXME consider turning this into an env var
-	cfgPtr := flag.String("config", "config.yaml", "config file")
-	flag.Parse()
-	cfg, err := parseConfigFile(*cfgPtr)
-	if err != nil {
-		log.Println("config: could not load dev config. Exiting.")
-		log.Fatalln(err)
-	}
-	return cfg
-}
-
 func ReadConfig() *Config {
 	// We expect config to be here:
 	//   * /opt/imls/config.yaml
 
-	cfg, err := parseConfigFile(configPath)
+	cfg, err := parseConfigFile(GetConfigPath())
 	if err != nil {
-		fmt.Printf("config: could not find config at default path [%v]\n", configPath)
-		fmt.Println("config: loading dev config")
-		return devConfig()
+		log.Fatal("config: please provide alternative configuration path.")
 	}
 
 	return cfg

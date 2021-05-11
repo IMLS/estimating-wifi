@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"runtime"
 )
 
 const FakeSerial = "CESTNEPASUNESERIE"
@@ -33,17 +34,20 @@ func cpuinfoLines() (lines []string) {
 }
 
 func GetSerial() string {
-	lines := cpuinfoLines()
 	serial := FakeSerial
-	re := regexp.MustCompile(`Serial\s+:\s+([a-f0-9]+)`)
-	for _, line := range lines {
-		// log.Println("line", line)
-		matched := re.FindStringSubmatch(line)
-		if len(matched) > 0 {
-			// log.Println("matched", matched)
-			serial = string(matched[1])
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
+		lines := cpuinfoLines()
+		re := regexp.MustCompile(`Serial\s+:\s+([a-f0-9]+)`)
+		for _, line := range lines {
+			// log.Println("line", line)
+			matched := re.FindStringSubmatch(line)
+			if len(matched) > 0 {
+				// log.Println("matched", matched)
+				serial = string(matched[1])
+			}
 		}
+	} else {
+		log.Fatal("Not running on an RPi. Cannot grab serial number. Exiting.")
 	}
-
 	return serial
 }
