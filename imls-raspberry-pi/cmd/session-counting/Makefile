@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all test clean
 
 all: clean test
 	go build session-counter.go
@@ -12,7 +12,6 @@ install: all
 
 test:
 	go test *.go
-	go test config/*.go
 	go test api/*.go
 
 crossbuild: clean

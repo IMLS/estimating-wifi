@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"gsa.gov/18f/config"
 	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/config"
 )
 
 // This probably should be a proper database.

@@ -4,7 +4,7 @@ import (
 	"log"
 	"testing"
 
-	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/config"
 )
 
 func mapEqual(m1 map[string]int, m2 map[string]int) bool {

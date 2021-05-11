@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"gsa.gov/18f/config"
+	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/wifi-hardware-search/models"
 	"gsa.gov/18f/wifi-hardware-search/search"
-	"gsa.gov/18f/session-counter/config"
-	"gsa.gov/18f/session-counter/constants"
 )
 
 func tshark(cfg *config.Config) []string {

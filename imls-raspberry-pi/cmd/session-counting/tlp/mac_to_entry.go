@@ -3,8 +3,8 @@ package tlp
 import (
 	"log"
 
+	"gsa.gov/18f/config"
 	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/model"
 )
 

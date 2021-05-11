@@ -5,13 +5,14 @@ import (
 	"strings"
 	"time"
 
-	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/config"
+	"gsa.gov/18f/http"
 )
 
 // This posts an array of data to ReVal.
 // Filter out things that were last seen more than zero minutes ago.
 func StoreDevicesCount(cfg *config.Config, tok *config.AuthConfig, session_id int, h map[string]int) error {
-	uri := FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
+	uri := http.FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
 
 	// Remove all the UIDs that we saw more than 0 minutes ago
 	var remove []string
@@ -54,7 +55,7 @@ func StoreDevicesCount(cfg *config.Config, tok *config.AuthConfig, session_id in
 		reportArr = append(reportArr, data)
 	}
 
-	postJSON(cfg, tok, uri, reportArr)
+	http.PostJSON(uri, reportArr)
 	return nil
 
 }

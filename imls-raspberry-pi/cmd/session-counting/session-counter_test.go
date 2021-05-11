@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/config"
 	"gsa.gov/18f/session-counter/tlp"
 )
 

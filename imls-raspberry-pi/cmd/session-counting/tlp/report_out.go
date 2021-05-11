@@ -5,8 +5,9 @@ import (
 	"log"
 	"time"
 
+	"gsa.gov/18f/config"
+	"gsa.gov/18f/http"
 	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/config"
 )
 
 func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
@@ -39,7 +40,7 @@ func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]in
 	http_error_count := 0
 
 	// For event logging
-	el := api.NewEventLogger(cfg)
+	el := http.NewEventLogger(cfg)
 
 	for {
 		select {

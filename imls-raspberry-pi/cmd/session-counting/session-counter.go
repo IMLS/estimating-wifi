@@ -8,8 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"gsa.gov/18f/config"
+	"gsa.gov/18f/http"
 	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/config"
 	"gsa.gov/18f/session-counter/tlp"
 	"gsa.gov/18f/version"
 )
@@ -57,7 +58,7 @@ func handleFlags() {
 	}
 
 	if *showKeyPtr {
-		auth, _ := config.ReadAuth() 
+		auth, _ := config.ReadAuth()
 		fmt.Println(auth.Token)
 		os.Exit(0)
 	}
@@ -75,7 +76,7 @@ func main() {
 	// Make sure the mfg database is in place and can be loaded.
 	api.CheckMfgDatabaseExists(cfg)
 
-	el := api.NewEventLogger(cfg)
+	el := http.NewEventLogger(cfg)
 	el.Log("startup", nil)
 
 	ka := tlp.NewKeepalive(cfg)

@@ -8,7 +8,8 @@ import (
 	"runtime"
 	"testing"
 
-	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/config"
+	"gsa.gov/18f/http"
 )
 
 // This should be much higher, like 2000
@@ -119,7 +120,7 @@ func _Test_LogEvent(t *testing.T) {
 	cfg.SessionId = config.CreateSessionId()
 	cfg.Serial = config.GetSerial()
 	// Create a new logger
-	el := NewEventLogger(cfg)
+	el := http.NewEventLogger(cfg)
 	el.Log("startup", map[string]string{"msg": "starting session-counter"})
 	el.Log("empty", map[string]string{})
 	el.Log("nil", nil)
@@ -162,7 +163,7 @@ func Test_RevalResponseUnmarshall(t *testing.T) {
 		"valid": true
 	  }`
 
-	var rev RevalResponse
+	var rev http.RevalResponse
 	err := json.Unmarshal([]byte(testString), &rev)
 	if err != nil {
 		log.Println("unmarshalling error:", err)

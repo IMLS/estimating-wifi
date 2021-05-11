@@ -7,7 +7,7 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/session-counter/config"
+	"gsa.gov/18f/config"
 )
 
 func CheckMfgDatabaseExists(cfg *config.Config) {
