@@ -1,0 +1,35 @@
+monitoring:
+  # How often we check health, in seconds.
+  pinginterval: 30
+  # The maximum number of HTTP errors we will tolerate
+  # in a window before crashing out and letting systemd restart us.
+  # The counter is reset at the end of each interval.
+  max_http_error_count: 8
+  http_error_interval_mins: 10
+  # How long we maintain a MAC -> UID mapping.
+  # If we don't see a device for this many minutes, then
+  # we drop the mapping. If the device shows up again, it will
+  # be a "new" device.
+  uniqueness_window: 120
+# These are two different endpoints.
+# They will both go through umbrella...
+# So only the path should be
+umbrella:
+  scheme: https
+  host: api.data.gov
+  # Goes through ReVal and ends up in our data table
+  data: /TEST/10x-imls/v1/wifi/
+  # Goes through ReVal and ends up in our events table
+  logging: /TEST/10x-imls/v1/events/
+wireshark:
+  path: /usr/bin/tshark
+  adapter: wlan1
+  # How long to go between wlan checks (minutes)
+  check_wlan: 3
+  # duration is the number of seconds that wireshark
+  # will listen to the adapter before reporting out.
+  # best if this is below one minute.
+  # FIXME: this should not be configurable.
+  duration: 45
+manufacturers:
+  db: /opt/imls/manufacturers.sqlite
