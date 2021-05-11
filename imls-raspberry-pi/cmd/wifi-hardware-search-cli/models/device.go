@@ -1,6 +1,6 @@
 package models
 
-import "gsa.gov/18f/find-ralink/config"
+import "gsa.gov/18f/wifi-hardware-search-cli/config"
 
 type Device struct {
 	Exists        bool

@@ -2,7 +2,7 @@ module gsa.gov/18f/imls-raspberry-pi
 
 go 1.16
 
-replace gsa.gov/18f/find-ralink v0.0.0 => ./cmd/wifi-hardware-search-cli
+replace gsa.gov/18f/wifi-hardware-search-cli v0.0.0 => ./cmd/wifi-hardware-search-cli
 
 replace gsa.gov/18f/input-initial-configuration v0.0.0 => ./cmd/input-configuration
 
@@ -25,4 +25,5 @@ require (
 	gsa.gov/18f/session-counter v0.0.0 // indirect
 	gsa.gov/18f/version v0.0.0 // indirect
 	gsa.gov/18f/wifi-hardware-search v0.0.0 // indirect
+	gsa.gov/18f/wifi-hardware-search-cli v0.0.0 // indirect
 )

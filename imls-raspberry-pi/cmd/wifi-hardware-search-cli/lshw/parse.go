@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"regexp"
 
-	"gsa.gov/18f/find-ralink/config"
-	"gsa.gov/18f/find-ralink/models"
+	"gsa.gov/18f/wifi-hardware-search-cli/config"
+	"gsa.gov/18f/wifi-hardware-search-cli/models"
 )
 
 // PURPOSE

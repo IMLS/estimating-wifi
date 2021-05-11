@@ -14,7 +14,7 @@ session-counter: deps
 	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/session-counter
 
 wifi-hardware-search-cli: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/find-ralink
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/wifi-hardware-search-cli
 
 release: all
 	git tag ${VERSION}

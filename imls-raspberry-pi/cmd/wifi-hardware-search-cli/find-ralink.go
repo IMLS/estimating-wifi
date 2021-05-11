@@ -10,11 +10,11 @@ import (
 	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/text"
-	"gsa.gov/18f/find-ralink/config"
-	"gsa.gov/18f/find-ralink/constants"
-	"gsa.gov/18f/find-ralink/lshw"
-	"gsa.gov/18f/find-ralink/models"
 	"gsa.gov/18f/version"
+	"gsa.gov/18f/wifi-hardware-search-cli/config"
+	"gsa.gov/18f/wifi-hardware-search-cli/constants"
+	"gsa.gov/18f/wifi-hardware-search-cli/lshw"
+	"gsa.gov/18f/wifi-hardware-search-cli/models"
 )
 
 func findMatchingDevice(wlan *models.Device) {
