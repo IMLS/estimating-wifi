@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -euox pipefail
+
+REPO_NAME="imls-pi-stack"
+GITHUB_REPO="cantsin/$REPO_NAME"
+VERSION=`curl -s https://raw.githubusercontent.com/$GITHUB_REPO/main/dev-version.txt`
+BINARY_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION"
+
+# install binaries into /usr/local/bin.
+for bin in "find-ralink" "input-initial-configuration" "session-counter" "log-event"
+do
+    sudo curl -L -s "$BINARY_URL/$bin" -o /usr/local/bin/$bin
+    sudo chmod +x /usr/local/bin/$bin
+done
+
+# unpack playbook into /opt/imls/source.
+DEST="/opt/imls"
+VLESS_VERSION=`echo $VERSION | cut -b2-`  # remove leading v.
+SOURCE_URL="https://github.com/$GITHUB_REPO/archive/refs/tags/$VERSION.tar.gz"
+sudo mkdir -p $DEST
+pushd $DEST
+curl -L -s $SOURCE_URL | sudo tar xz
+[ -d source/ ] && sudo rm -rf source/
+sudo mv "$REPO_NAME-$VLESS_VERSION" source
+popd

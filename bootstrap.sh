@@ -144,8 +144,8 @@ shim () {
     echo "Setting up the environment."
     mangle_console
     if [[ ! -z "${DEVELOP}" ]]; then
+        bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/dev.shim)
         restore_console
-        _err "Development shim not implemented yet."
         exit 1
     else
         bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim)
@@ -213,7 +213,7 @@ ansible_pull_playbook () {
             ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=`cat ../prod-version.txt`"
         else
             _status "Running playbook WITHOUT lockdown"
-            ansible-playbook -i inventory.yaml playbook.yaml
+            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "version=`cat ../dev-version.txt`"
         fi
         ANSIBLE_EXIT_STATUS=$?
     popd
