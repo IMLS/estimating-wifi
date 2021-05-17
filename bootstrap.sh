@@ -77,17 +77,20 @@ _msg () {
 _status () {
     MSG="$1"
     _msg "STATUS" "${GREEN}" "${MSG}"
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap status" --info '{"message": "${MSG}"}'
 }
 
 _debug () {
     MSG="$1"
     _msg "DEBUG" "${YELLOW}" "${MSG}"
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap debug" --info '{"message": "${MSG}"}'
 }
 
 _err () {
     SOMETHING_WENT_WRONG=1
     MSG="$1"
     _msg "ERROR" "${RED}" "${MSG}"
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap error" --info '{"message": "${MSG}"}'
 }
 
 _variable () {
