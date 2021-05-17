@@ -149,10 +149,11 @@ shim () {
     if [[ ! -z "${DEVELOP}" ]]; then
         bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/dev.shim)
         restore_console
-        exit 1
+        _debug "Set up a development environment"
     else
         bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim)
         restore_console
+        _debug "Set up a production environment"
     fi
 }
 
@@ -181,6 +182,7 @@ check_for_usb_wifi () {
 read_initial_configuration () {
     # just in case
     mkdir -p $PLAYBOOK_WORKING_DIR
+    _debug "Running input-initial-configuration"
     sudo /usr/local/bin/input-initial-configuration --path ${PLAYBOOK_WORKING_DIR}/auth.yaml --fcfs-seq --tag --word-pairs --write
 }
 
@@ -251,7 +253,7 @@ main () {
         # If NOKEYREAD is undefined, we should read in the config.
         read_initial_configuration
     else
-        echo " -- SKIPPING CONFIG ENTRY FOR TESTING PURPOSES --"
+        _debug " -- SKIPPING CONFIG ENTRY FOR TESTING PURPOSES --"
     fi
     create_logfile
     setup_logging
