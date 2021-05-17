@@ -8,6 +8,8 @@ replace gsa.gov/18f/input-initial-configuration v0.0.0 => ./cmd/input-configurat
 
 replace gsa.gov/18f/session-counter v0.0.0 => ./cmd/session-counting
 
+replace gsa.gov/18f/log-event v0.0.0 => ./cmd/log-event
+
 replace gsa.gov/18f/version v0.0.0 => ./internal/version
 
 replace gsa.gov/18f/config v0.0.0 => ./internal/config
@@ -23,6 +25,7 @@ require (
 	github.com/fatih/color v1.10.0 // indirect
 	gsa.gov/18f/input-initial-configuration v0.0.0 // indirect
 	gsa.gov/18f/session-counter v0.0.0 // indirect
+	gsa.gov/18f/log-event v0.0.0 // indirect
 	gsa.gov/18f/version v0.0.0 // indirect
 	gsa.gov/18f/wifi-hardware-search v0.0.0 // indirect
 	gsa.gov/18f/wifi-hardware-search-cli v0.0.0 // indirect

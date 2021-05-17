@@ -2,9 +2,9 @@ VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 ENVVARS = CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7
 
-all: input-configuration session-counter wifi-hardware-search-cli
+all: input-configuration session-counter wifi-hardware-search-cli log-event
 
-deps: 
+deps:
 	go mod download
 
 input-configuration: deps
@@ -16,6 +16,9 @@ session-counter: deps
 wifi-hardware-search-cli: deps
 	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/wifi-hardware-search-cli
 
+log-event: deps
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/log-event
+
 release: all
 	git tag ${VERSION}
 	git push origin --tags
@@ -24,7 +27,7 @@ release: all
 		--notes "Release by $(shell git config user.email) on $(shell date)" \
 		${VERSION} release/bin/linux_arm/*
 
-# 2020506 MCJ Do we do anything different in dev? 
+# 2020506 MCJ Do we do anything different in dev?
 dev: release
 
 clean:
@@ -39,4 +42,3 @@ test:
 	go test ./cmd/input-configuration/*.go
 	go test ./cmd/session-counting/*.go
 	go test ./cmd/session-counting/api/*.go
-	
