@@ -33,7 +33,8 @@ SOMETHING_WENT_WRONG=0
 # Creates a temporary logfile in a way that lets the OS
 # decide where it should go.
 create_logfile () {
-    export SETUP_LOGFILE=$(mktemp -t "setup-log-XXX")
+    SETUP_LOGFILE=$(mktemp -t "setup-log-XXX")
+    export SETUP_LOGFILE
 }
 
 mangle_console () {
@@ -70,32 +71,32 @@ _msg () {
     TAG="$1"
     COLOR="$2"
     MSG="$3"
-    printf "[${TAG}] ${MSG}\n" >&1
-    printf "[${COLOR}${TAG}${NC}] ${MSG}\n" >&3
+    printf "[%s] %s\n" "${TAG}" "${MSG}" >&1
+    printf "[%s%s%s] %s\n" "${COLOR}" "${TAG}" "${NC}" "${MSG}" >&3
 }
 
 _status () {
     MSG="$1"
     _msg "STATUS" "${GREEN}" "${MSG}"
-    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap status" --info '{"message": "${MSG}"}'
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap status" --info "{\"message\": \"${MSG}\"}"
 }
 
 _debug () {
     MSG="$1"
     _msg "DEBUG" "${YELLOW}" "${MSG}"
-    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap debug" --info '{"message": "${MSG}"}'
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap debug" --info "{\"message\": \"${MSG}\"}"
 }
 
 _err () {
     SOMETHING_WENT_WRONG=1
     MSG="$1"
     _msg "ERROR" "${RED}" "${MSG}"
-    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap error" --info '{"message": "${MSG}"}'
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap error" --info "{\"message\": \"${MSG}\"}"
 }
 
 _variable () {
     VAR="$1"
-    _msg "$VAR" "${PURPLE}" "${!VAR}"
+    _msg "${VAR}" "${PURPLE}" "${!VAR}"
 }
 
 ####################################
@@ -146,7 +147,7 @@ fix_the_time () {
 shim () {
     echo "Setting up the environment."
     mangle_console
-    if [[ ! -z "${DEVELOP}" ]]; then
+    if [[ -n "${DEVELOP}" ]]; then
         bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/dev.shim)
         restore_console
         _debug "Set up a development environment"
@@ -181,9 +182,9 @@ check_for_usb_wifi () {
 
 read_initial_configuration () {
     # just in case
-    mkdir -p $PLAYBOOK_WORKING_DIR
+    mkdir -p "${PLAYBOOK_WORKING_DIR}"
     _debug "Running input-initial-configuration"
-    sudo /usr/local/bin/input-initial-configuration --path ${PLAYBOOK_WORKING_DIR}/auth.yaml --fcfs-seq --tag --word-pairs --write
+    sudo /usr/local/bin/input-initial-configuration --path "${PLAYBOOK_WORKING_DIR}/auth.yaml" --fcfs-seq --tag --word-pairs --write
 }
 
 bootstrap_ansible () {
@@ -207,7 +208,7 @@ ansible_pull_playbook () {
     _status "Installing hardening playbook."
     ansible-galaxy collection install devsec.hardening
 
-    pushd $PLAYBOOK_WORKING_DIR/source/imls-playbook
+    pushd "${PLAYBOOK_WORKING_DIR}/source/imls-playbook" || return
         _status "Running the playbook. This will take a while."
         # For testing/dev purposes, we might not want to lock things down
         # when we're done. The lockdown flag is required to run the
@@ -215,15 +216,15 @@ ansible_pull_playbook () {
 
         # -z checks if the var is UNSET.
         if [[ -z "${NOLOCKDOWN}" || -v "${DEVELOP}" ]]; then
-            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=`cat ../prod-version.txt`"
+            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
         else
             _status "Running playbook WITHOUT lockdown"
-            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "develop=yes, version=`cat ../dev-version.txt`"
+            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
         fi
         ANSIBLE_EXIT_STATUS=$?
-    popd
+    popd || return
     _status "Done running playbook."
-    if [ $ANSIBLE_EXIT_STATUS -ne 0 ]; then
+    if [ "${ANSIBLE_EXIT_STATUS}" -ne 0 ]; then
         _err "Ansible playbook failed."
         _err "Exit code: ${ANSIBLE_EXIT_STATUS}"
         _err "Check the log: ${SETUP_LOGFILE}"
@@ -260,7 +261,7 @@ main () {
     bootstrap_ansible
     ansible_pull_playbook
     disable_interactive_login
-    if [ $SOMETHING_WENT_WRONG -ne 0 ]; then
+    if [ "${SOMETHING_WENT_WRONG}" -ne 0 ]; then
         _err "Things finished with errors."
         _err "We may need to see the logs: ${SETUP_LOGFILE}"
     else
