@@ -17,7 +17,7 @@ done
 # copy over the config.
 DEST="/opt/imls"
 sudo mkdir -p $DEST
-curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/main/config.init.yaml" -o $DEST/config.yaml
+sudo curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/main/config.init.yaml" -o $DEST/config.yaml
 
 # unpack playbook into /opt/imls/source.
 VLESS_VERSION=`echo $VERSION | cut -b2-`  # remove leading v.
