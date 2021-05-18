@@ -14,11 +14,14 @@ do
     sudo chmod +x /usr/local/bin/$bin
 done
 
-# unpack playbook into /opt/imls/source.
+# copy over the config.
 DEST="/opt/imls"
+sudo mkdir -p $DEST
+curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/main/config.init.yaml" -o $DEST/config.yaml
+
+# unpack playbook into /opt/imls/source.
 VLESS_VERSION=`echo $VERSION | cut -b2-`  # remove leading v.
 SOURCE_URL="https://github.com/$GITHUB_REPO/archive/refs/tags/$VERSION.tar.gz"
-sudo mkdir -p $DEST
 pushd $DEST
 curl -L -s $SOURCE_URL | sudo tar xz
 [ -d source/ ] && sudo rm -rf source/
