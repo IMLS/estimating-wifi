@@ -9,8 +9,8 @@ all:
     config_path: /opt/imls
     session_counter:
       binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/session-counter"
-    findralink:
-      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/find-ralink"
+    wifi_hardware_search:
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/wifi-hardware-search-cli"
     inputinitial:
       binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/input-initial-configuration"
     persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules

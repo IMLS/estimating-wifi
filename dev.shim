@@ -7,10 +7,10 @@ GITHUB_REPO="cantsin/$REPO_NAME"
 VERSION=`curl -s https://raw.githubusercontent.com/$GITHUB_REPO/main/dev-version.txt`
 BINARY_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION"
 # sometimes we have trouble overwriting.
-sudo rm -rf /usr/local/bin/{find-ralink,input-initial-configuration,session-counter,log-event}
+sudo rm -rf /usr/local/bin/{wifi-hardware-search-cli,input-initial-configuration,session-counter,log-event}
 
 # install binaries into /usr/local/bin.
-for bin in "find-ralink" "input-initial-configuration" "session-counter" "log-event"
+for bin in "wifi-hardware-search-cli" "input-initial-configuration" "session-counter" "log-event"
 do
     sudo curl -L -s "$BINARY_URL/$bin" -o /usr/local/bin/$bin
     sudo chmod +x /usr/local/bin/$bin

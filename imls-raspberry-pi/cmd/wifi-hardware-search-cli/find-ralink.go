@@ -144,7 +144,7 @@ func main() {
 	// We can't do this without root. Some things... might work.
 	// Print a big red warning.
 	if os.Getenv("USER") != "root" {
-		fmt.Println(text.FgRed.Sprint("find-ralink *really* needs to be run as root."))
+		fmt.Println(text.FgRed.Sprint("wifi-hardware-search-cli *really* needs to be run as root."))
 	}
 
 	// VERSION

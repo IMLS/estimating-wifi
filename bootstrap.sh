@@ -161,7 +161,7 @@ check_for_usb_wifi () {
     echo "Checking for wifi..."
     mangle_console
     sudo apt install -y lshw
-    if [[ "$(/usr/local/bin/find-ralink --exists)" =~ "false" ]]; then
+    if [[ "$(/usr/local/bin/wifi-hardware-search-cli --exists)" =~ "false" ]]; then
         restore_console
         echo "********************* PANIC OH NOES! *********************"
         echo "We think you did not plug in the USB wifi adapter!"
