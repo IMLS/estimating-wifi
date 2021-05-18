@@ -16,6 +16,15 @@
     - setup-imls-client-pi-playbook.service
   become: yes
 
+- name: Override IMLS timer for develop environments
+  copy:
+    src: run-imls-client-pi-playbook-dev.timer
+    dest: /etc/systemd/system/run-imls-client-pi-playbook.timer
+    owner: root
+    group: root
+    force: yes
+  when: develop is defined
+
 - name: Reload systemd
   systemd:
     daemon_reload: yes

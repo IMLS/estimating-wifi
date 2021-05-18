@@ -1,0 +1,11 @@
+[Unit]
+Description=Runs the IMLS playbook once a day (for dev purposes only).
+Requires=run-imls-client-pi-playbook.service
+
+[Timer]
+Unit=run-imls-client-pi-playbook.service
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
