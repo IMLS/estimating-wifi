@@ -3,9 +3,9 @@ VERSION := $(shell git describe --tags --abbrev=0)
 .PHONY: dev
 
 versioning:
-	pushd imls-playbook ; \
+	cd imls-playbook ; \
 		sed 's/<<VERSION>>/$(VERSION)/g' Makefile.in > Makefile ; \
-		popd
+		cd ..
 
 
 ifeq ($(shell git describe --tags --abbrev=0),$(VERSION))
@@ -21,7 +21,7 @@ release: versioning
 # make dev
 dev: versioning
 	@echo $(VERSION) > dev-version.txt
-	pushd imls-raspberry-pi ; make dev ; popd
+	cd imls-raspberry-pi ; make dev ; cd ..
 endif
 
 

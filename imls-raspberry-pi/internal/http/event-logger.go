@@ -15,7 +15,7 @@ func NewEventLogger(cfg *config.Config) *EventLogger {
 }
 
 func (el *EventLogger) LogJSON(tag string, json string) (int, error) {
-	uri := FormatUri(el.Cfg.Umbrella.Scheme, el.Cfg.Umbrella.Host, el.Cfg.Umbrella.Data)
+	uri := FormatUri(el.Cfg.Umbrella.Scheme, el.Cfg.Umbrella.Host, el.Cfg.Umbrella.Logging)
 	tok, _ := config.ReadAuth()
 
 	data := map[string]string{
@@ -42,10 +42,7 @@ func (el *EventLogger) Log(tag string, info map[string]string) (int, error) {
 	} else {
 		asJson, err = json.Marshal(info)
 		if err != nil {
-			asJson, _ = json.Marshal(map[string]string{
-				"msg":   "could not marshal info for tag",
-				"error": fmt.Sprint(err),
-			})
+			log.Fatal("could not marshal info for tag", fmt.Sprint(err))
 		}
 	}
 	//asB64 := b64.URLEncoding.EncodeToString([]byte(asJson))
