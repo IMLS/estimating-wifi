@@ -27,7 +27,7 @@
   loop:
     - run-imls-client-pi-playbook.service
     - run-imls-client-pi-playbook-dev.timer
-    - setup-imls-client-pi-playbook.service
+    - setup-imls-client-pi-playbook-dev.service
   become: yes
   when: develop is defined
 
