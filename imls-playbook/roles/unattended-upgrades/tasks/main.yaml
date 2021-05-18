@@ -15,14 +15,20 @@
     - run-imls-client-pi-playbook.timer
     - setup-imls-client-pi-playbook.service
   become: yes
+  when: develop is undefined
 
-- name: Override IMLS timer for develop environments
+- name: Copy IMLS client pi systemd service files for dev only
   copy:
-    src: run-imls-client-pi-playbook-dev.timer
-    dest: /etc/systemd/system/run-imls-client-pi-playbook.timer
+    src: "{{ item }}"
+    dest: /etc/systemd/system
     owner: root
     group: root
     force: yes
+  loop:
+    - run-imls-client-pi-playbook.service
+    - run-imls-client-pi-playbook-dev.timer
+    - setup-imls-client-pi-playbook.service
+  become: yes
   when: develop is defined
 
 - name: Reload systemd
