@@ -20,8 +20,8 @@
   ansible.builtin.copy:
     src: "files{{config_path}}/{{ item }}"
     dest: "{{config_path}}/{{ item }}"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "root"
+    group: "root"
     mode: '0644'
     force: yes
   loop:
