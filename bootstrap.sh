@@ -219,7 +219,7 @@ ansible_pull_playbook () {
             ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
         else
             _status "Running playbook WITHOUT lockdown"
-            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
+            ansible-playbook -vvv -i inventory.yaml playbook.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
         fi
         ANSIBLE_EXIT_STATUS=$?
     popd || return

@@ -27,7 +27,6 @@
   loop:
     - run-imls-client-pi-playbook-dev.service
     - run-imls-client-pi-playbook-dev.timer
-    - setup-imls-client-pi-playbook-dev.service
   become: yes
   when: develop is defined
 
@@ -49,13 +48,6 @@
     state: started
   become: yes
   when: develop is undefined
-
-- name: Pull the playbook (dev)
-  systemd:
-    name: setup-imls-client-pi-playbook-dev
-    state: started
-  become: yes
-  when: develop is defined
 
 - name: Start a hourly timer to pull the playbook (dev)
   systemd:
