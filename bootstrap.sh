@@ -72,7 +72,7 @@ _msg () {
     COLOR="$2"
     MSG="$3"
     printf "[%s] %s\n" "${TAG}" "${MSG}" >&1
-    printf "[%s%s%s] %s\n" "${COLOR}" "${TAG}" "${NC}" "${MSG}" >&3
+    printf "[%b%s%b] %s\n" "${COLOR}" "${TAG}" "${NC}" "${MSG}" >&3
 }
 
 _status () {
