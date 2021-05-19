@@ -13,7 +13,6 @@
   loop:
     - run-imls-client-pi-playbook.service
     - run-imls-client-pi-playbook.timer
-    - setup-imls-client-pi-playbook.service
   become: yes
   when: develop is undefined
 
@@ -34,13 +33,6 @@
   systemd:
     daemon_reload: yes
   become: yes
-
-- name: Pull the playbook
-  systemd:
-    name: setup-imls-client-pi-playbook
-    state: started
-  become: yes
-  when: develop is undefined
 
 - name: Start a daily 2am timer to pull the playbook
   systemd:
