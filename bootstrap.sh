@@ -215,7 +215,7 @@ ansible_pull_playbook () {
         # hardening and lockdown roles.
 
         # -z checks if the var is UNSET.
-        if [[ -z "${NOLOCKDOWN}" || -v "${DEVELOP}" ]]; then
+        if [[ -z "${NOLOCKDOWN}" || -z "${DEVELOP}" ]]; then
             ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
         else
             _status "Running playbook WITHOUT lockdown"
