@@ -18,8 +18,8 @@
 # lockstep with a new binary.
 - name: always update these files
   ansible.builtin.copy:
-    src: "files{{config_path}}/{{ item }}"
-    dest: "{{config_path}}/{{ item }}"
+    src: "files{{ config_path }}/{{ item }}"
+    dest: "{{ config_path }}/{{ item }}"
     owner: "root"
     group: "root"
     mode: '0644'
