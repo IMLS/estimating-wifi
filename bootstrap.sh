@@ -263,7 +263,8 @@ main () {
     disable_interactive_login
     if [ "${SOMETHING_WENT_WRONG}" -ne 0 ]; then
         _err "Things finished with errors."
-        _err "We may need to see the logs: ${SETUP_LOGFILE}"
+        _err "We have logged the errors at ${SETUP_LOGFILE}"
+        [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap something_went_wrong" --file "${SETUP_LOGFILE}"
     else
         _status "All done!"
         _status "We're rebooting in one minute!"
