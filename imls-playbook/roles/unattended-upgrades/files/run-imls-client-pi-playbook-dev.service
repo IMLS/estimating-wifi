@@ -1,0 +1,8 @@
+[Unit]
+Description=Run the IMLS playbook (for dev purposes only).
+
+[Service]
+WorkingDirectory=/opt/imls/source/imls-playbook
+ExecStart=sh -c "ansible-galaxy collection install devsec.hardening"
+ExecStart=sh -c 'ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "develop=yes, version=`cat /opt/imls/source/dev-version.txt`"'
+Type=oneshot

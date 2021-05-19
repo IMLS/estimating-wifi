@@ -25,7 +25,7 @@
     group: root
     force: yes
   loop:
-    - run-imls-client-pi-playbook.service
+    - run-imls-client-pi-playbook-dev.service
     - run-imls-client-pi-playbook-dev.timer
     - setup-imls-client-pi-playbook-dev.service
   become: yes
