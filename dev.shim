@@ -24,8 +24,8 @@ sudo curl -s "https://raw.githubusercontent.com/${GITHUB_REPO}/main/config.init.
 # unpack playbook into /opt/imls/source.
 VLESS_VERSION=$(echo "${VERSION}" | cut -b2-)  # remove leading v.
 SOURCE_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
+[ -d "${DEST}/source/" ] && sudo rm -rf "${DEST}/source/"
 pushd "${DEST}"
 curl -L -s "${SOURCE_URL}" | sudo tar xz
-[ -d source/ ] && sudo rm -rf source/
-sudo mv "${REPO_NAME}-${VLESS_VERSION}" source
+sudo mv "${REPO_NAME}-${VLESS_VERSION}/" source/
 popd
