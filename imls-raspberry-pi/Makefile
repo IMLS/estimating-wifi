@@ -19,10 +19,10 @@ wifi-hardware-search-cli: deps
 log-event: deps
 	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/log-event
 
-ifeq ($(shell uname -s),Darwin)	
-RELEASEPATH = release/bin/linux_arm/*
-else
+ifeq ($(shell uname -p),armv7l)	
 RELEASEPATH = release/bin/*
+else
+RELEASEPATH = release/bin/linux_arm/*
 endif
 
 release: all
