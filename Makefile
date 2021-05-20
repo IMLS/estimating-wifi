@@ -2,11 +2,15 @@ VERSION := $(shell git describe --tags --abbrev=0)
 
 .PHONY: dev
 
-stamp_the_dev_version: 
+stamp_the_dev_version:
 	@echo $(VERSION) > dev-version.txt
+	git add dev-version.txt
+	git commit -m "dev release: $(VERSION)"
 
 stamp_the_prod_version:
 	@echo $(VERSION) > prod-version.txt
+	git add prod-version.txt
+	git commit -m "prod release: $(VERSION)"
 
 packaging:
 	cd imls-playbook ; \
@@ -18,12 +22,10 @@ release:
 	@echo "Version needs to be updated from " $(VERSION)
 dev:
 	@echo "Version needs to be updated from " $(VERSION)
-else	
+else
 # make VERSION=v1.2.3 release
 release: stamp_the_release_version packaging
 # make dev
 dev: stamp_the_dev_version packaging
 	cd imls-raspberry-pi ; make dev ; cd ..
 endif
-
-
