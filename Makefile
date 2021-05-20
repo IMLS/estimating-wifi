@@ -9,10 +9,9 @@ stamp_the_prod_version:
 	@echo $(VERSION) > prod-version.txt
 
 packaging:
-	pushd imls-playbook ; \
+	cd imls-playbook ; \
 		sed 's/<<VERSION>>/$(VERSION)/g' Makefile.in > Makefile ; \
-		popd
-
+		cd ..
 
 ifeq ($(shell git describe --tags --abbrev=0),$(VERSION))
 release:
@@ -23,8 +22,8 @@ else
 # make VERSION=v1.2.3 release
 release: stamp_the_release_version packaging
 # make dev
-dev: stamp_the_dev_version versioning
-	pushd imls-raspberry-pi ; make dev ; popd
+dev: stamp_the_dev_version packaging
+	cd imls-raspberry-pi ; make dev ; cd ..
 endif
 
 
