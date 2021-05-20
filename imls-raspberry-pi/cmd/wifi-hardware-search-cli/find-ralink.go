@@ -143,7 +143,7 @@ func main() {
 	// ROOT
 	// We can't do this without root. Some things... might work.
 	// Print a big red warning.
-	if os.Getenv("USER") != "root" {
+	if os.Getuid() != 0 {
 		fmt.Println(text.FgRed.Sprint("wifi-hardware-search-cli *really* needs to be run as root."))
 	}
 
