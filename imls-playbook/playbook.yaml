@@ -6,6 +6,7 @@
   roles:
     - packages
     - unattended-upgrades
+    - log-event
     - session-counter
     - configure-monitor-mode
     # There are some mmap_rnd_bits errors being thrown that we want to ignore.
@@ -16,7 +17,7 @@
     # The lockdown removes us from passwordless sudo... so it has to come last.
     # - { role: devsec.hardening.os_hardening, ignore_errors: yes, become: yes, when: lockdown is defined }
     # - { role: devsec.hardening.ssh_hardening, ignore_errors: yes, become: yes, when: lockdown is defined }
-    
+
   vars:
     sysctl_overwrite:
       vm.mmap_rnd_bits: 16

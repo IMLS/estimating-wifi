@@ -13,4 +13,6 @@ all:
       binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/wifi-hardware-search-cli"
     inputinitial:
       binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/input-initial-configuration"
+    log_event:
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/log-event"
     persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules
