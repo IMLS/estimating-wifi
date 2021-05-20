@@ -15,7 +15,6 @@
     owner: root
     group: root
     mode: 0755
-  become: yes
 
 # exists bool
 # physical id    int
@@ -26,17 +25,15 @@
 # mac           string
 # configuration string
 
-# We must "become" for the wifi-hardware-search-cli tool.
-# It will not find USB devices as non-root.
-# Normally, if no device is found, there is a non-zero error.
-# However, if we're asking nicely to find out if one exists,
-# we will get "true" or "false", and a 0 error code always.
-# (Short of catestrophic errors/failures.)
+# The wifi-hardware-search-cli tool will not find USB devices as
+# non-root. Normally, if no device is found, there is a non-zero
+# error. However, if we're asking nicely to find out if one exists, we
+# will get "true" or "false", and a 0 error code always. (Short of
+# catestrophic errors/failures.)
 - name: do we find an ralink adapter?
   ansible.builtin.command:
     cmd: "{{ install_path }}/wifi-hardware-search-cli --discover --exists"
   register: ralink_exists
-  become: yes
 
 # - name: what is going on
 #   ansible.builtin.debug:
@@ -50,14 +47,12 @@
   ansible.builtin.command:
     cmd: "{{ install_path }}/wifi-hardware-search-cli --discover --extract mac"
   register: ralink_mac
-  become: yes
   when: "'true' in ralink_exists.stdout"
 
 - name: get the logical name of the adapter if it exists
   ansible.builtin.command:
     cmd: "{{ install_path }}/wifi-hardware-search-cli --discover --extract logicalname"
   register: ralink_logicalname
-  become: yes
   when: "'true' in ralink_exists.stdout"
 
 # If we find an adapter, then we can proceed to update
@@ -69,7 +64,6 @@
     state: present
     line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ralink_mac.stdout }}", NAME="{{ ralink_logicalname.stdout }}"'
     create: true
-  become: yes
   when: "'true' in ralink_exists.stdout"
 
 ###############
@@ -86,20 +80,17 @@
   ansible.builtin.command:
     cmd: "{{ install_path }}/wifi-hardware-search-cli --search brc --field configuration --exists"
   register: brc_exists
-  become: yes
 
 - name: get the mac address of the broadcom adapter if it exists
   ansible.builtin.command:
     cmd: "{{ install_path }}/wifi-hardware-search-cli --search brc --field configuration --extract mac"
   register: brc_mac
-  become: yes
   when: "'true' in brc_exists.stdout"
 
 - name: get the logical name of the broadcom adapter if it exists
   ansible.builtin.command:
     cmd: "{{ install_path }}/wifi-hardware-search-cli --search brc --field configuration --extract logicalname"
   register: brc_logicalname
-  become: yes
   when: "'true' in brc_exists.stdout"
 
 - name: write the built-in wifi into udev rules
@@ -109,7 +100,6 @@
     state: present
     line: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ brc_mac.stdout }}", NAME="{{ brc_logicalname.stdout }}"'
     create: yes
-  become: yes
   when: "'true' in brc_exists.stdout"
 
 ## Reload the rules
@@ -119,29 +109,24 @@
 - name: reload the rules
   ansible.builtin.command:
     cmd: udevadm control --reload-rules
-  become: yes
 
 - name: trigger the... newly reloaded rules...
   ansible.builtin.command:
     cmd: udevadm trigger
-  become: yes
 
 # Take the USB wifi interface down, set it in monitor mode, and
 # then bring it back up.
 - name: take down USB wifi
   ansible.builtin.command:
     cmd: "ip link set {{ ralink_logicalname.stdout }} down"
-  become: yes
   when: "'true' in ralink_exists.stdout"
 
 - name: set USB wifi into monitor mode
   ansible.builtin.command:
     cmd: "iw {{ ralink_logicalname.stdout }} set monitor none"
-  become: yes
   when: "'true' in ralink_exists.stdout"
 
 - name: bring up down USB wifi
   ansible.builtin.command:
     cmd: "ip link set {{ ralink_logicalname.stdout }} up"
-  become: yes
   when: "'true' in ralink_exists.stdout"

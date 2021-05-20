@@ -8,7 +8,7 @@
     - unattended-upgrades
     - log-event
     - session-counter
-    - configure-monitor-mode
+    - { role: configure-monitor-mode, become: yes }
     # There are some mmap_rnd_bits errors being thrown that we want to ignore.
     - { role: lockdown, ignore_errors: yes, when: lockdown is defined  }
     # 20210429 MCJ
