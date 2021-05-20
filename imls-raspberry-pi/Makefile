@@ -19,13 +19,19 @@ wifi-hardware-search-cli: deps
 log-event: deps
 	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/log-event
 
+ifeq ($(shell uname -s),Darwin)	
+RELEASEPATH = release/bin/linux_arm/*
+else
+RELEASEPATH = release/bin/*
+endif
+
 release: all
 	git tag ${VERSION}
 	git push origin --tags
 	gh release create \
 		--title '${VERSION} binaries' \
 		--notes "Release by $(shell git config user.email) on $(shell date)" \
-		${VERSION} release/bin/linux_arm/*
+		${VERSION} ${RELEASEPATH}
 
 # 2020506 MCJ Do we do anything different in dev?
 dev: release
