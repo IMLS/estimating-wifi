@@ -25,6 +25,7 @@ dev:
 else
 # make VERSION=v1.2.3 release
 release: stamp_the_release_version packaging
+	cd imls-raspberry-pi ; make release ; cd ..
 # make dev
 dev: stamp_the_dev_version packaging
 	cd imls-raspberry-pi ; make dev ; cd ..
