@@ -19,7 +19,7 @@ done
 
 # copy over the config.
 DEST="/opt/imls"
-sudo mkdir -p "${DEST}"
+sudo mkdir -p "${DEST}/${VERSION}"
 sudo curl -s "https://raw.githubusercontent.com/${GITHUB_REPO}/${BRANCH}/config.init.yaml" -o "${DEST}/config.yaml"
 
 
@@ -29,10 +29,9 @@ VLESS_VERSION=$(echo "${VERSION}" | cut -b2-)  # remove leading v.
 SOURCE_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
 if [ -d "${DEST}/source/${VERSION}" ]; then
     # It exists. We shouldn't have to do anything.
-    # /usr/local/bin/log-event --tag "dev-skip" --info "{\"version\": \"${VERSION}\"}"
+    echo "${VERSION} exists. Skipping."
 else 
-    # [ -d "${DEST}/source/" ] && sudo rm -rf "${DEST}/source/"
-    # /usr/local/bin/log-event --tag "dev-unpack" --info "{\"version\": \"${VERSION}\"}"
+    # Unpacking new version.
     pushd "${DEST}"
         curl -L -s "${SOURCE_URL}" | sudo tar xz
         sudo mv "${REPO_NAME}-${VLESS_VERSION}/" source/${VERSION}
