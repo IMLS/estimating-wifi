@@ -7,4 +7,5 @@ ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack
 ExecStart=bash /opt/imls/prod.shim
 ExecStart=sh -c "ansible-galaxy collection install devsec.hardening"
 ExecStart=sh -c 'ansible-playbook -i /opt/imls/source/imls-playbook/inventory.yaml /opt/imls/source/imls-playbook/playbook.yaml --extra-vars "lockdown=yes, version=`cat /opt/imls/source/prod-version.txt`"'
+ExecStart=sh -c '/usr/local/bin/log-event --tag "production playbook finished" --info "{}"'
 Type=oneshot

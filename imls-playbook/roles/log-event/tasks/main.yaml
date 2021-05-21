@@ -1,0 +1,13 @@
+- name: install log-event tool binary
+  ansible.builtin.get_url:
+    url: "{{ log_event.binary_url }}"
+    dest: "{{ install_path }}"
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+
+- name: log
+  ansible.builtin.command:
+    cmd: '{{ install_path }}/log-event --tag "playbook executing" --info "{\"version\": \"{{ version }}\"}"'
+  become: yes
