@@ -15,7 +15,9 @@ stamp_the_release_version:
 packaging:
 	cd imls-playbook ; \
 		sed 's/<<VERSION>>/$(VERSION)/g' Makefile.in > Makefile ; \
+		sed 's/<<VERSION>>/$(VERSION)/g' inventory.yaml.in > inventory.yaml ; \
 		cd ..
+
 
 ifeq ($(shell git describe --tags --abbrev=0),$(VERSION))
 release:
