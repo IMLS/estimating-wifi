@@ -7,7 +7,7 @@ stamp_the_dev_version:
 	git add dev-version.txt
 	git commit -m "dev release: $(VERSION)"
 
-stamp_the_prod_version:
+stamp_the_release_version:
 	@echo $(VERSION) > prod-version.txt
 	git add prod-version.txt
 	git commit -m "prod release: $(VERSION)"
