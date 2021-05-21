@@ -1,0 +1,19 @@
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python
+  vars:
+    version: <<VERSION>>
+    default_user: pi
+    install_path: /usr/local/bin
+    config_path: /opt/imls
+    session_counter:
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/session-counter"
+    wifi_hardware_search:
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/wifi-hardware-search-cli"
+    inputinitial:
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/input-initial-configuration"
+    log_event:
+      binary_url: "https://github.com/cantsin/imls-pi-stack/releases/download/{{ version }}/log-event"
+    persistent_rules: /etc/udev/rules.d/75-persistent-wifi-mapping.rules

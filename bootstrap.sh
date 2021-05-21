@@ -23,7 +23,8 @@
 
 # CRITICAL GLOBALS
 PLAYBOOK_WORKING_DIR="/opt/imls"
-BRANCH="versioning" # "main"
+# REMOVE THIS VERSIONING LATER - MCJ
+BRANCH="main" # "main"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
