@@ -3,9 +3,8 @@
 set -euox pipefail
 
 REPO_NAME="imls-pi-stack"
-BRANCH="versioning" # main
 GITHUB_REPO="cantsin/${REPO_NAME}"
-VERSION=$(curl -s "https://raw.githubusercontent.com/${GITHUB_REPO}/${BRANCH}/prod-version.txt")
+VERSION=$(curl -s "https://raw.githubusercontent.com/${GITHUB_REPO}/main/prod-version.txt")
 BINARY_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}"
 # sometimes we have trouble overwriting.
 sudo rm -rf /usr/local/bin/{wifi-hardware-search-cli,input-initial-configuration,session-counter,log-event}
@@ -19,20 +18,14 @@ done
 
 # copy over the config.
 DEST="/opt/imls"
-sudo mkdir -p "${DEST}/${VERSION}"
-sudo curl -s "https://raw.githubusercontent.com/${GITHUB_REPO}/${BRANCH}/config.init.yaml" -o "${DEST}/config.yaml"
+sudo mkdir -p "${DEST}"
+sudo curl -s "https://raw.githubusercontent.com/${GITHUB_REPO}/main/config.init.yaml" -o "${DEST}/config.yaml"
 
-# IF the VERSION directory exists, do nothing.
-# That means we're not doing a new install.
+# unpack playbook into /opt/imls/source.
 VLESS_VERSION=$(echo "${VERSION}" | cut -b2-)  # remove leading v.
 SOURCE_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
-if [ -d "${DEST}/source/${VERSION}" ]; then
-    # It exists. We shouldn't have to do anything.
-    echo "${VERSION} exists. Skipping."
-else 
-    # Unpacking new version.
-    pushd "${DEST}"
-        curl -L -s "${SOURCE_URL}" | sudo tar xz
-        sudo mv "${REPO_NAME}-${VLESS_VERSION}/" source/${VERSION}
-    popd
-fi
+[ -d "${DEST}/source/" ] && sudo rm -rf "${DEST}/source/"
+pushd "${DEST}"
+curl -L -s "${SOURCE_URL}" | sudo tar xz
+sudo mv "${REPO_NAME}-${VLESS_VERSION}/" source/
+popd
