@@ -28,10 +28,10 @@ VLESS_VERSION=$(echo "${VERSION}" | cut -b2-)  # remove leading v.
 SOURCE_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
 if [ -d "${DEST}/source/${VERSION}" ]; then
     # It exists. We shouldn't have to do anything.
-    /usr/local/bin/log-event --tag "prod-skip" --info "{\"version\": \"${VERSION}\"}"
+    # /usr/local/bin/log-event --tag "prod-skip" --info "{\"version\": \"${VERSION}\"}"
 else 
     # [ -d "${DEST}/source/" ] && sudo rm -rf "${DEST}/source/"
-    /usr/local/bin/log-event --tag "prod-bump" --info "{\"version\": \"${VERSION}\"}"
+    # /usr/local/bin/log-event --tag "prod-bump" --info "{\"version\": \"${VERSION}\"}"
     pushd "${DEST}"
         curl -L -s "${SOURCE_URL}" | sudo tar xz
         sudo mv "${REPO_NAME}-${VLESS_VERSION}/" source/${VERSION}
