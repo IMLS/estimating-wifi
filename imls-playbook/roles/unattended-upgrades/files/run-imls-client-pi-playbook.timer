@@ -1,6 +1,5 @@
 [Unit]
 Description=Runs the IMLS playbook once a day.
-Requires=run-imls-client-pi-playbook.service
 
 [Timer]
 Unit=run-imls-client-pi-playbook.service
