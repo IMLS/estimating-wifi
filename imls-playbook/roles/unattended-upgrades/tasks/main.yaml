@@ -4,9 +4,9 @@
   become: yes
 
 - name: Copy IMLS client pi systemd service files
-  template:
+  copy:
     src: "{{ item }}"
-    dest: "/etc/systemd/system/{{ item }}"
+    dest: /etc/systemd/system
     owner: root
     group: root
     force: yes
@@ -17,9 +17,9 @@
   when: develop is undefined
 
 - name: Copy IMLS client pi systemd service files for dev only
-  template:
+  copy:
     src: "{{ item }}"
-    dest: "/etc/systemd/system/{{ item }}"
+    dest: /etc/systemd/system
     owner: root
     group: root
     force: yes

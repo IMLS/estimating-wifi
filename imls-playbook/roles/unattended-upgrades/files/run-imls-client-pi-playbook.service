@@ -3,8 +3,9 @@ Description=Update and run the IMLS playbook.
 
 [Service]
 ExecStartPre=sh -c "mkdir -p /opt/imls"
-ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim -o /opt/imls/{{version}}/prod.shim"
+ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim -o /opt/imls/prod.shim"
 ExecStart=bash /opt/imls/prod.shim
 ExecStart=sh -c "ansible-galaxy collection install devsec.hardening"
-ExecStart=sh -c 'ansible-playbook -i /opt/imls/{{version}}/imls-playbook/inventory.yaml /opt/imls/{{version}}/imls-playbook/playbook.yaml --extra-vars "lockdown=yes, version=`cat /opt/imls/source/prod-version.txt`"'
+ExecStart=sh -c 'ansible-playbook -i /opt/imls/source/imls-playbook/inventory.yaml /opt/imls/source/imls-playbook/playbook.yaml --extra-vars "lockdown=yes, version=`cat /opt/imls/source/prod-version.txt`"'
+ExecStart=sh -c '/usr/local/bin/log-event --tag "production playbook finished" --info "{}"'
 Type=oneshot

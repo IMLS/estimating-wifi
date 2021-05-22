@@ -3,9 +3,9 @@ Description=Update and run the development IMLS playbook.
 
 [Service]
 ExecStartPre=sh -c "mkdir -p /opt/imls"
-ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/dev.shim -o /opt/imls/{{version}}/dev.shim"
+ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/dev.shim -o /opt/imls/dev.shim"
 ExecStart=bash /opt/imls/dev.shim
 ExecStart=sh -c "ansible-galaxy collection install devsec.hardening"
-ExecStart=sh -c 'ansible-playbook -i /opt/imls/{{version}}/imls-playbook/inventory.yaml /opt/imls/{{version}}/imls-playbook/playbook.yaml --extra-vars "develop=yes, version=`cat /opt/imls/source/dev-version.txt`"'
+ExecStart=sh -c 'ansible-playbook -i /opt/imls/source/imls-playbook/inventory.yaml /opt/imls/source/imls-playbook/playbook.yaml --extra-vars "develop=yes, version=`cat /opt/imls/source/dev-version.txt`"'
 ExecStart=sh -c '/usr/local/bin/log-event --tag "dev playbook finished" --info "{}"'
 Type=oneshot

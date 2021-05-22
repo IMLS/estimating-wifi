@@ -23,8 +23,6 @@
 
 # CRITICAL GLOBALS
 PLAYBOOK_WORKING_DIR="/opt/imls"
-# REMOVE THIS VERSIONING LATER - MCJ
-BRANCH="main" # "main"
 
 # A GLOBAL CATCH
 # If something goes wrong, set this to 1.
@@ -150,11 +148,11 @@ shim () {
     echo "Setting up the environment."
     mangle_console
     if [[ -n "${DEVELOP}" ]]; then
-        bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/${BRANCH}/dev.shim)
+        bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/dev.shim)
         restore_console
         _debug "Set up a development environment"
     else
-        bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/${BRANCH}/prod.shim)
+        bash <(curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim)
         restore_console
         _debug "Set up a production environment"
     fi

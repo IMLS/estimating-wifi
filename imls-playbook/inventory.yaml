@@ -4,7 +4,6 @@ all:
       ansible_connection: local
       ansible_python_interpreter: /usr/bin/python
   vars:
-    version: <<VERSION>>
     default_user: pi
     install_path: /usr/local/bin
     config_path: /opt/imls
