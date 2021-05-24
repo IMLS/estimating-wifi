@@ -266,9 +266,9 @@ main () {
         _debug " -- SKIPPING CONFIG ENTRY FOR TESTING PURPOSES --"
     fi
     create_logfile
-    serviceunit_playbook
     setup_logging
     bootstrap_ansible
+    serviceunit_playbook
     disable_interactive_login
     if [ "${SOMETHING_WENT_WRONG}" -ne 0 ]; then
         _err "Things finished with errors."
