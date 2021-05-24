@@ -9,6 +9,6 @@ ExecStart=sh -c "ansible-galaxy collection install devsec.hardening"
 ExecStart=sh -c 'ansible-playbook -i /opt/imls/source/imls-playbook/inventory.yaml /opt/imls/source/imls-playbook/playbook.yaml --extra-vars "develop=yes, version=`cat /opt/imls/source/dev-version.txt`"'
 ExecStart=sh -c '/usr/local/bin/log-event --tag "dev playbook finished" --info "{}"'
 
-ExecStopPost=sh -c '/usr/local/bin/log-event --tag "dev playbook errored out" --info "{\"error\": \"$(journalctl -u run-imls-client-pi-playbook-dev.service | tail | base64 -w 0)\"}"'
+ExecStopPost=sh -c '/usr/local/bin/log-event --tag "dev playbook errored out" --info "{\\"error\\": \\"$(journalctl -u run-imls-client-pi-playbook-dev.service | tail | base64 -w 0)\\"}"'
 
 Type=oneshot
