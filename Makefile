@@ -6,11 +6,13 @@ stamp_the_dev_version:
 	@echo $(VERSION) > dev-version.txt
 	git add dev-version.txt
 	git commit -m "dev release: $(VERSION)"
+	git push
 
 stamp_the_release_version:
 	@echo $(VERSION) > prod-version.txt
 	git add prod-version.txt
 	git commit -m "prod release: $(VERSION)"
+	git push
 
 packaging:
 	cd imls-playbook ; \
