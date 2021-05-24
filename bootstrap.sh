@@ -58,7 +58,6 @@ setup_logging () {
     _variable "SETUP_LOGFILE"
 }
 
-
 # COLORS!
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -66,6 +65,11 @@ YELLOW='\033[1;33m'
 PURPLE='\033[0;35m'
 # No color
 NC='\033[0m'
+
+_log_event () {
+    TAG="$1"
+    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "${TAG}" --info "{\"message\": \"$2\"}"
+}
 
 _msg () {
     TAG="$1"
@@ -78,20 +82,25 @@ _msg () {
 _status () {
     MSG="$1"
     _msg "STATUS" "${GREEN}" "${MSG}"
-    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap status" --info "{\"message\": \"${MSG}\"}"
+    # [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap status" --info "{\"message\": \"${MSG}\"}"
+    _log_event "bootstrap status" "${MSG}"
 }
 
 _debug () {
     MSG="$1"
     _msg "DEBUG" "${YELLOW}" "${MSG}"
-    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap debug" --info "{\"message\": \"${MSG}\"}"
+    # [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap debug" --info "{\"message\": \"${MSG}\"}"
+    _log_event "bootstrap debug" "${MSG}"
+
 }
 
-_err () {
+_error () {
     SOMETHING_WENT_WRONG=1
     MSG="$1"
     _msg "ERROR" "${RED}" "${MSG}"
-    [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap error" --info "{\"message\": \"${MSG}\"}"
+    # [ -f /usr/local/bin/log-event ] && /usr/local/bin/log-event --tag "bootstrap error" --info "{\"message\": \"${MSG}\"}"
+    _log_event "bootstrap error" "${MSG}"
+
 }
 
 _variable () {
@@ -201,31 +210,27 @@ bootstrap_ansible () {
     sudo apt-get install -y ansible
 }
 
+
 # PURPOSE
-# This clones and runs the playbook for configuring the
-# RPi for the IMLS/10x/18F data collection pilot.
-ansible_pull_playbook () {
-    _status "Installing hardening playbook."
-    ansible-galaxy collection install devsec.hardening
+# Clones a "bootstrap" playbook. All it does is install
+# the service units that run the full playbook.
+serviceunit_playbook () {
+    _status "Installing serviceunit playbook."
 
     pushd "${PLAYBOOK_WORKING_DIR}/source/imls-playbook" || return
-        _status "Running the playbook. This will take a while."
-        # For testing/dev purposes, we might not want to lock things down
-        # when we're done. The lockdown flag is required to run the
-        # hardening and lockdown roles.
-
+        _status "Running the serviceunit playbook. This may take a bit."
         # -z checks if the var is UNSET.
         if [[ -z "${NOLOCKDOWN}" && -z "${DEVELOP}" ]]; then
-            ansible-playbook -i inventory.yaml playbook.yaml --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
+            ansible-playbook -i inventory.yaml serviceunits.yaml  --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
         else
             _status "Running playbook WITHOUT lockdown"
-            ansible-playbook -vvv -i inventory.yaml playbook.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
+            ansible-playbook -vvv -i inventory.yaml serviceunits.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
         fi
         ANSIBLE_EXIT_STATUS=$?
     popd || return
-    _status "Done running playbook."
+    _status "Done running serviceunit playbook."
     if [ "${ANSIBLE_EXIT_STATUS}" -ne 0 ]; then
-        _err "Ansible playbook failed."
+        _err "Ansible serviceunit playbook failed."
         _err "Exit code: ${ANSIBLE_EXIT_STATUS}"
         _err "Check the log: ${SETUP_LOGFILE}"
     fi
@@ -248,7 +253,9 @@ main () {
     initial_update
     fix_the_time
     # set up the staging area (binaries and playbook).
+    # After shim, we can use `log-event`
     shim
+    _log_event "bootstrap" "done running shim"
     check_for_usb_wifi
     if [[ -z "${NOKEYREAD}" ]]; then
         # If NOKEYREAD is undefined, we should read in the config.
@@ -257,9 +264,9 @@ main () {
         _debug " -- SKIPPING CONFIG ENTRY FOR TESTING PURPOSES --"
     fi
     create_logfile
+    serviceunit_playbook
     setup_logging
     bootstrap_ansible
-    ansible_pull_playbook
     disable_interactive_login
     if [ "${SOMETHING_WENT_WRONG}" -ne 0 ]; then
         _err "Things finished with errors."
