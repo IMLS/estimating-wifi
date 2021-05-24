@@ -215,6 +215,7 @@ bootstrap_ansible () {
 # Clones a "bootstrap" playbook. All it does is install
 # the service units that run the full playbook.
 serviceunit_playbook () {
+    mangle_console
     _status "Installing serviceunit playbook."
 
     pushd "${PLAYBOOK_WORKING_DIR}/source/imls-playbook" || return
@@ -234,6 +235,7 @@ serviceunit_playbook () {
         _err "Exit code: ${ANSIBLE_EXIT_STATUS}"
         _err "Check the log: ${SETUP_LOGFILE}"
     fi
+    restore_console
 }
 
 disable_interactive_login () {
