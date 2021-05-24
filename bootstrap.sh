@@ -140,6 +140,7 @@ initial_update () {
     echo "Doing an initial software update."
     mangle_console
     sudo apt update
+    sudo apt install -y python-apt
     restore_console
 }
 
