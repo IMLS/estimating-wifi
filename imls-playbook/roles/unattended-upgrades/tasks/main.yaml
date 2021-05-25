@@ -44,14 +44,14 @@
 - name: Start a daily 2am timer to pull the playbook
   systemd:
     name: run-imls-client-pi-playbook.timer
-    state: started
+    enabled: true
   become: yes
   when: develop is undefined
 
 - name: Start a hourly timer to pull the playbook (dev)
   systemd:
     name: run-imls-client-pi-playbook-dev.timer
-    state: started
+    enabled: true
   become: yes
   when: develop is defined
 
