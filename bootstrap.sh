@@ -3,8 +3,7 @@
 # TESTING ENV VARS
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
 # NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
-# NOREBOOT - prevents reboot at end of bootstrap.sh
-# DEVELOP - sets NOLOCKDOWN, NOREBOOT and pulls from development branch instead of production versions.
+# DEVELOP - sets NOLOCKDOWN and pulls from development branch instead of production versions.
 #
 # Usage:
 # DEVELOP=1 bash <(curl -s ...)
@@ -216,7 +215,7 @@ bootstrap_ansible () {
 # Clones a "bootstrap" playbook. All it does is install
 # the service units that run the full playbook.
 serviceunit_playbook () {
-    
+
     _status "Installing serviceunit playbook."
 
     pushd "${PLAYBOOK_WORKING_DIR}/source/imls-playbook" || return
@@ -236,7 +235,7 @@ serviceunit_playbook () {
         _err "Exit code: ${ANSIBLE_EXIT_STATUS}"
         _err "Check the log: ${SETUP_LOGFILE}"
     fi
-    
+
 }
 
 disable_interactive_login () {
@@ -278,14 +277,8 @@ main () {
     else
         _status "All done!"
         _status "We're rebooting in one minute!"
-
-        # If the NOREBOOT or DEVELOP flags are NOT set, then reboot.
-        if [[ -z "${NOREBOOT}" && -z "${DEVELOP}" ]]; then
-            sleep 60
-            sudo reboot
-        else
-            _status "Reboot prevented by env flag."
-        fi
+        sleep 60
+        sudo reboot
     fi
 }
 
