@@ -243,6 +243,11 @@ disable_interactive_login () {
     # This tells the pi to boot to the console login, but not to auto-login `pi`
     # https://github.com/RPi-Distro/raspi-config/blob/master/raspi-config#L1308
     sudo /usr/bin/raspi-config nonint do_boot_behaviour B1
+
+    # in production, disable the pi user.
+    if [[ -z "${DEVELOP}" ]]; then
+        sudo usermod -L pi
+    fi
 }
 
 main () {
