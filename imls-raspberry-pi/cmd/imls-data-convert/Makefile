@@ -8,6 +8,9 @@ build: outputs mac_x86 linux_x86
 outputs:
 	mkdir -p build
 
+# TODO
+# https://victoria.dev/blog/how-to-create-a-self-documenting-makefile/
+
 mac_x86:
 	 GOOS=darwin GOARCH=amd64 go build -o build/mac-idc
 mac_arm:

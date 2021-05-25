@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,6 +12,9 @@ import (
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/briandowns/spinner"
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/jszwec/csvutil"
 	"gsa.gov/18f/version"
@@ -78,7 +82,7 @@ func getWifiEvents(cfg *config) ([]WifiEvent, error) {
 		q.Add("filter[fcfs_seq_id][_eq]", cfg.Fcfs_seq_id)
 		q.Add("filter[device_tag][_eq]", cfg.Device_tag)
 		req.URL.RawQuery = q.Encode()
-		fmt.Printf("URL: %v\n", req.URL.String())
+		// fmt.Printf("URL: %v\n", req.URL.String())
 
 		resp, err := client.Do(req)
 		if err != nil {
@@ -119,7 +123,6 @@ func getSessions(events []WifiEvent) []string {
 func remapEvents(events []WifiEvent) []WifiEvent {
 	// Get the unique sessions in the dataset
 	sessions := getSessions(events)
-	log.Println(sessions)
 	// We need things in order. This matters for remapping
 	// the manufacturer and patron indicies.
 	sort.Slice(events, func(i, j int) bool {
@@ -190,14 +193,17 @@ func fixLocaltime(cfg *config, events []WifiEvent) []WifiEvent {
 	return updated
 }
 
-func generateCSV(cfg *config) {
+func fixEvents(cfg *config) []WifiEvent {
 	allEvents, err := getWifiEvents(cfg)
 	if err != nil {
 		log.Println("no events retrieved.")
 	}
 	fixed := fixLocaltime(cfg, allEvents)
 	remapped := remapEvents(fixed)
+	return remapped
+}
 
+func generateCSV(cfg *config, remapped []WifiEvent) {
 	for _, s := range getSessions(remapped) {
 		events := getEventsFromSession(remapped, s)
 		b, err := csvutil.Marshal(events)
@@ -218,6 +224,45 @@ func generateCSV(cfg *config) {
 		f.Write(b)
 	}
 
+}
+
+func generateSqlite(cfg *config, remapped []WifiEvent) {
+	_ = os.Mkdir("output", 0777)
+	fcfs_tag := fmt.Sprintf("%v-%v", cfg.Fcfs_seq_id, cfg.Device_tag)
+	outdir := filepath.Join("output", fcfs_tag)
+	_ = os.Mkdir(outdir, 0777)
+	db, err := sql.Open("sqlite3", string(filepath.Join(outdir, fmt.Sprintf("%v.sqlite", fcfs_tag))))
+	if err != nil {
+		log.Fatal("could not open SQLite3 DB for writing.")
+	}
+	defer db.Close()
+	//ID,EventId,FCFSSeqId,DeviceTag,Localtime,Servertime,SessionId,ManufacturerIndex,PatronIndex
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS wifi 
+			(id INTEGER PRIMARY KEY, 
+			event_id INTEGER, 
+			fcfs_seq_id TEXT,
+			device_tag TEXT,
+			localtime TEXT,
+			servertime TEXT,
+			session_id TEXT,
+			manufacturer_index INTEGER,
+			patron_index INTEGER)`)
+	if err != nil {
+		log.Println("error creating table")
+		log.Fatal(err)
+	}
+
+	stat, _ := db.Prepare(`INSERT INTO wifi 
+			(event_id, fcfs_seq_id, device_tag, localtime, servertime, session_id, manufacturer_index, patron_index) 
+			VALUES  (?, ?, ?, ?, ?, ?, ?, ?)`)
+	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+	s.Suffix = " Writing data to SQLite table..."
+	s.Start()
+	for _, e := range remapped {
+		stat.Exec(e.EventId, e.FCFSSeqId, e.DeviceTag, e.Localtime.Format(time.RFC3339), e.Servertime.Format(time.RFC3339), e.SessionId, e.ManufacturerIndex, e.PatronIndex)
+	}
+	defer stat.Close()
+	s.Stop()
 }
 
 func main() {
@@ -265,5 +310,9 @@ func main() {
 		TzOffset:    *tzOffsetPtr,
 	}
 
-	generateCSV(&cfg)
+	remapped := fixEvents(&cfg)
+	generateCSV(&cfg, remapped)
+	if *sqlitePtr {
+		generateSqlite(&cfg, remapped)
+	}
 }
