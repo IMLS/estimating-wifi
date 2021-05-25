@@ -75,3 +75,10 @@
     minute: "0"
     hour: "3"
     job: "reboot"
+
+- name: Start the IMLS client pi service for the first time
+  systemd:
+    name: run-imls-client-pi-playbook.service
+    state: started
+  become: yes
+  when: autostart is defined
