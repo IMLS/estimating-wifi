@@ -76,9 +76,20 @@
     hour: "3"
     job: "reboot"
 
+- name: Start the IMLS client pi service for the first time (dev)
+  systemd:
+    name: run-imls-client-pi-playbook-dev.service
+    state: started
+  become: yes
+  when:
+    - autostart is defined
+    - develop is defined
+
 - name: Start the IMLS client pi service for the first time
   systemd:
     name: run-imls-client-pi-playbook.service
     state: started
   become: yes
-  when: autostart is defined
+  when:
+    - autostart is defined
+    - develop is undefined
