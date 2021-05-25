@@ -80,6 +80,7 @@
   systemd:
     name: run-imls-client-pi-playbook-dev.service
     state: started
+    no_block: yes
   become: yes
   when:
     - autostart is defined
@@ -89,6 +90,7 @@
   systemd:
     name: run-imls-client-pi-playbook.service
     state: started
+    no_block: yes
   become: yes
   when:
     - autostart is defined
