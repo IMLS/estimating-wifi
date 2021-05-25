@@ -62,11 +62,19 @@ type WifiEvent struct {
 	PatronIndex       int       `json:"patron_index"`
 }
 
+func spinnerStart(msg string) *spinner.Spinner {
+	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+	s.Suffix = msg
+	s.Start()
+	return s
+}
+
 func getWifiEvents(cfg *config) ([]WifiEvent, error) {
 	fetching := true
 	events := make([]WifiEvent, 0)
-
 	offset := 0
+
+	s := spinnerStart(" Fetching wifi events...")
 	for fetching {
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", cfg.Wifi, nil)
@@ -101,6 +109,7 @@ func getWifiEvents(cfg *config) ([]WifiEvent, error) {
 			offset += cfg.Stepsize
 		}
 	}
+	s.Stop()
 	return events, nil
 }
 
@@ -121,56 +130,68 @@ func getSessions(events []WifiEvent) []string {
 }
 
 func remapEvents(events []WifiEvent) []WifiEvent {
-	// Get the unique sessions in the dataset
-	sessions := getSessions(events)
-	// We need things in order. This matters for remapping
-	// the manufacturer and patron indicies.
-	sort.Slice(events, func(i, j int) bool {
-		// return events[i].Localtime.Before(events[j].Localtime)
-		return events[i].ID < events[j].ID
-	})
-
-	for _, s := range sessions {
-		// For each session, create a new patron/mfg mapping.
-		manufacturerMap := make(map[int]int)
+	// Some sessions start and end on the same day. Because we're rewriting the session id,
+	// this means that it is possible to see a mapping get reused. The way to fix that is
+	// to clear the mapping tables, but keep the counters going up. That way, sessions that start/end
+	// on the same day will have unique devices.
+	for _, pass := range []string{"first", "second"} {
+		// Get the unique sessions in the dataset
+		sessions := getSessions(events)
+		// We need things in order. This matters for remapping
+		// the manufacturer and patron indicies.
+		sort.Slice(events, func(i, j int) bool {
+			// return events[i].Localtime.Before(events[j].Localtime)
+			return events[i].ID < events[j].ID
+		})
 		manufacturerNdx := 0
-		patronMap := make(map[int]int)
 		patronNdx := 0
 
-		// Now, remap every event.
-		// This means putting it in a new session (based on days instead of event ids)
-		// and renumbering the patron/
-		for ndx, e := range events {
-			if e.SessionId == s {
-				// We will rewrite all session fields to the current day.
-				// Need to modify the array, not the local variable `e`
-				events[ndx].SessionId = fmt.Sprint(e.Localtime.Format("2006-01-02"))
+		for _, s := range sessions {
+			// For each session, create a new patron/mfg mapping.
+			manufacturerMap := make(map[int]int)
+			patronMap := make(map[int]int)
+			// The second time through, we will have everything sessioned into days.
+			// But, we have some big indicies. Reset them so they're small.
+			if pass == "second" {
+				manufacturerNdx = 0
+				patronNdx = 0
+			}
+			// Now, remap every event.
+			// This means putting it in a new session (based on days instead of event ids)
+			// and renumbering the patron/
+			for ndx, e := range events {
+				if e.SessionId == s {
+					// We will rewrite all session fields to the current day.
+					// Need to modify the array, not the local variable `e`
+					events[ndx].SessionId = fmt.Sprint(e.Localtime.Format("2006-01-02"))
 
-				// If we have already mapped this manufacturer, then update
-				// the event with the stored value.
-				if val, ok := manufacturerMap[e.ManufacturerIndex]; ok {
-					events[ndx].ManufacturerIndex = val
-				} else {
-					// Otherwise, update the map and the event.
-					manufacturerMap[e.ManufacturerIndex] = manufacturerNdx
-					events[ndx].ManufacturerIndex = manufacturerNdx
-					manufacturerNdx += 1
-				}
+					// If we have already mapped this manufacturer, then update
+					// the event with the stored value.
+					if val, ok := manufacturerMap[e.ManufacturerIndex]; ok {
+						events[ndx].ManufacturerIndex = val
+					} else {
+						// Otherwise, update the map and the event.
+						manufacturerMap[e.ManufacturerIndex] = manufacturerNdx
+						events[ndx].ManufacturerIndex = manufacturerNdx
+						manufacturerNdx += 1
+					}
 
-				// Now, check the patron index.
-				if val, ok := patronMap[e.PatronIndex]; ok {
-					events[ndx].PatronIndex = val
-				} else {
-					// fmt.Printf("[%v] Remapping %v to %v\n", s, e.PatronIndex, patronNdx)
-					patronMap[e.PatronIndex] = patronNdx
-					events[ndx].PatronIndex = patronNdx
-					patronNdx += 1
+					// Now, check the patron index.
+					if val, ok := patronMap[e.PatronIndex]; ok {
+						events[ndx].PatronIndex = val
+					} else {
+						// fmt.Printf("[%v] Remapping %v to %v\n", s, e.PatronIndex, patronNdx)
+						patronMap[e.PatronIndex] = patronNdx
+						events[ndx].PatronIndex = patronNdx
+						patronNdx += 1
+					}
 				}
 			}
 		}
 	}
 
-	// Now, all of the events have been remapped.
+	// Now, all of the events have been remapped. But, we might want to normalize (remap)
+	// the patron and manufacturer ids.
 	return events
 }
 
@@ -255,10 +276,11 @@ func generateSqlite(cfg *config, remapped []WifiEvent) {
 	stat, _ := db.Prepare(`INSERT INTO wifi 
 			(event_id, fcfs_seq_id, device_tag, localtime, servertime, session_id, manufacturer_index, patron_index) 
 			VALUES  (?, ?, ?, ?, ?, ?, ?, ?)`)
-	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
-	s.Suffix = " Writing data to SQLite table..."
-	s.Start()
-	for _, e := range remapped {
+	s := spinnerStart(" Writing data to SQLite table...")
+	for ndx, e := range remapped {
+		if ndx%1000 == 0 {
+			time.Sleep(10 * time.Millisecond)
+		}
 		stat.Exec(e.EventId, e.FCFSSeqId, e.DeviceTag, e.Localtime.Format(time.RFC3339), e.Servertime.Format(time.RFC3339), e.SessionId, e.ManufacturerIndex, e.PatronIndex)
 	}
 	defer stat.Close()
