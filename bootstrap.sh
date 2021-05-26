@@ -2,8 +2,7 @@
 
 # TESTING ENV VARS
 # NOKEYREAD - set this to 1 to prevent the key from being read in.
-# NOLOCKDOWN - prevents the pi from hardening and locking down. For testing.
-# DEVELOP - sets NOLOCKDOWN and pulls from development branch instead of production versions.
+# DEVELOP - pulls from development branch instead of production versions.
 #
 # Usage:
 # DEVELOP=1 bash <(curl -s ...)
@@ -221,10 +220,10 @@ serviceunit_playbook () {
     pushd "${PLAYBOOK_WORKING_DIR}/source/imls-playbook" || return
         _status "Running the serviceunit playbook. This may take a bit."
         # -z checks if the var is UNSET.
-        if [[ -z "${NOLOCKDOWN}" && -z "${DEVELOP}" ]]; then
+        if [[ -z "${DEVELOP}" ]]; then
             ansible-playbook -i inventory.yaml serviceunits.yaml  --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
         else
-            _status "Running playbook WITHOUT lockdown"
+            _status "Running DEVELOP playbook"
             ansible-playbook -vvv -i inventory.yaml serviceunits.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
         fi
         ANSIBLE_EXIT_STATUS=$?
@@ -244,6 +243,11 @@ disable_interactive_login () {
     # This tells the pi to boot to the console login, but not to auto-login `pi`
     # https://github.com/RPi-Distro/raspi-config/blob/master/raspi-config#L1308
     sudo /usr/bin/raspi-config nonint do_boot_behaviour B1
+
+    # in production, disable the pi user.
+    if [[ -z "${DEVELOP}" ]]; then
+        sudo usermod -L pi
+    fi
 }
 
 main () {
