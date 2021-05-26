@@ -15,6 +15,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	_ "github.com/mattn/go-sqlite3"
+	. "gsa.gov/18f/imls-data-convert/structs"
 
 	"github.com/jszwec/csvutil"
 	"gsa.gov/18f/version"
@@ -45,22 +46,6 @@ type config struct {
 "manufacturer_index":24,
 "patron_index":6467
 */
-
-type WifiEvents struct {
-	Data []WifiEvent `json:"data"`
-}
-
-type WifiEvent struct {
-	ID                int       `json:"id"`
-	EventId           int       `json:"event_id"`
-	FCFSSeqId         string    `json:"fcfs_seq_id"`
-	DeviceTag         string    `json:"device_tag"`
-	Localtime         time.Time `json:"localtime"`
-	Servertime        time.Time `json:"servertime"`
-	SessionId         string    `json:"session_id"`
-	ManufacturerIndex int       `json:"manufacturer_index"`
-	PatronIndex       int       `json:"patron_index"`
-}
 
 func spinnerStart(msg string) *spinner.Spinner {
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
@@ -134,25 +119,35 @@ func remapEvents(events []WifiEvent) []WifiEvent {
 	// this means that it is possible to see a mapping get reused. The way to fix that is
 	// to clear the mapping tables, but keep the counters going up. That way, sessions that start/end
 	// on the same day will have unique devices.
+
+	manufacturerNdx := 0
+	patronNdx := 0
+	// log.Println("len(events)", len(events))
+
 	for _, pass := range []string{"first", "second"} {
 		// Get the unique sessions in the dataset
 		sessions := getSessions(events)
+		// log.Println("pass", pass, "sessions", sessions)
 		// We need things in order. This matters for remapping
 		// the manufacturer and patron indicies.
 		sort.Slice(events, func(i, j int) bool {
 			// return events[i].Localtime.Before(events[j].Localtime)
 			return events[i].ID < events[j].ID
 		})
-		manufacturerNdx := 0
-		patronNdx := 0
+
+		manufacturerNdx = 0
+		patronNdx = 0
+		var manufacturerMap map[int]int
+		var patronMap map[int]int
 
 		for _, s := range sessions {
 			// For each session, create a new patron/mfg mapping.
-			manufacturerMap := make(map[int]int)
-			patronMap := make(map[int]int)
+			manufacturerMap = make(map[int]int)
+			patronMap = make(map[int]int)
 			// The second time through, we will have everything sessioned into days.
 			// But, we have some big indicies. Reset them so they're small.
 			if pass == "second" {
+				// log.Println(s, "resetting map counters")
 				manufacturerNdx = 0
 				patronNdx = 0
 			}
@@ -163,7 +158,9 @@ func remapEvents(events []WifiEvent) []WifiEvent {
 				if e.SessionId == s {
 					// We will rewrite all session fields to the current day.
 					// Need to modify the array, not the local variable `e`
-					events[ndx].SessionId = fmt.Sprint(e.Localtime.Format("2006-01-02"))
+					if pass == "first" {
+						events[ndx].SessionId = fmt.Sprint(e.Localtime.Format("2006-01-02"))
+					}
 
 					// If we have already mapped this manufacturer, then update
 					// the event with the stored value.
@@ -185,13 +182,16 @@ func remapEvents(events []WifiEvent) []WifiEvent {
 						events[ndx].PatronIndex = patronNdx
 						patronNdx += 1
 					}
-				}
-			}
-		}
+				} // if e.sessionId == s
+			} // end for e := events
+
+			// log.Println("max patronIndex", patronNdx, "max MfgIndex", manufacturerNdx)
+		} // end for s := sessions
 	}
 
 	// Now, all of the events have been remapped. But, we might want to normalize (remap)
 	// the patron and manufacturer ids.
+	// log.Println("len(events)", len(events))
 	return events
 }
 
