@@ -99,20 +99,20 @@ func getWifiEvents(cfg *config) ([]WifiEvent, error) {
 	return events, nil
 }
 
-func getKeys(d map[string]interface{}) []string {
-	keys := make([]string, 0)
-	for k := range d {
-		keys = append(keys, k)
-	}
-	return keys
-}
-
 func getSessions(events []WifiEvent) []string {
-	eventset := make(map[string]interface{})
+	eventset := make([]string, 0)
 	for _, e := range events {
-		eventset[e.SessionId] = true
+		found := false
+		for _, uniq := range eventset {
+			if e.SessionId == uniq {
+				found = true
+			}
+		}
+		if !found {
+			eventset = append(eventset, e.SessionId)
+		}
 	}
-	return getKeys(eventset)
+	return eventset
 }
 
 func remapEvents(events []WifiEvent) []WifiEvent {
@@ -328,6 +328,22 @@ func getLibraries(cfg *config) map[string][]string {
 	return set
 }
 
+func dedupe(events []WifiEvent) []WifiEvent {
+	clean := make([]WifiEvent, 0)
+	for _, e := range events {
+		found := false
+		for _, c := range clean {
+			if e.ID == c.ID {
+				found = true
+			}
+		}
+		if !found {
+			clean = append(clean, e)
+		}
+	}
+	return clean
+}
+
 func main() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	getLibrariesPtr := flag.Bool("get-libraries", false, "Fetch a list of libraries in the dataset and exit.")
@@ -388,7 +404,8 @@ func main() {
 	}
 
 	remapped := fixEvents(&cfg)
-	generateCSV(&cfg, remapped)
+	deduped := dedupe(remapped)
+	generateCSV(&cfg, deduped)
 	if *sqlitePtr {
 		generateSqlite(&cfg, remapped)
 	}
