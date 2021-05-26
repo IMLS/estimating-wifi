@@ -93,6 +93,24 @@ func isPatron(p WifiEvent, es []WifiEvent) int {
 	}
 }
 
+func getPatronFirstLast(patronId int, events []WifiEvent) (int, int) {
+	first := 1000000000
+	last := -1000000000
+
+	for _, e := range events {
+		if e.PatronIndex == patronId {
+			if e.EventId < first {
+				first = e.EventId
+			}
+			if e.EventId > last {
+				last = e.EventId
+			}
+		}
+	}
+
+	return first, last
+}
+
 func modColor(v int, p []color.Color) color.Color {
 	return p[v%len(p)]
 }
@@ -134,32 +152,15 @@ func main() {
 	// img := &image.Uniform(color.RGBA(0x00, 0x00, 0x00, 0x00))
 	dc := gg.NewContext(width, height)
 
-	// Draw the points
-	prevEvent := events[0]
-	for _, e := range events {
-		// If the event id changes, bump our y pointer down.
-		if e.EventId != prevEvent.EventId {
-			y += 1
-			prevEvent = e
-		}
-		x = e.PatronIndex
-		dc.DrawPoint(float64(x), float64(y), 2)
-		isP := isPatron(e, events)
-		if isP == Device {
-			dc.SetRGBA(0.5, 0.5, 0.5, 0.5)
-		} else if isP == Transient {
-			dc.SetRGBA(0.75, 0.75, 0.75, 0.5)
-		} else {
-			dc.SetColor(modColor(e.PatronIndex, palette.WebSafe))
-		}
-		dc.Fill()
-	}
+	dc.SetRGBA(0.5, 0.5, 0, 0.5)
+	dc.SetLineWidth(1)
+	dc.DrawStringAnchored(fmt.Sprint(events[0].FCFSSeqId, " ", events[0].DeviceTag, " ", events[0].Localtime.Format("2006-01-02")), float64(width-5), float64(1), 1, 1)
 
 	// Draw hour lines.
 	hoursSeen := make(map[int]bool)
 
 	y = 0
-	prevEvent = events[0]
+	prevEvent := events[0]
 	for _, e := range events {
 		if e.EventId != prevEvent.EventId {
 			y += 1
@@ -177,11 +178,81 @@ func main() {
 				dc.SetRGBA(0.5, 0.5, 0, 0.5)
 				dc.SetLineWidth(1)
 				dc.DrawStringAnchored(fmt.Sprint(currentHour), float64(width-5), float64(y), 1, 1)
+				dc.DrawStringAnchored(fmt.Sprint(currentHour), float64(width)*0.5, float64(y), 1, 1)
+				dc.DrawStringAnchored(fmt.Sprint(currentHour), float64(50), float64(y), 1, 1)
 			}
 			dc.DrawLine(0, float64(y), float64(width), float64(y))
 			dc.Stroke()
 		}
 
+	}
+
+	// Draw the points
+	y = 0
+	prevEvent = events[0]
+	for _, e := range events {
+		// If the event id changes, bump our y pointer down.
+		if e.EventId != prevEvent.EventId {
+			y += 1
+			prevEvent = e
+		}
+		x = e.PatronIndex
+		isP := isPatron(e, events)
+		if isP == Device {
+			dc.SetRGBA(0.5, 0.5, 0.5, 0.5)
+			dc.DrawPoint(float64(x), float64(y), 2)
+			dc.Fill()
+		} else if isP == Transient {
+			dc.SetRGBA(0.75, 0.75, 0.75, 0.5)
+			dc.DrawPoint(float64(x), float64(y), 2)
+			dc.Fill()
+		} else {
+			// Don't draw patron points... draw lines?
+			dc.SetColor(modColor(e.PatronIndex, palette.WebSafe))
+		}
+
+	}
+
+	// Draw patron lines
+	// Map event IDs to y
+	eventIdToY := make(map[int]int)
+	prevEvent = events[0]
+	y = 0
+	eventIdToY[prevEvent.EventId] = y
+	for _, e := range events {
+		if e.EventId != prevEvent.EventId {
+			y += 1
+			prevEvent = e
+			eventIdToY[prevEvent.EventId] = y
+		}
+	}
+
+	prevEvent = events[0]
+	y = 0
+	drawnPatrons := make(map[int]bool)
+	for _, e := range events {
+		// If the event id changes, bump our y pointer down.
+		if e.EventId != prevEvent.EventId {
+			y += 1
+			prevEvent = e
+		}
+		if _, ok := drawnPatrons[e.PatronIndex]; ok {
+			// Skip if we already checked this patron
+		} else {
+			drawnPatrons[e.PatronIndex] = true
+			isP := isPatron(e, events)
+			if isP == Patron {
+				x = e.PatronIndex
+				first, last := getPatronFirstLast(e.PatronIndex, events)
+
+				dc.SetColor(modColor(e.PatronIndex, palette.WebSafe))
+				dc.DrawLine(float64(x), float64(eventIdToY[first]), float64(x), float64(eventIdToY[last]))
+				//dc.DrawPoint(float64(x), float64(y), 2)
+				//dc.Fill()
+				dc.SetLineWidth(3)
+				dc.Stroke()
+			}
+		}
 	}
 
 	sid := events[0].SessionId
