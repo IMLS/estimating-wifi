@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"time"
 
@@ -287,8 +288,49 @@ func generateSqlite(cfg *config, remapped []WifiEvent) {
 	s.Stop()
 }
 
+func getLibraries(cfg *config) map[string][]string {
+	s := spinnerStart(" Fetching event events...")
+	set := make(map[string][]string)
+	// Fetch the last 50K events;
+	for count := 0; count < 10; count++ {
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", cfg.Events, nil)
+		if err != nil {
+			log.Println(err)
+			log.Fatal("Could not create HTTP request.")
+		}
+		// Add the API key to the header.
+		req.Header.Add("X-Api-Key", cfg.Key)
+		q := req.URL.Query()
+		q.Add("limit", fmt.Sprint(cfg.Stepsize))
+		q.Add("offset", fmt.Sprint(cfg.Stepsize*count))
+		q.Add("fields", "tag,fcfs_seq_id,device_tag")
+		req.URL.RawQuery = q.Encode()
+		//log.Printf("URL: %v\n", req.URL.String())
+
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Println(err)
+			log.Fatal("Failure in HTTP client execution.")
+		}
+		defer resp.Body.Close()
+
+		body, _ := ioutil.ReadAll(resp.Body)
+		evts := new(EventEvents)
+		json.Unmarshal(body, &evts)
+
+		for _, e := range evts.Data {
+			set[fmt.Sprint(e.FCFSSeqId, e.DeviceTag)] = []string{e.FCFSSeqId, e.DeviceTag}
+		}
+	}
+	s.Stop()
+
+	return set
+}
+
 func main() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
+	getLibrariesPtr := flag.Bool("get-libraries", false, "Fetch a list of libraries in the dataset and exit.")
 	fcfsSeqIdPtr := flag.String("fcfs_seq_id", "", "Set the FCFS Seq Id to process.")
 	deviceTagPtr := flag.String("device_tag", "", "Set the device tag to process.")
 	sqlitePtr := flag.Bool("sqlite", false, "Generate an SQLite table of the data.")
@@ -315,7 +357,7 @@ func main() {
 		os.Exit(-1)
 	}
 
-	if *fcfsSeqIdPtr == "" || *deviceTagPtr == "" {
+	if !*getLibrariesPtr && (*fcfsSeqIdPtr == "" || *deviceTagPtr == "") {
 		fmt.Println("Please set both fcfs_seq_id and device_tag.")
 		os.Exit(-1)
 	}
@@ -330,6 +372,19 @@ func main() {
 		Wifi:        *wifiPtr,
 		Stepsize:    *stepSizePtr,
 		TzOffset:    *tzOffsetPtr,
+	}
+
+	if *getLibrariesPtr {
+		libs := getLibraries(&cfg)
+		fmt.Println("fcfs_seq_id,device_tag")
+
+		for k, v := range libs {
+			ismatch, err := regexp.Match(`[A-Z]{2}[0-9]{4}-[0-9]{3}`, []byte(k))
+			if err == nil && ismatch {
+				fmt.Printf("%v,%v\n", v[0], v[1])
+			}
+		}
+		os.Exit(0)
 	}
 
 	remapped := fixEvents(&cfg)
