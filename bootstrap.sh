@@ -218,12 +218,12 @@ serviceunit_playbook () {
     _status "Installing serviceunit playbook."
 
     pushd "${PLAYBOOK_WORKING_DIR}/source/imls-playbook" || return
-        _status "Running the serviceunit playbook. This may take a bit."
+        _status "Running the serviceunit playbook."
         # -z checks if the var is UNSET.
         if [[ -z "${DEVELOP}" ]]; then
             ansible-playbook -i inventory.yaml serviceunits.yaml  --extra-vars "version=$(cat ../prod-version.txt)"
         else
-            _status "Running DEVELOP playbook"
+            _status "Running the serviceunit playbook for development"
             ansible-playbook -vvv -i inventory.yaml serviceunits.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
         fi
         ANSIBLE_EXIT_STATUS=$?

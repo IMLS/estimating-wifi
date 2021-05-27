@@ -1,9 +1,12 @@
 [Unit]
 Description=Runs the IMLS playbook once a day (for dev purposes only).
+After=network-online.target
+Wants=network-online.target
 
 [Timer]
 Unit=run-imls-client-pi-playbook-dev.service
 OnCalendar=hourly
+OnBootSec=60
 Persistent=true
 
 [Install]
