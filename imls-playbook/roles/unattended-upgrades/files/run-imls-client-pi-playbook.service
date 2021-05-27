@@ -6,7 +6,7 @@ ExecStartPre=sh -c "mkdir -p /opt/imls"
 
 ExecStart=sh -c "curl -s https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/prod.shim -o /opt/imls/prod.shim"
 ExecStart=bash /opt/imls/prod.shim
-ExecStart=sh -c 'ansible-playbook -i /opt/imls/source/imls-playbook/inventory.yaml /opt/imls/source/imls-playbook/playbook.yaml --extra-vars "lockdown=yes, version=$(cat /opt/imls/source/prod-version.txt)"'
+ExecStart=sh -c 'ansible-playbook -i /opt/imls/source/imls-playbook/inventory.yaml /opt/imls/source/imls-playbook/playbook.yaml --extra-vars "version=$(cat /opt/imls/source/prod-version.txt)"'
 
 ExecStartPost=sh -c '/usr/local/bin/log-event --tag "playbook finished" --info "{\\"version\\": \\"$(cat /opt/imls/source/prod-version.txt)\\"}"'
 
