@@ -221,7 +221,7 @@ serviceunit_playbook () {
         _status "Running the serviceunit playbook."
         # -z checks if the var is UNSET.
         if [[ -z "${DEVELOP}" ]]; then
-            ansible-playbook -i inventory.yaml serviceunits.yaml  --extra-vars "version=$(cat ../prod-version.txt)"
+            ansible-playbook -i inventory.yaml serviceunits.yaml  --extra-vars "lockdown=yes, version=$(cat ../prod-version.txt)"
         else
             _status "Running the serviceunit playbook for development"
             ansible-playbook -vvv -i inventory.yaml serviceunits.yaml --extra-vars "develop=yes, version=$(cat ../dev-version.txt)"
