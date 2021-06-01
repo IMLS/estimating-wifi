@@ -14,7 +14,7 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/jszwec/csvutil"
-	. "gsa.gov/18f/imls-data-convert/structs"
+	. "gsa.gov/18f/analysis"
 )
 
 const PATRONMINMINS = 30
