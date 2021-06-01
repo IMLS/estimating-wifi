@@ -11,12 +11,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"time"
 
 	"github.com/briandowns/spinner"
 	_ "github.com/mattn/go-sqlite3"
-	. "gsa.gov/18f/imls-data-convert/structs"
+	"gsa.gov/18f/analysis"
 
 	"github.com/jszwec/csvutil"
 	"gsa.gov/18f/version"
@@ -55,9 +54,9 @@ func spinnerStart(msg string) *spinner.Spinner {
 	return s
 }
 
-func getWifiEvents(cfg *config) ([]WifiEvent, error) {
+func getWifiEvents(cfg *config) ([]analysis.WifiEvent, error) {
 	fetching := true
-	events := make([]WifiEvent, 0)
+	events := make([]analysis.WifiEvent, 0)
 	offset := 0
 
 	s := spinnerStart(" Fetching wifi events...")
@@ -86,7 +85,7 @@ func getWifiEvents(cfg *config) ([]WifiEvent, error) {
 		defer resp.Body.Close()
 
 		body, _ := ioutil.ReadAll(resp.Body)
-		e := new(WifiEvents)
+		e := new(analysis.WifiEvents)
 		json.Unmarshal(body, &e)
 		events = append(events, e.Data...)
 		if len(e.Data) < cfg.Stepsize {
@@ -99,115 +98,8 @@ func getWifiEvents(cfg *config) ([]WifiEvent, error) {
 	return events, nil
 }
 
-func getSessions(events []WifiEvent) []string {
-	eventset := make([]string, 0)
-	for _, e := range events {
-		found := false
-		for _, uniq := range eventset {
-			if e.SessionId == uniq {
-				found = true
-			}
-		}
-		if !found {
-			eventset = append(eventset, e.SessionId)
-		}
-	}
-	return eventset
-}
-
-func remapEvents(events []WifiEvent) []WifiEvent {
-	// Some sessions start and end on the same day. Because we're rewriting the session id,
-	// this means that it is possible to see a mapping get reused. The way to fix that is
-	// to clear the mapping tables, but keep the counters going up. That way, sessions that start/end
-	// on the same day will have unique devices.
-
-	manufacturerNdx := 0
-	patronNdx := 0
-	// log.Println("len(events)", len(events))
-
-	for _, pass := range []string{"first", "second"} {
-		// Get the unique sessions in the dataset
-		sessions := getSessions(events)
-		// log.Println("pass", pass, "sessions", sessions)
-		// We need things in order. This matters for remapping
-		// the manufacturer and patron indicies.
-		sort.Slice(events, func(i, j int) bool {
-			// return events[i].Localtime.Before(events[j].Localtime)
-			return events[i].ID < events[j].ID
-		})
-
-		manufacturerNdx = 0
-		patronNdx = 0
-		var manufacturerMap map[int]int
-		var patronMap map[int]int
-
-		for _, s := range sessions {
-			// For each session, create a new patron/mfg mapping.
-			manufacturerMap = make(map[int]int)
-			patronMap = make(map[int]int)
-			// The second time through, we will have everything sessioned into days.
-			// But, we have some big indicies. Reset them so they're small.
-			if pass == "second" {
-				// log.Println(s, "resetting map counters")
-				manufacturerNdx = 0
-				patronNdx = 0
-			}
-			// Now, remap every event.
-			// This means putting it in a new session (based on days instead of event ids)
-			// and renumbering the patron/
-			for ndx, e := range events {
-				if e.SessionId == s {
-					// We will rewrite all session fields to the current day.
-					// Need to modify the array, not the local variable `e`
-					if pass == "first" {
-						events[ndx].SessionId = fmt.Sprint(e.Localtime.Format("2006-01-02"))
-					}
-
-					// If we have already mapped this manufacturer, then update
-					// the event with the stored value.
-					if val, ok := manufacturerMap[e.ManufacturerIndex]; ok {
-						events[ndx].ManufacturerIndex = val
-					} else {
-						// Otherwise, update the map and the event.
-						manufacturerMap[e.ManufacturerIndex] = manufacturerNdx
-						events[ndx].ManufacturerIndex = manufacturerNdx
-						manufacturerNdx += 1
-					}
-
-					// Now, check the patron index.
-					if val, ok := patronMap[e.PatronIndex]; ok {
-						events[ndx].PatronIndex = val
-					} else {
-						// fmt.Printf("[%v] Remapping %v to %v\n", s, e.PatronIndex, patronNdx)
-						patronMap[e.PatronIndex] = patronNdx
-						events[ndx].PatronIndex = patronNdx
-						patronNdx += 1
-					}
-				} // if e.sessionId == s
-			} // end for e := events
-
-			// log.Println("max patronIndex", patronNdx, "max MfgIndex", manufacturerNdx)
-		} // end for s := sessions
-	}
-
-	// Now, all of the events have been remapped. But, we might want to normalize (remap)
-	// the patron and manufacturer ids.
-	// log.Println("len(events)", len(events))
-	return events
-}
-
-func getEventsFromSession(events []WifiEvent, session string) []WifiEvent {
-	filtered := make([]WifiEvent, 0)
-	for _, e := range events {
-		if e.SessionId == session {
-			filtered = append(filtered, e)
-		}
-	}
-	return filtered
-}
-
-func fixLocaltime(cfg *config, events []WifiEvent) []WifiEvent {
-	updated := make([]WifiEvent, 0)
+func fixLocaltime(cfg *config, events []analysis.WifiEvent) []analysis.WifiEvent {
+	updated := make([]analysis.WifiEvent, 0)
 	for _, e := range events {
 		e.Localtime = e.Localtime.Add(time.Duration(cfg.TzOffset) * time.Hour)
 		updated = append(updated, e)
@@ -215,19 +107,19 @@ func fixLocaltime(cfg *config, events []WifiEvent) []WifiEvent {
 	return updated
 }
 
-func fixEvents(cfg *config) []WifiEvent {
+func fixEvents(cfg *config) []analysis.WifiEvent {
 	allEvents, err := getWifiEvents(cfg)
 	if err != nil {
 		log.Println("no events retrieved.")
 	}
 	fixed := fixLocaltime(cfg, allEvents)
-	remapped := remapEvents(fixed)
+	remapped := analysis.RemapEvents(fixed)
 	return remapped
 }
 
-func generateCSV(cfg *config, remapped []WifiEvent) {
-	for _, s := range getSessions(remapped) {
-		events := getEventsFromSession(remapped, s)
+func generateCSV(cfg *config, remapped []analysis.WifiEvent) {
+	for _, s := range analysis.GetSessions(remapped) {
+		events := analysis.GetEventsFromSession(remapped, s)
 		b, err := csvutil.Marshal(events)
 		if err != nil {
 			log.Println(err)
@@ -248,7 +140,7 @@ func generateCSV(cfg *config, remapped []WifiEvent) {
 
 }
 
-func generateSqlite(cfg *config, remapped []WifiEvent) {
+func generateSqlite(cfg *config, remapped []analysis.WifiEvent) {
 	_ = os.Mkdir("output", 0777)
 	fcfs_tag := fmt.Sprintf("%v-%v", cfg.Fcfs_seq_id, cfg.Device_tag)
 	outdir := filepath.Join("output", fcfs_tag)
@@ -316,7 +208,7 @@ func getLibraries(cfg *config) map[string][]string {
 		defer resp.Body.Close()
 
 		body, _ := ioutil.ReadAll(resp.Body)
-		evts := new(EventEvents)
+		evts := new(analysis.EventEvents)
 		json.Unmarshal(body, &evts)
 
 		for _, e := range evts.Data {
@@ -328,8 +220,8 @@ func getLibraries(cfg *config) map[string][]string {
 	return set
 }
 
-func dedupe(events []WifiEvent) []WifiEvent {
-	clean := make([]WifiEvent, 0)
+func dedupe(events []analysis.WifiEvent) []analysis.WifiEvent {
+	clean := make([]analysis.WifiEvent, 0)
 	for _, e := range events {
 		found := false
 		for _, c := range clean {
