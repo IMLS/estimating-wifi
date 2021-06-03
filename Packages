@@ -1,0 +1,15 @@
+Package: session-counter
+Version: 1.0-1
+Architecture: armhf
+Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
+Depends: libc6 (>= 1)
+Filename: ./session-counter_1.0-1.deb
+Size: 5206660
+MD5sum: 205a2184fb47dc9ff339fa4b723df99f
+SHA1: 83c47a0508753b60a2f768cf81560c1c6fbc96bf
+SHA256: 64b432d3bff333d4b5a9a56903da7895a4b4c0a4d5c0b776a6dc3d30552bddfc
+Section: base
+Priority: optional
+Description: Session Counter for IMLS Pilot
+ Fancy description.
+
