@@ -107,7 +107,11 @@ func _Test_StoreContent(t *testing.T) {
 	cfg.Serial = config.GetSerial()
 
 	auth, _ := config.ReadAuth()
-	StoreDevicesCount(cfg, auth, 42, map[string]int{"0:42": 0})
+	log.Println(auth)
+	// FIXME: Need part of a process network for this to work...
+	// arr := make([]map[string]int, 0)
+	// arr = append(arr, map[string]int{"0:42": 0})
+	// StoreDevicesCount(cfg, auth, 42, arr)
 }
 
 func _Test_LogEvent(t *testing.T) {
