@@ -22,6 +22,15 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
+	ch_data_for_report := make(chan []map[string]string)
+
+	// WARNING: If you get this length wrong, we have deadlock.
+	// That is, every one of these needs to be used/written to/read from.
+	const RESET_CHANS = 3
+	var chs_reset [RESET_CHANS]chan tlp.Ping
+	for ndx := 0; ndx < RESET_CHANS; ndx++ {
+		chs_reset[ndx] = make(chan tlp.Ping)
+	}
 
 	// Run the process network.
 	// Driven by a 1s `tick` process.
@@ -29,8 +38,18 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	go tlp.Tick(ka, ch_sec)
 	go tlp.TockEveryN(ka, 60, ch_sec, ch_nsec)
 	go tlp.RunWireshark(ka, cfg, ch_nsec, ch_macs)
-	go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_macs_counted, nil)
-	go tlp.ReportOut(ka, cfg, ch_macs_counted)
+	// The reset will never be triggered in AlgoTwo unless we're rnuning in "sqlite" storage mode.
+	go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_macs_counted, chs_reset[1], nil)
+	go tlp.PrepareDataForStorage(ka, cfg, ch_macs_counted, ch_data_for_report)
+	if cfg.StorageMode == "api" {
+		go tlp.StoreToCloud(ka, cfg, ch_data_for_report, chs_reset[2])
+	} else if cfg.StorageMode == "sqlite" {
+		// At midnight, flush internal structures and restart.
+		go tlp.PingAtMidnight(ka, cfg, chs_reset[0])
+		go tlp.StoreToSqlite(ka, cfg, ch_data_for_report, chs_reset[2])
+		// Fan out the ping to multiple PROCs
+		go tlp.ParDeltaBool(chs_reset[:]...)
+	}
 }
 
 func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
@@ -43,10 +62,13 @@ func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 	}
 }
 
-func handleFlags() {
+func handleFlags() *config.Config {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
+	configPathPtr := flag.String("config", "/opt/imls/config.yaml", "Path to config.")
+	storagePtr := flag.String("storage-mode", "api", "Either 'api', 'sqlite', or 'both'.")
+
 	flag.Parse()
 
 	config.Verbose = *verbosePtr
@@ -62,15 +84,35 @@ func handleFlags() {
 		fmt.Println(auth.Token)
 		os.Exit(0)
 	}
+
+	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
+		log.Println("Looked for config at:", *configPathPtr)
+		log.Fatal("Cannot find config file. Exiting.")
+	} else {
+		config.SetConfigPath(*configPathPtr)
+	}
+
+	cfg := config.ReadConfig()
+
+	if *storagePtr == "api" || *storagePtr == "sqlite" || *storagePtr == "both" {
+		cfg.StorageMode = *storagePtr
+	}
+
+	return cfg
+
 }
 
 func main() {
-	handleFlags()
-
 	// Read in a config
-	cfg := config.ReadConfig()
+	cfg := handleFlags()
+
 	// Set the session ID for this entire run
-	cfg.SessionId = config.CreateSessionId()
+	if cfg.StorageMode == "sqlite" {
+		t := time.Now()
+		cfg.SessionId = fmt.Sprintf("%v-%v-%v", t.Year(), t.Month(), t.Day())
+	} else {
+		cfg.SessionId = config.CreateSessionId()
+	}
 	// Store this so we don't keep hitting /proc/cpuinfo
 	cfg.Serial = config.GetSerial()
 	// Make sure the mfg database is in place and can be loaded.

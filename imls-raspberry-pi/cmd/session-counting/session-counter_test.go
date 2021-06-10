@@ -202,7 +202,8 @@ func TestRawToUid(t *testing.T) {
 			defer wg.Done()
 		}()
 
-		go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_uniq, ch_poison)
+		// Not using the reset here.
+		go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_uniq, nil, ch_poison)
 
 		wg.Add(1)
 		go func() {
