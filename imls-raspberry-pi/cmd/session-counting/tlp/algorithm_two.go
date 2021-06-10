@@ -17,7 +17,7 @@ import (
  * 5. WRONG Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, kill <-chan bool) {
+func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, reset <-chan Ping, kill <-chan bool) {
 	log.Println("Starting AlgorithmTwo")
 	// This is our "tracking database"
 	umdb := model.NewUMDB(cfg)
@@ -41,6 +41,12 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 			return
 		case <-ping:
 			pong <- "AlgorithmTwo"
+		case <-reset:
+			// Tell our mapping "db" to wipe itself.
+			// This clears all counters, etc., and essentially
+			// resets the algorithm as if we had just launched the whole process.
+			umdb.WipeDB()
+
 		case arr := <-in:
 
 			// If we consider every message a "tick" of the clock, we need to advance time.
