@@ -23,6 +23,11 @@ type Config struct {
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
-	SessionId string
-	Serial    string
+	SessionId   string
+	Serial      string `yaml:"serial"`
+	StorageMode string `yaml:"storagemode"`
+	Local       struct {
+		Crontab   string `yaml:"crontab"`
+		SummaryDB string `yaml:"summary_db"`
+	} `yaml:"local"`
 }
