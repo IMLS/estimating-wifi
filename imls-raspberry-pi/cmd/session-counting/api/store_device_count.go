@@ -11,7 +11,14 @@ import (
 
 // This posts an array of data to ReVal.
 // Filter out things that were last seen more than zero minutes ago.
-func StoreDevicesCount(cfg *config.Config, tok *config.AuthConfig, session_id int, h map[string]int) error {
+func StoreDevicesCount(cfg *config.Config, tok *config.AuthConfig, session_id int, arr []map[string]string) error {
+	uri := http.FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
+	http.PostJSON(uri, arr)
+	return nil
+
+}
+
+func StoreDevicesCountOld(cfg *config.Config, tok *config.AuthConfig, session_id int, h map[string]int) error {
 	uri := http.FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
 
 	// Remove all the UIDs that we saw more than 0 minutes ago
