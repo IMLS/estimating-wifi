@@ -3,6 +3,7 @@ package tlp
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"gsa.gov/18f/config"
@@ -10,7 +11,7 @@ import (
 	"gsa.gov/18f/session-counter/api"
 )
 
-func report(service string, cfg *config.Config, session_id int, h map[string]int) (http_error_count int, err error) {
+func report(service string, cfg *config.Config, session_id int, arr []map[string]string) (http_error_count int, err error) {
 	tok, errGT := config.ReadAuth()
 	http_error_count = 0
 
@@ -19,7 +20,7 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 		log.Println(errGT)
 		http_error_count = http_error_count + 1
 	} else {
-		err := api.StoreDevicesCount(cfg, tok, session_id, h)
+		err := api.StoreDevicesCount(cfg, tok, session_id, arr)
 		if err != nil {
 			log.Println("report2:", service, "results POST failure")
 			log.Println(err)
@@ -34,13 +35,17 @@ func report(service string, cfg *config.Config, session_id int, h map[string]int
 	return http_error_count, resultErr
 }
 
-func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]int) {
+func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping) {
 	log.Println("Starting ReportOut")
 	ping, pong := ka.Subscribe("ReportOut", 30)
 	http_error_count := 0
 
 	// For event logging
 	el := http.NewEventLogger(cfg)
+
+	// We never reset anything when storing to the cloud; that is only used by the SQLite version.
+	// Spawn a concurrent process to consume everything that comes in on the reset channel.
+	go Blackhole(ch_reset)
 
 	for {
 		select {
@@ -55,7 +60,7 @@ func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]in
 				log.Printf("reportout: http_error_count threshold of %d reached\n", http_error_count)
 			}
 		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
-		case h := <-ch_uidmap:
+		case arr := <-ch_data:
 			event_ndx, logerr := el.Log("logging_devices", nil)
 			if logerr != nil {
 				log.Println("reportout: error in event logging: ", logerr)
@@ -63,9 +68,13 @@ func ReportOut(ka *Keepalive, cfg *config.Config, ch_uidmap <-chan map[string]in
 				log.Println("reportout: HTTP_ERROR_COUNT", http_error_count)
 			}
 
-			// This used to loop over "directus" and "reval"
-			// We decided we will log only to reval, and it will handle validation and logging.
-			errCount, err := report("reval", cfg, event_ndx, h)
+			// Overwrite the existing event IDs in the prepared data.
+			// We want it to connect to the event logged in the DB.
+			for _, m := range arr {
+				m["event_id"] = strconv.Itoa(event_ndx)
+			}
+
+			errCount, err := report("reval", cfg, event_ndx, arr)
 			if err != nil {
 				log.Println("reportout: error in reporting to reval")
 				log.Println(err)
