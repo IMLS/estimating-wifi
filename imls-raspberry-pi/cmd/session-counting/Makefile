@@ -13,6 +13,7 @@ install: all
 test:
 	go test *.go
 	go test api/*.go
+	go test model/*.go
 
 crossbuild: clean
 	GOOS=linux GOARCH=arm GOARM=7 go build
