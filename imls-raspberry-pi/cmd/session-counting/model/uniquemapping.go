@@ -29,6 +29,14 @@ func NewUMDB(cfg *config.Config) *uniqueMappingDB {
 	return umdb
 }
 
+func (umdb uniqueMappingDB) WipeDB() {
+	*umdb.lastid = 0
+	umdb.uid = make(map[string]int)
+	umdb.mfg = make(map[string]string)
+	umdb.anonmfg = make(map[string]int)
+	umdb.tick = make(map[string]int)
+}
+
 func (umdb uniqueMappingDB) AdvanceTime() {
 	// Bump all the ticks by one.
 	for mac := range umdb.mfg {

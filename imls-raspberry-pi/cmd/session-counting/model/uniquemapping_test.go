@@ -2,6 +2,8 @@ package model
 
 import (
 	"log"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"gsa.gov/18f/config"
@@ -46,7 +48,12 @@ var tests = []struct {
 */
 
 func TestAsUserMappings(t *testing.T) {
-	cfg := config.ReadConfig()
+	//cfg := config.ReadConfig()
+	cfg := new(config.Config)
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+
 	umdb := NewUMDB(cfg)
 	m1 := umdb.AsUserMappings()
 
@@ -116,13 +123,27 @@ func TestAsUserMappings(t *testing.T) {
 
 	for ndx, test := range tests {
 		eq := mapEqual(test.want, test.got)
-		if !eq {
+		if eq {
+			log.Println(test.want, "==", test.got)
+		} else {
 			log.Println("want", test.want)
 			log.Println("got", test.got)
 			t.Fatalf("test %v: maps not equal", ndx+1)
-
 		}
+	}
 
+	// Wipe the DB and re-run the tests. They should "just pass."
+	umdb.WipeDB()
+
+	for ndx, test := range tests {
+		eq := mapEqual(test.want, test.got)
+		if eq {
+			log.Println(test.want, "==", test.got)
+		} else {
+			log.Println("want", test.want)
+			log.Println("got", test.got)
+			t.Fatalf("test %v: maps not equal", ndx+1)
+		}
 	}
 
 }
