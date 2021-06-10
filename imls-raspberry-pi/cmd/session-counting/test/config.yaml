@@ -1,3 +1,4 @@
+storagemode: sqlite
 monitoring:
   # How often we check health, in seconds.
   pinginterval: 30
@@ -36,3 +37,7 @@ wireshark:
   duration: 45
 manufacturers:
   db: /opt/imls/manufacturers.sqlite
+local:
+  summary_db: /opt/imls/summary.sqlite
+  crontab: @midnight
+
