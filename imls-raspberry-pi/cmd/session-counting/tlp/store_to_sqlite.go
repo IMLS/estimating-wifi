@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/jmoiron/sqlx"
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 )
@@ -29,7 +30,7 @@ func getSummaryDB(cfg *config.Config) *sql.DB {
 	// Create tables if it doesn't exist
 	createTableStatement := `
 	CREATE TABLE IF NOT EXISTS summary (
-		id text PRIMARY KEY,
+		id integer PRIMARY KEY AUTOINCREMENT,
 		pi_serial character text,
 		fcfs_seq_id character text,
 		device_tag character text,
@@ -52,18 +53,24 @@ func getSummaryDB(cfg *config.Config) *sql.DB {
 	return db
 }
 
-func newInMemoryDB() *sql.DB {
+func newInMemoryDB() *sqlx.DB {
 	const DB_STRING = ":memory:"
 
-	db, err := sql.Open("sqlite3", DB_STRING)
+	db, err := sqlx.Open("sqlite3", DB_STRING)
 	if err != nil {
-		log.Fatal("sqlite: Could not create in-memory DB.")
+		log.Fatal("sqlite: Could not create in-memory db.")
 	}
+
+	clearInMemoryDB(db)
+	return db
+}
+
+func clearInMemoryDB(db *sqlx.DB) {
 	// Create tables.
 	createTableStatement := `
 	DROP TABLE IF EXISTS wifi;
 	CREATE TABLE wifi (
-		id text PRIMARY KEY,
+		id integer PRIMARY KEY AUTOINCREMENT,
 		event_id integer,
 		fcfs_seq_id character text,
 		device_tag character text,
@@ -73,41 +80,62 @@ func newInMemoryDB() *sql.DB {
 		patron_index integer
 	);`
 
-	_, err = db.Exec(createTableStatement)
+	_, err := db.Exec(createTableStatement)
 	if err != nil {
 		log.Fatal("sqlite: could not create table in db.")
 	}
-
-	return db
 }
 
-func extractWifiEvents(memdb *sql.DB) []analysis.WifiEvent {
-	events := make([]analysis.WifiEvent, 0)
-	q := `SELECT * FROM wifi`
-	rows, err := memdb.Query(q)
+func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
+	// events := make([]analysis.WifiEvent, 0)
+	events := []analysis.WifiEvent{}
+	err := memdb.Select(&events, `SELECT * FROM wifi`)
 	if err != nil {
 		log.Println("sqlite: error in sqlite query.")
 		log.Fatal(err.Error())
 	}
-
-	for rows.Next() {
-		e := analysis.WifiEvent{}
-		err = rows.Scan(&e.ID, &e.EventId, &e.FCFSSeqId, &e.DeviceTag, &e.Localtime, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
-		events = append(events, e)
-	}
+	log.Println("events", events)
+	// for rows.Next() {
+	// 	e := analysis.WifiEvent{}
+	// 	err = rows.Scan(&e.ID, &e.EventId, &e.FCFSSeqId, &e.DeviceTag, &e.Localtime, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
+	// 	events = append(events, e)
+	// }
+	// rows.Close()
 
 	return events
 }
 
-func storeSummary(db *sql.DB, c *analysis.Counter) {
-
+func storeSummary(cfg *config.Config, c *analysis.Counter) {
+	log.Println("sqlite: getting summary db")
+	summarydb := getSummaryDB(cfg)
+	insertS, err := summarydb.Prepare(`INSERT INTO summary (pi_serial, fcfs_seq_id, device_tag, session_id, minimum_minutes, maximum_minutes, patron_count, patron_minutes, device_count, device_minutes, transient_count, transient_minutes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+	if err != nil {
+		log.Println("sqlite: could not prepare insert statement.")
+		log.Fatal(err.Error())
+	}
+	tok, _ := config.ReadAuth()
+	res, err := insertS.Exec(config.GetSerial(), tok.FCFSId, tok.DeviceTag, cfg.SessionId, cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes, c.Patrons, c.PatronMinutes, c.Devices, c.DeviceMinutes, c.Transients, c.TransientMinutes)
+	if err != nil {
+		log.Println("sqlite: could not insert into summary db")
+		log.Println(res)
+		log.Fatal(err.Error())
+	}
+	summarydb.Close()
 }
 
-func processDataFromDay(cfg *config.Config, memdb *sql.DB) {
-	summarydb := getSummaryDB(cfg)
+func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
+	log.Println("sqlite: extracting wifi events")
 	events := extractWifiEvents(memdb)
-	c := analysis.Summarize(events)
-	storeSummary(summarydb, c)
+	log.Println(len(events), "events found")
+	log.Println(events)
+	if len(events) > 0 {
+		log.Println("sqlite: counting")
+		c := analysis.Summarize(events)
+		log.Println("sqlite:", c)
+		storeSummary(cfg, c)
+	} else {
+		log.Println("sqlite: no events to summarize")
+	}
 }
 
 // FIXME
@@ -128,14 +156,33 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case <-ch_reset:
 			// Process the data from the day.
+			log.Println("sqlite: processing data from the day")
 			processDataFromDay(cfg, db)
-			// Close the existing DB.
-			db.Close()
-			// Open a new one.
-			db = newInMemoryDB()
+			log.Println("sqlite: resetting the in-memory db")
+			clearInMemoryDB(db)
 
-		case h := <-ch_data:
-			log.Println(h)
+		case arr := <-ch_data:
+			log.Println("sqlite: storing data into memory")
+			// This has to be done on the db that is currently open.
+			// Cannot pre-prepare for the entire process.
+			insertS, err := db.Prepare(`INSERT INTO wifi (event_id, fcfs_seq_id, device_tag, localtime, session_id, manufacturer_index, patron_index) VALUES (?,?,?,?,?,?,?)`)
+			if err != nil {
+				log.Fatal("sqlite: could not prepare insert statement.")
+			}
+
+			for _, h := range arr {
+				log.Println("inserting...")
+				log.Println(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
+					h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
+				res, err := insertS.Exec(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
+					h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
+				if err != nil {
+					log.Println("sqlite: could not insert into memory db")
+					log.Println(res)
+					log.Fatal(err.Error())
+				}
+			}
+
 			event_ndx += 1
 		}
 	}

@@ -12,6 +12,8 @@ monitoring:
   # we drop the mapping. If the device shows up again, it will
   # be a "new" device.
   uniqueness_window: 120
+  minimum_minutes: 30
+  maximum_minutes: 600
 # These are two different endpoints.
 # They will both go through umbrella...
 # So only the path should be
@@ -29,7 +31,7 @@ wireshark:
   # Should no longer be hardcoded or config'd.
   # adapter: wlan1
   # How long to go between wlan checks (minutes)
-  check_wlan: 3
+  check_wlan: 1
   # duration is the number of seconds that wireshark
   # will listen to the adapter before reporting out.
   # best if this is below one minute.
@@ -39,5 +41,5 @@ manufacturers:
   db: /opt/imls/manufacturers.sqlite
 local:
   summary_db: /opt/imls/summary.sqlite
-  crontab: @midnight
+  crontab: "*/3 * * * *"
 

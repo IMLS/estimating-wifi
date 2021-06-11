@@ -14,12 +14,12 @@ const (
 )
 
 type Counter struct {
-	patrons           int
-	devices           int
-	transients        int
-	patron_minutes    int
-	device_minutes    int
-	transient_minutes int
+	Patrons          int
+	Devices          int
+	Transients       int
+	PatronMinutes    int
+	DeviceMinutes    int
+	TransientMinutes int
 }
 
 func NewCounter() *Counter {
@@ -29,14 +29,14 @@ func NewCounter() *Counter {
 func (c *Counter) add(field int, minutes int) {
 	switch field {
 	case Patron:
-		c.patrons += 1
-		c.patron_minutes += minutes
+		c.Patrons += 1
+		c.PatronMinutes += minutes
 	case Device:
-		c.devices += 1
-		c.device_minutes += minutes
+		c.Devices += 1
+		c.DeviceMinutes += minutes
 	case Transient:
-		c.transients += 1
-		c.transient_minutes += minutes
+		c.Transients += 1
+		c.TransientMinutes += minutes
 	}
 }
 

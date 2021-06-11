@@ -7,6 +7,8 @@ type Config struct {
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
 		HTTPErrorIntervalMins int `yaml:"http_error_interval_mins"`
 		UniquenessWindow      int `yaml:"uniqueness_window"`
+		MinimumMinutes        int `yaml:"minimum_minutes"`
+		MaximumMinutes        int `yaml:"maximum_minutes"`
 	} `yaml:"monitoring"`
 	Umbrella struct {
 		Scheme  string `yaml:"scheme"`

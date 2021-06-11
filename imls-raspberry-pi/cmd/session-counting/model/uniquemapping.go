@@ -71,7 +71,8 @@ func (umdb uniqueMappingDB) UpdateMapping(mac string) {
 			mfgid = len(umdb.anonmfg)
 			if config.Verbose {
 				log.Println("mfg", mfg, "id", mfgid)
-				log.Println("umdb.mfg", umdb.mfg)
+				log.Println(len(umdb.mfg), "devices in mfg map.")
+				//log.Println("umdb.mfg", umdb.mfg)
 			}
 		}
 		umdb.anonmfg[mfg] = mfgid

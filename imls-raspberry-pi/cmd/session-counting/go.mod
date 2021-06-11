@@ -16,6 +16,7 @@ replace gsa.gov/18f/analysis v0.0.0 => ../../internal/analysis
 
 require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/robfig/cron/v3 v3.0.0
 	gsa.gov/18f/analysis v0.0.0

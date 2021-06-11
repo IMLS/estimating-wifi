@@ -74,7 +74,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			// If the config doesn't have this in it, we get a divide by zero.
 			if (ticker % minutes_interval) == 0 {
 				dev = search.SearchForMatchingDevice()
-				log.Println(dev)
+				//log.Println(dev)
 			}
 
 			// Only do a reading and continue the pipeline
