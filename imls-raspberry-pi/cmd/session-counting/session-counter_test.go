@@ -284,7 +284,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out
 			for i := 0; i < NUMRANDOM; i++ {
 				macs[30+i] = generateFakeMac()
 			}
-			log.Println("macs:", macs)
+			//log.Println("macs:", macs)
 			out <- macs
 
 		case <-ch_kill:
@@ -296,12 +296,29 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out
 }
 
 func TestManyTLPCycles(t *testing.T) {
-	const NUMTOCKS int = 10
+	const NUMDAYSTORUN int = 7
+	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
+	const WRITESUMMARYNHOURS int = 3
+	const SECONDSPERMINUTE int = 3
 
 	// This runs the TLP through 10000 cycles. This is roughly the same as week.
 	log.Println("Starting run for a week")
 
+	// Get a local config, so we have paths...
+	_, filename, _, _ := runtime.Caller(0)
+	fmt.Println(filename)
+	path := filepath.Dir(filename)
+	config.SetConfigPath(filepath.Join(path, "test", "config.yaml"))
+	config.SetAuthPath(filepath.Join(path, "test", "auth.yaml"))
 	cfg := config.ReadConfig()
+	_, err := config.ReadAuthTest()
+	if err != nil {
+		log.Println("could not read local auth")
+		log.Fatal(err.Error())
+	}
+	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
+	log.Println(cfg)
+
 	config.Verbose = true
 
 	// Create channels for process network
@@ -335,7 +352,7 @@ func TestManyTLPCycles(t *testing.T) {
 	wg.Add(1)
 
 	// Delta this out to RunWireshark and PingAfterNHours
-	go tlp.TockEveryN(nil, 60, ch_sec, ch_nsec, KC[0])
+	go tlp.TockEveryN(nil, SECONDSPERMINUTE, ch_sec, ch_nsec, KC[0])
 	go func(in chan bool, o1 chan bool, o2 chan bool) {
 		for {
 			<-in
@@ -352,21 +369,24 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.PrepareDataForStorage(nil, cfg, ch_macs_counted, ch_data_for_report, KC[3])
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
-	go PingAfterNHours(nil, cfg, 3, ch_nsec2, chs_reset[0], KC[4])
+	go PingAfterNHours(nil, cfg, WRITESUMMARYNHOURS, ch_nsec2, chs_reset[0], KC[4])
 	go tlp.StoreToSqlite(nil, cfg, ch_data_for_report, chs_reset[2], KC[5])
 	// Fan out the ping to multiple PROCs
 	go tlp.ParDelta(KC[6], chs_reset[:]...)
 
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {
+		// Give the rest of the network time to come alive.
 		time.Sleep(5 * time.Second)
-		counter := 0
-		for tock := 0; tock < NUMTOCKS*60; tock++ {
+		minutes := 0
+		for secs := 0; secs < NUMMINUTESTORUN*60; secs++ {
 			//log.Println("tocking...")
 			ch_sec <- true
-			if tock%60 == 0 {
-				counter += 1
-				log.Println("minutes:", counter)
+			if secs%SECONDSPERMINUTE == 0 {
+				minutes += 1
+				hours := (minutes / 60)
+				days := (minutes / (60 * 24))
+				log.Println(days, "d", hours, "h", minutes%60, "m")
 			}
 
 		}
@@ -378,6 +398,6 @@ func TestManyTLPCycles(t *testing.T) {
 
 	}()
 	wg.Wait()
-	log.Println("Done waiting...")
-
+	log.Println("Done waiting... exiting in 10 seconds")
+	time.Sleep(10 * time.Second)
 }

@@ -160,6 +160,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			pong <- "StoreToSqlite"
 			// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case <-ch_kill:
+			db.Close()
 			log.Println("Exiting StoreToSqlite")
 			return
 
