@@ -41,5 +41,6 @@ manufacturers:
   db: /opt/imls/manufacturers.sqlite
 local:
   summary_db: /opt/imls/summary.sqlite
-  crontab: "*/3 * * * *"
+  # "@midnight" or "0 0 * * *" for every midnight
+  crontab: "* */6 * * *"
 

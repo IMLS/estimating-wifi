@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"math/rand"
 	"path/filepath"
 	"runtime"
 	"sync"
 	"testing"
+	"time"
 
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/session-counter/tlp"
@@ -189,7 +192,7 @@ func TestRawToUid(t *testing.T) {
 
 		ch_macs := make(chan []string)
 		ch_uniq := make(chan map[string]int)
-		ch_poison := make(chan bool)
+		ch_poison := make(chan tlp.Ping)
 		var u map[string]int = nil
 
 		wg.Add(1)
@@ -215,7 +218,7 @@ func TestRawToUid(t *testing.T) {
 				<-ch_uniq
 			}
 			u = <-ch_uniq
-			ch_poison <- true
+			ch_poison <- tlp.Ping{}
 			defer wg.Done()
 		}()
 
@@ -230,4 +233,151 @@ func TestRawToUid(t *testing.T) {
 			assertEqual(t, expected, received, "not equal")
 		}
 	} // end for over tests
+}
+
+func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, n_hours int, ch_tick chan bool, ch_reset chan<- tlp.Ping, ch_kill <-chan tlp.Ping) {
+	counter := 0
+	for {
+		select {
+		case <-ch_tick:
+			counter += 1
+			// Ping every
+			if (counter != 0) && ((counter % (60 * n_hours)) == 0) {
+				ch_reset <- tlp.Ping{}
+			}
+		case <-ch_kill:
+			log.Println("Exiting PingAfterNHours")
+			return
+		}
+	}
+}
+
+func generateFakeMac() string {
+	var letterRunes = []rune("ABCDEF0123456789")
+	b := make([]rune, 17)
+	colons := [...]int{2, 5, 8, 11, 14}
+	for i := 0; i < 17; i++ {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+
+		for v := range colons {
+			if i == colons[v] {
+				b[i] = rune(':')
+			}
+		}
+	}
+	return string(b)
+}
+
+func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out chan []string, ch_kill <-chan tlp.Ping) {
+	NUMMACS := 40
+	NUMRANDOM := 10
+	// Lets have 30 consistent devices
+	macs := make([]string, NUMMACS)
+	for i := 0; i < NUMMACS-NUMRANDOM; i++ {
+		macs[i] = generateFakeMac()
+	}
+
+	for {
+		select {
+		case <-in:
+			// And 10 random devices
+			for i := 0; i < NUMRANDOM; i++ {
+				macs[30+i] = generateFakeMac()
+			}
+			log.Println("macs:", macs)
+			out <- macs
+
+		case <-ch_kill:
+			log.Println("Exiting RunFakeWireshark")
+			return
+		}
+	}
+
+}
+
+func TestManyTLPCycles(t *testing.T) {
+	const NUMTOCKS int = 10
+
+	// This runs the TLP through 10000 cycles. This is roughly the same as week.
+	log.Println("Starting run for a week")
+
+	cfg := config.ReadConfig()
+	config.Verbose = true
+
+	// Create channels for process network
+	ch_sec := make(chan bool)
+
+	ch_nsec := make(chan bool)
+	ch_nsec1 := make(chan bool)
+	ch_nsec2 := make(chan bool)
+
+	ch_macs := make(chan []string)
+	ch_macs_counted := make(chan map[string]int)
+	ch_data_for_report := make(chan []map[string]string)
+
+	const NUM_KILL_CHANNELS = 7
+	var KC [NUM_KILL_CHANNELS]chan tlp.Ping
+	for i := 0; i < NUM_KILL_CHANNELS; i++ {
+		KC[i] = make(chan tlp.Ping)
+	}
+
+	// WARNING: If you get this length wrong, we have deadlock.
+	// That is, every one of these needs to be used/written to/read from.
+	// The kill channel lets us poison the network for shutdown. Really only for testing.
+	const RESET_CHANS = 3
+	var chs_reset [RESET_CHANS]chan tlp.Ping
+	for ndx := 0; ndx < RESET_CHANS; ndx++ {
+		chs_reset[ndx] = make(chan tlp.Ping)
+	}
+
+	// See if we can wait and shut down the test...
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	// Delta this out to RunWireshark and PingAfterNHours
+	go tlp.TockEveryN(nil, 60, ch_sec, ch_nsec, KC[0])
+	go func(in chan bool, o1 chan bool, o2 chan bool) {
+		for {
+			<-in
+			o1 <- true
+			o2 <- true
+		}
+	}(ch_nsec, ch_nsec1, ch_nsec2)
+
+	// Need a fake RunWireshark
+	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
+	go RunFakeWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
+
+	go tlp.AlgorithmTwo(nil, cfg, ch_macs, ch_macs_counted, chs_reset[1], KC[2])
+	go tlp.PrepareDataForStorage(nil, cfg, ch_macs_counted, ch_data_for_report, KC[3])
+	// At midnight, flush internal structures and restart.
+	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
+	go PingAfterNHours(nil, cfg, 3, ch_nsec2, chs_reset[0], KC[4])
+	go tlp.StoreToSqlite(nil, cfg, ch_data_for_report, chs_reset[2], KC[5])
+	// Fan out the ping to multiple PROCs
+	go tlp.ParDelta(KC[6], chs_reset[:]...)
+
+	// We want 10000 minutes, but the tocker is every second.
+	go func() {
+		time.Sleep(5 * time.Second)
+		counter := 0
+		for tock := 0; tock < NUMTOCKS*60; tock++ {
+			//log.Println("tocking...")
+			ch_sec <- true
+			if tock%60 == 0 {
+				counter += 1
+				log.Println("minutes:", counter)
+			}
+
+		}
+		log.Println("Killing the test network.")
+		for ndx := 0; ndx < NUM_KILL_CHANNELS; ndx++ {
+			KC[ndx] <- tlp.Ping{}
+		}
+		wg.Done()
+
+	}()
+	wg.Wait()
+	log.Println("Done waiting...")
+
 }

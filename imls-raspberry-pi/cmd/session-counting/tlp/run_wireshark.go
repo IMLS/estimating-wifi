@@ -49,10 +49,15 @@ func tshark(cfg *config.Config) []string {
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []string) {
+func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []string, ch_kill <-chan Ping) {
 	log.Println("Starting runWireshark")
-	// If we have to wait twice the monitor duration, something broke.
-	ping, pong := ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)
+
+	var ping, pong chan interface{} = nil, nil
+
+	// ch_kill will be nil in production
+	if ch_kill == nil {
+		ping, pong = ka.Subscribe("runWireshark", cfg.Wireshark.Duration*2)
+	}
 
 	// Adapter count... every "ac" ticks, we look up the adapter.
 	// (ac % 0) guarantees that we look it up the first time.
@@ -66,6 +71,10 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			// We ping faster than this process can reply. However, we have a long
 			// enough timeout that we will *eventually* catch up with all of the pings.
 			pong <- "wireshark"
+
+		case <-ch_kill:
+			log.Println("Exiting RunWireshark")
+			return
 
 		case <-in:
 			// Look up the adapter. Use the find-ralink library.

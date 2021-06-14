@@ -35,10 +35,15 @@ func report(service string, cfg *config.Config, session_id int, arr []map[string
 	return http_error_count, resultErr
 }
 
-func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping) {
+func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping, ch_kill <-chan Ping) {
 	log.Println("Starting ReportOut")
-	ping, pong := ka.Subscribe("ReportOut", 30)
 	http_error_count := 0
+
+	//ch_kill will be nil in production
+	var ping, pong chan interface{} = nil, nil
+	if ch_kill == nil {
+		ping, pong = ka.Subscribe("ReportOut", 30)
+	}
 
 	// For event logging
 	el := http.NewEventLogger(cfg)
@@ -59,6 +64,11 @@ func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string
 			} else {
 				log.Printf("reportout: http_error_count threshold of %d reached\n", http_error_count)
 			}
+
+		case <-ch_kill:
+			log.Println("Exiting StoreToCloud")
+			return
+
 		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case arr := <-ch_data:
 			event_ndx, logerr := el.Log("logging_devices", nil)

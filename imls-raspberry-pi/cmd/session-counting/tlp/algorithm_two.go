@@ -17,7 +17,7 @@ import (
  * 5. WRONG Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, reset <-chan Ping, kill <-chan bool) {
+func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, reset <-chan Ping, ch_kill <-chan Ping) {
 	log.Println("Starting AlgorithmTwo")
 	// This is our "tracking database"
 	umdb := model.NewUMDB(cfg)
@@ -25,7 +25,7 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 	// If we are running live, the kill channel is `nil`.
 	// When we are live, THEN init the ping/pong.
 	testing := true
-	if kill == nil {
+	if ch_kill == nil {
 		testing = false
 	}
 	var ping chan interface{} = nil
@@ -36,7 +36,7 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 	}
 	for {
 		select {
-		case <-kill:
+		case <-ch_kill:
 			log.Println("a2: exiting")
 			return
 		case <-ping:

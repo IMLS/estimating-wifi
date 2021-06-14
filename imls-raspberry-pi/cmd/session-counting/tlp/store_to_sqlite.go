@@ -130,7 +130,7 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 	log.Println(events)
 	if len(events) > 0 {
 		log.Println("sqlite: counting")
-		c := analysis.Summarize(events)
+		c := analysis.Summarize(cfg, events)
 		log.Println("sqlite:", c)
 		storeSummary(cfg, c)
 	} else {
@@ -140,9 +140,14 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 
 // FIXME
 // On reset, we need to process and clear the sqlite tables. This should ping once daily.
-func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping) {
+func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping, ch_kill <-chan Ping) {
 	log.Println("Starting StoreToSqlite")
-	ping, pong := ka.Subscribe("StoreToSqlite", 30)
+
+	var ping, pong chan interface{} = nil, nil
+	// ch_kill will be nil in production
+	if ch_kill == nil {
+		ping, pong = ka.Subscribe("StoreToSqlite", 30)
+	}
 
 	// If we aren't logging events...
 	event_ndx := 0
@@ -153,7 +158,11 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 		select {
 		case <-ping:
 			pong <- "StoreToSqlite"
-		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
+			// This is the [ uid -> ticks ] map (uid looks like "Next:0")
+		case <-ch_kill:
+			log.Println("Exiting StoreToSqlite")
+			return
+
 		case <-ch_reset:
 			// Process the data from the day.
 			log.Println("sqlite: processing data from the day")
@@ -171,9 +180,8 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			}
 
 			for _, h := range arr {
-				log.Println("inserting...")
-				log.Println(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
-					h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
+				//log.Println("inserting...")
+				// log.Println(h["event_id"], h["fcfs_seq_id"], h["device_tag"], h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
 				res, err := insertS.Exec(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
 					h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
 				if err != nil {

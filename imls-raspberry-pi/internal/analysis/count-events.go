@@ -3,10 +3,14 @@ package analysis
 import (
 	"sort"
 	"time"
+
+	"gsa.gov/18f/config"
 )
 
-const PATRONMINMINS = 30
-const PATRONMAXMINS = 10 * 60
+// These defaults get overridden by the config.Config file.
+var patron_min_mins float64 = 30
+var patron_max_mins float64 = 10 * 60
+
 const (
 	Transient = iota
 	Patron
@@ -22,7 +26,9 @@ type Counter struct {
 	TransientMinutes int
 }
 
-func NewCounter() *Counter {
+func NewCounter(cfg *config.Config) *Counter {
+	patron_min_mins = float64(cfg.Monitoring.MinimumMinutes)
+	patron_max_mins = float64(cfg.Monitoring.MaximumMinutes)
 	return &Counter{0, 0, 0, 0, 0, 0}
 }
 
@@ -59,9 +65,9 @@ func isPatron(p WifiEvent, es []WifiEvent) int {
 	}
 
 	diff := latest.Sub(earliest).Minutes()
-	if diff < PATRONMINMINS {
+	if diff < patron_min_mins {
 		return Transient
-	} else if diff > PATRONMAXMINS {
+	} else if diff > patron_max_mins {
 		// log.Println("id", p.PatronIndex, "diff", diff)
 		return Device
 	} else {
@@ -98,8 +104,8 @@ func getEventIdTime(events []WifiEvent, eventId int) (t time.Time) {
 	return t
 }
 
-func doCounting(events []WifiEvent) *Counter {
-	c := NewCounter()
+func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
+	c := NewCounter(cfg)
 
 	prevEvent := events[0]
 	checked := make(map[int]bool)
@@ -144,10 +150,10 @@ func doCounting(events []WifiEvent) *Counter {
 
 // Return the drawing context where the image is drawn.
 // This can then be written to disk.
-func Summarize(events []WifiEvent) (c *Counter) {
+func Summarize(cfg *config.Config, events []WifiEvent) (c *Counter) {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].ID < events[j].ID
 	})
-	c = doCounting(events)
+	c = doCounting(cfg, events)
 	return c
 }
