@@ -1,6 +1,7 @@
-# imls-ppa
+# IMLS Debian PPA repository
 
-    curl -s --compressed "https://jadudm.github.io/imls-ppa/KEY.gpg" | sudo apt-key add -
-    sudo curl -s --compressed -o /etc/apt/sources.list.d/imls-ppa.list "https://jadudm.github.io/imls-ppa/contents.list"
-    sudo apt update
-    sudo apt install session-counter
+This PPA repository provides a standalone wifi session counter.
+
+To install:
+
+    bash <(curl -s -L https://raw.githubusercontent.com/jadudm/imls-ppa/main/imls-ppa.shim)
