@@ -29,7 +29,8 @@ type Config struct {
 	Serial      string `yaml:"serial"`
 	StorageMode string `yaml:"storagemode"`
 	Local       struct {
-		Crontab   string `yaml:"crontab"`
-		SummaryDB string `yaml:"summary_db"`
+		Crontab     string `yaml:"crontab"`
+		SummaryDB   string `yaml:"summary_db"`
+		TemporaryDB string `yaml:"temporary_db"`
 	} `yaml:"local"`
 }

@@ -65,6 +65,16 @@ func newInMemoryDB() *sqlx.DB {
 	return db
 }
 
+func newInFSDB(path string) *sqlx.DB {
+	db, err := sqlx.Open("sqlite3", path)
+	if err != nil {
+		log.Fatal("sqlite: Could not create in-memory db.")
+	}
+
+	clearInMemoryDB(db)
+	return db
+}
+
 func clearInMemoryDB(db *sqlx.DB) {
 	// Create tables.
 	createTableStatement := `
@@ -153,6 +163,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 	event_ndx := 0
 	// We'll use an in-memory DB for the recording of data throughout the day.
 	db := newInMemoryDB()
+	// db := newInFSDB(cfg.Local.TemporaryDB)
 
 	for {
 		select {
@@ -170,6 +181,9 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			processDataFromDay(cfg, db)
 			log.Println("sqlite: resetting the in-memory db")
 			clearInMemoryDB(db)
+			db.Close()
+			// db = newInFSDB(cfg.Local.TemporaryDB)
+			db = newInMemoryDB()
 
 		case arr := <-ch_data:
 			log.Println("sqlite: storing data into memory")
