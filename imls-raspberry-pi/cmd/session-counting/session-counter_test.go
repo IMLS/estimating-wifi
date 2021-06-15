@@ -393,7 +393,7 @@ func TestManyTLPCycles(t *testing.T) {
 				var m runtime.MemStats
 				runtime.ReadMemStats(&m)
 				minutes += 1
-				hours := (minutes / 60) % 60
+				hours := (minutes / 60) % 24
 				days := (minutes / (60 * 24))
 				memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
 				log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
