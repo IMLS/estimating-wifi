@@ -21,10 +21,10 @@ Depends: libc6 (>= 1),
          nginx (>= 1),
          session-counter (>= 1)
 Filename: ./session-counter-csv_1.0-1_arm.deb
-Size: 1084
-MD5sum: 6acf9c73eb296065002d59a169889222
-SHA1: 2d1b05d19731fe63a1474e95457047ea0105f093
-SHA256: 91f73c5881bb2a44fb0786838afb71154285e19a497b1ab478b633ad2287979e
+Size: 1156
+MD5sum: a95e7df66a1cdf81f9cf28820b0f55b1
+SHA1: b382293bac8c93c171a707321b0f4c4961ea0e06
+SHA256: 3cbd6d644e55d90df5a901a53e18c555a03f7c3be69d2567ed4b6af55553f0ce
 Section: base
 Priority: optional
 Description: Session Counter for IMLS Pilot

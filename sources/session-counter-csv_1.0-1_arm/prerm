@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+# clean up the nginx configuration.
+rm -f /etc/nginx/sites-{enabled,available}/session-counter.conf
+

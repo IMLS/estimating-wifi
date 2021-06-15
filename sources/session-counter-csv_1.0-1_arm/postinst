@@ -3,5 +3,5 @@
 set -e
 systemctl enable nginx.service
 rm -f /etc/nginx/sites-enabled/default
-ln -sf /etc/nginx/session-counter.conf /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/session-counter.conf /etc/nginx/sites-enabled/
 systemctl restart nginx.service
