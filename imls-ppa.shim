@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euox pipefail
+
+REPOSITORY="https://jadudm.github.io/imls-ppa"
+
+# TODO: install a version of input-initial-configuration that only asks for tag and fcfs id
+
+# add the two gpg keys used for signing.
+curl -s --compressed "${REPOSITORY}/KEY.gpg" | sudo apt-key add -
+curl -s --compressed "${REPOSITORY}/KEY_ALT.gpg" | sudo apt-key add -
+
+#
+sudo curl -s --compressed -o /etc/apt/sources.list.d/imls-ppa.list "${REPOSITORY}/contents.list"
+sudo apt update
+
+sudo apt install session-counter-csv
