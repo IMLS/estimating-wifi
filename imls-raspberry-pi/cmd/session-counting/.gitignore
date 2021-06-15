@@ -1,3 +1,4 @@
 session-counter
 testlogfile
 .vscode
+*.sqlite

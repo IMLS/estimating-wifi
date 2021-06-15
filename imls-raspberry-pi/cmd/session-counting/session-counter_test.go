@@ -252,6 +252,10 @@ func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, n_hours int, ch_tick
 	}
 }
 
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
+}
+
 func generateFakeMac() string {
 	var letterRunes = []rune("ABCDEF0123456789")
 	b := make([]rune, 17)
@@ -310,7 +314,10 @@ func TestManyTLPCycles(t *testing.T) {
 	path := filepath.Dir(filename)
 	config.SetConfigPath(filepath.Join(path, "test", "config.yaml"))
 	config.SetAuthPath(filepath.Join(path, "test", "auth.yaml"))
+
 	cfg := config.ReadConfig()
+	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
+
 	_, err := config.ReadAuthTest()
 	if err != nil {
 		log.Println("could not read local auth")
@@ -383,10 +390,14 @@ func TestManyTLPCycles(t *testing.T) {
 			//log.Println("tocking...")
 			ch_sec <- true
 			if secs%SECONDSPERMINUTE == 0 {
+				var m runtime.MemStats
+				runtime.ReadMemStats(&m)
 				minutes += 1
 				hours := (minutes / 60)
 				days := (minutes / (60 * 24))
-				log.Println(days, "d", hours, "h", minutes%60, "m")
+				memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
+				log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
+
 			}
 
 		}

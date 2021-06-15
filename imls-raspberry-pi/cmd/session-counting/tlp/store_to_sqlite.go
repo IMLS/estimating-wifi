@@ -104,7 +104,8 @@ func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
 		log.Println("sqlite: error in sqlite query.")
 		log.Fatal(err.Error())
 	}
-	log.Println("events", events)
+
+	//log.Println("events", events)
 	// for rows.Next() {
 	// 	e := analysis.WifiEvent{}
 	// 	err = rows.Scan(&e.ID, &e.EventId, &e.FCFSSeqId, &e.DeviceTag, &e.Localtime, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
@@ -137,7 +138,7 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 	log.Println("sqlite: extracting wifi events")
 	events := extractWifiEvents(memdb)
 	log.Println(len(events), "events found")
-	log.Println(events)
+	//log.Println(events)
 	if len(events) > 0 {
 		log.Println("sqlite: counting")
 		c := analysis.Summarize(cfg, events)

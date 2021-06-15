@@ -28,6 +28,10 @@ func CheckMfgDatabaseExists(cfg *config.Config) {
 // FUNC Mac_to_mfg
 // Looks up a MAC address in the manufactuerer's database.
 // Returns a valid name or "unknown" if the name cannot be found.
+
+// We hit this *all the time*. Perhaps we can speed it up?
+var cache map[string]string = make(map[string]string)
+
 func MacToMfg(cfg *config.Config, mac string) string {
 	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
@@ -49,28 +53,47 @@ func MacToMfg(cfg *config.Config, mac string) string {
 		// try and slice more of the string than exists.
 		if len(mac) >= length {
 			substr := mac[0:length]
-			q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
-			rows, err := db.Query(q)
-			// Close the rows down, too...
-			// Another possible leak?
-			if err != nil {
-				log.Println(err)
-				log.Printf("manufactuerer not found: %s", q)
+
+			// Can we pull this out of the "memoized" cache?
+			if v, ok := cache[substr]; ok {
+				return v
 			} else {
-				var id string
 
-				defer rows.Close()
+				q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
+				rows, err := db.Query(q)
+				// Close the rows down, too...
+				// Another possible leak?
+				if err != nil {
+					log.Println(err)
+					log.Printf("manufactuerer not found: %s", q)
 
-				for rows.Next() {
-					err = rows.Scan(&id)
-					if err != nil {
-						log.Fatal("Failed in DB result row scanning.")
-					}
-					if id != "" {
-						return id
+				} else {
+					var id string
+
+					defer rows.Close()
+
+					for rows.Next() {
+						err = rows.Scan(&id)
+						if err != nil {
+							log.Fatal("Failed in DB result row scanning.")
+						}
+						if id != "" {
+							cache[substr] = id
+							return id
+						}
 					}
 				}
 			}
+
+		}
+	}
+
+	// If we got here, then it doesn't matter which subset we use...
+	// we don't recognize this MAC address.
+	for _, length := range lengths {
+		if len(mac) >= length {
+			substr := mac[0:length]
+			cache[substr] = "unknown"
 		}
 	}
 

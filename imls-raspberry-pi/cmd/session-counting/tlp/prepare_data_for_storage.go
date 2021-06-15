@@ -15,6 +15,8 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 
 	log.Println("Starting PrepareDataForStorage")
 
+	// If ch_kill is nill, we're live.
+	// If it is *not* nill, we're running under test/simulation conditions.
 	var ping, pong chan interface{} = nil, nil
 	if ch_kill == nil {
 		ping, pong = ka.Subscribe("PrepareDataForStorage", 30)
