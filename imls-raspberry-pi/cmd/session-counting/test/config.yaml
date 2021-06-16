@@ -1,4 +1,8 @@
 storagemode: sqlite
+auth:
+  api_token: CESTNESPASUNTOKEN
+  device_tag: default-tag
+  fcfs_seq_id: ME9999-999
 monitoring:
   # How often we check health, in seconds.
   pinginterval: 30
