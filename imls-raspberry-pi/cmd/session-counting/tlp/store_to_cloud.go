@@ -12,20 +12,13 @@ import (
 )
 
 func report(service string, cfg *config.Config, session_id int, arr []map[string]string) (http_error_count int, err error) {
-	tok, errGT := config.ReadAuth()
 	http_error_count = 0
 
-	if errGT != nil {
-		log.Println("report2:", service, "error in token fetch")
-		log.Println(errGT)
+	err = api.StoreDevicesCount(cfg, session_id, arr)
+	if err != nil {
+		log.Println("report2:", service, "results POST failure")
+		log.Println(err)
 		http_error_count = http_error_count + 1
-	} else {
-		err := api.StoreDevicesCount(cfg, tok, session_id, arr)
-		if err != nil {
-			log.Println("report2:", service, "results POST failure")
-			log.Println(err)
-			http_error_count = http_error_count + 1
-		}
 	}
 
 	var resultErr error = nil

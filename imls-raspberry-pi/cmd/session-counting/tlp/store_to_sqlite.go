@@ -124,8 +124,8 @@ func storeSummary(cfg *config.Config, c *analysis.Counter) {
 		log.Println("sqlite: could not prepare insert statement.")
 		log.Fatal(err.Error())
 	}
-	tok, _ := config.ReadAuth()
-	res, err := insertS.Exec(config.GetSerial(), tok.FCFSId, tok.DeviceTag, cfg.SessionId, cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes, c.Patrons, c.PatronMinutes, c.Devices, c.DeviceMinutes, c.Transients, c.TransientMinutes)
+
+	res, err := insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes, c.Patrons, c.PatronMinutes, c.Devices, c.DeviceMinutes, c.Transients, c.TransientMinutes)
 	if err != nil {
 		log.Println("sqlite: could not insert into summary db")
 		log.Println(res)

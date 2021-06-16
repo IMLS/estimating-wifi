@@ -22,11 +22,6 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 		ping, pong = ka.Subscribe("PrepareDataForStorage", 30)
 	}
 
-	tok, err := config.ReadAuth()
-	if err != nil {
-		log.Fatal("prepdata: could not read auth info in PrepareDataForStorage.")
-	}
-
 	event_ndx := 0
 
 	for {
@@ -66,9 +61,9 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 					// The serial number of the Pi.
 					"pi_serial": config.GetSerial(),
 					// The FCFS Seq Id entered at setup time.
-					"fcfs_seq_id": tok.FCFSId,
+					"fcfs_seq_id": cfg.Auth.FCFSId,
 					// The tag entered at setup time.
-					"device_tag": tok.DeviceTag,
+					"device_tag": cfg.Auth.DeviceTag,
 					// The "anondevice" is now something like "0:32" or "26:384"
 					// We split that into a manufacturer ID and a device ID.
 					// The manufacturer Ids are consistent for a session (a powerup cycle)

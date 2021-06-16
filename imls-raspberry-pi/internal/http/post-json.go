@@ -32,7 +32,7 @@ func SetVerbose(v bool) {
 	Verbose = v
 }
 
-func PostJSON(cfg config.Config, uri string, data []map[string]string) (int, error) {
+func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, error) {
 	// tok, err := config.ReadAuth()
 	tok := cfg.Auth.Token
 

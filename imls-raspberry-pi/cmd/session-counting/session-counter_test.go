@@ -312,17 +312,9 @@ func TestManyTLPCycles(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-	config.SetConfigPath(filepath.Join(path, "test", "config.yaml"))
-	config.SetAuthPath(filepath.Join(path, "test", "auth.yaml"))
 
-	cfg := config.ReadConfig()
+	cfg, _ := config.ReadConfig(filepath.Join(path, "test", "config.yaml"))
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
-
-	_, err := config.ReadAuthTest()
-	if err != nil {
-		log.Println("could not read local auth")
-		log.Fatal(err.Error())
-	}
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	log.Println(cfg)
 

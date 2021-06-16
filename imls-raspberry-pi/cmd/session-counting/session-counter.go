@@ -82,12 +82,6 @@ func handleFlags() *config.Config {
 		os.Exit(0)
 	}
 
-	if *showKeyPtr {
-		auth, _ := config.ReadAuth()
-		fmt.Println(auth.Token)
-		os.Exit(0)
-	}
-
 	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
 		log.Println("Looked for config at:", *configPathPtr)
 		log.Fatal("Cannot find config file. Exiting.")
@@ -95,7 +89,15 @@ func handleFlags() *config.Config {
 		config.SetConfigPath(*configPathPtr)
 	}
 
-	cfg := config.ReadConfig()
+	cfg, err := config.ReadConfig(*configPathPtr)
+	if err != nil {
+		log.Fatal("session-counter: error loading config.")
+	}
+
+	if *showKeyPtr {
+		fmt.Println(cfg.Auth.Token)
+		os.Exit(0)
+	}
 
 	if *storagePtr == "api" || *storagePtr == "sqlite" || *storagePtr == "both" {
 		cfg.StorageMode = *storagePtr

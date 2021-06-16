@@ -27,7 +27,7 @@ func (el *EventLogger) LogJSON(tag string, json string) (int, error) {
 		"tag":         tag,
 		"info":        json,
 	}
-	ndx, err := PostJSON(*el.Cfg, uri, []map[string]string{data})
+	ndx, err := PostJSON(el.Cfg, uri, []map[string]string{data})
 	return ndx, err
 
 }
