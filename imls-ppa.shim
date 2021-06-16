@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#
+# pull the latest from the IMLS PPA.
 
 set -euox pipefail
 
@@ -12,15 +14,6 @@ curl -s --compressed "${PPA_REPOSITORY}/KEY_ALT.gpg" | sudo apt-key add -
 sudo curl -s --compressed -o /etc/apt/sources.list.d/imls-ppa.list "${PPA_REPOSITORY}/contents.list"
 sudo apt update
 
-# download and run input-initial-configuration, but only ask for tag and fcfs_id
-sudo mkdir -p /opt/imls/
-BINARY_REPOSITORY="https://github.com/cantsin/imls-pi-stack"
-BINARY_URL="${BINARY_REPOSITORY}/releases/latest/download/input-initial-configuration"
-BINARY_LOCATION="/usr/local/bin/input-initial-configuration"
-
-sudo curl -L -s "${BINARY_URL}" -o "${BINARY_LOCATION}"
-sudo chmod +x "${BINARY_LOCATION}"
-sudo "${BINARY_LOCATION}" -fcfs-seq -tag -write
-
-# install session-counter-csv, which also installs session-counter and nginx.
+# install session-counter-csv, which also installs 
+# input-initial-configuration, session-counter, and nginx.
 sudo apt install session-counter-csv

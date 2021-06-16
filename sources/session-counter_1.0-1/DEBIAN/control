@@ -3,7 +3,8 @@ Version: 1.0-1
 Section: base
 Priority: optional
 Architecture: armhf 
-Depends: libc6 (>= 1)
+Depends: libc6 (>= 1),
+         input-initial-configuration (>= 1)
 Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
 Description: Session Counter for IMLS Pilot
  Fancy description.

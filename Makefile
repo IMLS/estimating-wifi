@@ -1,9 +1,10 @@
 deb:
+	dpkg-deb --build sources/input-initial-configuration_1.0-1_arm
 	dpkg-deb --build sources/session-counter_1.0-1
 	dpkg-deb --build sources/session-counter-csv_1.0-1_arm
 	mv sources/*.deb .
 
-packages:
+packages: deb
 	dpkg-scanpackages --multiversion . > Packages
 	gzip -k -f Packages
 
