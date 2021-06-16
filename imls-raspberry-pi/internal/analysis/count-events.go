@@ -12,9 +12,9 @@ var patron_min_mins float64 = 30
 var patron_max_mins float64 = 10 * 60
 
 const (
-	Transient = iota
-	Patron
+	Patron = iota
 	Device
+	Transient
 )
 
 type Counter struct {
@@ -46,7 +46,7 @@ func (c *Counter) add(field int, minutes int) {
 	}
 }
 
-func isPatron(p WifiEvent, es []WifiEvent) int {
+func getDeviceType(p WifiEvent, es []WifiEvent) int {
 	var earliest time.Time
 	var latest time.Time
 
@@ -118,7 +118,7 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 			// Skip if we already checked this patron
 		} else {
 			checked[e.PatronIndex] = true
-			isP := isPatron(e, events)
+			isP := getDeviceType(e, events)
 			switch isP {
 			case Patron:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
@@ -148,12 +148,47 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 	return c
 }
 
+type Duration struct {
+	Id    int
+	Type  int
+	Start time.Time
+	End   time.Time
+}
+
+func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
+
+	// We want, for every patron_id, to know when the device started/ended.
+	prevEvent := events[0]
+	checked := make(map[int]bool)
+	durations := make(map[int]*Duration)
+
+	for _, e := range events {
+		// If the event id changes, bump our y pointer down.
+		if e.EventId != prevEvent.EventId {
+			prevEvent = e
+		}
+		if _, ok := checked[e.PatronIndex]; ok {
+			// Skip if we already checked this patron
+		} else {
+			checked[e.PatronIndex] = true
+			devType := getDeviceType(e, events)
+			first, last := getPatronFirstLast(e.PatronIndex, events)
+			firstTime := getEventIdTime(events, first)
+			lastTime := getEventIdTime(events, last)
+			durations[e.PatronIndex] = &Duration{Id: e.PatronIndex, Type: devType, Start: firstTime, End: lastTime}
+		}
+	}
+
+	return durations
+}
+
 // Return the drawing context where the image is drawn.
 // This can then be written to disk.
-func Summarize(cfg *config.Config, events []WifiEvent) (c *Counter) {
+func Summarize(cfg *config.Config, events []WifiEvent) (c *Counter, d map[int]*Duration) {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].ID < events[j].ID
 	})
 	c = doCounting(cfg, events)
-	return c
+	d = durationSummary(cfg, events)
+	return c, d
 }

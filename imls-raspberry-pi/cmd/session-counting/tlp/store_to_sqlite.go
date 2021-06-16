@@ -29,11 +29,11 @@ func getSummaryDB(cfg *config.Config) *sql.DB {
 
 	// Create tables if it doesn't exist
 	createTableStatement := `
-	CREATE TABLE IF NOT EXISTS summary (
+	CREATE TABLE IF NOT EXISTS counts (
 		id integer PRIMARY KEY AUTOINCREMENT,
-		pi_serial character text,
-		fcfs_seq_id character text,
-		device_tag character text,
+		pi_serial text,
+		fcfs_seq_id text,
+		device_tag text,
 		session_id text,
 		minimum_minutes integer,
 		maximum_minutes integer,
@@ -47,7 +47,22 @@ func getSummaryDB(cfg *config.Config) *sql.DB {
 
 	_, err = db.Exec(createTableStatement)
 	if err != nil {
-		log.Fatal("sqlite: could not create table in db.")
+		log.Fatal("sqlite: could not create counts table in db.")
+	}
+
+	createTableStatement = `
+	CREATE TABLE IF NOT EXISTS durations (
+		id integer PRIMARY KEY AUTOINCREMENT,
+		session_id text,
+		pid integer,
+		type integer,
+		start text,
+		end text
+	);`
+
+	_, err = db.Exec(createTableStatement)
+	if err != nil {
+		log.Fatal("sqlite: could not create durations table in db.")
 	}
 
 	return db
@@ -116,10 +131,10 @@ func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
 	return events
 }
 
-func storeSummary(cfg *config.Config, c *analysis.Counter) {
+func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.Duration) {
 	log.Println("sqlite: getting summary db")
 	summarydb := getSummaryDB(cfg)
-	insertS, err := summarydb.Prepare(`INSERT INTO summary (pi_serial, fcfs_seq_id, device_tag, session_id, minimum_minutes, maximum_minutes, patron_count, patron_minutes, device_count, device_minutes, transient_count, transient_minutes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+	insertS, err := summarydb.Prepare(`INSERT INTO counts (pi_serial, fcfs_seq_id, device_tag, session_id, minimum_minutes, maximum_minutes, patron_count, patron_minutes, device_count, device_minutes, transient_count, transient_minutes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
 	if err != nil {
 		log.Println("sqlite: could not prepare insert statement.")
 		log.Fatal(err.Error())
@@ -131,6 +146,21 @@ func storeSummary(cfg *config.Config, c *analysis.Counter) {
 		log.Println(res)
 		log.Fatal(err.Error())
 	}
+
+	insertS, err = summarydb.Prepare(`INSERT INTO durations (session_id, pid, type, start, end) VALUES (?,?,?,?,?)`)
+	if err != nil {
+		log.Println("sqlite: could not prepare insert statement.")
+		log.Fatal(err.Error())
+	}
+	for pid, duration := range d {
+		res, err := insertS.Exec(cfg.SessionId, pid, duration.Type, duration.Start, duration.End)
+		if err != nil {
+			log.Println("sqlite: could not insert into summary db")
+			log.Println(res)
+			log.Fatal(err.Error())
+		}
+	}
+
 	summarydb.Close()
 }
 
@@ -141,9 +171,12 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 	//log.Println(events)
 	if len(events) > 0 {
 		log.Println("sqlite: counting")
-		c := analysis.Summarize(cfg, events)
+		c, d := analysis.Summarize(cfg, events)
+		for k, v := range d {
+			log.Println("d", k, v)
+		}
 		log.Println("sqlite:", c)
-		storeSummary(cfg, c)
+		storeSummary(cfg, c, d)
 	} else {
 		log.Println("sqlite: no events to summarize")
 	}
