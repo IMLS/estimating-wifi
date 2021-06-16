@@ -7,5 +7,4 @@ chown -R www-data:www-data /www*
 rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/session-counter.conf /etc/nginx/sites-enabled/
 systemctl restart nginx.service
-systemctl enable imls-update.service
-systemctl start imls-update.service
+systemctl enable imls-update.timer
