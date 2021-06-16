@@ -13,4 +13,4 @@ release:
 	gpg --default-key "$$WHOM" -abs -o - Release > Release.gpg
 	gpg --default-key "$$WHOM" --clearsign -o - Release > InRelease
 
-all: deb packages release
+all: packages release
