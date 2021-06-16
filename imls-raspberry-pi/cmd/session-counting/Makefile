@@ -11,9 +11,9 @@ install: all
 	sudo cp session-counter /usr/local/bin/session-counter
 
 test:
-	go test *.go
 	go test api/*.go
 	go test model/*.go
+	go test -timeout 1m *.go
 
 crossbuild: clean
 	GOOS=linux GOARCH=arm GOARM=7 go build

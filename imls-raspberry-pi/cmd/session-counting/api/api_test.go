@@ -53,9 +53,8 @@ func Test_get_manufactuerer(t *testing.T) {
 func Test_thrash_db(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	config.SetConfigPath(filepath.Join(path, "..", "test", "config.yaml"))
 
-	cfg := config.ReadConfig()
+	cfg, _ := config.ReadConfig(filepath.Join(path, "..", "test", "config.yaml"))
 
 	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
@@ -68,67 +67,6 @@ func Test_thrash_db(t *testing.T) {
 
 		})
 	}
-}
-
-func _Test_ReadAuth(t *testing.T) {
-	a, e := config.ReadAuth()
-	if e != nil {
-		t.Fatal("failure in reading auth")
-	}
-	if a == nil {
-		t.Fatal("auth is nil")
-	}
-
-}
-
-func _Test_GetToken(t *testing.T) {
-	auth, err := config.ReadAuth()
-
-	if err != nil {
-		t.Log(err)
-		t.Fatal("Failed to read token.")
-	}
-
-	if len(auth.Token) < 2 {
-		t.Log(auth)
-		t.Fatal("Failed to find token in auth struct.")
-	}
-
-}
-
-func _Test_StoreContent(t *testing.T) {
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
-	config.SetConfigPath(filepath.Join(path, "..", "test", "config.yaml"))
-
-	cfg := config.ReadConfig()
-	// Fill in the rest of the config.
-	cfg.SessionId = config.CreateSessionId()
-	cfg.Serial = config.GetSerial()
-
-	auth, _ := config.ReadAuth()
-	log.Println(auth)
-	// FIXME: Need part of a process network for this to work...
-	// arr := make([]map[string]int, 0)
-	// arr = append(arr, map[string]int{"0:42": 0})
-	// StoreDevicesCount(cfg, auth, 42, arr)
-}
-
-func _Test_LogEvent(t *testing.T) {
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
-	config.SetConfigPath(filepath.Join(path, "..", "test", "config.yaml"))
-
-	cfg := config.ReadConfig()
-	// Fill in the rest of the config.
-	cfg.SessionId = config.CreateSessionId()
-	cfg.Serial = config.GetSerial()
-	// Create a new logger
-	el := http.NewEventLogger(cfg)
-	el.Log("startup", map[string]string{"msg": "starting session-counter"})
-	el.Log("empty", map[string]string{})
-	el.Log("nil", nil)
-
 }
 
 func Test_RevalResponseUnmarshall(t *testing.T) {
