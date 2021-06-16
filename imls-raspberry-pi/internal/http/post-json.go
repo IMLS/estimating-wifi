@@ -32,11 +32,9 @@ func SetVerbose(v bool) {
 	Verbose = v
 }
 
-func PostJSON(uri string, data []map[string]string) (int, error) {
-	tok, err := config.ReadAuth()
-	if err != nil {
-		log.Fatal("postjson: could not read auth. exiting.")
-	}
+func PostJSON(cfg config.Config, uri string, data []map[string]string) (int, error) {
+	// tok, err := config.ReadAuth()
+	tok := cfg.Auth.Token
 
 	log.Println("postjson: storing JSON to", uri)
 
@@ -87,19 +85,12 @@ func PostJSON(uri string, data []map[string]string) (int, error) {
 		// Lets set some headers. Perhaps we should quit here... but, we'll try and keep going
 		// if anything fails.
 		req.Header.Set("Content-type", "application/json")
-		if tok != nil {
-			if Verbose {
-				fmt.Printf("Access token length: %v\n", len(tok.Token))
-			}
-			req.Header.Set("X-Api-Key", tok.Token)
-		} else {
-			log.Printf("postjson: failed to set headers for authorization.")
-		}
+		req.Header.Set("X-Api-Key", tok)
 
 		// Clean up the log string... no tokens in the log
 		// FIXME This makes a mess if there is no token in the `tok` structure...
 		// APITOKEN&APITOKEN{APITOKENPAPITOKENOAPITOKENSAPITOKENTAPITOKEN A
-		reqLogString := strings.Replace(fmt.Sprint(req), tok.Token, "APITOKEN", -1)
+		reqLogString := strings.Replace(fmt.Sprint(req), tok, "APITOKEN", -1)
 		if Verbose {
 			log.Printf("postjson:req:\n%v\n", reqLogString)
 		}

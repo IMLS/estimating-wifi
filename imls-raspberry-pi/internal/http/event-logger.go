@@ -17,18 +17,17 @@ func NewEventLogger(cfg *config.Config) *EventLogger {
 
 func (el *EventLogger) LogJSON(tag string, json string) (int, error) {
 	uri := FormatUri(el.Cfg.Umbrella.Scheme, el.Cfg.Umbrella.Host, el.Cfg.Umbrella.Logging)
-	tok, _ := config.ReadAuth()
 
 	data := map[string]string{
 		"pi_serial":   config.GetSerial(),
-		"fcfs_seq_id": tok.FCFSId,
-		"device_tag":  tok.DeviceTag,
+		"fcfs_seq_id": el.Cfg.Auth.FCFSId,
+		"device_tag":  el.Cfg.Auth.DeviceTag,
 		"session_id":  el.Cfg.SessionId,
 		"localtime":   time.Now().Format(time.RFC3339),
 		"tag":         tag,
 		"info":        json,
 	}
-	ndx, err := PostJSON(uri, []map[string]string{data})
+	ndx, err := PostJSON(*el.Cfg, uri, []map[string]string{data})
 	return ndx, err
 
 }
