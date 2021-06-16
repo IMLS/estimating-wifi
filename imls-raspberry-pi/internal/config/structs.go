@@ -2,6 +2,11 @@ package config
 
 // At /opt/imls/config.yaml
 type Config struct {
+	Auth struct {
+		Token     string `yaml:"api_token"`
+		DeviceTag string `yaml:"tag"`
+		FCFSId    string `yaml:"fcfs_seq_id"`
+	} `yaml:"auth"`
 	Monitoring struct {
 		PingInterval          int `yaml:"pinginterval"`
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
