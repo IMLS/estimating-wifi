@@ -14,3 +14,7 @@ release:
 	gpg --default-key "$$WHOM" --clearsign -o - Release > InRelease
 
 all: packages release
+
+clean:
+	sudo rm -rf /opt/imls
+	sudo apt remove -y session-counter session-counter-csv input-initial-configuration
