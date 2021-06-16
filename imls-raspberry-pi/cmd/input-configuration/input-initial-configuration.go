@@ -14,6 +14,7 @@ import (
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
+	"gsa.gov/18f/config"
 	"gsa.gov/18f/input-initial-configuration/cryptopasta"
 	"gsa.gov/18f/input-initial-configuration/pi"
 	"gsa.gov/18f/input-initial-configuration/wordlist"
@@ -21,15 +22,8 @@ import (
 )
 
 const lookup = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-const yamlPath = "/opt/imls/auth.yaml"
 
 const states = "(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|AS|DC|FM|GU|MH|MP|PW|PR|VI)"
-
-type config struct {
-	Token string `yaml:"api_token"`
-	FCFS  string `yaml:"fcfs_seq_id"`
-	Tag   string `yaml:"tag"`
-}
 
 func decode(ndx int) string {
 	mask := int(math.Exp2(6) - 1)
@@ -232,12 +226,14 @@ func readTag() string {
 	return tag
 }
 
-func writeYAML(cfg *config, path string, enabled bool) {
-	s := fmt.Sprintf(`api_token: "%v"`, cfg.Token)
+func writeYAML(cfg *config.Config, path string, enabled bool) {
+	s := fmt.Sprintf(`auth:`)
 	s += "\n"
-	s += fmt.Sprintf(`fcfs_seq_id: "%v"`, cfg.FCFS)
+	s += fmt.Sprintf(`  api_token: "%v"`, cfg.Auth.Token)
 	s += "\n"
-	s += fmt.Sprintf(`tag: "%v"`, cfg.Tag)
+	s += fmt.Sprintf(`  fcfs_seq_id: "%v"`, cfg.Auth.FCFSId)
+	s += "\n"
+	s += fmt.Sprintf(`  tag: "%v"`, cfg.Auth.DeviceTag)
 	s += "\n"
 	if enabled {
 		// This will truncate the file if it exists.
@@ -262,12 +258,17 @@ func main() {
 	readWordPairPtr := flag.Bool("word-pairs", false, "Read in their API token as word pairs.")
 	tagPtr := flag.Bool("tag", false, "A local inventory tag or identifier.")
 	// Controlling output
-	writePtr := flag.Bool("write", false, "Enables writing the config file.")
-	configPathPtr := flag.String("path", yamlPath, "Where to write the config.")
+	writePtr := flag.Bool("write", true, "Enables writing the config file.")
+	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
 
 	flag.Parse()
 
-	cfg := &config{}
+	if *configPathPtr == "" {
+		log.Println("The flag --config MUST be provided.")
+		os.Exit(1)
+	}
+
+	cfg := &config.Config{}
 
 	// Dump version and exit
 	if *versionPtr {
@@ -282,8 +283,8 @@ func main() {
 	// version of the key for a given Pi, this must be run ON THAT Pi.
 	if *readTokenPtr {
 		fmt.Println()
-		cfg.Token = readToken()
-		fmt.Println(cfg.Token)
+		cfg.Auth.Token = readToken()
+		fmt.Println(cfg.Auth.Token)
 		os.Exit(0)
 	}
 
@@ -297,23 +298,22 @@ func main() {
 	// Read in the FCFS Seq Id
 	if *readFCFSPtr {
 		fmt.Println()
-		cfg.FCFS = readFCFS()
+		cfg.Auth.FCFSId = readFCFS()
 	}
 
 	// Read in the hardware tag
 	if *tagPtr {
 		fmt.Println()
-		cfg.Tag = readTag()
+		cfg.Auth.DeviceTag = readTag()
 	}
 
 	// Read in the word pairs
 	if *readWordPairPtr {
 		fmt.Println()
-		cfg.Token = readWordPairs()
+		cfg.Auth.Token = readWordPairs()
 	}
 
-	// Writes to the default location, or another location
-	// if overwridden by the flag. Only writes if --write is set to `true`
+	// Only writes to file if --write is set to `true`
 	writeYAML(cfg, *configPathPtr, *writePtr)
 
 	fmt.Println()
