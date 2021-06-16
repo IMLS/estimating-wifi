@@ -14,6 +14,6 @@ curl -s --compressed "${PPA_REPOSITORY}/KEY_ALT.gpg" | sudo apt-key add -
 sudo curl -s --compressed -o /etc/apt/sources.list.d/imls-ppa.list "${PPA_REPOSITORY}/contents.list"
 sudo apt update
 
-# install session-counter-csv, which also installs 
+# install or update session-counter-csv, which depends on 
 # input-initial-configuration, session-counter, and nginx.
 sudo apt install session-counter-csv
