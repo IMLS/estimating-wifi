@@ -69,10 +69,15 @@ func handleFlags() *config.Config {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
-	configPathPtr := flag.String("config", "/opt/imls/config.yaml", "Path to config.")
+	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
 	storagePtr := flag.String("storage-mode", "api", "Either 'api', 'sqlite', or 'both'.")
 
 	flag.Parse()
+
+	if *configPathPtr == "" {
+		log.Println("The flag --config MUST be provided.")
+		os.Exit(1)
+	}
 
 	config.Verbose = *verbosePtr
 
