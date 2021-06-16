@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"gopkg.in/yaml.v2"
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
@@ -226,26 +227,19 @@ func readTag() string {
 	return tag
 }
 
-func writeYAML(cfg *config.Config, path string, enabled bool) {
-	s := fmt.Sprintf(`auth:`)
-	s += "\n"
-	s += fmt.Sprintf(`  api_token: "%v"`, cfg.Auth.Token)
-	s += "\n"
-	s += fmt.Sprintf(`  fcfs_seq_id: "%v"`, cfg.Auth.FCFSId)
-	s += "\n"
-	s += fmt.Sprintf(`  tag: "%v"`, cfg.Auth.DeviceTag)
-	s += "\n"
-	if enabled {
-		// This will truncate the file if it exists.
-		f, err := os.Create(path)
-		if err != nil {
-			log.Fatal("could not open config for writing")
-		}
-		f.WriteString(s)
-		f.Close()
-	} else {
-		fmt.Println(s)
+func writeYAML(cfg *config.Config, path string) {
+	dump, err := yaml.Marshal(&cfg)
+	if err != nil {
+		log.Fatalf("error: %v", err)
 	}
+	s := string(dump)
+	// This will truncate the file if it exists.
+	f, err := os.Create(path)
+	if err != nil {
+		log.Fatal("could not open config for writing")
+	}
+	f.WriteString(s)
+	f.Close()
 }
 
 func main() {
@@ -258,7 +252,6 @@ func main() {
 	readWordPairPtr := flag.Bool("word-pairs", false, "Read in their API token as word pairs.")
 	tagPtr := flag.Bool("tag", false, "A local inventory tag or identifier.")
 	// Controlling output
-	writePtr := flag.Bool("write", true, "Enables writing the config file.")
 	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
 
 	flag.Parse()
@@ -268,7 +261,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg := &config.Config{}
+	cfg, err := config.ReadConfig(*configPathPtr)
+	if err != nil {
+		// no such configuration file, so create our own with defaults.
+		cfg = &config.Config{}
+		cfg.SetDefaults()
+	}
 
 	// Dump version and exit
 	if *versionPtr {
@@ -314,7 +312,7 @@ func main() {
 	}
 
 	// Only writes to file if --write is set to `true`
-	writeYAML(cfg, *configPathPtr, *writePtr)
+	writeYAML(cfg, *configPathPtr)
 
 	fmt.Println()
 	fmt.Println(box(color.New(color.FgHiBlue), color.New(color.FgYellow).Sprint("All done!")))
