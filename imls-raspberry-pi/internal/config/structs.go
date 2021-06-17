@@ -61,7 +61,7 @@ func(cfg *Config) SetDefaults() {
 
 	cfg.StorageMode = "sqlite"
 
-	cfg.Local.Crontab = "* */6 * * *"
+	cfg.Local.Crontab = "0 */6 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
 	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
 }
