@@ -40,8 +40,7 @@ func main() {
 	tagPtr := flag.String("tag", "event", "Event tag.")
 	infoPtr := flag.String("info", "{}", "Valid JSON for info. Exclusive w/ --file.")
 	filePtr := flag.String("file", "", "Filepath to include as info. Exclusive w/ --info.")
-	configPathPtr := flag.String("config", "", "Path to config.yaml (for testing).")
-	authPathPtr := flag.String("auth", "", "Path to auth.yaml (for testing).")
+	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
 	flag.Parse()
 
 	// If they just want the version, print and exit.
@@ -50,19 +49,22 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Set config paths if asked for...
-	if *configPathPtr != "" {
+	if *configPathPtr == "" {
+		log.Println("The flag --config MUST be provided.")
+		os.Exit(1)
+	} else {
 		config.SetConfigPath(*configPathPtr)
-	}
-
-	if *authPathPtr != "" {
-		config.SetAuthPath(*authPathPtr)
 	}
 
 	// Make sure we're exclusive between these two flags.
 	if *filePtr != "" && *infoPtr != "{}" {
 		fmt.Println("Only one of --info or --file permitted.")
 		os.Exit(-1)
+	}
+
+	cfg, err := config.ReadConfig(*configPathPtr)
+	if err != nil {
+		log.Fatal("log-event: error loading config.")
 	}
 
 	// This reuses the *infoPtr for reporting below.
@@ -73,13 +75,13 @@ func main() {
 		if err != nil {
 			fmt.Println("Could not B64 convert file. Exiting.")
 			os.Exit(-1)
-		} 
+		}
 		*infoPtr = `{"file": "` + b64 + `"}`
 	}
 
 
 	if isJsonOk(*infoPtr) {
-		logger := http.NewEventLogger(config.ReadConfig())
+		logger := http.NewEventLogger(cfg)
 		logger.LogJSON(*tagPtr, *infoPtr)
 	} else {
 		log.Fatal("BAD JSON: ", *infoPtr)

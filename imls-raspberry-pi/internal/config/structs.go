@@ -39,3 +39,29 @@ type Config struct {
 		TemporaryDB string `yaml:"temporary_db"`
 	} `yaml:"local"`
 }
+
+func(cfg *Config) SetDefaults() {
+	cfg.Monitoring.PingInterval = 30
+	cfg.Monitoring.MaxHTTPErrorCount = 8
+	cfg.Monitoring.HTTPErrorIntervalMins = 10
+	cfg.Monitoring.UniquenessWindow = 120
+	cfg.Monitoring.MinimumMinutes = 30
+	cfg.Monitoring.MaximumMinutes = 600
+
+	cfg.Umbrella.Scheme = "https"
+	cfg.Umbrella.Host = "api.data.gov"
+	cfg.Umbrella.Data = "/TEST/10x-imls/v1/wifi/"
+	cfg.Umbrella.Logging = "/TEST/10x-imls/v1/events/"
+
+	cfg.Wireshark.Duration = 45
+	cfg.Wireshark.Path = "/usr/bin/tshark"
+	cfg.Wireshark.CheckWlan = "1"
+
+	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
+
+	cfg.StorageMode = "sqlite"
+
+	cfg.Local.Crontab = "0 */6 * * *"
+	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
+	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
+}
