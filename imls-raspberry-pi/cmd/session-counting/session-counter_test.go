@@ -316,8 +316,7 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg, _ := config.ReadConfig(filepath.Join(path, "test", "config.yaml"))
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
-	theTime := time.Now()
-	cfg.SessionId = fmt.Sprintf("%v-%v-%v", theTime.Year(), int(theTime.Month()), theTime.Day())
+	cfg.SessionId = config.CreateSessionId()
 	log.Println(cfg)
 
 	config.Verbose = true

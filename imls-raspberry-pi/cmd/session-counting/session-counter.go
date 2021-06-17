@@ -116,13 +116,8 @@ func main() {
 	// Read in a config
 	cfg := handleFlags()
 
-	// Set the session ID for this entire run
-	if cfg.StorageMode == "sqlite" {
-		t := time.Now()
-		cfg.SessionId = fmt.Sprintf("%v-%v-%v", t.Year(), int(t.Month()), t.Day())
-	} else {
-		cfg.SessionId = config.CreateSessionId()
-	}
+	cfg.SessionId = config.CreateSessionId()
+
 	// Store this so we don't keep hitting /proc/cpuinfo
 	cfg.Serial = config.GetSerial()
 	// Make sure the mfg database is in place and can be loaded.
