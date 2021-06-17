@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"log"
 	"sort"
 	"time"
 
@@ -158,15 +159,10 @@ type Duration struct {
 func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
 
 	// We want, for every patron_id, to know when the device started/ended.
-	prevEvent := events[0]
 	checked := make(map[int]bool)
 	durations := make(map[int]*Duration)
 
 	for _, e := range events {
-		// If the event id changes, bump our y pointer down.
-		if e.EventId != prevEvent.EventId {
-			prevEvent = e
-		}
 		if _, ok := checked[e.PatronIndex]; ok {
 			// Skip if we already checked this patron
 		} else {
@@ -175,6 +171,8 @@ func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
 			first, last := getPatronFirstLast(e.PatronIndex, events)
 			firstTime := getEventIdTime(events, first)
 			lastTime := getEventIdTime(events, last)
+			minutes := int(lastTime.Sub(firstTime).Minutes())
+			log.Println("duration", e.PatronIndex, firstTime, lastTime, minutes)
 			durations[e.PatronIndex] = &Duration{Id: e.PatronIndex, Type: devType, Start: firstTime, End: lastTime}
 		}
 	}

@@ -119,7 +119,7 @@ func main() {
 	// Set the session ID for this entire run
 	if cfg.StorageMode == "sqlite" {
 		t := time.Now()
-		cfg.SessionId = fmt.Sprintf("%v-%v-%v", t.Year(), t.Month(), t.Day())
+		cfg.SessionId = fmt.Sprintf("%v-%v-%v", t.Year(), int(t.Month()), t.Day())
 	} else {
 		cfg.SessionId = config.CreateSessionId()
 	}
