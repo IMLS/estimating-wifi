@@ -47,5 +47,5 @@ local:
   summary_db: /opt/imls/summary.sqlite
   temporary_db: /tmp/imls.sqlite
   # "@midnight" or "0 0 * * *" for every midnight
-  crontab: "* */6 * * *"
+  crontab: "0 */6 * * *"
 

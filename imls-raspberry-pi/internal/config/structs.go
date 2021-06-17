@@ -4,7 +4,7 @@ package config
 type Config struct {
 	Auth struct {
 		Token     string `yaml:"api_token"`
-		DeviceTag string `yaml:"tag"`
+		DeviceTag string `yaml:"device_tag"`
 		FCFSId    string `yaml:"fcfs_seq_id"`
 	} `yaml:"auth"`
 	Monitoring struct {
