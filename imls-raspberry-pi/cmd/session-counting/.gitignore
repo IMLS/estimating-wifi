@@ -2,3 +2,4 @@ session-counter
 testlogfile
 .vscode
 *.sqlite
+config.yaml
