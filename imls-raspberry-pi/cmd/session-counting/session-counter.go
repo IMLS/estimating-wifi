@@ -118,6 +118,12 @@ func main() {
 	// Make sure the mfg database is in place and can be loaded.
 	api.CheckMfgDatabaseExists(cfg)
 
+	// also make sure the binary paths in the config are valid.
+	_, err := os.Stat(cfg.Wireshark.Path)
+	if os.IsNotExist(err) {
+		log.Fatal("cannot find wireshark: ", cfg.Wireshark.Path)
+	}
+
 	el := http.NewEventLogger(cfg)
 	el.Log("startup", nil)
 
