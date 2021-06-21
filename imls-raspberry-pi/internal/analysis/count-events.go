@@ -27,13 +27,13 @@ type Counter struct {
 	TransientMinutes int
 }
 
-func NewCounter(cfg *config.Config) *Counter {
-	patron_min_mins = float64(cfg.Monitoring.MinimumMinutes)
-	patron_max_mins = float64(cfg.Monitoring.MaximumMinutes)
+func NewCounter(minMinutes int, maxMinutes int) *Counter {
+	patron_min_mins = float64(minMinutes)
+	patron_max_mins = float64(maxMinutes)
 	return &Counter{0, 0, 0, 0, 0, 0}
 }
 
-func (c *Counter) add(field int, minutes int) {
+func (c *Counter) Add(field int, minutes int) {
 	switch field {
 	case Patron:
 		c.Patrons += 1
@@ -102,11 +102,12 @@ func getEventIdTime(events []WifiEvent, eventId int) (t time.Time) {
 			break
 		}
 	}
+
 	return t
 }
 
 func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
-	c := NewCounter(cfg)
+	c := NewCounter(cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes)
 
 	prevEvent := events[0]
 	checked := make(map[int]bool)
@@ -126,13 +127,13 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 				firstTime := getEventIdTime(events, first)
 				lastTime := getEventIdTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
-				c.add(Patron, minutes)
+				c.Add(Patron, minutes)
 			case Device:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
 				firstTime := getEventIdTime(events, first)
 				lastTime := getEventIdTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
-				c.add(Device, minutes)
+				c.Add(Device, minutes)
 			case Transient:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
 				firstTime := getEventIdTime(events, first)
@@ -141,7 +142,7 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 				if minutes <= 0 {
 					minutes = 1
 				}
-				c.add(Transient, minutes)
+				c.Add(Transient, minutes)
 			}
 		}
 	}
@@ -150,13 +151,18 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 }
 
 type Duration struct {
-	Id    int
-	Type  int
-	Start time.Time
-	End   time.Time
+	Id        int    `db:"id"`
+	PiSerial  string `db:"pi_serial"`
+	SessionId string `db:"session_id"`
+	FCFSSeqId string `db:"fcfs_seq_id"`
+	DeviceTag string `db:"device_tag"`
+	PatronId  string `db:"pid"`
+	Type      int    `db:"type"`
+	Start     string `db:"start"`
+	End       string `db:"end"`
 }
 
-func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
+func durationSummary(events []WifiEvent) map[int]*Duration {
 
 	// We want, for every patron_id, to know when the device started/ended.
 	checked := make(map[int]bool)
@@ -173,7 +179,7 @@ func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
 			lastTime := getEventIdTime(events, last)
 			minutes := int(lastTime.Sub(firstTime).Minutes())
 			log.Println("duration", e.PatronIndex, firstTime, lastTime, minutes)
-			durations[e.PatronIndex] = &Duration{Id: e.PatronIndex, Type: devType, Start: firstTime, End: lastTime}
+			durations[e.PatronIndex] = &Duration{Id: e.PatronIndex, Type: devType, Start: firstTime.Format(time.RFC3339), End: lastTime.Format(time.RFC3339)}
 		}
 	}
 
@@ -187,6 +193,6 @@ func Summarize(cfg *config.Config, events []WifiEvent) (c *Counter, d map[int]*D
 		return events[i].ID < events[j].ID
 	})
 	c = doCounting(cfg, events)
-	d = durationSummary(cfg, events)
+	d = durationSummary(events)
 	return c, d
 }

@@ -70,7 +70,6 @@ func handleFlags() *config.Config {
 	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
 	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
-	storagePtr := flag.String("storage-mode", "api", "Either 'api', 'sqlite', or 'both'.")
 
 	flag.Parse()
 
@@ -102,10 +101,6 @@ func handleFlags() *config.Config {
 	if *showKeyPtr {
 		fmt.Println(cfg.Auth.Token)
 		os.Exit(0)
-	}
-
-	if *storagePtr == "api" || *storagePtr == "sqlite" || *storagePtr == "both" {
-		cfg.StorageMode = *storagePtr
 	}
 
 	return cfg

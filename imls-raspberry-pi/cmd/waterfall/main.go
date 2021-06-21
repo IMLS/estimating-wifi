@@ -13,46 +13,17 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
+	"github.com/jmoiron/sqlx"
 	"github.com/jszwec/csvutil"
-	. "gsa.gov/18f/analysis"
+	_ "github.com/mattn/go-sqlite3"
+	"gsa.gov/18f/analysis"
+	"gsa.gov/18f/config"
 )
 
 const PATRONMINMINS = 30
 const PATRONMAXMINS = 10 * 60
-const (
-	Transient = iota
-	Patron
-	Device
-)
 
-type counter struct {
-	patrons           int
-	devices           int
-	transients        int
-	patron_minutes    int
-	device_minutes    int
-	transient_minutes int
-}
-
-func NewCounter() *counter {
-	return &counter{0, 0, 0, 0, 0, 0}
-}
-
-func (c *counter) add(field int, minutes int) {
-	switch field {
-	case Patron:
-		c.patrons += 1
-		c.patron_minutes += minutes
-	case Device:
-		c.devices += 1
-		c.device_minutes += minutes
-	case Transient:
-		c.transients += 1
-		c.transient_minutes += minutes
-	}
-}
-
-func countEvents(events []WifiEvent) int {
+func countEvents(events []analysis.WifiEvent) int {
 	prev := events[0]
 	counter := 1
 
@@ -66,7 +37,7 @@ func countEvents(events []WifiEvent) int {
 	return counter
 }
 
-func allPatronIds(events []WifiEvent) []int {
+func allPatronIds(events []analysis.WifiEvent) []int {
 	d := make(map[int]bool)
 	for _, e := range events {
 		d[e.PatronIndex] = true
@@ -78,7 +49,7 @@ func allPatronIds(events []WifiEvent) []int {
 	return a
 }
 
-func countPatrons(events []WifiEvent) int {
+func countPatrons(events []analysis.WifiEvent) int {
 	max := 0
 
 	for _, e := range events {
@@ -90,7 +61,7 @@ func countPatrons(events []WifiEvent) int {
 	return max
 }
 
-func isPatron(p WifiEvent, es []WifiEvent) int {
+func isPatron(p analysis.WifiEvent, es []analysis.WifiEvent) int {
 	var earliest time.Time
 	var latest time.Time
 
@@ -110,17 +81,17 @@ func isPatron(p WifiEvent, es []WifiEvent) int {
 
 	diff := latest.Sub(earliest).Minutes()
 	if diff < PATRONMINMINS {
-		return Transient
+		return analysis.Transient
 	} else if diff > PATRONMAXMINS {
 		// log.Println("id", p.PatronIndex, "diff", diff)
-		return Device
+		return analysis.Device
 	} else {
 		// log.Println("patron", p)
-		return Patron
+		return analysis.Patron
 	}
 }
 
-func getPatronFirstLast(patronId int, events []WifiEvent) (int, int) {
+func getPatronFirstLast(patronId int, events []analysis.WifiEvent) (int, int) {
 	first := 1000000000
 	last := -1000000000
 
@@ -138,7 +109,7 @@ func getPatronFirstLast(patronId int, events []WifiEvent) (int, int) {
 	return first, last
 }
 
-func getEventIdTime(events []WifiEvent, eventId int) (t time.Time) {
+func getEventIdTime(events []analysis.WifiEvent, eventId int) (t time.Time) {
 	for _, e := range events {
 		if e.EventId == eventId {
 			t = e.Localtime
@@ -152,7 +123,7 @@ func modColor(v int, p []color.Color) color.Color {
 	return p[v%len(p)]
 }
 
-func drawLines(events []WifiEvent, dc *gg.Context, width int, height int) {
+func drawLines(events []analysis.WifiEvent, dc *gg.Context, width int, height int) {
 
 	// Draw hour lines.
 	hoursSeen := make(map[int]bool)
@@ -187,7 +158,7 @@ func drawLines(events []WifiEvent, dc *gg.Context, width int, height int) {
 	}
 }
 
-func drawPoints(events []WifiEvent, dc *gg.Context, width int, height int) {
+func drawPoints(events []analysis.WifiEvent, dc *gg.Context, width int, height int) {
 
 	// Draw the points
 	y := 0
@@ -201,11 +172,11 @@ func drawPoints(events []WifiEvent, dc *gg.Context, width int, height int) {
 		}
 		x = e.PatronIndex
 		isP := isPatron(e, events)
-		if isP == Device {
+		if isP == analysis.Device {
 			dc.SetRGBA(0.5, 0.5, 0.5, 0.5)
 			dc.DrawPoint(float64(x), float64(y), 2)
 			dc.Fill()
-		} else if isP == Transient {
+		} else if isP == analysis.Transient {
 			dc.SetRGBA(0.75, 0.75, 0.75, 0.5)
 			dc.DrawPoint(float64(x), float64(y), 2)
 			dc.Fill()
@@ -216,7 +187,7 @@ func drawPoints(events []WifiEvent, dc *gg.Context, width int, height int) {
 	}
 }
 
-func drawPatronLines(events []WifiEvent, dc *gg.Context, c *counter, width int, height int) {
+func drawPatronLines(events []analysis.WifiEvent, dc *gg.Context, c *analysis.Counter, width int, height int) {
 	x := 0
 	y := 0
 
@@ -248,26 +219,26 @@ func drawPatronLines(events []WifiEvent, dc *gg.Context, c *counter, width int, 
 			drawnPatrons[e.PatronIndex] = true
 			isP := isPatron(e, events)
 			switch isP {
-			case Patron:
+			case analysis.Patron:
 				x = e.PatronIndex
 				first, last := getPatronFirstLast(e.PatronIndex, events)
 				firstTime := getEventIdTime(events, first)
 				lastTime := getEventIdTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
-				c.add(Patron, minutes)
+				c.Add(analysis.Patron, minutes)
 				dc.SetColor(modColor(e.PatronIndex, palette.WebSafe))
 				dc.DrawLine(float64(x), float64(eventIdToY[first]), float64(x), float64(eventIdToY[last]))
 				//dc.DrawPoint(float64(x), float64(y), 2)
 				//dc.Fill()
 				dc.SetLineWidth(3)
 				dc.Stroke()
-			case Device:
+			case analysis.Device:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
 				firstTime := getEventIdTime(events, first)
 				lastTime := getEventIdTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
-				c.add(Device, minutes)
-			case Transient:
+				c.Add(analysis.Device, minutes)
+			case analysis.Transient:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
 				firstTime := getEventIdTime(events, first)
 				lastTime := getEventIdTime(events, last)
@@ -275,7 +246,7 @@ func drawPatronLines(events []WifiEvent, dc *gg.Context, c *counter, width int, 
 				if minutes <= 0 {
 					minutes = 1
 				}
-				c.add(Transient, minutes)
+				c.Add(analysis.Transient, minutes)
 			}
 		}
 	}
@@ -283,7 +254,7 @@ func drawPatronLines(events []WifiEvent, dc *gg.Context, c *counter, width int, 
 
 // Return the drawing context where the image is drawn.
 // This can then be written to disk.
-func drawWaterfall(events []WifiEvent) (c *counter, dc *gg.Context) {
+func drawWaterfall(events []analysis.WifiEvent) (c *analysis.Counter, dc *gg.Context) {
 
 	// Event ids are our measure of y, patron ids are x.
 	// Colors come from mfg?
@@ -298,7 +269,7 @@ func drawWaterfall(events []WifiEvent) (c *counter, dc *gg.Context) {
 	// This creates an infinite sized image of uniform color.
 	// img := &image.Uniform(color.RGBA(0x00, 0x00, 0x00, 0x00))
 	dc = gg.NewContext(width, height)
-	c = NewCounter()
+	c = analysis.NewCounter(5, 300)
 
 	dc.SetRGBA(0.5, 0.5, 0, 0.5)
 	dc.SetLineWidth(1)
@@ -313,22 +284,14 @@ func drawWaterfall(events []WifiEvent) (c *counter, dc *gg.Context) {
 	return c, dc
 }
 
-func main() {
-	csvPtr := flag.String("csv", "", "A CSV datafile.")
-	dataPtr := flag.String("data", "", "Data output.")
-	flag.Parse()
-
-	if *csvPtr == "" {
-		log.Fatal("no CSV file provided.")
-		os.Exit(-1)
-	}
+func drawOldWaterfalls(csvPtr *string, dataPtr *string) {
 
 	b, err := ioutil.ReadFile(*csvPtr)
 	if err != nil {
 		log.Fatal("could not open CSV file.")
 	}
 
-	var events []WifiEvent
+	var events []analysis.WifiEvent
 	if err := csvutil.Unmarshal(b, &events); err != nil {
 		log.Println(err)
 		log.Fatal("could not unmarshal CSV file as wifi events.")
@@ -369,9 +332,134 @@ func main() {
 			f.WriteString("fcfs_seq_id,device_tag,session_id,patrons,patron_minutes,devices,device_minutes,transients,transient_minutes\n")
 		}
 		f.WriteString(fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
-			seqId, dt, sid, c.patrons, c.patron_minutes, c.devices, c.device_minutes, c.transients, c.transient_minutes))
+			seqId, dt, sid, c.Patrons, c.PatronMinutes, c.Devices, c.DeviceMinutes, c.Transients, c.TransientMinutes))
 	} else {
 		fmt.Printf("%+v\n", c)
 	}
+}
 
+// sqlx makes it easy to pull things in.
+func getDurations(db *sqlx.DB, sid string) []analysis.Duration {
+	durations := []analysis.Duration{}
+	err := db.Select(&durations, `SELECT * FROM durations WHERE session_id=?`, sid)
+	if err != nil {
+		log.Println("sqlite: error in getDurations query.")
+		log.Fatal(err.Error())
+	}
+	return durations
+}
+
+func getUniqueSessions(db *sqlx.DB) (sessions []string) {
+	err := db.Select(&sessions, `SELECT DISTINCT(session_id) FROM durations`)
+	if err != nil {
+		log.Println("Failed to get unique sessions.")
+	}
+
+	return sessions
+}
+
+func _drawNewWaterfalls(cfg *config.Config, db *sqlx.DB) {
+	WIDTH := 1200
+	HEIGHT := 600
+
+	// sid := durations[0].SessionId
+	// seqId := durations[0].FCFSSeqId
+	// dt := durations[0].DeviceTag
+	// _ = os.Mkdir("output", 0777)
+	// fcfs_tag := fmt.Sprintf("%v-%v", seqId, dt)
+	// outdir := filepath.Join("output", fcfs_tag)
+	// _ = os.Mkdir(outdir, 0777)
+	// baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
+	//pngFilename := fmt.Sprintf("%v.png", baseFilename)
+
+	// This creates an infinite sized image of uniform color.
+	// img := &image.Uniform(color.RGBA(0x00, 0x00, 0x00, 0x00))
+	dc := gg.NewContext(WIDTH, HEIGHT)
+	dc.SetRGBA(0.5, 0.5, 0, 0.5)
+	dc.SetLineWidth(1)
+
+	for _, sid := range getUniqueSessions(db) {
+		for _, d := range getDurations(db, sid) {
+			log.Println("d", d)
+			st, _ := time.Parse(time.RFC3339, d.Start)
+			et, _ := time.Parse(time.RFC3339, d.End)
+			diff := int(et.Sub(st).Minutes())
+			// log.Println("st", st, "et", et, "diff", diff)
+			if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MinimumMinutes) {
+				log.Println(d.PatronId, diff)
+			}
+		}
+	}
+}
+
+func drawNewWaterfalls(cfg *config.Config, csvPtr *string) {
+	b, err := ioutil.ReadFile(*csvPtr)
+	if err != nil {
+		log.Fatal("could not open CSV file.")
+	}
+	var events []analysis.WifiEvent
+	if err := csvutil.Unmarshal(b, &events); err != nil {
+		log.Println(err)
+		log.Fatal("could not unmarshal CSV file as wifi events.")
+	}
+	// Capture the data about the session while running in a `counter` structure.
+	_, durations := analysis.Summarize(cfg, events)
+	for _, d := range durations {
+		st, _ := time.Parse(time.RFC3339, d.Start)
+		et, _ := time.Parse(time.RFC3339, d.End)
+		diff := int(et.Sub(st).Minutes())
+		//log.Println("st", st, "et", et, "diff", diff)
+		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MinimumMinutes) {
+			log.Println(d.PatronId, diff)
+		}
+	}
+}
+
+func main() {
+	csvPtr := flag.String("csv", "", "A CSV datafile.")
+	summaryDbPtr := flag.String("summary", "", "A summary DB (SQLite)")
+	cfgPath := flag.String("config", "", "Path to valid config file. REQUIRED.")
+	dataPtr := flag.String("data", "", "Data output.")
+	newstyleFlag := flag.Bool("newstyle", false, "Draw new style waterfalls.")
+	flag.Parse()
+
+	if *csvPtr != "" && *summaryDbPtr != "" {
+		log.Fatal("Provide EITHER a CSV file OR a summary DB.")
+		os.Exit(-1)
+	}
+
+	if *csvPtr == "" && *summaryDbPtr == "" {
+		log.Fatal("Provide EITHER a CSV file OR a summary DB.")
+		os.Exit(-1)
+	}
+
+	if *cfgPath == "" {
+		log.Fatal("Must provide valid config file.")
+	}
+
+	if *csvPtr != "" && !*newstyleFlag {
+		drawOldWaterfalls(csvPtr, dataPtr)
+	}
+
+	if *csvPtr != "" && *newstyleFlag {
+
+		// FOR PROCESSING NEW-STYLE SUMMARY DBS... NOT YET READY
+
+		// The new waterfalls use the summary DB.
+		// 	insertS, err = summarydb.Prepare(`INSERT INTO durations (pi_serial, fcfs_seq_id, device_tag, session_id, pid, type, start, end) VALUES (?,?,?,?,?,?,?,?)`)
+		// As a CSV, those are the headers.
+		// if _, err := os.Stat(*summaryDbPtr); os.IsNotExist(err) {
+		// 	log.Println("Could not find", *summaryDbPtr)
+		// 	os.Exit(-1)
+		// }
+
+		// db, err := sqlx.Open("sqlite3", fmt.Sprintf("%v?parseTime=true", *summaryDbPtr))
+		// if err != nil {
+		// 	log.Fatal("sqlite: could not open summary db.")
+		// }
+
+		cfg, _ := config.ReadConfig(*cfgPath)
+		//drawNewWaterfalls(cfg, db)
+		drawNewWaterfalls(cfg, csvPtr)
+	}
 }
