@@ -2,6 +2,7 @@ package tlp
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -100,8 +101,8 @@ func clearInMemoryDB(db *sqlx.DB) {
 	CREATE TABLE wifi (
 		id integer PRIMARY KEY AUTOINCREMENT,
 		event_id integer,
-		fcfs_seq_id character text,
-		device_tag character text,
+		fcfs_seq_id text,
+		device_tag text,
 		"localtime" date,
 		session_id text,
 		manufacturer_index integer,
@@ -150,7 +151,16 @@ func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.D
 		log.Fatal(err.Error())
 	}
 
-	insertS, err = summarydb.Prepare(`INSERT INTO durations (pi_serial, fcfs_seq_id, device_tag, session_id, pid, type, start, end) VALUES (?,?,?,?,?,?,?,?)`)
+	insertS, err = summarydb.Prepare(fmt.Sprintf(`INSERT INTO durations (%v,%v,%v,%v,%v,%v,%v,%v) VALUES (?,?,?,?,?,?,?,?)`,
+		"pi_serial",
+		"fcfs_seq_id",
+		"device_tag",
+		"session_id",
+		"pid",
+		"type",
+		"start",
+		"end"))
+
 	if err != nil {
 		log.Println("sqlite: could not prepare insert statement.")
 		log.Fatal(err.Error())
@@ -217,6 +227,8 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			db.Close()
 			// db = newInFSDB(cfg.Local.TemporaryDB)
 			db = newInMemoryDB()
+			// After clearing, it is a new session.
+			cfg.SessionId = config.CreateSessionId()
 
 		case arr := <-ch_data:
 			log.Println("sqlite: storing data into memory")
