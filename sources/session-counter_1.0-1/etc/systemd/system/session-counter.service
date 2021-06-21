@@ -11,7 +11,7 @@ User=root
 Group=root
 LimitNOFILE=1024
 
-ExecStart="/usr/local/bin/session-counter"
+ExecStart=/bin/sh -c "/usr/local/bin/session-counter -config /opt/imls/config.yaml"
 
 # make sure log directory exists and owned by syslog
 PermissionsStartOnly=true
