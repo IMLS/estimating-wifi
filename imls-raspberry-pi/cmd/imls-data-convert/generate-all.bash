@@ -12,3 +12,4 @@ go run main.go --fcfs_seq_id KY0069-002 --device_tag richmond0 --tzoffset -5 $1
 go run main.go --fcfs_seq_id KY0069-003 --device_tag berea1 --tzoffset -5 $1
 
 go run main.go --fcfs_seq_id AR0012-004 --device_tag dardanelle-pac-desk --tzoffset -6 $1
+go run main.go --fcfs_seq_id MA0269-002 --device_tag mnspear-1 --tzoffset -5 $1
