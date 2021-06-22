@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"gsa.gov/18f/config"
@@ -62,7 +61,6 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 	// Adapter count... every "ac" ticks, we look up the adapter.
 	// (ac % 0) guarantees that we look it up the first time.
 	ticker := 0
-	minutes_interval, _ := strconv.Atoi(cfg.Wireshark.CheckWlan)
 
 	for {
 		select {
