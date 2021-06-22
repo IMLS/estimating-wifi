@@ -286,6 +286,8 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 				log.Fatal("sqlite: could not prepare insert statement.")
 			}
 
+			log.Println(arr)
+
 			for _, h := range arr {
 				//log.Println("inserting...")
 				// log.Println(h["event_id"], h["fcfs_seq_id"], h["device_tag"], h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
