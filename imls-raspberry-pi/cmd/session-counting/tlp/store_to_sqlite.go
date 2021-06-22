@@ -218,7 +218,14 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 	}
 	defer f.Close()
 
-	f.WriteString("pi_serial,fcfs_seq_id,device_tag,session_id,patron_id,mfg_id,start,end,minutes\n")
+	// Write the header only when the file is opened for the first time.
+	fi, err := f.Stat()
+	if err == nil {
+		if fi.Size() == 0 {
+			f.WriteString("pi_serial,fcfs_seq_id,device_tag,session_id,patron_id,mfg_id,start,end,minutes\n")
+		}
+	}
+
 	for _, d := range durations {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
