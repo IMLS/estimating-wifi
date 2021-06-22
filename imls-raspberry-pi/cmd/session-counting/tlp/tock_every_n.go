@@ -8,7 +8,7 @@ import (
 )
 
 func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
-	log.Println("Starting tick")
+	log.Println("Starting TockEveryMinute")
 	ping, pong := ka.Subscribe("TockEveryMinute", 2)
 	// What is the best way to drive a 1-second tick?
 
@@ -25,7 +25,7 @@ func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
 	for {
 		select {
 		case <-ping:
-			pong <- "tick"
+			pong <- "TockEveryMinute"
 		case <-ch_kill:
 			log.Println("Exiting TockEveryN")
 			return
