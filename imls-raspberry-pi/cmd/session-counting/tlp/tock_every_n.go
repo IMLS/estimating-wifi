@@ -14,6 +14,9 @@ func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
 
 	c := cron.New()
 	_, err := c.AddFunc("*/1 * * * *", func() {
+		if config.Verbose {
+			log.Println("Tock every minute.")
+		}
 		out <- true
 	})
 	if err != nil {
