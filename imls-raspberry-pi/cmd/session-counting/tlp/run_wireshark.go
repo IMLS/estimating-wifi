@@ -81,10 +81,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			// The % will trigger first time through, which we want.
 			var dev *models.Device = nil
 			// If the config doesn't have this in it, we get a divide by zero.
-			if (ticker % minutes_interval) == 0 {
-				dev = search.SearchForMatchingDevice()
-				//log.Println(dev)
-			}
+			dev = search.SearchForMatchingDevice()
 
 			// Only do a reading and continue the pipeline
 			// if we find an adapter.
