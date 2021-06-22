@@ -27,8 +27,13 @@ func (el *EventLogger) LogJSON(tag string, json string) (int, error) {
 		"tag":         tag,
 		"info":        json,
 	}
-	ndx, err := PostJSON(el.Cfg, uri, []map[string]string{data})
-	return ndx, err
+	if el.Cfg.StorageMode == "api" {
+		ndx, err := PostJSON(el.Cfg, uri, []map[string]string{data})
+		return ndx, err
+	} else {
+		// Don't log unless we're using the API
+		return 0, nil
+	}
 
 }
 
