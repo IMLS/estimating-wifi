@@ -2,7 +2,8 @@ package tlp
 
 import (
 	"log"
-	"time"
+
+	"github.com/robfig/cron/v3"
 )
 
 /* PROCESS tick
@@ -13,18 +14,19 @@ func Tick(ka *Keepalive, ch chan<- bool) {
 	log.Println("Starting tick")
 	ping, pong := ka.Subscribe("tick", 2)
 	// What is the best way to drive a 1-second tick?
-	ticker := time.NewTicker(1 * time.Second)
+
+	c := cron.New()
+	_, err := c.AddFunc("*/1 * * * *", func() {
+		ch <- true
+	})
+	if err != nil {
+		log.Println("cron: could not set up crontab entry")
+		log.Fatal(err.Error())
+	}
+	c.Start()
 
 	for {
-		select {
-		case <-ping:
-			pong <- "tick"
-
-		// FIXME: This drifts?
-		//case <-time.After(1 * time.Second):
-		// MCJ: Is this better?
-		case <-ticker.C:
-			ch <- true
-		}
+		<-ping
+		pong <- "tick"
 	}
 }
