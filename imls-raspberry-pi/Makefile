@@ -1,6 +1,6 @@
 VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
-ENVVARS = CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7
+ENVVARS = CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
 
 all: input-configuration session-counter wifi-hardware-search-cli log-event
 
