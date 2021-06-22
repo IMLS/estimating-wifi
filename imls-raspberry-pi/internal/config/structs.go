@@ -65,4 +65,5 @@ func (cfg *Config) SetDefaults() {
 	cfg.Local.Crontab = "0 */6 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
 	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
+	cfg.Local.WebDirectory = "/www/imls"
 }
