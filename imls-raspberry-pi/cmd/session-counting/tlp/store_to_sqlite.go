@@ -114,8 +114,7 @@ func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
 		log.Println("sqlite: error in extracting all wifi events.")
 		log.Fatal(err.Error())
 	}
-	log.Println("events extracted")
-	log.Println(events)
+
 	return events
 }
 
@@ -182,14 +181,14 @@ func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
 
 	yesterday := time.Now().Add(-1 * time.Hour)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
+		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
 			log.Println("could not create web directory:", cfg.Local.WebDirectory)
 		}
 	}
 	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
 	if _, err := os.Stat(imagedir); os.IsNotExist(err) {
-		err := os.Mkdir(imagedir, os.ModeDir)
+		err := os.Mkdir(imagedir, 0777)
 		if err != nil {
 			log.Println("could not create image directory")
 		}
@@ -203,7 +202,7 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 
 	_, durations := analysis.Summarize(cfg, events)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
+		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
 			log.Println("could not create web directory:", cfg.Local.WebDirectory)
 		}
@@ -285,8 +284,6 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			if err != nil {
 				log.Fatal("sqlite: could not prepare insert statement.")
 			}
-
-			log.Println("arr", arr)
 
 			for _, h := range arr {
 				//log.Println("inserting...")

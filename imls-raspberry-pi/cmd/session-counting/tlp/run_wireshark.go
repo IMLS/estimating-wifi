@@ -61,6 +61,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 	// Adapter count... every "ac" ticks, we look up the adapter.
 	// (ac % 0) guarantees that we look it up the first time.
 	ticker := 0
+	adapter := ""
 
 	for {
 		select {
@@ -86,7 +87,11 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			if dev != nil && dev.Exists {
 				// Load the config for use.
 				cfg.Wireshark.Adapter = dev.Logicalname
-				search.SetMonitorMode(dev)
+				// Set monitor mode if the adapter changes.
+				if cfg.Wireshark.Adapter != adapter {
+					search.SetMonitorMode(dev)
+					adapter = cfg.Wireshark.Adapter
+				}
 
 				// This will block for [cfg.Wireshark.Duration] seconds.
 				macmap := tshark(cfg)
