@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"log"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,6 +36,19 @@ func GetSearches() []models.Search {
 	}
 
 	return searches
+}
+
+func SetMonitorMode(dev *models.Device) {
+	cmds := make([]*exec.Cmd, 0)
+	cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "down"))
+	cmds = append(cmds, exec.Command("/usr/sbin/iw", dev.Logicalname, "set", "monitor", "none"))
+	cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "up"))
+
+	// Run the commands to set the adapter into monitor mode.
+	for _, c := range cmds {
+		c.Start()
+		c.Wait()
+	}
 }
 
 // PURPOSE

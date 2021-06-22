@@ -86,6 +86,8 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			if dev != nil && dev.Exists {
 				// Load the config for use.
 				cfg.Wireshark.Adapter = dev.Logicalname
+				search.SetMonitorMode(dev)
+
 				// This will block for [cfg.Wireshark.Duration] seconds.
 				macmap := tshark(cfg)
 				// Mark and remove too-short MAC addresses
