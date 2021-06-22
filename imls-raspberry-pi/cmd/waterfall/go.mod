@@ -12,12 +12,10 @@ go 1.16
 
 require (
 	github.com/fogleman/gg v1.3.0
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jszwec/csvutil v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.7
-	golang.org/x/image v0.0.0-20210504121937-7319ad40d33e // indirect
 	gsa.gov/18f/analysis v0.0.0
-		gsa.gov/18f/config v0.0.0
+	gsa.gov/18f/config v0.0.0
 
 )

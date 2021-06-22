@@ -1,7 +1,6 @@
 package analysis
 
 import (
-	"log"
 	"sort"
 	"time"
 
@@ -25,6 +24,27 @@ type Counter struct {
 	PatronMinutes    int
 	DeviceMinutes    int
 	TransientMinutes int
+}
+type ByStart []*Duration
+
+func (a ByStart) Len() int { return len(a) }
+func (a ByStart) Less(i, j int) bool {
+	it, _ := time.Parse(time.RFC3339, a[i].Start)
+	jt, _ := time.Parse(time.RFC3339, a[j].Start)
+	return it.Before(jt)
+}
+func (a ByStart) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type Duration struct {
+	Id        int    `db:"id"`
+	PiSerial  string `db:"pi_serial"`
+	SessionId string `db:"session_id"`
+	FCFSSeqId string `db:"fcfs_seq_id"`
+	DeviceTag string `db:"device_tag"`
+	PatronId  int    `db:"pid"`
+	Type      int    `db:"type"`
+	Start     string `db:"start"`
+	End       string `db:"end"`
 }
 
 func NewCounter(minMinutes int, maxMinutes int) *Counter {
@@ -150,18 +170,6 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 	return c
 }
 
-type Duration struct {
-	Id        int    `db:"id"`
-	PiSerial  string `db:"pi_serial"`
-	SessionId string `db:"session_id"`
-	FCFSSeqId string `db:"fcfs_seq_id"`
-	DeviceTag string `db:"device_tag"`
-	PatronId  int    `db:"pid"`
-	Type      int    `db:"type"`
-	Start     string `db:"start"`
-	End       string `db:"end"`
-}
-
 func durationSummary(events []WifiEvent) map[int]*Duration {
 
 	// We want, for every patron_id, to know when the device started/ended.
@@ -169,7 +177,7 @@ func durationSummary(events []WifiEvent) map[int]*Duration {
 	durations := make(map[int]*Duration)
 
 	for _, e := range events {
-		log.Println("Patron index:", e.PatronIndex)
+		//log.Println("Patron index:", e.PatronIndex)
 		if _, ok := checked[e.PatronIndex]; ok {
 			// Skip if we already checked this patron
 		} else {
@@ -178,8 +186,8 @@ func durationSummary(events []WifiEvent) map[int]*Duration {
 			first, last := getPatronFirstLast(e.PatronIndex, events)
 			firstTime := getEventIdTime(events, first)
 			lastTime := getEventIdTime(events, last)
-			minutes := int(lastTime.Sub(firstTime).Minutes())
-			log.Println("duration", e.PatronIndex, firstTime, lastTime, minutes)
+			//minutes := int(lastTime.Sub(firstTime).Minutes())
+			//log.Println("duration", e.PatronIndex, firstTime, lastTime, minutes)
 			durations[e.PatronIndex] = &Duration{PatronId: e.PatronIndex, Type: devType, Start: firstTime.Format(time.RFC3339), End: lastTime.Format(time.RFC3339)}
 		}
 	}

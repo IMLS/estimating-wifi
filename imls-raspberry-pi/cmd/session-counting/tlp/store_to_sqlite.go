@@ -1,10 +1,11 @@
 package tlp
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"gsa.gov/18f/analysis"
@@ -13,7 +14,7 @@ import (
 
 //func store(service string, cfg *config.Config, session_id int, h map[string]int) error {
 
-func getSummaryDB(cfg *config.Config) *sql.DB {
+func getSummaryDB(cfg *config.Config) *sqlx.DB {
 	if _, err := os.Stat(cfg.Local.SummaryDB); os.IsNotExist(err) {
 		file, err := os.Create(cfg.Local.SummaryDB)
 		if err != nil {
@@ -23,7 +24,7 @@ func getSummaryDB(cfg *config.Config) *sql.DB {
 		file.Close()
 	}
 
-	db, err := sql.Open("sqlite3", cfg.Local.SummaryDB)
+	db, err := sqlx.Open("sqlite3", cfg.Local.SummaryDB)
 	if err != nil {
 		log.Fatal("sqlite: could not open summary db.")
 	}
@@ -84,16 +85,6 @@ func newInMemoryDB() *sqlx.DB {
 	return db
 }
 
-func newInFSDB(path string) *sqlx.DB {
-	db, err := sqlx.Open("sqlite3", path)
-	if err != nil {
-		log.Fatal("sqlite: Could not create in-memory db.")
-	}
-
-	clearInMemoryDB(db)
-	return db
-}
-
 func clearInMemoryDB(db *sqlx.DB) {
 	// Create tables.
 	createTableStatement := `
@@ -120,18 +111,9 @@ func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
 	events := []analysis.WifiEvent{}
 	err := memdb.Select(&events, `SELECT * FROM wifi`)
 	if err != nil {
-		log.Println("sqlite: error in sqlite query.")
+		log.Println("sqlite: error in extracting all wifi events.")
 		log.Fatal(err.Error())
 	}
-
-	//log.Println("events", events)
-	// for rows.Next() {
-	// 	e := analysis.WifiEvent{}
-	// 	err = rows.Scan(&e.ID, &e.EventId, &e.FCFSSeqId, &e.DeviceTag, &e.Localtime, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
-	// 	events = append(events, e)
-	// }
-	// rows.Close()
-
 	return events
 }
 
@@ -191,6 +173,66 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 	}
 }
 
+//This must happen after the data is updated for the day.
+func writeCSVAndImages(cfg *config.Config, memdb *sqlx.DB) {
+	events := extractWifiEvents(memdb)
+	yesterday := time.Now().Add(-1 * time.Hour)
+	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
+		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
+		if err != nil {
+			log.Println("could not create web directory")
+		}
+	}
+	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
+	if _, err := os.Stat(imagedir); os.IsNotExist(err) {
+		err := os.Mkdir(imagedir, os.ModeDir)
+		if err != nil {
+			log.Println("could not create image directory")
+		}
+	}
+
+	path := filepath.Join(imagedir, fmt.Sprintf("%v-%v-%v-summary.png", yesterday.Month(), yesterday.Day(), yesterday.Year()))
+	analysis.DrawPatronSessions(cfg, events, path)
+}
+
+func writeSummaryCSV(cfg *config.Config, memdb *sqlx.DB) {
+	events := extractWifiEvents(memdb)
+	_, durations := analysis.Summarize(cfg, events)
+	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
+		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
+		if err != nil {
+			log.Println("could not create web directory")
+		}
+	}
+	path := filepath.Join(cfg.Local.WebDirectory,
+		fmt.Sprintf("%v-%v-durations.csv", cfg.Auth.FCFSId, cfg.Auth.DeviceTag))
+
+	// Open for appending
+	f, err := os.OpenFile(path,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Println("could not open durations CSV for writing")
+	}
+	defer f.Close()
+
+	f.WriteString("pi_serial,fcfs_seq_id,device_tag,session_id,patron_id,start,end,minutes\n")
+	for _, d := range durations {
+		st, _ := time.Parse(time.RFC3339, d.Start)
+		et, _ := time.Parse(time.RFC3339, d.End)
+		diff := int(et.Sub(st).Minutes())
+		str := fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v,%v\n",
+			d.PiSerial,
+			d.FCFSSeqId,
+			d.DeviceTag,
+			d.SessionId,
+			d.PatronId,
+			d.Start,
+			d.End,
+			diff)
+		f.WriteString(str)
+	}
+}
+
 // FIXME
 // On reset, we need to process and clear the sqlite tables. This should ping once daily.
 func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping, ch_kill <-chan Ping) {
@@ -222,6 +264,8 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			// Process the data from the day.
 			log.Println("sqlite: processing data from the day")
 			processDataFromDay(cfg, db)
+			writeCSVAndImages(cfg, db)
+			writeSummaryCSV(cfg, db)
 			log.Println("sqlite: resetting the in-memory db")
 			clearInMemoryDB(db)
 			db.Close()

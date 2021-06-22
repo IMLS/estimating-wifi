@@ -380,78 +380,16 @@ func _drawNewWaterfalls(cfg *config.Config, db *sqlx.DB) {
 
 	for _, sid := range getUniqueSessions(db) {
 		for _, d := range getDurations(db, sid) {
-			log.Println("d", d)
 			st, _ := time.Parse(time.RFC3339, d.Start)
 			et, _ := time.Parse(time.RFC3339, d.End)
 			diff := int(et.Sub(st).Minutes())
 			// log.Println("st", st, "et", et, "diff", diff)
-			if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MinimumMinutes) {
-				log.Println(d.PatronId, diff)
+			if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
+				log.Println("d", d)
+
 			}
 		}
 	}
-}
-
-func drawNewWaterfalls(cfg *config.Config, csvPtr *string) {
-	b, err := ioutil.ReadFile(*csvPtr)
-	if err != nil {
-		log.Fatal("could not open CSV file.")
-	}
-	var events []analysis.WifiEvent
-	if err := csvutil.Unmarshal(b, &events); err != nil {
-		log.Println(err)
-		log.Fatal("could not unmarshal CSV file as wifi events.")
-	}
-	// Capture the data about the session while running in a `counter` structure.
-	_, durations := analysis.Summarize(cfg, events)
-	durationsInRange := 0
-
-	for _, d := range durations {
-		st, _ := time.Parse(time.RFC3339, d.Start)
-		et, _ := time.Parse(time.RFC3339, d.End)
-		diff := int(et.Sub(st).Minutes())
-		//log.Println("st", st, "et", et, "diff", diff)
-		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
-			log.Println("id", d.PatronId, "diff", diff)
-			durationsInRange += 1
-		}
-	}
-
-	WIDTH := 1440
-	HEIGHT := 24 * (durationsInRange + 2)
-	dc := gg.NewContext(WIDTH, HEIGHT)
-	dc.SetRGBA(0.5, 0.5, 0, 0.5)
-	dc.SetLineWidth(1)
-
-	for ndx, d := range durations {
-		st, _ := time.Parse(time.RFC3339, d.Start)
-		et, _ := time.Parse(time.RFC3339, d.End)
-		diff := int(et.Sub(st).Minutes())
-		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
-			// 1440 minutes in a day
-			// Therefore...
-			log.Println("eod", eod(st))
-			st_in_minutes := 1440 - int(eod(st).Sub(st).Minutes())
-			x := st_in_minutes
-			y := 20 + (ndx * 20)
-			log.Println("rect", x, y, diff, 20)
-			dc.DrawRectangle(float64(x), float64(y), float64(diff), 20)
-			dc.Stroke()
-		}
-	}
-
-	//baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
-	pngFilename := fmt.Sprintf("%v.png", "test")
-	err = dc.SavePNG(pngFilename)
-	if err != nil {
-		log.Println("failed to save png")
-		log.Fatal(err)
-	}
-}
-
-func eod(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 23, 59, 59, 0, t.Location())
 }
 
 func main() {
@@ -499,6 +437,6 @@ func main() {
 
 		cfg, _ := config.ReadConfig(*cfgPath)
 		//drawNewWaterfalls(cfg, db)
-		drawNewWaterfalls(cfg, csvPtr)
+		//analysis.DrawPatronSessions(cfg, csvPtr, "test.png")
 	}
 }

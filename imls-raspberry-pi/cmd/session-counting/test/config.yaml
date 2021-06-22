@@ -46,6 +46,7 @@ manufacturers:
 local:
   summary_db: /opt/imls/summary.sqlite
   temporary_db: /tmp/imls.sqlite
+  web_directory: /www/imls
   # "@midnight" or "0 0 * * *" for every midnight
   crontab: "0 */6 * * *"
 
