@@ -176,6 +176,14 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 //This must happen after the data is updated for the day.
 func writeCSVAndImages(cfg *config.Config, memdb *sqlx.DB) {
 	events := extractWifiEvents(memdb)
+
+	// Just stop if we don't have any events to process.
+	if len(events) < 1 {
+		return
+	}
+
+	writeSummaryCSV(cfg, events)
+
 	yesterday := time.Now().Add(-1 * time.Hour)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
@@ -195,8 +203,8 @@ func writeCSVAndImages(cfg *config.Config, memdb *sqlx.DB) {
 	analysis.DrawPatronSessions(cfg, events, path)
 }
 
-func writeSummaryCSV(cfg *config.Config, memdb *sqlx.DB) {
-	events := extractWifiEvents(memdb)
+func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
+
 	_, durations := analysis.Summarize(cfg, events)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
