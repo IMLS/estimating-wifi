@@ -60,7 +60,7 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 		device_tag text,
 		session_id text,
 		pid integer,
-		type integer,
+		mfg_id integer,
 		start text,
 		end text
 	);`
@@ -139,7 +139,7 @@ func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.D
 		"device_tag",
 		"session_id",
 		"pid",
-		"type",
+		"mfg_id",
 		"start",
 		"end"))
 
@@ -215,17 +215,18 @@ func writeSummaryCSV(cfg *config.Config, memdb *sqlx.DB) {
 	}
 	defer f.Close()
 
-	f.WriteString("pi_serial,fcfs_seq_id,device_tag,session_id,patron_id,start,end,minutes\n")
+	f.WriteString("pi_serial,fcfs_seq_id,device_tag,session_id,patron_id,mfg_id,start,end,minutes\n")
 	for _, d := range durations {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
-		str := fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v,%v\n",
+		str := fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v,%v,%v\n",
 			d.PiSerial,
 			d.FCFSSeqId,
 			d.DeviceTag,
 			d.SessionId,
 			d.PatronId,
+			d.MfgId,
 			d.Start,
 			d.End,
 			diff)

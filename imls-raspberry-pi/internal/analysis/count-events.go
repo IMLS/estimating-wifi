@@ -42,7 +42,7 @@ type Duration struct {
 	FCFSSeqId string `db:"fcfs_seq_id"`
 	DeviceTag string `db:"device_tag"`
 	PatronId  int    `db:"pid"`
-	Type      int    `db:"type"`
+	MfgId     int    `db:"mfgid"`
 	Start     string `db:"start"`
 	End       string `db:"end"`
 }
@@ -182,13 +182,13 @@ func durationSummary(events []WifiEvent) map[int]*Duration {
 			// Skip if we already checked this patron
 		} else {
 			checked[e.PatronIndex] = true
-			devType := getDeviceType(e, events)
+			//devType := getDeviceType(e, events)
 			first, last := getPatronFirstLast(e.PatronIndex, events)
 			firstTime := getEventIdTime(events, first)
 			lastTime := getEventIdTime(events, last)
 			//minutes := int(lastTime.Sub(firstTime).Minutes())
 			//log.Println("duration", e.PatronIndex, firstTime, lastTime, minutes)
-			durations[e.PatronIndex] = &Duration{PatronId: e.PatronIndex, Type: devType, Start: firstTime.Format(time.RFC3339), End: lastTime.Format(time.RFC3339)}
+			durations[e.PatronIndex] = &Duration{PatronId: e.PatronIndex, MfgId: e.ManufacturerIndex, Start: firstTime.Format(time.RFC3339), End: lastTime.Format(time.RFC3339)}
 		}
 	}
 
