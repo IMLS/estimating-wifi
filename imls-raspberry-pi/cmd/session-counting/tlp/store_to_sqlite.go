@@ -180,7 +180,7 @@ func writeCSVAndImages(cfg *config.Config, memdb *sqlx.DB) {
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
 		if err != nil {
-			log.Println("could not create web directory")
+			log.Println("could not create web directory:", cfg.Local.WebDirectory)
 		}
 	}
 	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
@@ -201,7 +201,7 @@ func writeSummaryCSV(cfg *config.Config, memdb *sqlx.DB) {
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, os.ModeDir)
 		if err != nil {
-			log.Println("could not create web directory")
+			log.Println("could not create web directory:", cfg.Local.WebDirectory)
 		}
 	}
 	path := filepath.Join(cfg.Local.WebDirectory,
