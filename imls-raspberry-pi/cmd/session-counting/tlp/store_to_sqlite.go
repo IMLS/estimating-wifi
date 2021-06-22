@@ -114,6 +114,8 @@ func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
 		log.Println("sqlite: error in extracting all wifi events.")
 		log.Fatal(err.Error())
 	}
+	log.Println("events extracted")
+	log.Println(events)
 	return events
 }
 
@@ -167,6 +169,8 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 	if len(events) > 0 {
 		log.Println("sqlite: summarizing")
 		c, d := analysis.Summarize(cfg, events)
+		writeImages(cfg, events)
+		writeSummaryCSV(cfg, events)
 		storeSummary(cfg, c, d)
 	} else {
 		log.Println("sqlite: no events to summarize")
@@ -174,15 +178,7 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 }
 
 //This must happen after the data is updated for the day.
-func writeCSVAndImages(cfg *config.Config, memdb *sqlx.DB) {
-	events := extractWifiEvents(memdb)
-
-	// Just stop if we don't have any events to process.
-	if len(events) < 1 {
-		return
-	}
-
-	writeSummaryCSV(cfg, events)
+func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
 
 	yesterday := time.Now().Add(-1 * time.Hour)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
@@ -273,8 +269,6 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			// Process the data from the day.
 			log.Println("sqlite: processing data from the day")
 			processDataFromDay(cfg, db)
-			writeCSVAndImages(cfg, db)
-			writeSummaryCSV(cfg, db)
 			log.Println("sqlite: resetting the in-memory db")
 			clearInMemoryDB(db)
 			db.Close()
