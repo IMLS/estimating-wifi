@@ -148,7 +148,7 @@ func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.D
 		log.Fatal(err.Error())
 	}
 	for pid, duration := range d {
-		res, err := insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, pid, duration.Type, duration.Start, duration.End)
+		res, err := insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, pid, duration.MfgId, duration.Start, duration.End)
 		if err != nil {
 			log.Println("sqlite: could not insert into summary db")
 			log.Println(res)
