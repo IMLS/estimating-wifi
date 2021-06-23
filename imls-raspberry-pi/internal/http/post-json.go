@@ -33,7 +33,21 @@ func SetVerbose(v bool) {
 }
 
 func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, error) {
-	// tok, err := config.ReadAuth()
+
+	// THIS IS HACKY.
+	// We now have an SQLite-based local mode. We still want a magic counter, but we do
+	// not want to post to the API.
+	// No doubt, I will regret this later... but, here we go...
+
+	// If we are running in local storage mode, update the event counter,
+	// and bail out.
+	if cfg.StorageMode == "sqlite" {
+		magic_index += 1
+		return magic_index, nil
+	}
+	// The implicit ELSE:
+	// Do all the other things.
+
 	tok := cfg.Auth.Token
 
 	log.Println("postjson: storing JSON to", uri)
