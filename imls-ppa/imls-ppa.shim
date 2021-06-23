@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# pull the latest from the IMLS PPA.
+
+set -euox pipefail
+
+PPA_REPOSITORY="https://jadudm.github.io/imls-ppa"
+
+# add the two gpg keys used for signing.
+curl -s --compressed "${PPA_REPOSITORY}/KEY.gpg" | sudo apt-key add -
+curl -s --compressed "${PPA_REPOSITORY}/KEY_ALT.gpg" | sudo apt-key add -
+
+# update the PPA list
+sudo curl -s --compressed -o /etc/apt/sources.list.d/imls-ppa.list "${PPA_REPOSITORY}/contents.list"
+sudo apt update -y
+
+# ensure that wireshark installs without configuration input
+echo "wireshark-common wireshark-common/install-setuid boolean true" | sudo debconf-set-selections
+
+# install or update our packages.
+sudo DEBIAN_FRONTEND=noninteractive apt install -y session-counter-csv session-counter input-initial-configuration

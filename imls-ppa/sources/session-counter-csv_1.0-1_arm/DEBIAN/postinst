@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+systemctl enable nginx.service
+mkdir -p /www/imls
+chown -R www-data:www-data /www*
+rm -f /etc/nginx/sites-enabled/default
+ln -sf /etc/nginx/sites-available/session-counter.conf /etc/nginx/sites-enabled/
+systemctl restart nginx.service
+systemctl enable imls-update.timer

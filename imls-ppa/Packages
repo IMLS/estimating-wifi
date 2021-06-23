@@ -1,0 +1,49 @@
+Package: input-initial-configuration
+Version: 1.0-1
+Architecture: armhf
+Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
+Depends: libc6 (>= 1)
+Filename: ./input-initial-configuration_1.0-1_arm.deb
+Size: 2493996
+MD5sum: 55cc58e6a78a696b71b8df3e68ac6517
+SHA1: f68b9f81b3781fa1362fb04b9e7067ff6695d1b4
+SHA256: 47f54e299f7dc81bce9b029bd3c172bba3727cc7461c0fc49a724da03aca522a
+Section: base
+Priority: optional
+Description: Tool to read in IMLS settings
+
+Package: session-counter
+Version: 1.0-1
+Architecture: armhf
+Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
+Depends: libc6 (>= 1),
+         lshw (>= 1),
+         tshark (>= 1),
+         input-initial-configuration (>= 1)
+Filename: ./session-counter_1.0-1.deb
+Size: 5940120
+MD5sum: 4fcc72da2d1b21ea0ecbc45074294dfd
+SHA1: 817cdb24335d838d38afae8b7a5425377e06a164
+SHA256: d820a54ba9831556e62a2541b2296dd9729ac1db82a13ee17702f8a594e1131d
+Section: base
+Priority: optional
+Description: Session Counter for IMLS Pilot
+ Fancy description.
+
+Package: session-counter-csv
+Version: 1.0-1
+Architecture: armhf
+Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
+Depends: libc6 (>= 1),
+         nginx (>= 1),
+         session-counter (>= 1)
+Filename: ./session-counter-csv_1.0-1_arm.deb
+Size: 1572
+MD5sum: be3335cf2be45b4369a06c36cbc6bd0f
+SHA1: d98c570de390c6bf376be9c11382a6822cd19e2e
+SHA256: 64500fd747705f480148a834de5394b79d122e5a5fbd2cb890b318e12f283af1
+Section: base
+Priority: optional
+Description: Session Counter for IMLS Pilot
+ Sets up a nginx config to allow retrieval of CSVs.
+
