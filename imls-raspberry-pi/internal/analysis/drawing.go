@@ -122,7 +122,7 @@ func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath strin
 	}
 
 	day, _ := time.Parse(time.RFC3339, durationArray[0].Start)
-	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v", day.Month(), day.Day(), day.Year())
+	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag)
 	summaryA := fmt.Sprintf("%v devices seen", totalPatrons)
 	summaryP := fmt.Sprintf("%v patron devices", durationsInRange)
 	summaryM := fmt.Sprintf("%v minutes served", totalMinutes)
@@ -143,7 +143,7 @@ func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath strin
 	dc.DrawStringAnchored("LEGEND", xpos-100, 7.5, 1, 1)
 	dc.DrawStringAnchored("LEGEND", xpos-99, 7.5, 1, 1)
 	w, _ := dc.MeasureString("LEGEND")
-	dc.DrawLine(xpos-100-w, 40, xpos+120, 40)
+	dc.DrawLine(xpos-100-w, 35, xpos+120, 35)
 	dc.Stroke()
 
 	dc.DrawStringAnchored("start time", xpos, 7.5, 1.15, 1)
