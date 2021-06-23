@@ -40,8 +40,6 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	// Run the process network.
 	// Driven by a 1s `tick` process.
 	// Thread the keepalive through the network
-	//go tlp.Tick(ka, ch_sec)
-	//go tlp.TockEveryN(ka, 60, ch_sec, ch_nsec, NIL_KILL_CHANNEL)
 	go tlp.TockEveryMinute(ka, ch_nsec, NIL_KILL_CHANNEL)
 	go tlp.RunWireshark(ka, cfg, ch_nsec, ch_macs, NIL_KILL_CHANNEL)
 	// The reset will never be triggered in AlgoTwo unless we're rnuning in "sqlite" storage mode.
@@ -78,17 +76,20 @@ func handleFlags() *config.Config {
 
 	flag.Parse()
 
-	if *configPathPtr == "" {
-		log.Println("The flag --config MUST be provided.")
-		os.Exit(1)
-	}
-
-	config.Verbose = *verbosePtr
-
 	// If they just want the version, print and exit.
 	if *versionPtr {
 		fmt.Println(version.GetVersion())
 		os.Exit(0)
+	}
+
+	// By default, we are not verbose.
+	// This ends up wrapping a bunch of logging.
+	config.Verbose = *verbosePtr
+
+	// Make sure a config is passed.
+	if *configPathPtr == "" {
+		log.Println("The flag --config MUST be provided.")
+		os.Exit(1)
 	}
 
 	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
