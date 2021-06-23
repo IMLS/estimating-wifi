@@ -1,24 +1,34 @@
-deb:
-	rm -f *.deb
-	dpkg-deb --build sources/input-initial-configuration_1.0-1_arm
-	dpkg-deb --build sources/session-counter_1.0-1
-	dpkg-deb --build sources/session-counter-csv_1.0-1_arm
-	mv sources/*.deb .
+VERSION := $(shell git describe --tags --abbrev=0)
 
-packages: deb
-	dpkg-scanpackages --multiversion . > Packages
-	gzip -k -f Packages
+.PHONY: dev
 
-release: packages
-	apt-ftparchive release . > Release
-	gpg --default-key "$$WHOM" -abs -o - Release > Release.gpg
-	gpg --default-key "$$WHOM" --clearsign -o - Release > InRelease
+stamp_the_dev_version:
+	@echo $(VERSION) > dev-version.txt
+	git add dev-version.txt
+	git commit -m "dev release: $(VERSION)"
+	git push
 
-all: packages release
+stamp_the_release_version:
+	@echo $(VERSION) > prod-version.txt
+	git add prod-version.txt
+	git commit -m "prod release: $(VERSION)"
+	git push
 
-clean:
-	sudo rm -rf /opt/imls
-	sudo apt remove -y session-counter session-counter-csv input-initial-configuration
+packaging:
+	cd imls-playbook ; \
+		sed 's/<<VERSION>>/$(VERSION)/g' Makefile.in > Makefile ; \
+		cd ..
 
-reinstall: clean
-	./imls-ppa.shim
+ifeq ($(shell git describe --tags --abbrev=0),$(VERSION))
+release:
+	@echo "Version needs to be updated from " $(VERSION)
+dev:
+	@echo "Version needs to be updated from " $(VERSION)
+else
+# make VERSION=v1.2.3 release
+release: stamp_the_release_version packaging
+	cd imls-raspberry-pi ; make release ; cd ..
+# make dev
+dev: stamp_the_dev_version packaging
+	cd imls-raspberry-pi ; make dev ; cd ..
+endif
