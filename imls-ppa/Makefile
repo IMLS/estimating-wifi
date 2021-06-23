@@ -22,3 +22,10 @@ clean:
 
 reinstall: clean
 	./imls-ppa.shim
+
+update-binaries:
+	cp ../imls-raspberry-pi/release/bin/input-initial-configuration sources/input-initial-configuration_1.0-1_arm/usr/local/bin/
+	chmod +x sources/input-initial-configuration_1.0-1_arm/usr/local/bin/input-initial-configuration
+	cp ../imls-raspberry-pi/release/bin/session-counter sources/session-counter_1.0-1/usr/local/bin/
+	chmod +x sources/session-counter_1.0-1/usr/local/bin/session-counter
+
