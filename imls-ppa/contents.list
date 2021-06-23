@@ -1,1 +1,1 @@
-deb https://jadudm.github.io/imls-ppa ./
+deb https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/imls-ppa ./
