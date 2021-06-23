@@ -4,7 +4,7 @@
 
 set -euox pipefail
 
-PPA_REPOSITORY="https://jadudm.github.io/imls-ppa"
+PPA_REPOSITORY="https://raw.githubusercontent.com/cantsin/imls-pi-stack/main/imls-ppa"
 
 # add the two gpg keys used for signing.
 curl -s --compressed "${PPA_REPOSITORY}/KEY.gpg" | sudo apt-key add -
