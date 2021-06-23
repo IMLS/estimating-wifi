@@ -119,7 +119,9 @@ func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
 }
 
 func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.Duration) {
-	log.Println("sqlite: getting summary db")
+	if config.Verbose {
+		log.Println("sqlite: getting summary db")
+	}
 	summarydb := getSummaryDB(cfg)
 	insertS, err := summarydb.Prepare(`INSERT INTO counts (pi_serial, fcfs_seq_id, device_tag, session_id, minimum_minutes, maximum_minutes, patron_count, patron_minutes, device_count, device_minutes, transient_count, transient_minutes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
 	if err != nil {
@@ -161,18 +163,27 @@ func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.D
 }
 
 func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
-	log.Println("sqlite: extracting wifi events")
+	if config.Verbose {
+		log.Println("sqlite: extracting wifi events")
+	}
 	events := extractWifiEvents(memdb)
-	log.Println(len(events), "events found")
+	if config.Verbose {
+		log.Println(len(events), "events found")
+	}
+
 	//log.Println(events)
 	if len(events) > 0 {
-		log.Println("sqlite: summarizing")
+		if config.Verbose {
+			log.Println("sqlite: summarizing")
+		}
 		c, d := analysis.Summarize(cfg, events)
 		writeImages(cfg, events)
 		writeSummaryCSV(cfg, events)
 		storeSummary(cfg, c, d)
 	} else {
-		log.Println("sqlite: no events to summarize")
+		if config.Verbose {
+			log.Println("sqlite: no events to summarize")
+		}
 	}
 }
 
@@ -183,14 +194,18 @@ func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
-			log.Println("could not create web directory:", cfg.Local.WebDirectory)
+			if config.Verbose {
+				log.Println("could not create web directory:", cfg.Local.WebDirectory)
+			}
 		}
 	}
 	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
 	if _, err := os.Stat(imagedir); os.IsNotExist(err) {
 		err := os.Mkdir(imagedir, 0777)
 		if err != nil {
-			log.Println("could not create image directory")
+			if config.Verbose {
+				log.Println("could not create image directory")
+			}
 		}
 	}
 
@@ -204,7 +219,9 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
-			log.Println("could not create web directory:", cfg.Local.WebDirectory)
+			if config.Verbose {
+				log.Println("could not create web directory:", cfg.Local.WebDirectory)
+			}
 		}
 	}
 	path := filepath.Join(cfg.Local.WebDirectory,
@@ -214,7 +231,9 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 	f, err := os.OpenFile(path,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Println("could not open durations CSV for writing")
+		if config.Verbose {
+			log.Println("could not open durations CSV for writing")
+		}
 	}
 	defer f.Close()
 
@@ -259,7 +278,6 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 	event_ndx := 0
 	// We'll use an in-memory DB for the recording of data throughout the day.
 	db := newInMemoryDB()
-	// db := newInFSDB(cfg.Local.TemporaryDB)
 
 	for {
 		select {
@@ -268,23 +286,30 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case <-ch_kill:
 			db.Close()
-			log.Println("Exiting StoreToSqlite")
+			if config.Verbose {
+				log.Println("Exiting StoreToSqlite")
+			}
 			return
 
 		case <-ch_reset:
 			// Process the data from the day.
-			log.Println("sqlite: processing data from the day")
+			if config.Verbose {
+				log.Println("sqlite: processing data from the day")
+			}
 			processDataFromDay(cfg, db)
-			log.Println("sqlite: resetting the in-memory db")
+			if config.Verbose {
+				log.Println("sqlite: resetting the in-memory db")
+			}
 			clearInMemoryDB(db)
 			db.Close()
-			// db = newInFSDB(cfg.Local.TemporaryDB)
 			db = newInMemoryDB()
 			// After clearing, it is a new session.
 			cfg.SessionId = config.CreateSessionId()
 
 		case arr := <-ch_data:
-			log.Println("sqlite: storing data into memory")
+			if config.Verbose {
+				log.Println("sqlite: storing data into memory")
+			}
 			// This has to be done on the db that is currently open.
 			// Cannot pre-prepare for the entire process.
 			insertS, err := db.Prepare(`INSERT INTO wifi (event_id, fcfs_seq_id, device_tag, localtime, session_id, manufacturer_index, patron_index) VALUES (?,?,?,?,?,?,?)`)
@@ -293,8 +318,6 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			}
 
 			for _, h := range arr {
-				//log.Println("inserting...")
-				// log.Println(h["event_id"], h["fcfs_seq_id"], h["device_tag"], h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
 				res, err := insertS.Exec(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
 					h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
 				if err != nil {

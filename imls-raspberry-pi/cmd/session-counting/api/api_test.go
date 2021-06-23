@@ -109,7 +109,9 @@ func Test_RevalResponseUnmarshall(t *testing.T) {
 	err := json.Unmarshal([]byte(testString), &rev)
 	if err != nil {
 		log.Println("unmarshalling error:", err)
+
 	} else {
 		log.Println(rev)
+
 	}
 }

@@ -18,7 +18,9 @@ import (
  */
 
 func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, reset <-chan Ping, ch_kill <-chan Ping) {
-	log.Println("Starting AlgorithmTwo")
+	if config.Verbose {
+		log.Println("Starting AlgorithmTwo")
+	}
 	// This is our "tracking database"
 	umdb := model.NewUMDB(cfg)
 
@@ -32,12 +34,16 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 	var pong chan interface{} = nil
 	if !testing {
 		ping, pong = ka.Subscribe("AlgorithmTwo", 5)
-		log.Println("a2: initialized keepalive")
+		if config.Verbose {
+			log.Println("a2: initialized keepalive")
+		}
 	}
 	for {
 		select {
 		case <-ch_kill:
-			log.Println("a2: exiting")
+			if config.Verbose {
+				log.Println("a2: exiting")
+			}
 			return
 		case <-ping:
 			pong <- "AlgorithmTwo"
@@ -55,7 +61,6 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out cha
 			// We get in a list of MAC addresses. Create mappings.
 			// Timestamp everything as we see it, new or old.
 			for _, mac := range arr {
-				// log.Println("updating mapping for ", mac)
 				umdb.UpdateMapping(mac)
 			}
 			// Now, filter old things out

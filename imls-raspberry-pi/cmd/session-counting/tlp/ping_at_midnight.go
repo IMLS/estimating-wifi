@@ -8,7 +8,9 @@ import (
 )
 
 func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_kill <-chan Ping) {
-	log.Println("Starting PingAtMidnight")
+	if config.Verbose {
+		log.Println("Starting PingAtMidnight")
+	}
 
 	// ch_kill will be nil in production
 	var ping, pong chan interface{} = nil, nil
@@ -31,7 +33,9 @@ func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_
 	for {
 		select {
 		case <-ch_kill:
-			log.Println("Exiting PingAtMidnight")
+			if config.Verbose {
+				log.Println("Exiting PingAtMidnight")
+			}
 			// Stop the cron scheduler.
 			c.Stop()
 			return

@@ -16,7 +16,9 @@ import (
 )
 
 func run(ka *tlp.Keepalive, cfg *config.Config) {
-	log.Println("Starting run")
+	if config.Verbose {
+		log.Println("Starting run")
+	}
 	// Create channels for process network
 	// ch_sec := make(chan bool)
 	ch_nsec := make(chan bool)
@@ -57,7 +59,9 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 }
 
 func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
-	log.Println("Starting keepalive")
+	if config.Verbose {
+		log.Println("Starting keepalive")
+	}
 	var counter int64 = 0
 	for {
 		time.Sleep(time.Duration(cfg.Monitoring.PingInterval) * time.Second)

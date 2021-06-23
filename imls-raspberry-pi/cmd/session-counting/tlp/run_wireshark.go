@@ -49,7 +49,9 @@ func tshark(cfg *config.Config) []string {
  * Empty MAC addresses are filtered out.
  */
 func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []string, ch_kill <-chan Ping) {
-	log.Println("Starting runWireshark")
+	if config.Verbose {
+		log.Println("Starting runWireshark")
+	}
 
 	var ping, pong chan interface{} = nil, nil
 
@@ -72,7 +74,9 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			pong <- "wireshark"
 
 		case <-ch_kill:
-			log.Println("Exiting RunWireshark")
+			if config.Verbose {
+				log.Println("Exiting RunWireshark")
+			}
 			return
 
 		case <-in:
@@ -107,7 +111,9 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 				// Report out the cleaned MACmap.
 				out <- keepers
 			} else {
-				log.Println("No wifi device found. No scanning carried out.")
+				if config.Verbose {
+					log.Println("No wifi device found. No scanning carried out.")
+				}
 				// Report an empty array of keepers
 				out <- make([]string, 0)
 			}

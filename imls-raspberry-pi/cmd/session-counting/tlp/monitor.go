@@ -69,7 +69,6 @@ func (b *Keepalive) Start() {
 			for ch := range procs {
 				// In parallel...
 				go func(c chan interface{}) {
-					// log.Printf("Pinging %v\n", procs[c].id)
 					// Ping every process that is subscribed.
 					// The channel has a single slot.
 					c <- msg
@@ -86,7 +85,9 @@ func (b *Keepalive) Start() {
 								"process_id":      fmt.Sprint(procs[c].id),
 								"process_timeout": fmt.Sprint(procs[c].timeout)})
 
-						log.Printf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
+						if config.Verbose {
+							log.Printf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
+						}
 						processTimedOut = true
 					}
 				}(ch)
@@ -95,7 +96,9 @@ func (b *Keepalive) Start() {
 		case <-time.After(interval):
 			if processTimedOut {
 				// If we timed out, exit. Hope systemd restarts us.
-				log.Println("Exiting after", interval, "seconds. Bye!")
+				if config.Verbose {
+					log.Println("Exiting after", interval, "seconds. Bye!")
+				}
 				os.Exit(constants.ExitProcessTimeout)
 			}
 		} // end select

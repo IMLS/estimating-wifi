@@ -246,7 +246,9 @@ func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, n_hours int, ch_tick
 				ch_reset <- tlp.Ping{}
 			}
 		case <-ch_kill:
-			log.Println("Exiting PingAfterNHours")
+			if config.Verbose {
+				log.Println("Exiting PingAfterNHours")
+			}
 			return
 		}
 	}
@@ -288,11 +290,14 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out
 			for i := 0; i < NUMRANDOM; i++ {
 				macs[30+i] = generateFakeMac()
 			}
-			//log.Println("macs:", macs)
 			out <- macs
 
 		case <-ch_kill:
-			log.Println("Exiting RunFakeWireshark")
+			if config.Verbose {
+				if config.Verbose {
+					log.Println("Exiting RunFakeWireshark")
+				}
+			}
 			return
 		}
 	}
@@ -380,7 +385,6 @@ func TestManyTLPCycles(t *testing.T) {
 		time.Sleep(5 * time.Second)
 		minutes := 0
 		for secs := 0; secs < NUMMINUTESTORUN*60; secs++ {
-			//log.Println("tocking...")
 			ch_sec <- true
 			if secs%SECONDSPERMINUTE == 0 {
 				var m runtime.MemStats

@@ -13,7 +13,9 @@ import (
 func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 	in_hash <-chan map[string]int, out_arr chan<- []map[string]string, ch_kill <-chan Ping) {
 
-	log.Println("Starting PrepareDataForStorage")
+	if config.Verbose {
+		log.Println("Starting PrepareDataForStorage")
+	}
 
 	// If ch_kill is nill, we're live.
 	// If it is *not* nill, we're running under test/simulation conditions.
@@ -29,7 +31,9 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 		case <-ping:
 			pong <- "PrepareDataForStorage"
 		case <-ch_kill:
-			log.Println("Exiting PrepareDataForStorage")
+			if config.Verbose {
+				log.Println("Exiting PrepareDataForStorage")
+			}
 			return
 
 		// Block waiting to read the incoming hash

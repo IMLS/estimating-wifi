@@ -3,6 +3,8 @@ package tlp
 import (
 	"log"
 	"sync"
+
+	"gsa.gov/18f/config"
 )
 
 type Ping struct {
@@ -17,7 +19,9 @@ func ParDelta(ch_kill <-chan Ping, chs_reset ...chan Ping) {
 	for {
 		select {
 		case <-ch_kill:
-			log.Println("Exiting ParDelta")
+			if config.Verbose {
+				log.Println("Exiting ParDelta")
+			}
 			return
 		case <-chs_reset[0]:
 			var wg sync.WaitGroup

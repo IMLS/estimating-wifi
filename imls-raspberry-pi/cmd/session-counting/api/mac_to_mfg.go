@@ -64,8 +64,10 @@ func MacToMfg(cfg *config.Config, mac string) string {
 				// Close the rows down, too...
 				// Another possible leak?
 				if err != nil {
-					log.Println(err)
-					log.Printf("manufactuerer not found: %s", q)
+					if config.Verbose {
+						log.Println(err)
+						log.Printf("manufactuerer not found: %s", q)
+					}
 
 				} else {
 					var id string

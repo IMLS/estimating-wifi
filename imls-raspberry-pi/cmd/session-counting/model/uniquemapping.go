@@ -72,7 +72,6 @@ func (umdb uniqueMappingDB) UpdateMapping(mac string) {
 			if config.Verbose {
 				log.Println("mfg", mfg, "id", mfgid)
 				log.Println(len(umdb.mfg), "devices in mfg map.")
-				//log.Println("umdb.mfg", umdb.mfg)
 			}
 		}
 		umdb.anonmfg[mfg] = mfgid
@@ -90,7 +89,6 @@ func (umdb uniqueMappingDB) RemoveOldMappings(window int) {
 	// Find everything we need to remove.
 	for mac := range umdb.mfg {
 		if umdb.tick[mac] >= window {
-			// log.Println(mac, "is old. removing. tick:", umdb.tick[mac])
 			remove = append(remove, mac)
 		}
 	}

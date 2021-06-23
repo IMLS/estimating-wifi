@@ -14,7 +14,9 @@ import (
  * Uses "unknown" for all unknown manufacturers.
  */
 func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry, ch_kill <-chan Ping) {
-	log.Println("Starting macToEntry")
+	if config.Verbose {
+		log.Println("Starting macToEntry")
+	}
 
 	// ch_kill will be nil in production
 	var ping, pong chan interface{} = nil, nil
@@ -27,7 +29,9 @@ func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int,
 		case <-ping:
 			pong <- "macToEntry"
 		case <-ch_kill:
-			log.Println("Exiting MacToEntry")
+			if config.Verbose {
+				log.Println("Exiting MacToEntry")
+			}
 			return
 
 		case mm := <-macmap:
