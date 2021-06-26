@@ -84,12 +84,12 @@ func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath strin
 			dc.SetLineWidth(1)
 
 			// Therefore...
-			log.Println("eod", eod(st))
+			// log.Println("eod", eod(st))
 			st_in_minutes := 1440 - int(eod(st).Sub(st).Minutes())
 			x := st_in_minutes
 			y := 20 + (ystep * 20)
-			log.Println("start time", st, "end time", et)
-			log.Println("rect", x, y, diff, 20)
+			// log.Println("start time", st, "end time", et)
+			// log.Println("rect", x, y, diff, 20)
 
 			dc.DrawRectangle(float64(x), float64(y), float64(diff), 20)
 			dc.Stroke()
@@ -107,11 +107,11 @@ func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath strin
 			if diff < 60 {
 				duration = fmt.Sprintf("%vm", pad(diff))
 			} else {
-				log.Println("diff", diff)
+				// log.Println("diff", diff)
 				hours := (diff / 60)
 				minutes := diff - ((diff / 60) * 60)
 				duration = fmt.Sprintf("%vh%vm", hours, pad(minutes))
-				log.Println(duration)
+				// log.Println(duration)
 			}
 
 			dc.DrawStringAnchored(duration, float64(x+diff), float64(y), 1.25, 1)

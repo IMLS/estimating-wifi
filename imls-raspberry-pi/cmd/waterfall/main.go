@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
-	"github.com/jmoiron/sqlx"
 	"github.com/jszwec/csvutil"
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/analysis"
@@ -284,9 +283,9 @@ func drawWaterfall(events []analysis.WifiEvent) (c *analysis.Counter, dc *gg.Con
 	return c, dc
 }
 
-func drawOldWaterfalls(csvPtr *string, dataPtr *string) {
+func readWifiEventsFromCSV(path string) []analysis.WifiEvent {
 
-	b, err := ioutil.ReadFile(*csvPtr)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal("could not open CSV file.")
 	}
@@ -297,19 +296,33 @@ func drawOldWaterfalls(csvPtr *string, dataPtr *string) {
 		log.Fatal("could not unmarshal CSV file as wifi events.")
 	}
 
+	return events
+}
+
+func buildImagePath(fcfs string, deviceTag string, pngName string) string {
+
+	_ = os.Mkdir("output", 0777)
+	fcfs_tag := fmt.Sprintf("%v-%v", fcfs, deviceTag)
+	outdir := filepath.Join("output", fcfs_tag)
+	_ = os.Mkdir(outdir, 0777)
+	baseFilename := fmt.Sprint(filepath.Join(outdir, pngName))
+	fullPath := fmt.Sprintf("%v.png", baseFilename)
+
+	return fullPath
+}
+
+func drawOldWaterfalls(events []analysis.WifiEvent, dataPtr *string) {
+
 	// Capture the data about the session while running in a `counter` structure.
 	c, dc := drawWaterfall(events)
 
 	sid := events[0].SessionId
 	seqId := events[0].FCFSSeqId
 	dt := events[0].DeviceTag
-	_ = os.Mkdir("output", 0777)
-	fcfs_tag := fmt.Sprintf("%v-%v", seqId, dt)
-	outdir := filepath.Join("output", fcfs_tag)
-	_ = os.Mkdir(outdir, 0777)
-	baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
-	pngFilename := fmt.Sprintf("%v.png", baseFilename)
-	err = dc.SavePNG(pngFilename)
+	pngName := fmt.Sprintf("%v-%v-%v", sid, seqId, dt)
+	fullPath := buildImagePath(seqId, dt, pngName)
+
+	err := dc.SavePNG(fullPath)
 	if err != nil {
 		log.Println("failed to save png")
 		log.Fatal(err)
@@ -338,105 +351,45 @@ func drawOldWaterfalls(csvPtr *string, dataPtr *string) {
 	}
 }
 
-// sqlx makes it easy to pull things in.
-func getDurations(db *sqlx.DB, sid string) []analysis.Duration {
-	durations := []analysis.Duration{}
-	err := db.Select(&durations, `SELECT * FROM durations WHERE session_id=?`, sid)
-	if err != nil {
-		log.Println("sqlite: error in getDurations query.")
-		log.Fatal(err.Error())
-	}
-	return durations
-}
-
-func getUniqueSessions(db *sqlx.DB) (sessions []string) {
-	err := db.Select(&sessions, `SELECT DISTINCT(session_id) FROM durations`)
-	if err != nil {
-		log.Println("Failed to get unique sessions.")
-	}
-
-	return sessions
-}
-
-func _drawNewWaterfalls(cfg *config.Config, db *sqlx.DB) {
-	WIDTH := 1200
-	HEIGHT := 600
-
-	// sid := durations[0].SessionId
-	// seqId := durations[0].FCFSSeqId
-	// dt := durations[0].DeviceTag
-	// _ = os.Mkdir("output", 0777)
-	// fcfs_tag := fmt.Sprintf("%v-%v", seqId, dt)
-	// outdir := filepath.Join("output", fcfs_tag)
-	// _ = os.Mkdir(outdir, 0777)
-	// baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
-	//pngFilename := fmt.Sprintf("%v.png", baseFilename)
-
-	// This creates an infinite sized image of uniform color.
-	// img := &image.Uniform(color.RGBA(0x00, 0x00, 0x00, 0x00))
-	dc := gg.NewContext(WIDTH, HEIGHT)
-	dc.SetRGBA(0.5, 0.5, 0, 0.5)
-	dc.SetLineWidth(1)
-
-	for _, sid := range getUniqueSessions(db) {
-		for _, d := range getDurations(db, sid) {
-			st, _ := time.Parse(time.RFC3339, d.Start)
-			et, _ := time.Parse(time.RFC3339, d.End)
-			diff := int(et.Sub(st).Minutes())
-			// log.Println("st", st, "et", et, "diff", diff)
-			if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
-				log.Println("d", d)
-
-			}
-		}
+func pad(n int) string {
+	if n < 10 {
+		return fmt.Sprintf("0%v", n)
+	} else {
+		return fmt.Sprintf("%v", n)
 	}
 }
 
 func main() {
 	csvPtr := flag.String("csv", "", "A CSV datafile.")
-	summaryDbPtr := flag.String("summary", "", "A summary DB (SQLite)")
 	cfgPath := flag.String("config", "", "Path to valid config file. REQUIRED.")
 	dataPtr := flag.String("data", "", "Data output.")
-	newstyleFlag := flag.Bool("newstyle", false, "Draw new style waterfalls.")
+	newstyleFlag := flag.Bool("new", false, "Draw new style waterfalls.")
 	flag.Parse()
-
-	if *csvPtr != "" && *summaryDbPtr != "" {
-		log.Fatal("Provide EITHER a CSV file OR a summary DB.")
-		os.Exit(-1)
-	}
-
-	if *csvPtr == "" && *summaryDbPtr == "" {
-		log.Fatal("Provide EITHER a CSV file OR a summary DB.")
-		os.Exit(-1)
-	}
 
 	if *cfgPath == "" {
 		log.Fatal("Must provide valid config file.")
 	}
 
-	if *csvPtr != "" && !*newstyleFlag {
-		drawOldWaterfalls(csvPtr, dataPtr)
+	cfg, _ := config.ReadConfig(*cfgPath)
+	events := readWifiEventsFromCSV(*csvPtr)
+	if len(events) < 1 {
+		log.Fatal("No wifi events found. Exiting.")
+		os.Exit(-1)
 	}
-
 	if *csvPtr != "" && *newstyleFlag {
-
-		// FOR PROCESSING NEW-STYLE SUMMARY DBS... NOT YET READY
-
-		// The new waterfalls use the summary DB.
-		// 	insertS, err = summarydb.Prepare(`INSERT INTO durations (pi_serial, fcfs_seq_id, device_tag, session_id, pid, type, start, end) VALUES (?,?,?,?,?,?,?,?)`)
-		// As a CSV, those are the headers.
-		// if _, err := os.Stat(*summaryDbPtr); os.IsNotExist(err) {
-		// 	log.Println("Could not find", *summaryDbPtr)
-		// 	os.Exit(-1)
-		// }
-
-		// db, err := sqlx.Open("sqlite3", fmt.Sprintf("%v?parseTime=true", *summaryDbPtr))
-		// if err != nil {
-		// 	log.Fatal("sqlite: could not open summary db.")
-		// }
-
-		cfg, _ := config.ReadConfig(*cfgPath)
-		//drawNewWaterfalls(cfg, db)
-		//analysis.DrawPatronSessions(cfg, csvPtr, "test.png")
+		fcfs := events[0].FCFSSeqId
+		dt := events[0].DeviceTag
+		d := events[0].Localtime
+		// This is necessary... in case we're testing with a
+		// bogus config.yaml file. Better to pull the identifiers from
+		// the actual event stream than trust the file passed.
+		cfg.Auth.FCFSId = fcfs
+		cfg.Auth.DeviceTag = dt
+		pngName := fmt.Sprintf("%v-%v-%v-%v-%v-patron-sessions", d.Year(), pad(int(d.Month())), pad(int(d.Day())), fcfs, dt)
+		//log.Println("writing to", pngName)
+		analysis.DrawPatronSessions(cfg, events, buildImagePath(fcfs, dt, pngName))
+	} else {
+		drawOldWaterfalls(events, dataPtr)
 	}
+
 }
