@@ -11,9 +11,7 @@ replace gsa.gov/18f/cryptopasta v0.0.0 => ../../internal/cryptopasta
 go 1.16
 
 require (
-	github.com/Masterminds/squirrel v1.5.0 // indirect
 	github.com/briandowns/spinner v1.12.0
-	github.com/jszwec/csvutil v1.5.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect

@@ -1,4 +1,4 @@
 build/*
-output/*
+output*/*
 cache-to-sqlite
 2021*/**
