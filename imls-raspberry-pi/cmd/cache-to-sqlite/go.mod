@@ -1,4 +1,4 @@
-module gsa.gov/18f/imls-data-convert
+module gsa.gov/18f/cache-to-sqlite
 
 replace gsa.gov/18f/version v0.0.0 => ../../internal/version
 
@@ -11,6 +11,7 @@ replace gsa.gov/18f/cryptopasta v0.0.0 => ../../internal/cryptopasta
 go 1.16
 
 require (
+	github.com/Masterminds/squirrel v1.5.0 // indirect
 	github.com/briandowns/spinner v1.12.0
 	github.com/jszwec/csvutil v1.5.0
 	github.com/kr/pretty v0.1.0 // indirect

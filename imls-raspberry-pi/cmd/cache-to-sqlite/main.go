@@ -11,14 +11,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
+	"sync"
 	"time"
 
 	"github.com/briandowns/spinner"
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/analysis"
 
-	"github.com/jszwec/csvutil"
 	"gsa.gov/18f/version"
 )
 
@@ -35,6 +34,7 @@ type config struct {
 	Wifi        string
 	Stepsize    int
 	TzOffset    int
+	DestDir     string
 }
 
 /* {"id":1382983,
@@ -55,12 +55,12 @@ func spinnerStart(msg string) *spinner.Spinner {
 	return s
 }
 
-func getWifiEvents(cfg *config) ([]analysis.WifiEvent, error) {
+func getWifiEvents(cfg *config, events chan<- []analysis.WifiEvent, wg *sync.WaitGroup) {
 	fetching := true
-	events := make([]analysis.WifiEvent, 0)
+	// events := make([]analysis.WifiEvent, 0)
 	offset := 0
 
-	s := spinnerStart(" Fetching wifi events...")
+	log.Println("Fetching wifi events...")
 	for fetching {
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", cfg.Wifi, nil)
@@ -88,65 +88,38 @@ func getWifiEvents(cfg *config) ([]analysis.WifiEvent, error) {
 		body, _ := ioutil.ReadAll(resp.Body)
 		e := new(analysis.WifiEvents)
 		json.Unmarshal(body, &e)
-		events = append(events, e.Data...)
+
+		// events = append(events, e.Data...)
+		events <- e.Data
+
 		if len(e.Data) < cfg.Stepsize {
 			fetching = false
 		} else {
 			offset += cfg.Stepsize
+			log.Println(fmt.Sprintf(" fetched %v events", offset))
 		}
 	}
-	s.Stop()
-	return events, nil
+
+	//return events, nil
+
+	// Leave the gofuncs
+	log.Println("Done reading events")
+	events <- nil
+	wg.Done()
 }
 
-func fixLocaltime(cfg *config, events []analysis.WifiEvent) []analysis.WifiEvent {
-	updated := make([]analysis.WifiEvent, 0)
-	for _, e := range events {
-		e.Localtime = e.Localtime.Add(time.Duration(cfg.TzOffset) * time.Hour)
-		updated = append(updated, e)
-	}
-	return updated
-}
+// func getEvents(cfg *config) []analysis.WifiEvent {
+// 	allEvents, err := getWifiEvents(cfg)
+// 	if err != nil {
+// 		log.Println("no events retrieved.")
+// 	}
+// 	return allEvents
+// }
 
-func fixEvents(cfg *config) []analysis.WifiEvent {
-	allEvents, err := getWifiEvents(cfg)
-	if err != nil {
-		log.Println("no events retrieved.")
-	}
-	fixed := fixLocaltime(cfg, allEvents)
-	remapped := analysis.RemapEvents(fixed)
-	return remapped
-}
-
-func generateCSV(cfg *config, remapped []analysis.WifiEvent) {
-	for _, s := range analysis.GetSessions(remapped) {
-		events := analysis.GetEventsFromSession(remapped, s)
-		b, err := csvutil.Marshal(events)
-		if err != nil {
-			log.Println(err)
-			log.Fatal("could not convert events to CSV")
-		}
-
-		_ = os.Mkdir("output", 0777)
-		fcfs_tag := fmt.Sprintf("%v-%v", cfg.Fcfs_seq_id, cfg.Device_tag)
-		outdir := filepath.Join("output", fcfs_tag)
-		_ = os.Mkdir(outdir, 0777)
-		f, err := os.Create(filepath.Join(outdir, fmt.Sprintf("%v-%v.csv", s, fcfs_tag)))
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer f.Close()
-		f.Write(b)
-	}
-
-}
-
-func generateSqlite(cfg *config, remapped []analysis.WifiEvent) {
-	_ = os.Mkdir("output", 0777)
+func generateSqlite(cfg *config, ch <-chan []analysis.WifiEvent, wg *sync.WaitGroup) {
+	// _ = os.Mkdir("output", 0777)
 	fcfs_tag := fmt.Sprintf("%v-%v", cfg.Fcfs_seq_id, cfg.Device_tag)
-	outdir := filepath.Join("output", fcfs_tag)
-	_ = os.Mkdir(outdir, 0777)
-	db, err := sql.Open("sqlite3", string(filepath.Join(outdir, fmt.Sprintf("%v.sqlite", fcfs_tag))))
+	db, err := sql.Open("sqlite3", string(filepath.Join(cfg.DestDir, fmt.Sprintf("%v.sqlite", fcfs_tag))))
 	if err != nil {
 		log.Fatal("could not open SQLite3 DB for writing.")
 	}
@@ -167,18 +140,43 @@ func generateSqlite(cfg *config, remapped []analysis.WifiEvent) {
 		log.Fatal(err)
 	}
 
-	stat, _ := db.Prepare(`INSERT INTO wifi 
+	// stat, _ := db.Prepare(`INSERT INTO wifi
+	// 		(event_id, fcfs_seq_id, device_tag, localtime, servertime, session_id, manufacturer_index, patron_index)
+	// 		VALUES  (?, ?, ?, ?, ?, ?, ?, ?)`)
+	// defer stat.Close()
+
+	//. s := spinnerStart(" Writing data to SQLite table...")
+	for {
+		events := <-ch
+		// Transactions are required to speed this up. Massively.
+		// https://jmoiron.github.io/sqlx/
+		// WIthout timing it, this runs around 2M events in a few miinutes.
+		// But, it used to take *forever*.
+		// Note this is storing the data in a DB on a RAMDISK. Speed will be slightly slower on an SSD.
+		tx, _ := db.Begin()
+		stat, _ := tx.Prepare(`INSERT INTO wifi 
 			(event_id, fcfs_seq_id, device_tag, localtime, servertime, session_id, manufacturer_index, patron_index) 
 			VALUES  (?, ?, ?, ?, ?, ?, ?, ?)`)
-	s := spinnerStart(" Writing data to SQLite table...")
-	for ndx, e := range remapped {
-		if ndx%1000 == 0 {
-			time.Sleep(10 * time.Millisecond)
+		defer stat.Close()
+
+		if events == nil {
+			stat.Close()
+			db.Close()
+			log.Println("Done writing events.")
+			wg.Done()
+			return
+		} else {
+			for _, e := range events {
+				stat.Exec(e.EventId, e.FCFSSeqId, e.DeviceTag, e.Localtime.Format(time.RFC3339), e.Servertime.Format(time.RFC3339), e.SessionId, e.ManufacturerIndex, e.PatronIndex)
+			}
+			// This is the same as .Close()
+			// Do all 10K inserts at once.
+			err = tx.Commit()
+			if err != nil {
+				log.Fatal("could not execute transaction")
+			}
 		}
-		stat.Exec(e.EventId, e.FCFSSeqId, e.DeviceTag, e.Localtime.Format(time.RFC3339), e.Servertime.Format(time.RFC3339), e.SessionId, e.ManufacturerIndex, e.PatronIndex)
 	}
-	defer stat.Close()
-	s.Stop()
 }
 
 func getLibraries(cfg *config) map[string][]string {
@@ -221,54 +219,19 @@ func getLibraries(cfg *config) map[string][]string {
 	return set
 }
 
-func dedupe(events []analysis.WifiEvent) []analysis.WifiEvent {
-	clean := make([]analysis.WifiEvent, 0)
-	for _, e := range events {
-		found := false
-		for _, c := range clean {
-			if e.ID == c.ID {
-				found = true
-			}
-		}
-		if !found {
-			clean = append(clean, e)
-		}
-	}
-	return clean
-}
-
-func dedupe2(events []analysis.WifiEvent) []analysis.WifiEvent {
-	clean := make(map[int]analysis.WifiEvent)
-	for _, e := range events {
-		clean[e.ID] = e
-	}
-
-	cleaned := make([]analysis.WifiEvent, 0)
-	for _, evt := range clean {
-		cleaned = append(cleaned, evt)
-	}
-
-	// Make sure that we put everything in order
-	sort.Slice(cleaned[:], func(i, j int) bool {
-		return cleaned[i].ID < cleaned[j].ID
-	})
-
-	return cleaned
-}
-
 func main() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
-	getLibrariesPtr := flag.Bool("get-libraries", false, "Fetch a list of libraries in the dataset and exit.")
+	getLibrariesPtr := flag.Bool("libraries", false, "Fetch a list of libraries in the dataset and exit.")
 	fcfsSeqIdPtr := flag.String("fcfs_seq_id", "", "Set the FCFS Seq Id to process.")
 	deviceTagPtr := flag.String("device_tag", "", "Set the device tag to process.")
 	sqlitePtr := flag.Bool("sqlite", false, "Generate an SQLite table of the data.")
-	csvPtr := flag.Bool("csv", true, "Generate a CSV file of the data. Default.")
 	graphQLPtr := flag.String("graphql", "https://api.data.gov/TEST/10x-imls/v1/graphql/", "GraphQL endpoint.")
 	eventsPtr := flag.String("events", "https://api.data.gov/TEST/10x-imls/v1/search/events/", "Events REST endpoint.")
 	wifiPtr := flag.String("wifi", "https://api.data.gov/TEST/10x-imls/v1/search/wifi/", "Wifi REST endpoint.")
-	stepSizePtr := flag.Int("stepsize", 10000, "How many elements to retrieve per HTTPS GET.")
+	stepSizePtr := flag.Int("stepsize", 10000, "How many elements to retrieve per HTTPS GET. Default is 10K.")
 	// The server is recording time in Z, or Zulu time, which is GMT.
 	tzOffsetPtr := flag.Int("tzoffset", -5, "localtime timezone offset from server")
+	destPtr := flag.String("dest", "", "Destination directory for sqlite db.")
 
 	flag.Parse()
 
@@ -292,7 +255,7 @@ func main() {
 
 	cfg := config{Key: os.Getenv("APIDATAGOV"),
 		Sqlite:      *sqlitePtr,
-		CSV:         *csvPtr,
+		CSV:         false,
 		Fcfs_seq_id: *fcfsSeqIdPtr,
 		Device_tag:  *deviceTagPtr,
 		GraphQL:     *graphQLPtr,
@@ -300,6 +263,7 @@ func main() {
 		Wifi:        *wifiPtr,
 		Stepsize:    *stepSizePtr,
 		TzOffset:    *tzOffsetPtr,
+		DestDir:     *destPtr,
 	}
 
 	if *getLibrariesPtr {
@@ -315,10 +279,15 @@ func main() {
 		os.Exit(0)
 	}
 
-	remapped := fixEvents(&cfg)
-	deduped := dedupe2(remapped)
-	generateCSV(&cfg, deduped)
-	if *sqlitePtr {
-		generateSqlite(&cfg, remapped)
-	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	ch := make(chan []analysis.WifiEvent)
+	go getWifiEvents(&cfg, ch, &wg)
+	go generateSqlite(&cfg, ch, &wg)
+	wg.Wait()
+
 }
+
+// https://gist.github.com/htr3n/344f06ba2bb20b1056d7d5570fe7f596
+// diskutil erasevolume HFS+ 'RAMDISK' `hdiutil attach -nobrowse -nomount ram://4194304
+// go build ; ./cache-to-sqlite --fcfs_seq_id GA0027-004 --device_tag in-ops --dest /Volumes/RAMDISK
