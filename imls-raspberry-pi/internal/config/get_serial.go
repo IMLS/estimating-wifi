@@ -21,8 +21,10 @@ func cpuinfoLines() (lines []string) {
 	file, err := os.Open("/proc/cpuinfo")
 
 	if err != nil {
-		log.Println("error opening /proc/cpuinfo")
-		log.Println(err)
+		if Verbose {
+			log.Println("error opening /proc/cpuinfo")
+			log.Println(err)
+		}
 	}
 	defer file.Close()
 
@@ -32,8 +34,10 @@ func cpuinfoLines() (lines []string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Println("error reading /proc/cpuino")
-		log.Println(err)
+		if Verbose {
+			log.Println("error reading /proc/cpuino")
+			log.Println(err)
+		}
 	}
 
 	return lines
@@ -59,7 +63,9 @@ func GetSerial() string {
 			}
 		} else {
 			if !serialWarnGiven {
-				log.Println("Not running on an RPi. Cannot grab serial number. Exiting.")
+				if Verbose {
+					log.Println("Not running on an RPi. Cannot grab serial number. Exiting.")
+				}
 				serialWarnGiven = true
 			}
 

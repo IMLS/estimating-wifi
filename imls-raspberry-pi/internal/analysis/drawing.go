@@ -10,19 +10,13 @@ import (
 	"gsa.gov/18f/config"
 )
 
-func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath string) {
+func DrawPatronSessions(cfg *config.Config, durations []*Duration, outputPath string) {
 
 	// Capture the data about the session while running in a `counter` structure.
-	_, durations := Summarize(cfg, events)
 	durationsInRange := 0
-	durationArray := make([]*Duration, 0)
+	sort.Sort(ByStart(durations))
 
-	for _, v := range durations {
-		durationArray = append(durationArray, v)
-	}
-	sort.Sort(ByStart(durationArray))
-
-	for _, d := range durationArray {
+	for _, d := range durations {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
@@ -51,7 +45,7 @@ func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath strin
 	dc.Stroke()
 	dc.Pop()
 
-	for _, d := range durationArray {
+	for _, d := range durations {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
@@ -121,7 +115,7 @@ func DrawPatronSessions(cfg *config.Config, events []WifiEvent, outputPath strin
 
 	}
 
-	day, _ := time.Parse(time.RFC3339, durationArray[0].Start)
+	day, _ := time.Parse(time.RFC3339, durations[0].Start)
 	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag)
 	summaryA := fmt.Sprintf("%v devices seen", totalPatrons)
 	summaryP := fmt.Sprintf("%v patron devices", durationsInRange)

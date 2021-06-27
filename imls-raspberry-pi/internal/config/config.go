@@ -33,11 +33,15 @@ func decodeAuthToken(token string) string {
 	copy(key[:], serial)
 	b64, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
-		log.Println("config: cannot b64 decode auth token.")
+		if Verbose {
+			log.Println("config: cannot b64 decode auth token.")
+		}
 	}
 	dec, err := cryptopasta.Decrypt(b64, &key)
 	if err != nil {
-		log.Println("config: failed to decrypt auth token after decoding")
+		if Verbose {
+			log.Println("config: failed to decrypt auth token after decoding")
+		}
 	}
 
 	return string(dec)
