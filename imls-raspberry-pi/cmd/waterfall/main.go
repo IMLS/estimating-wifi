@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
+	"github.com/jmoiron/sqlx"
 	"github.com/jszwec/csvutil"
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/analysis"
@@ -359,11 +360,39 @@ func pad(n int) string {
 	}
 }
 
+func readDurationsFromSqlite(path string) []*analysis.Duration {
+	db, err := sqlx.Open("sqlite3", path)
+	if err != nil {
+		log.Fatal("could not open sqlite file.")
+	}
+
+	events := []*analysis.Duration{}
+	rows, err := db.Query("SELECT * FROM durations")
+	if err != nil {
+		log.Println("error in read query")
+		log.Fatal(err)
+	}
+	for rows.Next() {
+		d := analysis.Duration{}
+		var id int
+		var minutes int
+		err = rows.Scan(&id, &d.PiSerial, &d.SessionId, &d.FCFSSeqId,
+			&d.DeviceTag, &d.PatronId, &d.MfgId, &d.Start, &d.End, &minutes)
+		if err != nil {
+			log.Println("could not scan")
+			log.Fatal(err)
+		}
+		events = append(events, &d)
+	}
+
+	return events
+}
+
 func main() {
-	csvPtr := flag.String("csv", "", "A CSV datafile.")
+	srcPtr := flag.String("src", "", "A source datafile (sqlite or csv).")
 	cfgPath := flag.String("config", "", "Path to valid config file. REQUIRED.")
 	dataPtr := flag.String("data", "", "Data output.")
-	newstyleFlag := flag.Bool("new", false, "Draw new style waterfalls.")
+	typeFlag := flag.String("type", "sqlite", "Either 'csv' or 'sqlite' for source data")
 	flag.Parse()
 
 	if *cfgPath == "" {
@@ -371,24 +400,38 @@ func main() {
 	}
 
 	cfg, _ := config.ReadConfig(*cfgPath)
-	events := readWifiEventsFromCSV(*csvPtr)
-	if len(events) < 1 {
-		log.Fatal("No wifi events found. Exiting.")
-		os.Exit(-1)
-	}
-	if *csvPtr != "" && *newstyleFlag {
-		fcfs := events[0].FCFSSeqId
-		dt := events[0].DeviceTag
-		d := events[0].Localtime
-		// This is necessary... in case we're testing with a
-		// bogus config.yaml file. Better to pull the identifiers from
-		// the actual event stream than trust the file passed.
-		cfg.Auth.FCFSId = fcfs
-		cfg.Auth.DeviceTag = dt
-		pngName := fmt.Sprintf("%v-%v-%v-%v-%v-patron-sessions", d.Year(), pad(int(d.Month())), pad(int(d.Day())), fcfs, dt)
-		//log.Println("writing to", pngName)
-		analysis.DrawPatronSessions(cfg, events, buildImagePath(fcfs, dt, pngName))
+
+	if *typeFlag == "sqlite" {
+		durations := readDurationsFromSqlite(*srcPtr)
+		sessions := make(map[string]string)
+		for _, d := range durations {
+			sessions[d.SessionId] = d.SessionId
+		}
+
+		for _, s := range sessions {
+			subset := make([]*analysis.Duration, 0)
+			for _, d := range durations {
+				if d.SessionId == s {
+					subset = append(subset, d)
+				}
+			}
+
+			fcfs := subset[0].FCFSSeqId
+			dt := subset[0].DeviceTag
+			d := subset[0].Start
+			dtime, _ := time.Parse(time.RFC3339, d)
+			// This is necessary... in case we're testing with a
+			// bogus config.yaml file. Better to pull the identifiers from
+			// the actual event stream than trust the file passed.
+			cfg.Auth.FCFSId = fcfs
+			cfg.Auth.DeviceTag = dt
+			pngName := fmt.Sprintf("%v-%v-%v-%v-%v-patron-sessions", dtime.Year(), pad(int(dtime.Month())), pad(int(dtime.Day())), fcfs, dt)
+			//log.Println("writing to", pngName)
+			analysis.DrawPatronSessions(cfg, subset, buildImagePath(fcfs, dt, pngName))
+		}
+
 	} else {
+		events := readWifiEventsFromCSV(*srcPtr)
 		drawOldWaterfalls(events, dataPtr)
 	}
 
