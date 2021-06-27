@@ -256,9 +256,11 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []WifiE
 					log.Println("start", firstTime, "end", lastTime)
 					log.Println("cannot start after end! swapping...")
 				}
-				tmp := lastTime
-				lastTime = firstTime
-				firstTime = tmp
+				if swap {
+					tmp := lastTime
+					lastTime = firstTime
+					firstTime = tmp
+				}
 			}
 			// Only process these if the times are in the right order...
 			if firstTime.Before(lastTime) {
