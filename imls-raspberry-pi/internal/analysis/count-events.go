@@ -222,7 +222,7 @@ func tomorrow(t time.Time) time.Time {
 
 // FIXME: note the swap of times when things are borked in the DB...
 // is that the best way to fix things?
-func MultiDayDurations(cfg *config.Config, newPid int, events []WifiEvent) (map[int]*Duration, int) {
+func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []WifiEvent) (map[int]*Duration, int) {
 
 	// We want, for every patron_id, to know when the device started/ended.
 	checked := make(map[int]bool)
@@ -252,27 +252,51 @@ func MultiDayDurations(cfg *config.Config, newPid int, events []WifiEvent) (map[
 			firstTime := getEventIdTime(events, first)
 			lastTime := getEventIdTime(events, last)
 			if lastTime.Before(firstTime) {
-				log.Println("start", firstTime, "end", lastTime)
-				log.Println("cannot start after end! swapping...")
+				if config.Verbose {
+					log.Println("start", firstTime, "end", lastTime)
+					log.Println("cannot start after end! swapping...")
+				}
 				tmp := lastTime
 				lastTime = firstTime
 				firstTime = tmp
 			}
-			firstDay := firstTime.Day()
-			lastDay := lastTime.Day()
+			// Only process these if the times are in the right order...
+			if firstTime.Before(lastTime) {
+				firstDay := firstTime.Day()
+				lastDay := lastTime.Day()
 
-			if lastDay > firstDay {
-				// If this patron spans multiple days, they need to be split into multiple durations, and
-				// they need to be given new, unique patron IDs for each day/duration.
-				for lastDay > firstDay {
+				if lastDay > firstDay {
+					// If this patron spans multiple days, they need to be split into multiple durations, and
+					// they need to be given new, unique patron IDs for each day/duration.
+					for lastDay > firstDay {
+						//duration := lastTime.Sub(firstTime)
+						//slog.Println("splitting", int(float64(duration)/float64(time.Hour)), "hour device", firstDay, lastDay)
+
+						//log.Println("id", e.PatronIndex, "ft", firstTime.Format(time.RFC3339), "lt", lastTime.Format(time.RFC3339))
+						// First, bump the end of this session to the end of today.
+						endOfToday := eod(firstTime)
+						// Insert the duration between the firstTime and the endOfToday, with a unique id.
+						//log.Println("splitting", e.SessionId, e.PatronIndex, "to", maxPatronId)
+						durations[maxPatronId] = &Duration{
+							PiSerial:  cfg.Serial,
+							SessionId: e.SessionId,
+							FCFSSeqId: e.FCFSSeqId,
+							DeviceTag: e.DeviceTag,
+							PatronId:  maxPatronId,
+							MfgId:     e.ManufacturerIndex,
+							Start:     firstTime.Format(time.RFC3339),
+							End:       endOfToday.Format(time.RFC3339)}
+						maxPatronId += 1
+						firstTime = bod(tomorrow(firstTime))
+						firstDay = firstTime.Day()
+
+					}
+
 					//duration := lastTime.Sub(firstTime)
-					//slog.Println("splitting", int(float64(duration)/float64(time.Hour)), "hour device", firstDay, lastDay)
-
-					//log.Println("id", e.PatronIndex, "ft", firstTime.Format(time.RFC3339), "lt", lastTime.Format(time.RFC3339))
-					// First, bump the end of this session to the end of today.
-					endOfToday := eod(firstTime)
-					// Insert the duration between the firstTime and the endOfToday, with a unique id.
-					//log.Println("splitting", e.SessionId, e.PatronIndex, "to", maxPatronId)
+					//log.Println("last split", int(float64(duration)/float64(time.Hour)), "hour device", e.PatronIndex, maxPatronId, firstDay, lastDay)
+					endOfToday := lastTime
+					firstTime = bod(lastTime)
+					// When done looping, insert the remainder...
 					durations[maxPatronId] = &Duration{
 						PiSerial:  cfg.Serial,
 						SessionId: e.SessionId,
@@ -283,39 +307,21 @@ func MultiDayDurations(cfg *config.Config, newPid int, events []WifiEvent) (map[
 						Start:     firstTime.Format(time.RFC3339),
 						End:       endOfToday.Format(time.RFC3339)}
 					maxPatronId += 1
-					firstTime = bod(tomorrow(firstTime))
-					firstDay = firstTime.Day()
 
+				} else {
+					durations[e.PatronIndex] = &Duration{
+						PiSerial:  cfg.Serial,
+						SessionId: e.SessionId,
+						FCFSSeqId: e.FCFSSeqId,
+						DeviceTag: e.DeviceTag,
+						PatronId:  e.PatronIndex,
+						MfgId:     e.ManufacturerIndex,
+						Start:     firstTime.Format(time.RFC3339),
+						End:       lastTime.Format(time.RFC3339)}
 				}
-
-				//duration := lastTime.Sub(firstTime)
-				//log.Println("last split", int(float64(duration)/float64(time.Hour)), "hour device", e.PatronIndex, maxPatronId, firstDay, lastDay)
-				endOfToday := lastTime
-				firstTime = bod(lastTime)
-				// When done looping, insert the remainder...
-				durations[maxPatronId] = &Duration{
-					PiSerial:  cfg.Serial,
-					SessionId: e.SessionId,
-					FCFSSeqId: e.FCFSSeqId,
-					DeviceTag: e.DeviceTag,
-					PatronId:  maxPatronId,
-					MfgId:     e.ManufacturerIndex,
-					Start:     firstTime.Format(time.RFC3339),
-					End:       endOfToday.Format(time.RFC3339)}
-				maxPatronId += 1
-
-			} else {
-				durations[e.PatronIndex] = &Duration{
-					PiSerial:  cfg.Serial,
-					SessionId: e.SessionId,
-					FCFSSeqId: e.FCFSSeqId,
-					DeviceTag: e.DeviceTag,
-					PatronId:  e.PatronIndex,
-					MfgId:     e.ManufacturerIndex,
-					Start:     firstTime.Format(time.RFC3339),
-					End:       lastTime.Format(time.RFC3339)}
 			}
-		}
+
+		} // end else
 	}
 
 	// These are now in need of patron renumbering, because new patrons were introduced.

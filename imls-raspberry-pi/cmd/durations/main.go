@@ -198,60 +198,17 @@ func createDurationsTable(db *sqlx.DB) {
 	}
 }
 
-func createRevisedTable(db *sqlx.DB) {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS revised
-			(id INTEGER PRIMARY KEY, 
-			pi_serial text,
-			session_id text,
-			fcfs_seq_id text,
-			device_tag text,
-			pid integer,
-			mfgid integer,
-			start text,
-			end text,
-			minutes integer
-			)`)
-	if err != nil {
-		log.Println("error creating table")
-		log.Fatal(err)
-	}
-}
-
-func createSummariesTable(db *sqlx.DB) {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS summaries 
-	(id INTEGER PRIMARY KEY, 
-	pi_serial text,
-	session_id text,
-	day text,
-	fcfs_seq_id text,
-	device_tag text,
-	patrons integer,
-	patron_minutes integer,
-	devices integer,
-	transients integer
-	)`)
-	if err != nil {
-		log.Println("error creating table")
-		log.Fatal(err)
-	}
-}
-
 func writeDurations(cfg *config.Config, path string, durations []*analysis.Duration) {
-	// Wipe out the existing file
+	if len(durations) <= 0 {
+		return
+	}
+
 	thedb := filepath.Join(path, fmt.Sprintf("%v-%v-durations.sqlite", durations[0].FCFSSeqId, durations[0].DeviceTag))
 	out, err := sqlx.Open("sqlite3", thedb)
 	if err != nil {
 		log.Fatal("could not open durations sqlite file")
 	}
 
-	// filtered := make([]analysis.WifiEvent, 0)
-	// for _, e := range events {
-	// 	if e.SessionId == sessionId {
-	// 		filtered = append(filtered, e)
-	// 	}
-	// }
-
-	//_, d := analysis.Summarize(cfg, filtered)
 	createDurationsTable(out)
 	tx, _ := out.Begin()
 	stat, err := tx.Prepare(`INSERT INTO durations 
@@ -284,7 +241,7 @@ func writeDurations(cfg *config.Config, path string, durations []*analysis.Durat
 	}
 }
 
-func reviseDurations(cfg *config.Config, path string, newPid int, sessionId string, events []analysis.WifiEvent) ([]*analysis.Duration, int) {
+func reviseDurations(cfg *config.Config, path string, swap bool, newPid int, sessionId string, events []analysis.WifiEvent) ([]*analysis.Duration, int) {
 	filtered := make([]analysis.WifiEvent, 0)
 	for _, e := range events {
 		if e.SessionId == sessionId {
@@ -298,7 +255,7 @@ func reviseDurations(cfg *config.Config, path string, newPid int, sessionId stri
 	// As we roll, a device needs to be reset into multiple (new) devices.
 	// Devices that span from one day to the next also need to be split.
 
-	d, newPid := analysis.MultiDayDurations(cfg, newPid, filtered)
+	d, newPid := analysis.MultiDayDurations(cfg, swap, newPid, filtered)
 	sorted := make([]*analysis.Duration, 0)
 
 	for _, v := range d {
@@ -372,6 +329,7 @@ func main() {
 	dataPtr := flag.String("sqlite", "", "A raw SQLite datafile.")
 	cfgPath := flag.String("config", "", "Path to valid config file. REQUIRED.")
 	outPath := flag.String("dest", "", "Path to output directory.")
+	swapPtr := flag.Bool("swap", true, "Swap Start/End times that are out of order... (O_o)")
 
 	// newstyleFlag := flag.Bool("new", false, "Draw new style waterfalls.")
 	flag.Parse()
@@ -395,7 +353,7 @@ func main() {
 		var revised []*analysis.Duration
 		for _, s := range sessions {
 			//writeDurations(cfg, *outPath, s, events)
-			revised, pid = reviseDurations(cfg, *outPath, pid, s, events)
+			revised, pid = reviseDurations(cfg, *outPath, *swapPtr, pid, s, events)
 			revised = remapPidsPerSession(revised)
 			writeDurations(cfg, *outPath, revised)
 		}
