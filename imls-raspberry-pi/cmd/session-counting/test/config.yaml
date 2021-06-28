@@ -44,6 +44,7 @@ wireshark:
 manufacturers:
   db: /opt/imls/manufacturers.sqlite
 local:
+  logfile: /opt/imls/log.json
   summary_db: /opt/imls/summary.sqlite
   temporary_db: /tmp/imls.sqlite
   web_directory: /www/imls

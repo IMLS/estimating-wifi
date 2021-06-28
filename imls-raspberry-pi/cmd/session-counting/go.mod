@@ -14,6 +14,8 @@ replace gsa.gov/18f/cryptopasta v0.0.0 => ../../internal/cryptopasta
 
 replace gsa.gov/18f/analysis v0.0.0 => ../../internal/analysis
 
+replace gsa.gov/18f/logwrapper v0.0.0 => ../../internal/logwrapper
+
 require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
 	github.com/jmoiron/sqlx v1.3.4
@@ -22,6 +24,7 @@ require (
 	gsa.gov/18f/analysis v0.0.0
 	gsa.gov/18f/config v0.0.0
 	gsa.gov/18f/http v0.0.0
+	gsa.gov/18f/logwrapper v0.0.0
 	gsa.gov/18f/version v0.0.0
 	gsa.gov/18f/wifi-hardware-search v0.0.0
 )

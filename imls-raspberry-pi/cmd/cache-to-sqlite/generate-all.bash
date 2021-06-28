@@ -1,6 +1,8 @@
 #!/bin/bash
-DEST=output
-mkdir -p output
+DEST=./output
+mkdir -p $DEST
+# Clear old stuff
+rm -rf $DEST/*.sqlite
 go build
 EXE=./cache-to-sqlite
 

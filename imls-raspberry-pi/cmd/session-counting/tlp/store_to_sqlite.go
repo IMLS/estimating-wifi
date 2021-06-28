@@ -210,7 +210,7 @@ func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
 	}
 
 	path := filepath.Join(imagedir, fmt.Sprintf("%04d-%02d-%02d-%v-%v-summary.png", yesterday.Year(), int(yesterday.Month()), int(yesterday.Day()), cfg.Auth.FCFSId, cfg.Auth.DeviceTag))
-	analysis.DrawPatronSessions(cfg, events, path)
+	analysis.DrawPatronSessionsFromWifi(cfg, events, path)
 }
 
 func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {

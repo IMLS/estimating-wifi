@@ -34,6 +34,7 @@ type Config struct {
 	Serial      string `yaml:"serial"`
 	StorageMode string `yaml:"storagemode"`
 	Local       struct {
+		Logfile      string `yaml:"logfile"`
 		Crontab      string `yaml:"crontab"`
 		SummaryDB    string `yaml:"summary_db"`
 		TemporaryDB  string `yaml:"temporary_db"`
@@ -62,6 +63,7 @@ func (cfg *Config) SetDefaults() {
 
 	cfg.StorageMode = "sqlite"
 
+	cfg.Local.Logfile = "/opt/imls/log.json"
 	cfg.Local.Crontab = "0 */6 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
 	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"

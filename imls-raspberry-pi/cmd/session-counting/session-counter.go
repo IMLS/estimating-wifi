@@ -10,6 +10,7 @@ import (
 
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/http"
+	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/tlp"
 	"gsa.gov/18f/version"
@@ -118,6 +119,9 @@ func main() {
 	cfg := handleFlags()
 
 	cfg.SessionId = config.CreateSessionId()
+
+	lw := logwrapper.NewLogger(cfg)
+	lw.Info("startup")
 
 	// Store this so we don't keep hitting /proc/cpuinfo
 	cfg.Serial = config.GetSerial()
