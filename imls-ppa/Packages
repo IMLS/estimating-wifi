@@ -5,9 +5,9 @@ Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
 Depends: libc6 (>= 1)
 Filename: ./input-initial-configuration_1.0-1_arm.deb
 Size: 2521608
-MD5sum: 262285c570176d153a4cb0fa8a003208
-SHA1: 277c873cb814edc96a2dabdd9f9cc9965b005292
-SHA256: 2f885a03e7e134af3a17934a8025d5c09308a0134bd0c56ebaff8512e9ff3b9b
+MD5sum: 79cd9d982a7491d74b7a75deedb96199
+SHA1: 46a5b98b1eae3e961b1958444824794be398a340
+SHA256: 3253cb1953182a07666dde6f911cde19c7b6e306e7cb396c9cebd5ecd0bbb149
 Section: base
 Priority: optional
 Description: Tool to read in IMLS settings
@@ -21,10 +21,10 @@ Depends: libc6 (>= 1),
          tshark (>= 1),
          input-initial-configuration (>= 1)
 Filename: ./session-counter_1.0-1.deb
-Size: 6337796
-MD5sum: 03418910bfa54de003fc44b5acf1feba
-SHA1: dda11c3f3dfaa2543780da91b7b037f3f6985289
-SHA256: 75619ee9dd7899da19e1ab3ff1ba292eb1383680ce4a22ee16edb5a7552c16f4
+Size: 6337804
+MD5sum: afff2e3b509f101b5f5f1db126a17bed
+SHA1: dbb3e8a922bf3f82900afae81ba0d2ee119cce31
+SHA256: 163e62da6a029ea5cfb747d44f3a25a6b209330de7dd286d38b6c95536762938
 Section: base
 Priority: optional
 Description: Session Counter for IMLS Pilot
@@ -38,10 +38,10 @@ Depends: libc6 (>= 1),
          nginx (>= 1),
          session-counter (>= 1)
 Filename: ./session-counter-csv_1.0-1_arm.deb
-Size: 1528
-MD5sum: 97bb430d4a5e2121e1463f5a5d563212
-SHA1: e62367f5f2f77c167997d356d048868eb3fdec63
-SHA256: b33c191ae050fc44500378c5051ac98268396cbf885882d879acb6c38ac6f997
+Size: 1568
+MD5sum: c2e0ee21619f2f34c1cc39adc41e9830
+SHA1: 18254c53ecfa8db8576f0e5f43046b23628c4234
+SHA256: 1fbdb8cf80881322694a86488c8ac95c18c3fb83f6ffefd65fe133ff2a40ff55
 Section: base
 Priority: optional
 Description: Session Counter for IMLS Pilot
