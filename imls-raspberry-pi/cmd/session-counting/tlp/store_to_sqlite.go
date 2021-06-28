@@ -77,7 +77,7 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 func newTemporaryDB(cfg *config.Config) *sqlx.DB {
 	lw := logwrapper.NewLogger(cfg)
 	t := time.Now()
-	todaysDB := fmt.Sprintf("%v-%02d-%02d", t.Year(), int(t.Month()), int(t.Day()))
+	todaysDB := fmt.Sprintf("%v-%02d-%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
 	db, err := sqlx.Open("sqlite3", path)
 	if err != nil {
