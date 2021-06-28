@@ -12,8 +12,8 @@ import (
 
 func DrawPatronSessionsFromWifi(cfg *config.Config, events []WifiEvent, outputPath string) {
 	_, d := Summarize(cfg, events)
-	durations := make ([]Duration, 0)
-	for _, v := d {
+	durations := make([]*Duration, 0)
+	for _, v := range d {
 		durations = append(durations, v)
 	}
 	DrawPatronSessions(cfg, durations, outputPath)

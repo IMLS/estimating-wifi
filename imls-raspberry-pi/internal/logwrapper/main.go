@@ -3,6 +3,7 @@ package logwrapper
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,7 @@ import (
 // Event stores messages to log later, from our standard interface
 type Event struct {
 	id      int
+	level   int
 	message string
 }
 
@@ -26,31 +28,64 @@ type StandardLogger struct {
 // NewLogger initializes the standard logger
 func NewLogger(cfg *config.Config) *StandardLogger {
 	var baseLogger = logrus.New()
-	var standardLogger = &StandardLogger{baseLogger}
-	standardLogger.Formatter = &logrus.JSONFormatter{}
-
 	iow, err := os.OpenFile(cfg.Local.Logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		fmt.Printf("could not open logfile %v for wriiting\n", cfg.Local.Logfile)
 		os.Exit(-1)
 	}
-	defer iow.Close()
-	logrus.SetOutput(iow)
+	baseLogger.SetOutput(iow)
+
+	var standardLogger = &StandardLogger{baseLogger}
+	standardLogger.Formatter = &logrus.JSONFormatter{}
 
 	return standardLogger
 }
 
+const (
+	INFO = iota
+	WARN
+	ERROR
+	FATAL
+)
+
 // Declare variables to store log messages as new Events
 var (
-	infoMsg = Event{1, "INFO: %s"}
+	infoMsg  = Event{1, INFO, "%s"}
+	warnMsg  = Event{2, WARN, "%s"}
+	errorMsg = Event{3, ERROR, "%s"}
+	fatalMsg = Event{4, FATAL, "%s"}
+	notFound = Event{5, FATAL, "not found: %s"}
 )
 
 func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
-	l.Errorf(fmt.Sprintf("[%v] %v", loc, fmt.Sprintf(e.message, args...)))
+	fields := logrus.Fields{
+		"file": loc,
+	}
+	switch e.level {
+	case INFO:
+		l.WithFields(fields).Info(fmt.Sprintf(e.message, args...))
+	case WARN:
+		l.WithFields(fields).Warn(fmt.Sprintf(e.message, args...))
+	case ERROR:
+		l.WithFields(fields).Error(fmt.Sprintf(e.message, args...))
+	case FATAL:
+		l.WithFields(fields).Fatal(fmt.Sprintf(e.message, args...))
+	}
+
 }
 
 // InvalidArg is a standard error message
 func (l *StandardLogger) Info(msg string) {
 	_, file, _, _ := runtime.Caller(1)
-	l.Base(infoMsg, file, msg)
+	l.Base(infoMsg, filepath.Base(file), msg)
+}
+
+func (l *StandardLogger) Fatal(path string) {
+	_, file, _, _ := runtime.Caller(1)
+	l.Base(fatalMsg, filepath.Base(file), path)
+}
+
+func (l *StandardLogger) ExeNotFound(path string) {
+	_, file, _, _ := runtime.Caller(1)
+	l.Base(notFound, filepath.Base(file), path)
 }
