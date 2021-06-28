@@ -50,11 +50,12 @@ const (
 
 // Declare variables to store log messages as new Events
 var (
-	infoMsg  = Event{1, INFO, "%s"}
-	warnMsg  = Event{2, WARN, "%s"}
-	errorMsg = Event{3, ERROR, "%s"}
-	fatalMsg = Event{4, FATAL, "%s"}
-	notFound = Event{5, FATAL, "not found: %s"}
+	infoMsg   = Event{1, INFO, "%s"}
+	warnMsg   = Event{2, WARN, "%s"}
+	errorMsg  = Event{3, ERROR, "%s"}
+	fatalMsg  = Event{4, FATAL, "%s"}
+	notFound  = Event{5, FATAL, "not found: %s"}
+	lengthMsg = Event{6, INFO, "array %v length %d"}
 )
 
 func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
@@ -88,4 +89,9 @@ func (l *StandardLogger) Fatal(path string) {
 func (l *StandardLogger) ExeNotFound(path string) {
 	_, file, _, _ := runtime.Caller(1)
 	l.Base(notFound, filepath.Base(file), path)
+}
+
+func (l *StandardLogger) Length(arrname string, len int) {
+	_, file, _, _ := runtime.Caller(1)
+	l.Base(lengthMsg, filepath.Base(file), arrname, len)
 }

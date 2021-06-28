@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 //func store(service string, cfg *config.Config, session_id int, h map[string]int) error {
@@ -73,19 +74,18 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 	return db
 }
 
-func newInMemoryDB() *sqlx.DB {
-	const DB_STRING = ":memory:"
-
-	db, err := sqlx.Open("sqlite3", DB_STRING)
+func newTemporaryDB(cfg *config.Config) *sqlx.DB {
+	lw := logwrapper.NewLogger(cfg)
+	db, err := sqlx.Open("sqlite3", cfg.Local.TemporaryDB)
 	if err != nil {
-		log.Fatal("sqlite: Could not create in-memory db.")
+		lw.Fatal(fmt.Sprintf("could not open temporary db: %v", cfg.Local.TemporaryDB))
 	}
 
-	clearInMemoryDB(db)
+	clearTemporaryDB(cfg, db)
 	return db
 }
 
-func clearInMemoryDB(db *sqlx.DB) {
+func clearTemporaryDB(cfg *config.Config, db *sqlx.DB) {
 	// Create tables.
 	createTableStatement := `
 	DROP TABLE IF EXISTS wifi;
@@ -102,7 +102,8 @@ func clearInMemoryDB(db *sqlx.DB) {
 
 	_, err := db.Exec(createTableStatement)
 	if err != nil {
-		log.Fatal("sqlite: could not create table in db.")
+		lw := logwrapper.NewLogger(cfg)
+		lw.Fatal("could not re-create wifi table in temporary db.")
 	}
 }
 
@@ -163,15 +164,10 @@ func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.D
 }
 
 func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
-	if config.Verbose {
-		log.Println("sqlite: extracting wifi events")
-	}
 	events := extractWifiEvents(memdb)
-	if config.Verbose {
-		log.Println(len(events), "events found")
-	}
+	lw := logwrapper.NewLogger(cfg)
+	lw.Length("events", len(events))
 
-	//log.Println(events)
 	if len(events) > 0 {
 		if config.Verbose {
 			log.Println("sqlite: summarizing")
@@ -277,7 +273,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 	// If we aren't logging events...
 	event_ndx := 0
 	// We'll use an in-memory DB for the recording of data throughout the day.
-	db := newInMemoryDB()
+	db := newTemporaryDB(cfg)
 
 	for {
 		select {
@@ -293,16 +289,10 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 
 		case <-ch_reset:
 			// Process the data from the day.
-			if config.Verbose {
-				log.Println("sqlite: processing data from the day")
-			}
 			processDataFromDay(cfg, db)
-			if config.Verbose {
-				log.Println("sqlite: resetting the in-memory db")
-			}
-			clearInMemoryDB(db)
+			clearTemporaryDB(cfg, db)
 			db.Close()
-			db = newInMemoryDB()
+			db = newTemporaryDB(cfg)
 			// After clearing, it is a new session.
 			cfg.SessionId = config.CreateSessionId()
 
