@@ -22,6 +22,8 @@ replace gsa.gov/18f/wifi-hardware-search v0.0.0 => ./internal/wifi-hardware-sear
 
 replace gsa.gov/18f/analysis v0.0.0 => ./internal/analysis
 
+replace gsa.gov/18f/logwrapper v0.0.0 => ./internal/logwrapper
+
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/fatih/color v1.10.0 // indirect
@@ -33,4 +35,5 @@ require (
 	gsa.gov/18f/wifi-hardware-search v0.0.0 // indirect
 	gsa.gov/18f/wifi-hardware-search-cli v0.0.0 // indirect
 	gsa.gov/18f/analysis v0.0.0 // indirect
+	gsa.gov/18f/logwrapper v0.0.0 // indirect
 )
