@@ -13,8 +13,6 @@ import (
 	"gsa.gov/18f/logwrapper"
 )
 
-//func store(service string, cfg *config.Config, session_id int, h map[string]int) error {
-
 func getSummaryDB(cfg *config.Config) *sqlx.DB {
 	if _, err := os.Stat(cfg.Local.SummaryDB); os.IsNotExist(err) {
 		file, err := os.Create(cfg.Local.SummaryDB)
@@ -75,7 +73,8 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 }
 
 func newTemporaryDB(cfg *config.Config) *sqlx.DB {
-	lw := logwrapper.NewLogger(cfg)
+	lw := logwrapper.NewLogger(nil)
+	lw.Info("Using a singleton.")
 	t := time.Now()
 	todaysDB := fmt.Sprintf("%v-%02d-%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
@@ -90,7 +89,7 @@ func newTemporaryDB(cfg *config.Config) *sqlx.DB {
 
 func createWifiTable(cfg *config.Config, db *sqlx.DB) {
 	createTableStatement := `
-	CREATE TABLE wifi (
+	CREATE TABLE IF NOT EXISTS wifi (
 		id integer PRIMARY KEY AUTOINCREMENT,
 		event_id integer,
 		fcfs_seq_id text,

@@ -16,7 +16,7 @@ import (
 )
 
 func run(ka *tlp.Keepalive, cfg *config.Config) {
-	lw := logwrapper.NewLogger(cfg)
+	lw := logwrapper.NewLogger(nil)
 
 	// Create channels for process network
 	// ch_sec := make(chan bool)
@@ -58,7 +58,7 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 }
 
 func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
-	lw := logwrapper.NewLogger(cfg)
+	lw := logwrapper.NewLogger(nil)
 	lw.Info("starting keepalive")
 	var counter int64 = 0
 	for {

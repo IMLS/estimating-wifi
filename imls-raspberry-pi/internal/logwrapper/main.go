@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"gsa.gov/18f/config"
@@ -25,18 +26,31 @@ type StandardLogger struct {
 	*logrus.Logger
 }
 
-// NewLogger initializes the standard logger
-func NewLogger(cfg *config.Config) *StandardLogger {
-	var baseLogger = logrus.New()
-	iow, err := os.OpenFile(cfg.Local.Logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		fmt.Printf("could not open logfile %v for wriiting\n", cfg.Local.Logfile)
-		os.Exit(-1)
-	}
-	baseLogger.SetOutput(iow)
+var standardLogger *StandardLogger = nil
+var once sync.Once
 
-	var standardLogger = &StandardLogger{baseLogger}
-	standardLogger.Formatter = &logrus.JSONFormatter{}
+// Convoluted for use within libraries...
+func NewLogger(cfg *config.Config) *StandardLogger {
+	once.Do(func() {
+		var baseLogger = logrus.New()
+
+		// If we have a config object...
+		if cfg != nil {
+			// Set the output to a file if we have a config file to guide us.
+
+			iow, err := os.OpenFile(cfg.Local.Logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+			if err != nil {
+				fmt.Printf("could not open logfile %v for wriiting\n", cfg.Local.Logfile)
+				os.Exit(-1)
+			}
+			baseLogger.SetOutput(iow)
+		}
+
+		// If we have a valid config file, and lw is not already configured...
+		standardLogger = &StandardLogger{baseLogger}
+		standardLogger.Formatter = &logrus.JSONFormatter{}
+
+	})
 
 	return standardLogger
 }
