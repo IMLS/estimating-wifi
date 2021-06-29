@@ -84,8 +84,28 @@ func newTemporaryDB(cfg *config.Config) *sqlx.DB {
 		lw.Fatal(fmt.Sprintf("could not open temporary db: %v", path))
 	}
 
-	clearTemporaryDB(cfg, db)
+	createWifiTable(cfg, db)
 	return db
+}
+
+func createWifiTable(cfg *config.Config, db *sqlx.DB) {
+	createTableStatement := `
+	CREATE TABLE wifi (
+		id integer PRIMARY KEY AUTOINCREMENT,
+		event_id integer,
+		fcfs_seq_id text,
+		device_tag text,
+		"localtime" date,
+		session_id text,
+		manufacturer_index integer,
+		patron_index integer
+	);`
+
+	_, err := db.Exec(createTableStatement)
+	if err != nil {
+		lw := logwrapper.NewLogger(cfg)
+		lw.Info("could not create wifi table in temporary db.")
+	}
 }
 
 func clearTemporaryDB(cfg *config.Config, db *sqlx.DB) {
