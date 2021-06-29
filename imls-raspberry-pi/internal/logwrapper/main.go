@@ -98,6 +98,8 @@ func (l *StandardLogger) Info(msg string, args ...interface{}) {
 func (l *StandardLogger) Fatal(msg string, args ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
 	l.Base(fatalMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
+	// We're leaving, on a jet plane...
+	os.Exit(-1)
 }
 
 func (l *StandardLogger) ExeNotFound(path string) {
