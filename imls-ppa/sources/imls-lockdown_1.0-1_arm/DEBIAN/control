@@ -6,4 +6,4 @@ Architecture: armhf
 Depends: libc6 (>= 1),
          ufw
 Maintainer: James Tranovich (james.tranovich@gsa.gov)
-Description: lock down the system
+Description: Lock down the system for IMLS Pilot
