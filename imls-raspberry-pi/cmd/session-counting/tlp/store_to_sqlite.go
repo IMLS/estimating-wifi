@@ -14,18 +14,20 @@ import (
 )
 
 func getSummaryDB(cfg *config.Config) *sqlx.DB {
+	lw := logwrapper.NewLogger(nil)
+
 	if _, err := os.Stat(cfg.Local.SummaryDB); os.IsNotExist(err) {
 		file, err := os.Create(cfg.Local.SummaryDB)
 		if err != nil {
-			log.Println("sqlite: could not create sqlite summary db file.")
-			log.Fatal(err.Error())
+			lw.Info("could not create sqlite summary db file: %v", cfg.Local.SummaryDB)
+			lw.Fatal(err.Error())
 		}
 		file.Close()
 	}
 
 	db, err := sqlx.Open("sqlite3", cfg.Local.SummaryDB)
 	if err != nil {
-		log.Fatal("sqlite: could not open summary db.")
+		lw.Fatal("could not open summary db.")
 	}
 
 	// Create tables if it doesn't exist
@@ -48,7 +50,7 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 
 	_, err = db.Exec(createTableStatement)
 	if err != nil {
-		log.Fatal("sqlite: could not create counts table in db.")
+		lw.Fatal("could not create counts table in summary db.")
 	}
 
 	createTableStatement = `
@@ -66,7 +68,7 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 
 	_, err = db.Exec(createTableStatement)
 	if err != nil {
-		log.Fatal("sqlite: could not create durations table in db.")
+		lw.Fatal("could not create durations table in summary db.")
 	}
 
 	return db
@@ -74,13 +76,14 @@ func getSummaryDB(cfg *config.Config) *sqlx.DB {
 
 func newTemporaryDB(cfg *config.Config) *sqlx.DB {
 	lw := logwrapper.NewLogger(nil)
-	lw.Info("Using a singleton.")
+
 	t := time.Now()
 	todaysDB := fmt.Sprintf("%v-%02d-%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
+	lw.Info("Created temporary db: %v", todaysDB)
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
 	db, err := sqlx.Open("sqlite3", path)
 	if err != nil {
-		lw.Fatal(fmt.Sprintf("could not open temporary db: %v", path))
+		lw.Fatal("could not open temporary db: %v", path)
 	}
 
 	createWifiTable(cfg, db)
@@ -107,56 +110,57 @@ func createWifiTable(cfg *config.Config, db *sqlx.DB) {
 	}
 }
 
-func clearTemporaryDB(cfg *config.Config, db *sqlx.DB) {
-	// Create tables.
-	createTableStatement := `
-	DROP TABLE IF EXISTS wifi;
-	CREATE TABLE wifi (
-		id integer PRIMARY KEY AUTOINCREMENT,
-		event_id integer,
-		fcfs_seq_id text,
-		device_tag text,
-		"localtime" date,
-		session_id text,
-		manufacturer_index integer,
-		patron_index integer
-	);`
+// When in-memory temp dbs are reintroduced, we might want this.
+// func clearTemporaryDB(cfg *config.Config, db *sqlx.DB) {
+// 	// Create tables.
+// 	createTableStatement := `
+// 	DROP TABLE IF EXISTS wifi;
+// 	CREATE TABLE wifi (
+// 		id integer PRIMARY KEY AUTOINCREMENT,
+// 		event_id integer,
+// 		fcfs_seq_id text,
+// 		device_tag text,
+// 		"localtime" date,
+// 		session_id text,
+// 		manufacturer_index integer,
+// 		patron_index integer
+// 	);`
 
-	_, err := db.Exec(createTableStatement)
-	if err != nil {
-		lw := logwrapper.NewLogger(cfg)
-		lw.Fatal("could not re-create wifi table in temporary db.")
-	}
-}
+// 	_, err := db.Exec(createTableStatement)
+// 	if err != nil {
+// 		lw := logwrapper.NewLogger(cfg)
+// 		lw.Fatal("could not re-create wifi table in temporary db.")
+// 	}
+// }
 
 func extractWifiEvents(memdb *sqlx.DB) []analysis.WifiEvent {
-	// events := make([]analysis.WifiEvent, 0)
+	lw := logwrapper.NewLogger(nil)
 	events := []analysis.WifiEvent{}
 	err := memdb.Select(&events, `SELECT * FROM wifi`)
 	if err != nil {
-		log.Println("sqlite: error in extracting all wifi events.")
-		log.Fatal(err.Error())
+		lw.Info("error in extracting all wifi events.")
+		lw.Fatal(err.Error())
 	}
 
+	lw.Length("events", events)
 	return events
 }
 
 func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.Duration) {
-	if config.Verbose {
-		log.Println("sqlite: getting summary db")
-	}
 	summarydb := getSummaryDB(cfg)
+	defer summarydb.Close()
+	lw := logwrapper.NewLogger(nil)
+
 	insertS, err := summarydb.Prepare(`INSERT INTO counts (pi_serial, fcfs_seq_id, device_tag, session_id, minimum_minutes, maximum_minutes, patron_count, patron_minutes, device_count, device_minutes, transient_count, transient_minutes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
 	if err != nil {
-		log.Println("sqlite: could not prepare insert statement.")
-		log.Fatal(err.Error())
+		lw.Info("could not prepare `counts` insert statement")
+		lw.Fatal(err.Error())
 	}
 
-	res, err := insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes, c.Patrons, c.PatronMinutes, c.Devices, c.DeviceMinutes, c.Transients, c.TransientMinutes)
+	_, err = insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes, c.Patrons, c.PatronMinutes, c.Devices, c.DeviceMinutes, c.Transients, c.TransientMinutes)
 	if err != nil {
-		log.Println("sqlite: could not insert into summary db")
-		log.Println(res)
-		log.Fatal(err.Error())
+		lw.Info("could not insert into `counts` db")
+		lw.Fatal(err.Error())
 	}
 
 	insertS, err = summarydb.Prepare(fmt.Sprintf(`INSERT INTO durations (%v,%v,%v,%v,%v,%v,%v,%v) VALUES (?,?,?,?,?,?,?,?)`,
@@ -170,38 +174,30 @@ func storeSummary(cfg *config.Config, c *analysis.Counter, d map[int]*analysis.D
 		"end"))
 
 	if err != nil {
-		log.Println("sqlite: could not prepare insert statement.")
-		log.Fatal(err.Error())
+		lw.Info("could not prepare `durations` insert statement.")
+		lw.Fatal(err.Error())
 	}
 	for pid, duration := range d {
-		res, err := insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, pid, duration.MfgId, duration.Start, duration.End)
+		_, err := insertS.Exec(config.GetSerial(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag, cfg.SessionId, pid, duration.MfgId, duration.Start, duration.End)
 		if err != nil {
-			log.Println("sqlite: could not insert into summary db")
-			log.Println(res)
-			log.Fatal(err.Error())
+			lw.Info("could not insert into `durations` db")
+			lw.Fatal(err.Error())
 		}
 	}
-
-	summarydb.Close()
 }
 
 func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 	events := extractWifiEvents(memdb)
-	lw := logwrapper.NewLogger(cfg)
-	lw.Length("events", len(events))
+	lw := logwrapper.NewLogger(nil)
 
 	if len(events) > 0 {
-		if config.Verbose {
-			log.Println("sqlite: summarizing")
-		}
+		lw.Length("events", events)
 		c, d := analysis.Summarize(cfg, events)
 		writeImages(cfg, events)
 		writeSummaryCSV(cfg, events)
 		storeSummary(cfg, c, d)
 	} else {
-		if config.Verbose {
-			log.Println("sqlite: no events to summarize")
-		}
+		lw.Info("no `events` to summarize")
 	}
 }
 
@@ -296,6 +292,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 	event_ndx := 0
 	// We'll use an in-memory DB for the recording of data throughout the day.
 	db := newTemporaryDB(cfg)
+	lw := logwrapper.NewLogger(nil)
 
 	for {
 		select {
@@ -310,6 +307,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			return
 
 		case <-ch_reset:
+			lw.Info("receieved reset message")
 			// Process the data from the day.
 			processDataFromDay(cfg, db)
 			//clearTemporaryDB(cfg, db)
@@ -319,23 +317,21 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			cfg.SessionId = config.CreateSessionId()
 
 		case arr := <-ch_data:
-			if config.Verbose {
-				log.Println("sqlite: storing data into memory")
-			}
+			lw.Info("storing temporary data")
 			// This has to be done on the db that is currently open.
 			// Cannot pre-prepare for the entire process.
 			insertS, err := db.Prepare(`INSERT INTO wifi (event_id, fcfs_seq_id, device_tag, localtime, session_id, manufacturer_index, patron_index) VALUES (?,?,?,?,?,?,?)`)
 			if err != nil {
 				log.Fatal("sqlite: could not prepare insert statement.")
+				lw.Fatal("could not prepare wifi insert statement")
 			}
 
 			for _, h := range arr {
-				res, err := insertS.Exec(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
+				_, err := insertS.Exec(h["event_id"], h["fcfs_seq_id"], h["device_tag"],
 					h["localtime"], h["session_id"], h["manufacturer_index"], h["patron_index"])
 				if err != nil {
-					log.Println("sqlite: could not insert into memory db")
-					log.Println(res)
-					log.Fatal(err.Error())
+					lw.Info("could not insert into temporary db")
+					lw.Fatal(err.Error())
 				}
 			}
 

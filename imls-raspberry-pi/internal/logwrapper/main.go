@@ -90,14 +90,14 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 }
 
 // InvalidArg is a standard error message
-func (l *StandardLogger) Info(msg string) {
+func (l *StandardLogger) Info(msg string, args ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
-	l.Base(infoMsg, filepath.Base(file), msg)
+	l.Base(infoMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
 }
 
-func (l *StandardLogger) Fatal(path string) {
+func (l *StandardLogger) Fatal(msg string, args ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
-	l.Base(fatalMsg, filepath.Base(file), path)
+	l.Base(fatalMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
 }
 
 func (l *StandardLogger) ExeNotFound(path string) {
@@ -105,7 +105,7 @@ func (l *StandardLogger) ExeNotFound(path string) {
 	l.Base(notFound, filepath.Base(file), path)
 }
 
-func (l *StandardLogger) Length(arrname string, len int) {
+func (l *StandardLogger) Length(arrname string, arr ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
-	l.Base(lengthMsg, filepath.Base(file), arrname, len)
+	l.Base(lengthMsg, filepath.Base(file), arrname, len(arr))
 }
