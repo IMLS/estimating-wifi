@@ -293,7 +293,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 		case <-ch_reset:
 			// Process the data from the day.
 			processDataFromDay(cfg, db)
-			clearTemporaryDB(cfg, db)
+			//clearTemporaryDB(cfg, db)
 			db.Close()
 			db = newTemporaryDB(cfg)
 			// After clearing, it is a new session.

@@ -134,7 +134,7 @@ func (nt NullTime) Value() (driver.Value, error) {
 	return nt.Time, nil
 }
 
-func readWifiEventsFromSqlite(path string) []analysis.WifiEvent {
+func readWifiEventsFromSqlite(path string, tzoffset int) []analysis.WifiEvent {
 	db, err := sqlx.Open("sqlite3", fmt.Sprintf("%v?parseTime=true", path)) //?parseTime=true
 	if err != nil {
 		log.Fatal("could not open sqlite file.")
@@ -150,15 +150,20 @@ func readWifiEventsFromSqlite(path string) []analysis.WifiEvent {
 		e := analysis.WifiEvent{}
 		var id int
 		var lt string
-		var st string
 		err = rows.Scan(&id, &e.EventId, &e.FCFSSeqId, &e.DeviceTag,
-			&lt, &st, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
+			&lt, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
 		if err != nil {
-			log.Println("could not scan")
-			log.Fatal(err)
+			var st string
+
+			err = rows.Scan(&id, &e.EventId, &e.FCFSSeqId, &e.DeviceTag,
+				&lt, &st, &e.SessionId, &e.ManufacturerIndex, &e.PatronIndex)
+			if err != nil {
+				log.Println("failed to scan with 8 and 9 args. Exiting.")
+				log.Fatal(err)
+			}
 		}
 		e.Localtime, _ = time.Parse(time.RFC3339, lt)
-		e.Servertime, _ = time.Parse(time.RFC3339, st)
+		e.Localtime = e.Localtime.Add(time.Duration(tzoffset) * time.Hour)
 		events = append(events, e)
 	}
 
@@ -331,6 +336,14 @@ func main() {
 	outPath := flag.String("dest", "", "Path to output directory.")
 	swapPtr := flag.Bool("swap", true, "Swap Start/End times that are out of order... (O_o)")
 
+	// Dynamically grab the timezone offset for the machine we're running on.
+	// It will be more... useful than a fixed constant.
+	t := time.Now()
+	zone, offset := t.Zone()
+	// Get the offset in hours, not seconds.
+	offset = offset / (60 * 60)
+	tzPtr := flag.Int("tz", offset, fmt.Sprintf("timezone offset (%v is %v)", zone, offset))
+
 	// newstyleFlag := flag.Bool("new", false, "Draw new style waterfalls.")
 	flag.Parse()
 
@@ -340,7 +353,7 @@ func main() {
 
 	cfg, _ := config.ReadConfig(*cfgPath)
 
-	events := readWifiEventsFromSqlite(*dataPtr)
+	events := readWifiEventsFromSqlite(*dataPtr, *tzPtr)
 
 	if len(events) > 0 {
 		thedb := filepath.Join(*outPath, fmt.Sprintf("%v-%v-durations.sqlite", events[0].FCFSSeqId, events[0].DeviceTag))
