@@ -64,7 +64,7 @@ func (cfg *Config) SetDefaults() {
 	cfg.StorageMode = "sqlite"
 
 	cfg.Local.Logfile = "/opt/imls/log.json"
-	cfg.Local.Crontab = "0 */6 * * *"
+	cfg.Local.Crontab = "0 0 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
 	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
 	cfg.Local.WebDirectory = "/www/imls"
