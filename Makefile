@@ -14,11 +14,6 @@ stamp_the_release_version:
 	git commit -m "prod release: $(VERSION)"
 	git push
 
-packaging:
-	cd imls-playbook ; \
-		sed 's/<<VERSION>>/$(VERSION)/g' Makefile.in > Makefile ; \
-		cd ..
-
 ifeq ($(shell git describe --tags --abbrev=0),$(VERSION))
 release:
 	@echo "Version needs to be updated from " $(VERSION)
@@ -26,9 +21,9 @@ dev:
 	@echo "Version needs to be updated from " $(VERSION)
 else
 # make VERSION=v1.2.3 release
-release: stamp_the_release_version packaging
+release: stamp_the_release_version
 	cd imls-raspberry-pi ; make release ; cd ..
 # make dev
-dev: stamp_the_dev_version packaging
+dev: stamp_the_dev_version
 	cd imls-raspberry-pi ; make dev ; cd ..
 endif

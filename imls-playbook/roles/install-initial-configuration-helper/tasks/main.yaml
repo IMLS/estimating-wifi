@@ -1,8 +1,0 @@
-- name: install input-initial-configuration binary from github
-  ansible.builtin.get_url:
-    url: "{{ inputinitial.binary_url }}"
-    dest: "{{ install_path }}/input-initial-configuration"
-    owner: root
-    group: root
-    mode: 0755
-  become: yes
