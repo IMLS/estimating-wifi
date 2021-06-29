@@ -3,6 +3,7 @@ deb:
 	dpkg-deb --build sources/input-initial-configuration_1.0-1_arm
 	dpkg-deb --build sources/session-counter_1.0-1
 	dpkg-deb --build sources/session-counter-csv_1.0-1_arm
+	dpkg-deb --build sources/imls-lockdown_1.0-1_arm
 	mv sources/*.deb .
 
 packages: deb
@@ -28,4 +29,3 @@ update-binaries:
 	chmod +x sources/input-initial-configuration_1.0-1_arm/usr/local/bin/input-initial-configuration
 	cp ../imls-raspberry-pi/release/bin/session-counter sources/session-counter_1.0-1/usr/local/bin/
 	chmod +x sources/session-counter_1.0-1/usr/local/bin/session-counter
-

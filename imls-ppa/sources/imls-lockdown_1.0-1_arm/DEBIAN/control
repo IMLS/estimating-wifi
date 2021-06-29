@@ -1,0 +1,9 @@
+Package: imls-lockdown
+Version: 1.0-1
+Section: base
+Priority: optional
+Architecture: armhf
+Depends: libc6 (>= 1),
+         ufw
+Maintainer: James Tranovich (james.tranovich@gsa.gov)
+Description: lock down the system
