@@ -56,14 +56,18 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 }
 
 const (
-	INFO = iota
+	DEBUG = iota
+	INFO
 	WARN
 	ERROR
 	FATAL
 )
 
 // Declare variables to store log messages as new Events
+// THe error level recorded here will impact what happens at runtime.
+// For example, a FATAL message type will exit.
 var (
+	debugMsg  = Event{0, INFO, "%s"}
 	infoMsg   = Event{1, INFO, "%s"}
 	warnMsg   = Event{2, WARN, "%s"}
 	errorMsg  = Event{3, ERROR, "%s"}
@@ -77,6 +81,8 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 		"file": loc,
 	}
 	switch e.level {
+	case DEBUG:
+		l.WithFields(fields).Debug(fmt.Sprintf(e.message, args...))
 	case INFO:
 		l.WithFields(fields).Info(fmt.Sprintf(e.message, args...))
 	case WARN:
@@ -85,8 +91,15 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 		l.WithFields(fields).Error(fmt.Sprintf(e.message, args...))
 	case FATAL:
 		l.WithFields(fields).Fatal(fmt.Sprintf(e.message, args...))
+		// We're leaving, on a jet plane...
+		os.Exit(-1)
 	}
 
+}
+
+func (l *StandardLogger) Debug(msg string, args ...interface{}) {
+	_, file, _, _ := runtime.Caller(1)
+	l.Base(debugMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
 }
 
 // InvalidArg is a standard error message
@@ -95,11 +108,19 @@ func (l *StandardLogger) Info(msg string, args ...interface{}) {
 	l.Base(infoMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
 }
 
+func (l *StandardLogger) Warn(msg string, args ...interface{}) {
+	_, file, _, _ := runtime.Caller(1)
+	l.Base(warnMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
+}
+
+func (l *StandardLogger) Error(msg string, args ...interface{}) {
+	_, file, _, _ := runtime.Caller(1)
+	l.Base(errorMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
+}
+
 func (l *StandardLogger) Fatal(msg string, args ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
 	l.Base(fatalMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
-	// We're leaving, on a jet plane...
-	os.Exit(-1)
 }
 
 func (l *StandardLogger) ExeNotFound(path string) {

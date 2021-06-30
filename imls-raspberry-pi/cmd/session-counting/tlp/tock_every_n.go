@@ -5,25 +5,25 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
-	if config.Verbose {
-		log.Println("Starting TockEveryMinute")
-	}
+	lw := logwrapper.NewLogger(nil)
+	lw.Info("starting TockEveryMinute")
+
 	ping, pong := ka.Subscribe("TockEveryMinute", 2)
 	// What is the best way to drive a 1-second tick?
 
 	c := cron.New()
 	_, err := c.AddFunc("*/1 * * * *", func() {
-		if config.Verbose {
-			log.Println("Tock every minute.")
-		}
+		lw := logwrapper.NewLogger(nil)
+		lw.Debug("tock every minute")
 		out <- true
 	})
 	if err != nil {
-		log.Println("cron: could not set up crontab entry")
-		log.Fatal(err.Error())
+		lw.Info("cron: could not set up crontab entry")
+		lw.Fatal(err.Error())
 	}
 	c.Start()
 
@@ -32,9 +32,7 @@ func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
 		case <-ping:
 			pong <- "TockEveryMinute"
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting TockEveryN")
-			}
+			lw.Debug("Exiting TockEveryN")
 			return
 		}
 	}
