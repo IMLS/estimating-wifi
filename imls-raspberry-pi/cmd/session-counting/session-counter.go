@@ -68,8 +68,8 @@ func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 }
 
 func handleFlags() *config.Config {
+	logLvlPtr := flag.String("log-level", "ERROR", "Set log level (DEBUG, INFO, WARN).")
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
-	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
 	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
 	flag.Parse()
@@ -83,7 +83,17 @@ func handleFlags() *config.Config {
 
 	// By default, we are not verbose.
 	// This ends up wrapping a bunch of logging.
-	config.Verbose = *verbosePtr
+	//config.Verbose = *verbosePtr
+	switch *logLvlPtr {
+	case "DEBUG":
+		logwrapper.SetLogLevel(logwrapper.DEBUG)
+	case "INFO":
+		logwrapper.SetLogLevel(logwrapper.INFO)
+	case "WARN":
+		logwrapper.SetLogLevel(logwrapper.WARN)
+	default:
+		logwrapper.SetLogLevel(logwrapper.ERROR)
+	}
 
 	// Make sure a config is passed.
 	if *configPathPtr == "" {

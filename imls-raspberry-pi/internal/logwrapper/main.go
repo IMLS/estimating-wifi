@@ -29,6 +29,12 @@ type StandardLogger struct {
 var standardLogger *StandardLogger = nil
 var once sync.Once
 
+var logLevel int
+
+func SetLogLevel(lvl int) {
+	logLevel = lvl
+}
+
 // Convoluted for use within libraries...
 func NewLogger(cfg *config.Config) *StandardLogger {
 	once.Do(func() {
@@ -82,14 +88,22 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 	}
 	switch e.level {
 	case DEBUG:
-		l.WithFields(fields).Debug(fmt.Sprintf(e.message, args...))
+		if logLevel <= DEBUG {
+			l.WithFields(fields).Debug(fmt.Sprintf(e.message, args...))
+		}
 	case INFO:
-		l.WithFields(fields).Info(fmt.Sprintf(e.message, args...))
+		if logLevel <= INFO {
+			l.WithFields(fields).Info(fmt.Sprintf(e.message, args...))
+		}
 	case WARN:
-		l.WithFields(fields).Warn(fmt.Sprintf(e.message, args...))
+		if logLevel <= WARN {
+			l.WithFields(fields).Warn(fmt.Sprintf(e.message, args...))
+		}
 	case ERROR:
+		// Always log ERROR level log events.
 		l.WithFields(fields).Error(fmt.Sprintf(e.message, args...))
 	case FATAL:
+		// Always log FATAL level log events.
 		l.WithFields(fields).Fatal(fmt.Sprintf(e.message, args...))
 		// We're leaving, on a jet plane...
 		os.Exit(-1)
