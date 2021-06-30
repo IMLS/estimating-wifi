@@ -32,7 +32,10 @@ var once sync.Once
 var logLevel int = ERROR
 
 func SetLogLevel(lvl int) {
-	logLevel = lvl
+	// Don't allow broken logging levels.
+	if lvl > DEBUG && lvl <= FATAL {
+		logLevel = lvl
+	}
 }
 
 // Convoluted for use within libraries...
