@@ -1,21 +1,19 @@
 package tlp
 
 import (
-	"log"
 	"strconv"
 	"strings"
 	"time"
 
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 // Gets the raw data ready for posting.
 func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 	in_hash <-chan map[string]int, out_arr chan<- []map[string]string, ch_kill <-chan Ping) {
-
-	if config.Verbose {
-		log.Println("Starting PrepareDataForStorage")
-	}
+	lw := logwrapper.NewLogger(nil)
+	lw.Debug("Starting PrepareDataForStorage")
 
 	// If ch_kill is nill, we're live.
 	// If it is *not* nill, we're running under test/simulation conditions.
@@ -31,9 +29,7 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 		case <-ping:
 			pong <- "PrepareDataForStorage"
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting PrepareDataForStorage")
-			}
+			lw.Debug("exiting PrepareDataForStorage")
 			return
 
 		// Block waiting to read the incoming hash
@@ -49,6 +45,9 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 			for _, r := range remove {
 				delete(h, r)
 			}
+
+			lw.Debug("event ndx: %v", event_ndx)
+			lw.Length("macs-to-store", remove)
 
 			// Now, bundle that as an array of hashmaps.
 			reportArr := make([]map[string]string, 0)
