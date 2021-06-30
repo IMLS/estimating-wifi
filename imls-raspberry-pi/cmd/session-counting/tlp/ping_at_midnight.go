@@ -5,12 +5,12 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_kill <-chan Ping) {
-	if config.Verbose {
-		log.Println("Starting PingAtMidnight")
-	}
+	lw := logwrapper.NewLogger(nil)
+	lw.Debug("starting PingAtMidnight")
 
 	// ch_kill will be nil in production
 	var ping, pong chan interface{} = nil, nil
@@ -25,7 +25,7 @@ func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_
 		ch_reset <- Ping{}
 	})
 	if err != nil {
-		log.Println("cron: could not set up crontab entry")
+		lw.Error("could not set up crontab entry")
 		log.Fatal(err.Error())
 	}
 	c.Start()
@@ -33,9 +33,7 @@ func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_
 	for {
 		select {
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting PingAtMidnight")
-			}
+			lw.Debug("exiting PingAtMidnight")
 			// Stop the cron scheduler.
 			c.Stop()
 			return
