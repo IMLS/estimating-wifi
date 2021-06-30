@@ -3,11 +3,11 @@ package tlp
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os/exec"
 	"strings"
 
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/wifi-hardware-search/models"
 	"gsa.gov/18f/wifi-hardware-search/search"
@@ -49,9 +49,8 @@ func tshark(cfg *config.Config) []string {
  * Empty MAC addresses are filtered out.
  */
 func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []string, ch_kill <-chan Ping) {
-	if config.Verbose {
-		log.Println("Starting runWireshark")
-	}
+	lw := logwrapper.NewLogger(nil)
+	lw.Info("starting RunWireshark")
 
 	var ping, pong chan interface{} = nil, nil
 
@@ -74,9 +73,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			pong <- "wireshark"
 
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting RunWireshark")
-			}
+			lw.Debug("exiting RunWireshark")
 			return
 
 		case <-in:
@@ -91,8 +88,10 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 			if dev != nil && dev.Exists {
 				// Load the config for use.
 				cfg.Wireshark.Adapter = dev.Logicalname
+				lw.Debug("found adapter: %v", cfg.Wireshark.Adapter)
 				// Set monitor mode if the adapter changes.
 				if cfg.Wireshark.Adapter != adapter {
+					lw.Debug("setting monitor mode")
 					search.SetMonitorMode(dev)
 					adapter = cfg.Wireshark.Adapter
 				}
@@ -108,12 +107,11 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, in <-chan bool, out chan []
 						keepers = append(keepers, k)
 					}
 				}
-				// Report out the cleaned MACmap.
+				// How many devices did we find to keep?
+				lw.Length("wireshark keepers", keepers)
 				out <- keepers
 			} else {
-				if config.Verbose {
-					log.Println("No wifi device found. No scanning carried out.")
-				}
+				lw.Info("no wifi devices found. no scanning carried out.")
 				// Report an empty array of keepers
 				out <- make([]string, 0)
 			}
