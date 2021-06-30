@@ -14,29 +14,30 @@ import (
 )
 
 func tshark(cfg *config.Config) []string {
-
+	lw := logwrapper.NewLogger(nil)
 	tsharkCmd := exec.Command(cfg.Wireshark.Path,
 		"-a", fmt.Sprintf("duration:%d", cfg.Wireshark.Duration),
 		"-I", "-i", cfg.Wireshark.Adapter,
 		"-Tfields", "-e", "wlan.sa")
 
-	tsharkOut, _ := tsharkCmd.StdoutPipe()
-	tsharkCmd.Start()
-	tsharkBytes, _ := ioutil.ReadAll(tsharkOut)
+	tsharkOut, err := tsharkCmd.StdoutPipe()
+	if err != nil {
+		lw.Error("could not open wireshark pipe")
+		lw.Error(err.Error())
+	}
+	defer tsharkOut.Close()
+	err = tsharkCmd.Start()
+	if err != nil {
+		lw.Error("could not exe wireshark")
+		lw.Error(err.Error())
+	}
+	tsharkBytes, err := ioutil.ReadAll(tsharkOut)
+	if err != nil {
+		lw.Info("did not read wireshark bytes")
+		lw.Error(err.Error())
+	}
 	tsharkCmd.Wait()
 	macs := strings.Split(string(tsharkBytes), "\n")
-
-	// Let's not worry about how many packets.
-	// Just track the MAC addresses.
-	// pkts := make(map[string]int)
-	// for _, a_mac := range macs {
-	// 	v, ok := pkts[a_mac]
-	// 	if ok {
-	// 		pkts[a_mac] = v + 1
-	// 	} else {
-	// 		pkts[a_mac] = 1
-	// 	}
-	// }
 
 	return macs
 }
