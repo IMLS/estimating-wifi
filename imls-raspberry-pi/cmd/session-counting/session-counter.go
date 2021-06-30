@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -81,15 +82,12 @@ func handleFlags() *config.Config {
 		os.Exit(0)
 	}
 
-	// By default, we are not verbose.
-	// This ends up wrapping a bunch of logging.
-	//config.Verbose = *verbosePtr
-	switch *logLvlPtr {
-	case "DEBUG":
+	switch strings.ToLower(*logLvlPtr) {
+	case "debug":
 		logwrapper.SetLogLevel(logwrapper.DEBUG)
-	case "INFO":
+	case "info":
 		logwrapper.SetLogLevel(logwrapper.INFO)
-	case "WARN":
+	case "warn":
 		logwrapper.SetLogLevel(logwrapper.WARN)
 	default:
 		logwrapper.SetLogLevel(logwrapper.ERROR)
