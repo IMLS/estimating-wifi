@@ -33,23 +33,19 @@ CREATE TABLE public.validators_v2 (
 ALTER TABLE ONLY public.validators_v2
     ADD CONSTRAINT validators_v2_pkey PRIMARY KEY (name);
 
--- counts:
+-- durations:
 -- store wifi summaries
-DROP TABLE IF EXISTS public.counts_v2;
-CREATE TABLE public.counts_v2 (
+DROP TABLE IF EXISTS public.durations_v2;
+CREATE TABLE public.durations_v2 (
     id serial PRIMARY KEY,
     pi_serial character varying(16),
     fcfs_seq_id character varying(16),
     device_tag character varying(32),
     session_id character varying(255),
-    minimum_minutes integer,
-    maximum_minutes integer,
-    patron_count integer,
-    patron_minutes integer,
-    device_count integer,
-    device_minutes integer,
-    transient_count integer,
-    transient_minutes integer
+    pid integer,
+    mfg_id integer,
+    "start" text,
+    "end" text
 );
 
 -- events:
