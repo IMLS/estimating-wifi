@@ -3,24 +3,26 @@ package api
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 func CheckMfgDatabaseExists(cfg *config.Config) {
+	lw := logwrapper.NewLogger(nil)
+
 	_, err := os.Stat(cfg.Manufacturers.Db)
 
 	if os.IsNotExist(err) {
-		log.Fatal("cannot find mfg database: ", cfg.Manufacturers.Db)
+		lw.Fatal("cannot find mfg database: %v", cfg.Manufacturers.Db)
 	}
 
 	db, dberr := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
-		log.Println("Failed to open manufacturer database:", cfg.Manufacturers.Db)
-		log.Fatal(dberr)
+		lw.Info("failed to open manufacturer database: %v", cfg.Manufacturers.Db)
+		lw.Fatal(dberr.Error())
 	}
 	defer db.Close()
 }
@@ -33,9 +35,10 @@ func CheckMfgDatabaseExists(cfg *config.Config) {
 var cache map[string]string = make(map[string]string)
 
 func MacToMfg(cfg *config.Config, mac string) string {
+	lw := logwrapper.NewLogger(nil)
 	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
 	if err != nil {
-		log.Fatal("Failed to open manufacturer database:", cfg.Manufacturers.Db)
+		lw.Fatal("Failed to open manufacturer database: %v", cfg.Manufacturers.Db)
 	}
 	// Close the DB at the end of the function.
 	// If not, it's a resource leak.
@@ -64,11 +67,8 @@ func MacToMfg(cfg *config.Config, mac string) string {
 				// Close the rows down, too...
 				// Another possible leak?
 				if err != nil {
-					if config.Verbose {
-						log.Println(err)
-						log.Printf("manufactuerer not found: %s", q)
-					}
-
+					lw.Debug("manufactuerer not found: %s", q)
+					lw.Debug(err.Error())
 				} else {
 					var id string
 
@@ -77,7 +77,7 @@ func MacToMfg(cfg *config.Config, mac string) string {
 					for rows.Next() {
 						err = rows.Scan(&id)
 						if err != nil {
-							log.Fatal("Failed in DB result row scanning.")
+							lw.Fatal("failed in DB result row scanning")
 						}
 						if id != "" {
 							cache[substr] = id

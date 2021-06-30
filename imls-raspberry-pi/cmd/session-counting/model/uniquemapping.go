@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"log"
 
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/session-counter/api"
@@ -69,10 +68,6 @@ func (umdb uniqueMappingDB) UpdateMapping(mac string) {
 		mfgid, found := umdb.anonmfg[mfg]
 		if !found {
 			mfgid = len(umdb.anonmfg)
-			if config.Verbose {
-				log.Println("mfg", mfg, "id", mfgid)
-				log.Println(len(umdb.mfg), "devices in mfg map.")
-			}
 		}
 		umdb.anonmfg[mfg] = mfgid
 		umdb.mfg[mac] = mfg
