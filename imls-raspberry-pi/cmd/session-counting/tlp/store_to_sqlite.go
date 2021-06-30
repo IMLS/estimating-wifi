@@ -224,6 +224,7 @@ func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
 
 func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 	lw := logwrapper.NewLogger(nil)
+	yesterday := time.Now().Add(-1 * time.Hour)
 	_, durations := analysis.Summarize(cfg, events)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
@@ -231,8 +232,9 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 			lw.Info("could not create web directory: %v", cfg.Local.WebDirectory)
 		}
 	}
+
 	path := filepath.Join(cfg.Local.WebDirectory,
-		fmt.Sprintf("%v-%v-durations.csv", cfg.Auth.FCFSId, cfg.Auth.DeviceTag))
+		fmt.Sprintf("%04d-%02d-%02d-%v-%v-durations.csv", yesterday.Year(), int(yesterday.Month()), int(yesterday.Day()), cfg.Auth.FCFSId, cfg.Auth.DeviceTag))
 
 	// Open for appending
 	f, err := os.OpenFile(path,
