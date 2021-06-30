@@ -1,9 +1,8 @@
 package tlp
 
 import (
-	"log"
-
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/model"
 )
@@ -14,9 +13,8 @@ import (
  * Uses "unknown" for all unknown manufacturers.
  */
 func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry, ch_kill <-chan Ping) {
-	if config.Verbose {
-		log.Println("Starting macToEntry")
-	}
+	lw := logwrapper.NewLogger(nil)
+	lw.Debug("starting MacToEntry")
 
 	// ch_kill will be nil in production
 	var ping, pong chan interface{} = nil, nil
@@ -29,9 +27,7 @@ func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int,
 		case <-ping:
 			pong <- "macToEntry"
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting MacToEntry")
-			}
+			lw.Debug("exiting MacToEntry")
 			return
 
 		case mm := <-macmap:
