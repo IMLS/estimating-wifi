@@ -25,7 +25,10 @@ func tshark(cfg *config.Config) []string {
 		lw.Error("could not open wireshark pipe")
 		lw.Error(err.Error())
 	}
-	defer tsharkOut.Close()
+	// The closer is called on exe exit. Idomatic use does not
+	// explicitly call the closer.
+	// defer tsharkOut.Close()
+
 	err = tsharkCmd.Start()
 	if err != nil {
 		lw.Error("could not exe wireshark")
