@@ -1,14 +1,12 @@
 package tlp
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
 	"gsa.gov/18f/config"
-	"gsa.gov/18f/http"
+	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/constants"
 )
 
@@ -25,16 +23,17 @@ type resp struct {
 type Keepalive struct {
 	publishCh   chan interface{}
 	subCh       chan resp
-	eventLogger *http.EventLogger
+	eventLogger *logwrapper.StandardLogger
 }
 
 func NewKeepalive(cfg *config.Config) *Keepalive {
-	el := http.NewEventLogger(cfg)
+	// el := http.NewEventLogger(cfg)
+	lw := logwrapper.NewLogger(nil)
 
 	return &Keepalive{
 		publishCh:   make(chan interface{}, 1),
 		subCh:       make(chan resp, 1),
-		eventLogger: el,
+		eventLogger: lw,
 	}
 }
 
@@ -78,16 +77,10 @@ func (b *Keepalive) Start() {
 					// This way, systemd will restart us.
 					select {
 					case <-procs[c].pongCh:
-						// log.Printf("Pong from %v", procs[c].id)
+						// WARNING: This could get very noisy in the log.
+						b.eventLogger.Debug("pong from %v", procs[c].id)
 					case <-time.After(procs[c].timeout):
-						b.eventLogger.Log("keepalive_timeout",
-							map[string]string{
-								"process_id":      fmt.Sprint(procs[c].id),
-								"process_timeout": fmt.Sprint(procs[c].timeout)})
-
-						if config.Verbose {
-							log.Printf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
-						}
+						b.eventLogger.Debug("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
 						processTimedOut = true
 					}
 				}(ch)
@@ -96,9 +89,7 @@ func (b *Keepalive) Start() {
 		case <-time.After(interval):
 			if processTimedOut {
 				// If we timed out, exit. Hope systemd restarts us.
-				if config.Verbose {
-					log.Println("Exiting after", interval, "seconds. Bye!")
-				}
+				b.eventLogger.Error("exiting after %v seconds. Hopefully someone will restart us!", interval)
 				os.Exit(constants.ExitProcessTimeout)
 			}
 		} // end select
