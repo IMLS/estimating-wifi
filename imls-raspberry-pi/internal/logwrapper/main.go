@@ -29,7 +29,7 @@ type StandardLogger struct {
 var standardLogger *StandardLogger = nil
 var once sync.Once
 
-var logLevel int
+var logLevel int = ERROR
 
 func SetLogLevel(lvl int) {
 	logLevel = lvl
