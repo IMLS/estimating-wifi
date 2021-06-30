@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -321,6 +322,9 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg, _ := config.ReadConfig(filepath.Join(path, "test", "config.yaml"))
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
+	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
+	os.Mkdir(cfg.Local.WebDirectory, 0755)
+
 	cfg.SessionId = config.CreateSessionId()
 	log.Println(cfg)
 
@@ -377,7 +381,7 @@ func TestManyTLPCycles(t *testing.T) {
 	go PingAfterNHours(nil, cfg, WRITESUMMARYNHOURS, ch_nsec2, chs_reset[0], KC[4])
 	go tlp.StoreToSqlite(nil, cfg, ch_data_for_report, chs_reset[2], KC[5])
 	// Fan out the ping to multiple PROCs
-	go tlp.ParDelta(KC[6], chs_reset[:]...)
+	go tlp.ParDelta(KC[6], chs_reset[0], chs_reset[1:]...)
 
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {

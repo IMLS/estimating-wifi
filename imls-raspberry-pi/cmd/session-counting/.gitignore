@@ -3,3 +3,4 @@ testlogfile
 .vscode
 *.sqlite
 config.yaml
+test/www/*

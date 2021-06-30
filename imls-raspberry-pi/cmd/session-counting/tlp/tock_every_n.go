@@ -10,7 +10,7 @@ import (
 
 func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
 	lw := logwrapper.NewLogger(nil)
-	lw.Info("starting TockEveryMinute")
+	lw.Debug("starting TockEveryMinute")
 
 	ping, pong := ka.Subscribe("TockEveryMinute", 2)
 	// What is the best way to drive a 1-second tick?

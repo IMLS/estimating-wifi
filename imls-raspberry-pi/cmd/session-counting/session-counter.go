@@ -53,7 +53,7 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 		go tlp.PingAtMidnight(ka, cfg, chs_reset[0], NIL_KILL_CHANNEL)
 		go tlp.StoreToSqlite(ka, cfg, ch_data_for_report, chs_reset[2], NIL_KILL_CHANNEL)
 		// Fan out the ping to multiple PROCs
-		go tlp.ParDelta(NIL_KILL_CHANNEL, chs_reset[:]...)
+		go tlp.ParDelta(NIL_KILL_CHANNEL, chs_reset[0], chs_reset[1:]...)
 	}
 }
 
