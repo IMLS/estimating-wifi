@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"sync"
 	"time"
@@ -73,8 +72,9 @@ func handleFlags() *config.Config {
 	verbosePtr := flag.Bool("verbose", false, "Set log verbosity.")
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
 	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
-
 	flag.Parse()
+	lw := logwrapper.NewLogger(nil)
+
 	// If they just want the version, print and exit.
 	if *versionPtr {
 		fmt.Println(version.GetVersion())
@@ -87,19 +87,18 @@ func handleFlags() *config.Config {
 
 	// Make sure a config is passed.
 	if *configPathPtr == "" {
-		log.Fatal("The flag --config MUST be provided.")
+		lw.Fatal("The flag --config MUST be provided.")
 		os.Exit(1)
 	}
 
 	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
-		log.Println("Looked for config at:", *configPathPtr)
-		log.Fatal("Cannot find config file. Exiting.")
+		lw.Info("Looked for config at: %v", *configPathPtr)
+		lw.Fatal("Cannot find config file. Exiting.")
 	} else {
 		config.SetConfigPath(*configPathPtr)
 	}
 
 	cfg, err := config.ReadConfig(*configPathPtr)
-	lw := logwrapper.NewLogger(cfg)
 
 	if err != nil {
 		lw.Fatal("session-counter: error loading config.")

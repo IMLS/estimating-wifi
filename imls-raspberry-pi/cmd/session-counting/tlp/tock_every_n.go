@@ -1,10 +1,7 @@
 package tlp
 
 import (
-	"log"
-
 	"github.com/robfig/cron/v3"
-	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 )
 
@@ -49,9 +46,8 @@ func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
  * a stream of second ticks into minute `tocks`.
  */
 func TockEveryN(ka *Keepalive, n int, in <-chan bool, out chan<- bool, ch_kill <-chan Ping) {
-	if config.Verbose {
-		log.Println("Starting tockEveryN")
-	}
+	lw := logwrapper.NewLogger(nil)
+	lw.Debug("starting TockEveryN")
 	// We timeout one second beyond the number of ticks we're waiting for
 
 	// ch_kill will be nil in production
@@ -66,17 +62,12 @@ func TockEveryN(ka *Keepalive, n int, in <-chan bool, out chan<- bool, ch_kill <
 		case <-ping:
 			pong <- "tock"
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting TockEveryN")
-			}
 			return
 
 		case <-in:
 			counter = counter + 1
 			if counter == n {
-				if config.Verbose {
-					log.Println("tickN", counter)
-				}
+				lw.Info("tickN", counter)
 				counter = 0
 				out <- true
 			}

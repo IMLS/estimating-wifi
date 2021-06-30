@@ -2,7 +2,6 @@ package tlp
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -203,23 +202,19 @@ func processDataFromDay(cfg *config.Config, memdb *sqlx.DB) {
 
 //This must happen after the data is updated for the day.
 func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
-
+	lw := logwrapper.NewLogger(nil)
 	yesterday := time.Now().Add(-1 * time.Hour)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
-			if config.Verbose {
-				log.Println("could not create web directory:", cfg.Local.WebDirectory)
-			}
+			lw.Info("could not create web directory: %v", cfg.Local.WebDirectory)
 		}
 	}
 	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
 	if _, err := os.Stat(imagedir); os.IsNotExist(err) {
 		err := os.Mkdir(imagedir, 0777)
 		if err != nil {
-			if config.Verbose {
-				log.Println("could not create image directory")
-			}
+			lw.Info("could not create image directory")
 		}
 	}
 
@@ -228,14 +223,12 @@ func writeImages(cfg *config.Config, events []analysis.WifiEvent) {
 }
 
 func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
-
+	lw := logwrapper.NewLogger(nil)
 	_, durations := analysis.Summarize(cfg, events)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
-			if config.Verbose {
-				log.Println("could not create web directory:", cfg.Local.WebDirectory)
-			}
+			lw.Info("could not create web directory: %v", cfg.Local.WebDirectory)
 		}
 	}
 	path := filepath.Join(cfg.Local.WebDirectory,
@@ -245,9 +238,7 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 	f, err := os.OpenFile(path,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		if config.Verbose {
-			log.Println("could not open durations CSV for writing")
-		}
+		lw.Info("could not open durations CSV for writing")
 	}
 	defer f.Close()
 
@@ -280,7 +271,8 @@ func writeSummaryCSV(cfg *config.Config, events []analysis.WifiEvent) {
 // FIXME
 // On reset, we need to process and clear the sqlite tables. This should ping once daily.
 func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping, ch_kill <-chan Ping) {
-	log.Println("Starting StoreToSqlite")
+	lw := logwrapper.NewLogger(nil)
+	lw.Debug("starting StoreToSqlite")
 
 	var ping, pong chan interface{} = nil, nil
 	// ch_kill will be nil in production
@@ -292,7 +284,6 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 	event_ndx := 0
 	// We'll use an in-memory DB for the recording of data throughout the day.
 	db := newTemporaryDB(cfg)
-	lw := logwrapper.NewLogger(nil)
 
 	for {
 		select {
@@ -320,8 +311,8 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			// Cannot pre-prepare for the entire process.
 			insertS, err := db.Prepare(`INSERT INTO wifi (event_id, fcfs_seq_id, device_tag, localtime, session_id, manufacturer_index, patron_index) VALUES (?,?,?,?,?,?,?)`)
 			if err != nil {
-				log.Fatal("sqlite: could not prepare insert statement.")
-				lw.Fatal("could not prepare wifi insert statement")
+				lw.Info("could not prepare wifi insert statement")
+				lw.Fatal(err.Error())
 			}
 
 			for _, h := range arr {

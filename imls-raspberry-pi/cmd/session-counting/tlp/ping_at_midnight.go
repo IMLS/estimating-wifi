@@ -1,8 +1,6 @@
 package tlp
 
 import (
-	"log"
-
 	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
@@ -26,7 +24,7 @@ func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_
 	})
 	if err != nil {
 		lw.Error("could not set up crontab entry")
-		log.Fatal(err.Error())
+		lw.Fatal(err.Error())
 	}
 	c.Start()
 
