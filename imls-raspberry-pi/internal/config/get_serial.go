@@ -2,7 +2,6 @@ package config
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"regexp"
 	"runtime"
@@ -19,27 +18,18 @@ var cache map[string]string = make(map[string]string)
 
 func cpuinfoLines() (lines []string) {
 	file, err := os.Open("/proc/cpuinfo")
-
+	// If we can't find/read cpuinfo, return an empty list.
 	if err != nil {
-		if Verbose {
-			log.Println("error opening /proc/cpuinfo")
-			log.Println(err)
-		}
+		return make([]string, 0)
 	}
 	defer file.Close()
-
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-
 	if err := scanner.Err(); err != nil {
-		if Verbose {
-			log.Println("error reading /proc/cpuino")
-			log.Println(err)
-		}
+		return make([]string, 0)
 	}
-
 	return lines
 }
 
@@ -53,19 +43,17 @@ func GetSerial() string {
 			lines := cpuinfoLines()
 			re := regexp.MustCompile(`Serial\s+:\s+([a-f0-9]+)`)
 			for _, line := range lines {
-				// log.Println("line", line)
 				matched := re.FindStringSubmatch(line)
 				if len(matched) > 0 {
-					// log.Println("matched", matched)
 					serial = string(matched[1])
 					cache["serial"] = serial
 				}
 			}
 		} else {
 			if !serialWarnGiven {
-				if Verbose {
-					log.Println("Not running on an RPi. Cannot grab serial number. Exiting.")
-				}
+				// if Verbose {
+				// 	log.Println("Not running on an RPi. Cannot grab serial number.")
+				// }
 				serialWarnGiven = true
 			}
 
