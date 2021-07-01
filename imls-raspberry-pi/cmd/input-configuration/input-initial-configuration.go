@@ -330,7 +330,10 @@ func main() {
 	if *readWordPairPtr {
 		if readYesOrNo(os.Stdin) {
 			fmt.Println()
+			cfg.StorageMode = "api"
 			cfg.Auth.Token = readWordPairs(os.Stdin)
+		} else {
+			cfg.StorageMode = "sqlite"
 		}
 	}
 
