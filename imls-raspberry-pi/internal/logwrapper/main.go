@@ -42,6 +42,26 @@ func (l *StandardLogger) SetLogLevel(lvl int) {
 	}
 }
 
+func (l *StandardLogger) GetLogLevel() int {
+	return logLevel
+}
+
+func (l *StandardLogger) GetLogLevelName() string {
+	switch logLevel {
+	case 0:
+		return "DEBUG"
+	case 1:
+		return "INFO"
+	case 2:
+		return "WARN"
+	case 3:
+		return "ERROR"
+	case 4:
+		return "FAIL"
+	}
+	return "UNKNOWN"
+}
+
 func NewLogger(cfg *config.Config) (sl *StandardLogger) {
 	once.Do(func() {
 		sl = newLogger(cfg)
@@ -91,8 +111,7 @@ func newLogger(cfg *config.Config) *StandardLogger {
 			}
 			writers = append(writers, iow)
 		case "api:directus":
-			uri := cfg.GetLoggingUri()
-			api := NewApiLogger(uri)
+			api := NewApiLogger(cfg)
 			writers = append(writers, api)
 		}
 	}
