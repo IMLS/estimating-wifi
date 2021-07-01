@@ -40,6 +40,26 @@ func decode(ndx int) string {
 	return strings.TrimSpace(result)
 }
 
+func readYesOrNo() bool {
+	msg := "Do you have an api.data.gov API key?"
+	reader := bufio.NewReader(os.Stdin)
+	yes := regexp.MustCompile("(?i)^(yes|y)$")
+	no := regexp.MustCompile("(?i)^(no|n)$")
+
+	fmt.Println(box(color.New(color.FgBlue), msg))
+	for true {
+		answer, _ := reader.ReadString('\n')
+		answer = strings.TrimSpace(answer)
+		if yes.MatchString(answer) {
+			return true
+		} else if no.MatchString(answer) {
+			return false
+		}
+		fmt.Printf("Please enter a yes or no answer.\n\n")
+	}
+	return false;
+}
+
 func readFCFS() string {
 	msg := ""
 	msg += "Look up and enter the FCFS Id Seq for this device's location\n\n"
@@ -307,8 +327,10 @@ func main() {
 
 	// Read in the word pairs
 	if *readWordPairPtr {
-		fmt.Println()
-		cfg.Auth.Token = readWordPairs()
+		if readYesOrNo() {
+			fmt.Println()
+			cfg.Auth.Token = readWordPairs()
+		}
 	}
 
 	// Only writes to file if --write is set to `true`
