@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"os"
@@ -40,9 +41,9 @@ func decode(ndx int) string {
 	return strings.TrimSpace(result)
 }
 
-func readYesOrNo() bool {
+func readYesOrNo(input io.Reader) bool {
 	msg := "Do you have an api.data.gov API key?"
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(input)
 	yes := regexp.MustCompile("(?i)^(yes|y)$")
 	no := regexp.MustCompile("(?i)^(no|n)$")
 
@@ -60,7 +61,7 @@ func readYesOrNo() bool {
 	return false;
 }
 
-func readFCFS() string {
+func readFCFS(input io.Reader) string {
 	msg := ""
 	msg += "Look up and enter the FCFS Id Seq for this device's location\n\n"
 	msg += color.BlueString("https://www.imls.gov/search-compare/\n\n")
@@ -68,7 +69,7 @@ func readFCFS() string {
 	msg += color.New(color.FgYellow).Sprint("KY0069-003")
 	fmt.Println(box(color.New(color.FgBlue), msg))
 
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(input)
 	re := regexp.MustCompile(states + `[0-9]{4}-[0-9]{3}`)
 	fcfsid := ""
 
@@ -135,12 +136,12 @@ func box(c *color.Color, s string) string {
 	return result
 }
 
-func readWordPairs() string {
+func readWordPairs(input io.Reader) string {
 	wordlist.Init()
 
 	// We need to read things until they write DONE.
 	reading := true
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(input)
 
 	key := ""
 	textc := color.New(color.FgCyan)
@@ -192,9 +193,9 @@ func readWordPairs() string {
 	return encandb64
 }
 
-func readToken() string {
+func readToken(input io.Reader) string {
 	fmt.Printf("Enter raw token (dev testing only): ")
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(input)
 	tok, _ := reader.ReadString('\n')
 	tok = strings.TrimSpace(tok)
 	serial := []byte(pi.GetSerial())
@@ -209,7 +210,7 @@ func readToken() string {
 	return str
 }
 
-func readTag() string {
+func readTag(input io.Reader) string {
 	msg := ""
 	msg += "Enter your device tag.\n\n"
 	msg += "This will end up in the data, and will help you identify the device.\n\n"
@@ -221,7 +222,7 @@ func readTag() string {
 	msg += color.New(color.FgYellow).Sprint("Only lowercase letters and hyphens (-) are allowed. We will truncate this at 32 characters.")
 	fmt.Print(box(color.New(color.FgBlue), msg))
 
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(input)
 	re := regexp.MustCompile("^[-0-9a-z]+$")
 	tag := ""
 
@@ -301,7 +302,7 @@ func main() {
 	// version of the key for a given Pi, this must be run ON THAT Pi.
 	if *readTokenPtr {
 		fmt.Println()
-		cfg.Auth.Token = readToken()
+		cfg.Auth.Token = readToken(os.Stdin)
 		fmt.Println(cfg.Auth.Token)
 		os.Exit(0)
 	}
@@ -316,20 +317,20 @@ func main() {
 	// Read in the FCFS Seq Id
 	if *readFCFSPtr {
 		fmt.Println()
-		cfg.Auth.FCFSId = readFCFS()
+		cfg.Auth.FCFSId = readFCFS(os.Stdin)
 	}
 
 	// Read in the hardware tag
 	if *tagPtr {
 		fmt.Println()
-		cfg.Auth.DeviceTag = readTag()
+		cfg.Auth.DeviceTag = readTag(os.Stdin)
 	}
 
 	// Read in the word pairs
 	if *readWordPairPtr {
-		if readYesOrNo() {
+		if readYesOrNo(os.Stdin) {
 			fmt.Println()
-			cfg.Auth.Token = readWordPairs()
+			cfg.Auth.Token = readWordPairs(os.Stdin)
 		}
 	}
 
