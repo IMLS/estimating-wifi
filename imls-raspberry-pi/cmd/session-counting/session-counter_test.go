@@ -247,9 +247,7 @@ func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, n_hours int, ch_tick
 				ch_reset <- tlp.Ping{}
 			}
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting PingAfterNHours")
-			}
+			log.Println("Exiting PingAfterNHours")
 			return
 		}
 	}
@@ -294,11 +292,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out
 			out <- macs
 
 		case <-ch_kill:
-			if config.Verbose {
-				if config.Verbose {
-					log.Println("Exiting RunFakeWireshark")
-				}
-			}
+			log.Println("Exiting RunFakeWireshark")
 			return
 		}
 	}
@@ -328,8 +322,6 @@ func TestManyTLPCycles(t *testing.T) {
 
 	cfg.NewSessionId()
 	log.Println(cfg)
-
-	config.Verbose = true
 
 	// Create channels for process network
 	ch_sec := make(chan bool)

@@ -62,7 +62,8 @@ func main() {
 		os.Exit(-1)
 	}
 
-	cfg, err := config.ReadConfig(*configPathPtr)
+	cfg := config.NewConfig()
+	err := cfg.ReadConfig(*configPathPtr)
 	if err != nil {
 		log.Fatal("log-event: error loading config.")
 	}

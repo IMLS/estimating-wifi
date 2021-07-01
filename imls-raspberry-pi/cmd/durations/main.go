@@ -185,8 +185,8 @@ type Duration struct {
 */
 
 func createDurationsTable(db *sqlx.DB) {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS durations 
-			(id INTEGER PRIMARY KEY, 
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS durations
+			(id INTEGER PRIMARY KEY,
 			pi_serial text,
 			session_id text,
 			fcfs_seq_id text,
@@ -203,7 +203,7 @@ func createDurationsTable(db *sqlx.DB) {
 	}
 }
 
-func writeDurations(cfg *config.Config, path string, durations []*analysis.Duration) {
+func writeDurations(path string, durations []*analysis.Duration) {
 	if len(durations) <= 0 {
 		return
 	}
@@ -216,8 +216,8 @@ func writeDurations(cfg *config.Config, path string, durations []*analysis.Durat
 
 	createDurationsTable(out)
 	tx, _ := out.Begin()
-	stat, err := tx.Prepare(`INSERT INTO durations 
-			(pi_serial, session_id, fcfs_seq_id, device_tag, pid, mfgid, start, end, minutes) 
+	stat, err := tx.Prepare(`INSERT INTO durations
+			(pi_serial, session_id, fcfs_seq_id, device_tag, pid, mfgid, start, end, minutes)
 			VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		log.Println("cannot prepare transactional insert")
@@ -365,10 +365,9 @@ func main() {
 		pid := 0
 		var revised []*analysis.Duration
 		for _, s := range sessions {
-			//writeDurations(cfg, *outPath, s, events)
 			revised, pid = reviseDurations(cfg, *outPath, *swapPtr, pid, s, events)
 			revised = remapPidsPerSession(revised)
-			writeDurations(cfg, *outPath, revised)
+			writeDurations(*outPath, revised)
 		}
 	} else {
 		log.Fatal("No wifi events found. Exiting.")
