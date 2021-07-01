@@ -265,9 +265,7 @@ func main() {
 	cfg := config.NewConfig()
 	err := cfg.ReadConfig(*configPathPtr)
 	if err != nil {
-		// no such configuration file, so create our own with defaults.
-		cfg = &config.Config{}
-		cfg.SetDefaults()
+		cfg = config.NewConfig()
 	}
 
 	// Dump version and exit

@@ -319,13 +319,14 @@ func TestManyTLPCycles(t *testing.T) {
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
 
-	cfg, _ := config.ReadConfig(filepath.Join(path, "test", "config.yaml"))
+	cfg := config.NewConfig()
+	cfg.ReadConfig(filepath.Join(path, "test", "config.yaml"))
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
 
-	cfg.SessionId = config.CreateSessionId()
+	cfg.NewSessionId()
 	log.Println(cfg)
 
 	config.Verbose = true

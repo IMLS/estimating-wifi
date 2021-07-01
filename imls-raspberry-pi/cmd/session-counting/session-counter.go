@@ -16,7 +16,7 @@ import (
 )
 
 func run(ka *tlp.Keepalive, cfg *config.Config) {
-	lw := logwrapper.NewLogger(nil)
+	logwrapper.NewLogger(nil)
 
 	// Create channels for process network
 	// ch_sec := make(chan bool)
@@ -115,13 +115,13 @@ func handleFlags() *config.Config {
 
 	switch strings.ToLower(*logLvlPtr) {
 	case "debug":
-		logwrapper.SetLogLevel(logwrapper.DEBUG)
+		lw.SetLogLevel(logwrapper.DEBUG)
 	case "info":
-		logwrapper.SetLogLevel(logwrapper.INFO)
+		lw.SetLogLevel(logwrapper.INFO)
 	case "warn":
-		logwrapper.SetLogLevel(logwrapper.WARN)
+		lw.SetLogLevel(logwrapper.WARN)
 	default:
-		logwrapper.SetLogLevel(logwrapper.ERROR)
+		lw.SetLogLevel(logwrapper.ERROR)
 	}
 
 	// Make sure a config is passed.
@@ -137,8 +137,8 @@ func handleFlags() *config.Config {
 		config.SetConfigPath(*configPathPtr)
 	}
 
-	cfg, err := config.ReadConfig(*configPathPtr)
-
+	cfg := config.NewConfig()
+	err := cfg.ReadConfig(*configPathPtr)
 	if err != nil {
 		lw.Fatal("session-counter: error loading config.")
 	}
@@ -156,7 +156,7 @@ func main() {
 	// Read in a config
 	cfg := handleFlags()
 
-	cfg.SessionId = config.CreateSessionId()
+	cfg.NewSessionId()
 
 	lw := logwrapper.NewLogger(cfg)
 	lw.Info("startup")

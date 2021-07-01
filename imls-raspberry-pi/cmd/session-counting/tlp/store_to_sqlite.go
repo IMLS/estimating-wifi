@@ -305,7 +305,7 @@ func StoreToSqlite(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[strin
 			db.Close()
 			db = newTemporaryDB(cfg)
 			// After clearing, it is a new session.
-			cfg.SessionId = config.CreateSessionId()
+			cfg.NewSessionId()
 
 		case arr := <-ch_data:
 			lw.Info("storing temporary data")

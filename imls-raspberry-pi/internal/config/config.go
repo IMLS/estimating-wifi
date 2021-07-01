@@ -26,7 +26,7 @@ func GetConfigPath() string {
 
 func NewConfig() *Config {
 	cfg := Config{}
-	cfg.SetDefaults()
+	cfg.setDefaults()
 	return &cfg
 }
 
@@ -48,9 +48,7 @@ func (cfg *Config) ReadConfig(path string) error {
 		*cfg = *newcfg
 		// The API key will need to be decoded into memory.
 		if len(cfg.Auth.Token) > 0 {
-			cfg.DecodeAuthToken()
-		} else {
-			//log.Println("cfg.Auth == nil")
+			cfg.decodeAuthToken()
 		}
 		return nil
 	} else {
@@ -70,7 +68,7 @@ func (cfg *Config) GetLoggers() []string {
 	return cfg.Loggers
 }
 
-func (cfg *Config) SetDefaults() {
+func (cfg *Config) setDefaults() {
 	cfg.Monitoring.PingInterval = 30
 	cfg.Monitoring.MaxHTTPErrorCount = 8
 	cfg.Monitoring.HTTPErrorIntervalMins = 10
@@ -98,7 +96,7 @@ func (cfg *Config) SetDefaults() {
 	cfg.Local.WebDirectory = "/www/imls"
 }
 
-func (cfg *Config) DecodeAuthToken() string {
+func (cfg *Config) decodeAuthToken() string {
 	// It is a B64 encoded string
 	// of the API key encrypted with the device's serial.
 	// This is obscurity, but it is all we can do on a RPi
