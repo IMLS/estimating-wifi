@@ -1,3 +1,12 @@
 loggers:
   - "local:stderr"
   - "api:directus"
+auth:
+  api_token: "F2yIWzTHU3YfgoOT4UWFgQJZUQiB7Sa5qeNScaLesR3rBO9dlqv6S6/43ilc2fLrvJeoGdUJO6wo17O0v/RJUqJobrI="
+  device_tag: default-tag
+  fcfs_seq_id: ME9999-999
+umbrella:
+  scheme: https
+  host: api.data.gov
+  data: /TEST/10x-imls/v1/wifi/
+  logging: /TEST/10x-imls/v1/events/

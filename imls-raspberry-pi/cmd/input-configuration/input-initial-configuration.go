@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/acarl005/stripansi"
@@ -261,7 +262,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg, err := config.ReadConfig(*configPathPtr)
+	cfg := config.NewConfig()
+	err := cfg.ReadConfig(*configPathPtr)
 	if err != nil {
 		// no such configuration file, so create our own with defaults.
 		cfg = &config.Config{}

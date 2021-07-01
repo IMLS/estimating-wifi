@@ -70,10 +70,6 @@ func (cfg *Config) GetLoggers() []string {
 	return cfg.Loggers
 }
 
-func (cfg *Config) GetLoggingUri() string {
-	return fmt.Sprintf("%v://%v/%v", cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
-}
-
 func (cfg *Config) SetDefaults() {
 	cfg.Monitoring.PingInterval = 30
 	cfg.Monitoring.MaxHTTPErrorCount = 8

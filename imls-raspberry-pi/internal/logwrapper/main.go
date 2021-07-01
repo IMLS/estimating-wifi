@@ -69,6 +69,7 @@ func NewLogger(cfg *config.Config) (sl *StandardLogger) {
 	return sl
 }
 
+// For unit testing only
 func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
 	return newLogger(cfg)
 }
