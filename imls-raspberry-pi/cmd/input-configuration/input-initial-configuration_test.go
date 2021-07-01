@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"strings"
@@ -12,6 +13,21 @@ import (
 type test struct {
 	have string
 	want string
+}
+
+func TestYesOrNo(t *testing.T) {
+	input := bytes.NewBufferString("no")
+	if readYesOrNo(input) {
+		t.Errorf("did not accept 'no'")
+	}
+	input = bytes.NewBufferString("Y")
+	if !readYesOrNo(input) {
+		t.Errorf("did not accept 'Y'")
+	}
+	input = bytes.NewBufferString("nah\nn")
+	if readYesOrNo(input) {
+		t.Errorf("accepted 'nah'")
+	}
 }
 
 func TestDecode(t *testing.T) {
