@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -100,7 +99,6 @@ func keepalive(ka *tlp.Keepalive, cfg *config.Config) {
 }
 
 func handleFlags() *config.Config {
-	logLvlPtr := flag.String("log-level", "ERROR", "Set log level (DEBUG, INFO, WARN).")
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
 	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
@@ -111,17 +109,6 @@ func handleFlags() *config.Config {
 	if *versionPtr {
 		fmt.Println(version.GetVersion())
 		os.Exit(0)
-	}
-
-	switch strings.ToLower(*logLvlPtr) {
-	case "debug":
-		lw.SetLogLevel(logwrapper.DEBUG)
-	case "info":
-		lw.SetLogLevel(logwrapper.INFO)
-	case "warn":
-		lw.SetLogLevel(logwrapper.WARN)
-	default:
-		lw.SetLogLevel(logwrapper.ERROR)
 	}
 
 	// Make sure a config is passed.

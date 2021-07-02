@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -32,12 +33,18 @@ var once sync.Once
 
 const LOGDIR = "/var/log/session-counter"
 
-var logLevel int = DEBUG
+var logLevel int = ERROR
 
-func (l *StandardLogger) SetLogLevel(lvl int) {
-	// Don't allow broken logging levels.
-	if lvl > DEBUG && lvl <= FATAL {
-		logLevel = lvl
+func (l *StandardLogger) SetLogLevel(level string) {
+	switch strings.ToLower(level) {
+	case "debug":
+                logLevel = DEBUG
+	case "info":
+                logLevel = INFO
+	case "warn":
+		logLevel = WARN
+	default:
+		logLevel = ERROR
 	}
 }
 
@@ -85,6 +92,7 @@ func newLogger(cfg *config.Config) *StandardLogger {
 	} else {
 		loggers = cfg.GetLoggers()
 	}
+
 	writers := make([]io.Writer, 0)
 
 	for _, l := range loggers {
@@ -120,6 +128,9 @@ func newLogger(cfg *config.Config) *StandardLogger {
 	// If we have a valid config file, and lw is not already configured...
 	standardLogger = &StandardLogger{baseLogger}
 	standardLogger.Formatter = &logrus.JSONFormatter{}
+
+	level := cfg.GetLogLevel()
+	standardLogger.SetLogLevel(level)
 
 	return standardLogger
 }

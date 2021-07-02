@@ -1,3 +1,4 @@
+log_level: DEBUG
 loggers:
   - "local:stderr"
   - "api:directus"
