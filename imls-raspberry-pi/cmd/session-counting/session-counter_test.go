@@ -368,7 +368,7 @@ func TestManyTLPCycles(t *testing.T) {
 	go RunFakeWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
 
 	go tlp.AlgorithmTwo(nil, cfg, ch_macs, ch_macs_counted, chs_reset[1], KC[2])
-	go tlp.PrepareDataForStorage(nil, cfg, ch_macs_counted, ch_data_for_report, KC[3])
+	go tlp.PrepareEphemeralWifi(nil, cfg, ch_macs_counted, ch_data_for_report, KC[3])
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
 	go PingAfterNHours(nil, cfg, WRITESUMMARYNHOURS, ch_nsec2, chs_reset[0], KC[4])

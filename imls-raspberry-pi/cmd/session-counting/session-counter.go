@@ -42,7 +42,7 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	go tlp.RunWireshark(ka, cfg, ch_nsec, ch_macs, NIL_KILL_CHANNEL)
 	// The reset will never be triggered in AlgoTwo unless we're rnuning in "sqlite" storage mode.
 	go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_macs_counted, chs_reset[1], NIL_KILL_CHANNEL)
-	go tlp.PrepareDataForStorage(ka, cfg, ch_macs_counted, ch_data_for_report, NIL_KILL_CHANNEL)
+	go tlp.PrepareEphemeralWifi(ka, cfg, ch_macs_counted, ch_data_for_report, NIL_KILL_CHANNEL)
 
 	// We need a multiplexer of sorts that will route data to the appropriate
 	// storage processes. The storage processes can then sit there waiting.
@@ -52,8 +52,8 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	// We need to think about how our state is managed; currently, it is burried
 	// in StoreToSqlite, but really, that temporary state is not unique to that
 	// backend. Perhaps the temporary state is a process that lives between
-	// PrepareDataForStorage and the storage procs?  (Sorry... proc == gofunc)
-	// Or, perhaps the state management moves back into PrepareDataForStorage?
+	// PrepareEphemeralWifi and the storage procs?  (Sorry... proc == gofunc)
+	// Or, perhaps the state management moves back into PrepareEphemeralWifi?
 	// Either way, the kind of state we need to reset is... well, it's threaded
 	// through the network. Anything that listens to, and takes action on, a Ping
 	// on the chs_reset[] lines, is something that we need to think about.

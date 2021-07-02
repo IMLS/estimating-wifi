@@ -10,16 +10,16 @@ import (
 )
 
 // Gets the raw data ready for posting.
-func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
+func PrepareEphemeralWifi(ka *Keepalive, cfg *config.Config,
 	in_hash <-chan map[string]int, out_arr chan<- []map[string]string, ch_kill <-chan Ping) {
 	lw := logwrapper.NewLogger(nil)
-	lw.Debug("Starting PrepareDataForStorage")
+	lw.Debug("Starting PrepareEphmeralWifi")
 
 	// If ch_kill is nill, we're live.
 	// If it is *not* nill, we're running under test/simulation conditions.
 	var ping, pong chan interface{} = nil, nil
 	if ch_kill == nil {
-		ping, pong = ka.Subscribe("PrepareDataForStorage", 30)
+		ping, pong = ka.Subscribe("PrepareEphmeralWifi", 30)
 	}
 
 	event_ndx := 0
@@ -27,9 +27,9 @@ func PrepareDataForStorage(ka *Keepalive, cfg *config.Config,
 	for {
 		select {
 		case <-ping:
-			pong <- "PrepareDataForStorage"
+			pong <- "PrepareEphmeralWifi"
 		case <-ch_kill:
-			lw.Debug("exiting PrepareDataForStorage")
+			lw.Debug("exiting PrepareEphmeralWifi")
 			return
 
 		// Block waiting to read the incoming hash
