@@ -78,14 +78,14 @@ func (cfg *Config) setDefaults() {
 	cfg.Monitoring.PingInterval = 30
 	cfg.Monitoring.MaxHTTPErrorCount = 8
 	cfg.Monitoring.HTTPErrorIntervalMins = 10
-	cfg.Monitoring.UniquenessWindow = 120
+	cfg.Monitoring.UniquenessWindow = 24 * 60
 	cfg.Monitoring.MinimumMinutes = 30
 	cfg.Monitoring.MaximumMinutes = 600
 
 	cfg.Umbrella.Scheme = "https"
 	cfg.Umbrella.Host = "api.data.gov"
-	cfg.Umbrella.Data = "/TEST/10x-imls/v1/wifi/"
-	cfg.Umbrella.Logging = "/TEST/10x-imls/v1/events/"
+	cfg.Umbrella.Data = "/TEST/10x-imls/v2/durations/"
+	cfg.Umbrella.Logging = "/TEST/10x-imls/v2/events/"
 
 	cfg.Wireshark.Duration = 45
 	cfg.Wireshark.Path = "/usr/bin/tshark"
