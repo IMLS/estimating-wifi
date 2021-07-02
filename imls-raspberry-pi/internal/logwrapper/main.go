@@ -3,7 +3,6 @@ package logwrapper
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -33,7 +32,7 @@ var once sync.Once
 
 const LOGDIR = "/var/log/session-counter"
 
-var logLevel int = ERROR
+var logLevel int = DEBUG
 
 func (l *StandardLogger) SetLogLevel(lvl int) {
 	// Don't allow broken logging levels.
@@ -84,10 +83,8 @@ func newLogger(cfg *config.Config) *StandardLogger {
 	if cfg == nil {
 		loggers = append(loggers, "local:stderr")
 	} else {
-		log.Println("cfg not nil")
 		loggers = cfg.GetLoggers()
 	}
-	log.Println("loggers", loggers)
 	writers := make([]io.Writer, 0)
 
 	for _, l := range loggers {
