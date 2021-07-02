@@ -1,10 +1,7 @@
-.PHONY: all clean test
-
-test:
-	go test *.go
+.PHONY: all
 
 build:
 	rm -f log-event
 	go build log-event.go
-	
-all: test build
+
+all: build
