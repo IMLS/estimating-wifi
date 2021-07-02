@@ -83,10 +83,12 @@ func newLogger(cfg *config.Config) *StandardLogger {
 	// If we have a config file, grab the loggers defined there.
 	// Otherwise, use stderr.
 	loggers := make([]string, 0)
+	level := "ERROR"
 	if cfg == nil {
 		loggers = append(loggers, "local:stderr")
 	} else {
 		loggers = cfg.GetLoggers()
+		level = cfg.GetLogLevel()
 	}
 
 	writers := make([]io.Writer, 0)
@@ -124,8 +126,6 @@ func newLogger(cfg *config.Config) *StandardLogger {
 	// If we have a valid config file, and lw is not already configured...
 	standardLogger = &StandardLogger{baseLogger}
 	standardLogger.Formatter = &logrus.JSONFormatter{}
-
-	level := cfg.GetLogLevel()
 	standardLogger.SetLogLevel(level)
 
 	return standardLogger

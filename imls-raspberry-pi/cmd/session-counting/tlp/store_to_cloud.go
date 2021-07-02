@@ -7,16 +7,17 @@ import (
 	"time"
 
 	"gsa.gov/18f/config"
-	"gsa.gov/18f/session-counter/api"
+	"gsa.gov/18f/http"
 )
 
 func report(service string, cfg *config.Config, session_id int, arr []map[string]string) (http_error_count int, err error) {
 	http_error_count = 0
 
-	err = api.StoreDevicesCount(cfg, session_id, arr)
-	if err != nil {
+	uri := http.FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
+	_, err2 := http.PostJSON(cfg, uri, arr)
+	if err2 != nil {
 		log.Println("report2:", service, "results POST failure")
-		log.Println(err)
+		log.Println(err2)
 		http_error_count = http_error_count + 1
 	}
 
