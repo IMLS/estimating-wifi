@@ -48,10 +48,6 @@ func (l *StandardLogger) SetLogLevel(level string) {
 	}
 }
 
-func (l *StandardLogger) GetLogLevel() int {
-	return logLevel
-}
-
 func (l *StandardLogger) GetLogLevelName() string {
 	switch logLevel {
 	case 0:
