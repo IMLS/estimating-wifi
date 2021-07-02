@@ -26,31 +26,10 @@ var magic_index int = 0
 
 var slash_warned bool = false
 
-var Verbose = false
-
-func SetVerbose(v bool) {
-	Verbose = v
-}
-
 func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, error) {
 
-	// THIS IS HACKY.
-	// We now have an SQLite-based local mode. We still want a magic counter, but we do
-	// not want to post to the API.
-	// No doubt, I will regret this later... but, here we go...
-
-	// If we are running in local storage mode, update the event counter,
-	// and bail out.
-	if cfg.StorageMode == "sqlite" {
-		magic_index += 1
-		return magic_index, nil
-	}
-	// The implicit ELSE:
-	// Do all the other things.
-
 	tok := cfg.Auth.Token
-
-	log.Println("postjson: storing JSON to", uri)
+	log.Println("postjson: storing JSON [%v] to %s", data, uri)
 
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slash_warned && !matched {
@@ -105,21 +84,15 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, er
 		// FIXME This makes a mess if there is no token in the `tok` structure...
 		// APITOKEN&APITOKEN{APITOKENPAPITOKENOAPITOKENSAPITOKENTAPITOKEN A
 		reqLogString := strings.Replace(fmt.Sprint(req), tok, "APITOKEN", -1)
-		if Verbose {
-			log.Printf("postjson:req:\n%v\n", reqLogString)
-		}
+		log.Printf("postjson:req:\n%v\n", reqLogString)
 
 		// MAKE THE REQUEST
 		resp, err := client.Do(req)
 		// Show the response from the server. Helpful in debugging.
-		if Verbose {
-			log.Printf("postjson:resp: %v\n", resp)
-		}
+		log.Printf("postjson:resp: %v\n", resp)
 		// If there was an error in the post, log it, and exit the function.
 		if err != nil {
-			if Verbose {
-				log.Printf("postjson:err resp: %v\n", resp)
-			}
+			log.Printf("postjson:err resp: %v\n", resp)
 			return -1, fmt.Errorf("postjson: failure in client attempt to POST to %v", uri)
 		} else {
 			// If we get things back, the errors will be encoded within the JSON.
@@ -136,9 +109,7 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, er
 					// If we can't parse the response, return a valid index but also include an error.
 					return magic_index, fmt.Errorf("postjson: could not unmarshal response body")
 				}
-				if Verbose {
-					log.Println("postjson: resp.Body", string(body))
-				}
+				log.Println("postjson: resp.Body", string(body))
 			}
 		}
 		// Close the body at function exit.
