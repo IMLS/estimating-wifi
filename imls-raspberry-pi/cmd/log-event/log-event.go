@@ -29,12 +29,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg := config.NewConfig()
-	err := cfg.ReadConfig(*configPathPtr)
+	cfg, err := config.NewConfigFromPath(*configPathPtr)
 	if err != nil {
 		log.Fatal("log-event: error loading config.")
 	}
 
-	lw := logwrapper.NewLogger(nil)
+	lw := logwrapper.NewLogger(cfg)
 	lw.Info(strings.Join(rest, " "));
 }

@@ -12,16 +12,14 @@ func TestSimple(t *testing.T) {
 }
 
 func TestFileLogger(t *testing.T) {
-	cfg := config.NewConfig()
-	cfg.ReadConfig("./file-config.yaml")
+	cfg, _ := config.NewConfigFromPath("./file-config.yaml")
 	lw := UnsafeNewLogger(cfg)
 	lw.SetLogLevel(INFO)
 	lw.Info("Hi")
 }
 
 func TestApiLogger(t *testing.T) {
-	cfg := config.NewConfig()
-	cfg.ReadConfig("./api-config.yaml")
+	cfg, _ := config.NewConfigFromPath("./api-config.yaml")
 	lw := UnsafeNewLogger(cfg)
 	lw.SetLogLevel(INFO)
 	lw.Info("Hi")

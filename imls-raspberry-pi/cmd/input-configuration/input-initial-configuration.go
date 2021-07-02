@@ -262,8 +262,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg := config.NewConfig()
-	err := cfg.ReadConfig(*configPathPtr)
+	cfg, err := config.NewConfigFromPath(*configPathPtr)
 	if err != nil {
 		cfg = config.NewConfig()
 	}

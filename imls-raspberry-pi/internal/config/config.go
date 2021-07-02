@@ -12,14 +12,17 @@ import (
 	"gsa.gov/18f/cryptopasta"
 )
 
-// This might not exist.
-// A wrapper script should require a valid path.
-var configPath = "config.yaml"
-
 func NewConfig() *Config {
 	cfg := Config{}
 	cfg.setDefaults()
 	return &cfg
+}
+
+func NewConfigFromPath(path string) (*Config, error) {
+	cfg := Config{}
+	cfg.setDefaults()
+	err := cfg.ReadConfig(path)
+	return &cfg, err
 }
 
 func (cfg *Config) ReadConfig(path string) error {

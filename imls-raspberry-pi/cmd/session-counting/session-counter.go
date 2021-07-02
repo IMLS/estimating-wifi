@@ -135,8 +135,7 @@ func handleFlags() *config.Config {
 		lw.Fatal("Cannot find config file. Exiting.")
 	}
 
-	cfg := config.NewConfig()
-	err := cfg.ReadConfig(*configPathPtr)
+	cfg, err := config.NewConfigFromPath(*configPathPtr)
 	if err != nil {
 		lw.Fatal("session-counter: error loading config.")
 	}
