@@ -43,7 +43,7 @@ func (cfg *Config) ReadConfig(path string) error {
 		*cfg = *newcfg
 		// The API key will need to be decoded into memory.
 		if len(cfg.Auth.Token) > 0 {
-			cfg.decodeAuthToken()
+			cfg.Auth.Token = cfg.decodeAuthToken()
 		}
 		return nil
 	} else {
