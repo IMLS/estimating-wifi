@@ -1,10 +1,14 @@
-storagemode: sqlite
+storagemodes:
+  - "local:sqlite"
+  - "imls:v2"
+logmodes:
+  - "local:file"
+  - "imls:v2"
 auth:
   api_token: CESTNESPASUNTOKEN
   device_tag: default-tag
   fcfs_seq_id: ME9999-999
 monitoring:
-  pinginterval: 30
   max_http_error_count: 8
   http_error_interval_mins: 10
   uniqueness_window: 120

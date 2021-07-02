@@ -54,7 +54,7 @@ func Test_thrash_db(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
 
-	cfg, _ := config.ReadConfig(filepath.Join(path, "..", "test", "config.yaml"))
+	cfg, _ := config.NewConfigFromPath(filepath.Join(path, "..", "test", "config.yaml"))
 
 	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {

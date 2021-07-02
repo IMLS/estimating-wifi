@@ -247,9 +247,7 @@ func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, n_hours int, ch_tick
 				ch_reset <- tlp.Ping{}
 			}
 		case <-ch_kill:
-			if config.Verbose {
-				log.Println("Exiting PingAfterNHours")
-			}
+			log.Println("Exiting PingAfterNHours")
 			return
 		}
 	}
@@ -294,11 +292,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out
 			out <- macs
 
 		case <-ch_kill:
-			if config.Verbose {
-				if config.Verbose {
-					log.Println("Exiting RunFakeWireshark")
-				}
-			}
+			log.Println("Exiting RunFakeWireshark")
 			return
 		}
 	}
@@ -319,16 +313,15 @@ func TestManyTLPCycles(t *testing.T) {
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
 
-	cfg, _ := config.ReadConfig(filepath.Join(path, "test", "config.yaml"))
+	configPath := filepath.Join(path, "test", "config.yaml")
+	cfg, _ := config.NewConfigFromPath(configPath)
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
 
-	cfg.SessionId = config.CreateSessionId()
+	cfg.NewSessionId()
 	log.Println(cfg)
-
-	config.Verbose = true
 
 	// Create channels for process network
 	ch_sec := make(chan bool)

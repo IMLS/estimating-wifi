@@ -2,9 +2,11 @@ package logwrapper
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -29,37 +31,102 @@ type StandardLogger struct {
 var standardLogger *StandardLogger = nil
 var once sync.Once
 
+const LOGDIR = "/var/log/session-counter"
+
 var logLevel int = ERROR
 
-func SetLogLevel(lvl int) {
-	// Don't allow broken logging levels.
-	if lvl > DEBUG && lvl <= FATAL {
-		logLevel = lvl
+func (l *StandardLogger) SetLogLevel(level string) {
+	switch strings.ToLower(level) {
+	case "debug":
+                logLevel = DEBUG
+	case "info":
+                logLevel = INFO
+	case "warn":
+		logLevel = WARN
+	default:
+		logLevel = ERROR
 	}
 }
 
-// Convoluted for use within libraries...
-func NewLogger(cfg *config.Config) *StandardLogger {
+func (l *StandardLogger) GetLogLevelName() string {
+	switch logLevel {
+	case 0:
+		return "DEBUG"
+	case 1:
+		return "INFO"
+	case 2:
+		return "WARN"
+	case 3:
+		return "ERROR"
+	case 4:
+		return "FAIL"
+	}
+	return "UNKNOWN"
+}
+
+func NewLogger(cfg *config.Config) (sl *StandardLogger) {
 	once.Do(func() {
-		var baseLogger = logrus.New()
+		sl = newLogger(cfg)
+	})
+	return sl
+}
 
-		// If we have a config object...
-		if cfg != nil {
-			// Set the output to a file if we have a config file to guide us.
+// For unit testing only
+func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
+	return newLogger(cfg)
+}
 
-			iow, err := os.OpenFile(cfg.Local.Logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+// Convoluted for use within libraries...
+func newLogger(cfg *config.Config) *StandardLogger {
+	var baseLogger = logrus.New()
+
+	// If we have a config file, grab the loggers defined there.
+	// Otherwise, use stderr.
+	loggers := make([]string, 0)
+	level := "ERROR"
+	if cfg == nil {
+		loggers = append(loggers, "local:stderr")
+	} else {
+		loggers = cfg.GetLoggers()
+		level = cfg.GetLogLevel()
+	}
+
+	writers := make([]io.Writer, 0)
+
+	for _, l := range loggers {
+		switch l {
+		case "local:stderr":
+			writers = append(writers, os.Stderr)
+		case "local:file":
+			os.Mkdir(LOGDIR, 0755)
+			filename := filepath.Join(LOGDIR, "log.json")
+			iow, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 			if err != nil {
-				fmt.Printf("could not open logfile %v for wriiting\n", cfg.Local.Logfile)
+				fmt.Printf("could not open logfile %v for writing\n", filename)
 				os.Exit(-1)
 			}
-			baseLogger.SetOutput(iow)
+			writers = append(writers, iow)
+		case "local:tmp":
+			filename := filepath.Join("/tmp", "log.json")
+			iow, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+			if err != nil {
+				fmt.Printf("could not open logfile %v for writing\n", filename)
+				os.Exit(-1)
+			}
+			writers = append(writers, iow)
+		case "api:directus":
+			api := NewApiLogger(cfg)
+			writers = append(writers, api)
 		}
+	}
 
-		// If we have a valid config file, and lw is not already configured...
-		standardLogger = &StandardLogger{baseLogger}
-		standardLogger.Formatter = &logrus.JSONFormatter{}
+	mw := io.MultiWriter(writers...)
+	baseLogger.SetOutput(mw)
 
-	})
+	// If we have a valid config file, and lw is not already configured...
+	standardLogger = &StandardLogger{baseLogger}
+	standardLogger.Formatter = &logrus.JSONFormatter{}
+	standardLogger.SetLogLevel(level)
 
 	return standardLogger
 }
