@@ -16,14 +16,6 @@ import (
 // A wrapper script should require a valid path.
 var configPath = "config.yaml"
 
-func SetConfigPath(path string) {
-	configPath = path
-}
-
-func GetConfigPath() string {
-	return configPath
-}
-
 func NewConfig() *Config {
 	cfg := Config{}
 	cfg.setDefaults()

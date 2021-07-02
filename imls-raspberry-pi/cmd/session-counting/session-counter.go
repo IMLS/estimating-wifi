@@ -133,8 +133,6 @@ func handleFlags() *config.Config {
 	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
 		lw.Info("Looked for config at: %v", *configPathPtr)
 		lw.Fatal("Cannot find config file. Exiting.")
-	} else {
-		config.SetConfigPath(*configPathPtr)
 	}
 
 	cfg := config.NewConfig()

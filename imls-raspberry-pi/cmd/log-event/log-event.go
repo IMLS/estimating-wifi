@@ -27,8 +27,6 @@ func main() {
 	if *configPathPtr == "" {
 		log.Println("The flag -config MUST be provided.")
 		os.Exit(1)
-	} else {
-		config.SetConfigPath(*configPathPtr)
 	}
 
 	cfg := config.NewConfig()
