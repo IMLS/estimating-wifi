@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 	"time"
 
 	"gsa.gov/18f/config"
@@ -29,8 +28,6 @@ var slash_warned bool = false
 func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, error) {
 
 	tok := cfg.Auth.Token
-	log.Println("postjson: storing JSON [%v] to %s", data, uri)
-
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slash_warned && !matched {
 		slash_warned = true
@@ -80,36 +77,29 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, er
 		req.Header.Set("Content-type", "application/json")
 		req.Header.Set("X-Api-Key", tok)
 
-		// Clean up the log string... no tokens in the log
-		// FIXME This makes a mess if there is no token in the `tok` structure...
-		// APITOKEN&APITOKEN{APITOKENPAPITOKENOAPITOKENSAPITOKENTAPITOKEN A
-		reqLogString := strings.Replace(fmt.Sprint(req), tok, "APITOKEN", -1)
-		log.Printf("postjson:req:\n%v\n", reqLogString)
-
 		// MAKE THE REQUEST
 		resp, err := client.Do(req)
-		// Show the response from the server. Helpful in debugging.
-		log.Printf("postjson:resp: %v\n", resp)
 		// If there was an error in the post, log it, and exit the function.
 		if err != nil {
-			log.Printf("postjson:err resp: %v\n", resp)
-			return -1, fmt.Errorf("postjson: failure in client attempt to POST to %v", uri)
+			message := fmt.Sprintf("postjson: failure in client attempt to POST to %v", uri)
+			log.Printf(message)
+			return -1, fmt.Errorf(message)
 		} else {
 			// If we get things back, the errors will be encoded within the JSON.
 			if resp.StatusCode < 200 || resp.StatusCode > 299 {
-				log.Printf("postjson: bad status on POST uri: %v\n", uri)
-				log.Printf("postjson: bad status on POST response: [ %v ]\n", resp.Status)
-				return magic_index, fmt.Errorf("postjson: bad status on POST response: [ %v ]", resp.Status)
+				message := fmt.Sprintf("PostJSON: bad status from POST to %v [%v]\n", uri, resp.Status)
+				log.Printf(message)
+				return magic_index, fmt.Errorf(message)
 			} else {
 				// Parse the response. Everything comes from ReVal in our current formulation.
 				var dat RevalResponse
 				body, _ := ioutil.ReadAll(resp.Body)
 				err := json.Unmarshal(body, &dat)
 				if err != nil {
-					// If we can't parse the response, return a valid index but also include an error.
-					return magic_index, fmt.Errorf("postjson: could not unmarshal response body")
+					message := fmt.Sprintf("PostJSON: could not unmarshal response body")
+					log.Printf(message)
+					return magic_index, fmt.Errorf(message)
 				}
-				log.Println("postjson: resp.Body", string(body))
 			}
 		}
 		// Close the body at function exit.
