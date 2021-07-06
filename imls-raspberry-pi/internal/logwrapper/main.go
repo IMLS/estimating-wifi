@@ -3,6 +3,7 @@ package logwrapper
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -25,7 +26,7 @@ type Event struct {
 
 // StandardLogger enforces specific log message formats
 type StandardLogger struct {
-	*logrus.Logger
+	logger *logrus.Logger
 }
 
 var standardLogger *StandardLogger = nil
@@ -68,18 +69,33 @@ func NewLogger(cfg *config.Config) (sl *StandardLogger) {
 	once.Do(func() {
 		sl = newLogger(cfg)
 	})
+
+	// FIXME: This comes up... we need to investigate this.
+	// It came up in testing, where it is hard to debug, because STDERR/STDOUT
+	// get clobbered...
+	// What happens if we still see nil?
+	if sl == nil {
+		sl = UnsafeNewLogger(cfg)
+	}
 	return sl
 }
 
 // For unit testing only
 func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
-	return newLogger(cfg)
+	if sl != nil {
+		return sl
+	} else {
+		sl = newLogger(cfg)
+	}
+	return sl
 }
 
 // Convoluted for use within libraries...
 func newLogger(cfg *config.Config) *StandardLogger {
 	var baseLogger = logrus.New()
-
+	if baseLogger == nil {
+		log.Println("baseLogger is nil")
+	}
 	// If we have a config file, grab the loggers defined there.
 	// Otherwise, use stderr.
 	loggers := make([]string, 0)
@@ -91,12 +107,17 @@ func newLogger(cfg *config.Config) *StandardLogger {
 		level = cfg.GetLogLevel()
 	}
 
+	// log.Println("loggers", loggers)
 	writers := make([]io.Writer, 0)
 
 	for _, l := range loggers {
 		switch l {
 		case "local:stderr":
 			writers = append(writers, os.Stderr)
+			logLevel = DEBUG
+		case "local:stdout":
+			writers = append(writers, os.Stdout)
+			logLevel = DEBUG
 		case "local:file":
 			os.Mkdir(LOGDIR, 0755)
 			filename := filepath.Join(LOGDIR, "log.json")
@@ -125,7 +146,7 @@ func newLogger(cfg *config.Config) *StandardLogger {
 
 	// If we have a valid config file, and lw is not already configured...
 	standardLogger = &StandardLogger{baseLogger}
-	standardLogger.Formatter = &logrus.JSONFormatter{}
+	standardLogger.logger.Formatter = &logrus.JSONFormatter{}
 	standardLogger.SetLogLevel(level)
 
 	return standardLogger
@@ -143,7 +164,7 @@ const (
 // THe error level recorded here will impact what happens at runtime.
 // For example, a FATAL message type will exit.
 var (
-	debugMsg  = Event{0, INFO, "%s"}
+	debugMsg  = Event{0, DEBUG, "%s"}
 	infoMsg   = Event{1, INFO, "%s"}
 	warnMsg   = Event{2, WARN, "%s"}
 	errorMsg  = Event{3, ERROR, "%s"}
@@ -156,25 +177,33 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 	fields := logrus.Fields{
 		"file": loc,
 	}
+	if l == nil {
+		log.Println("logger `l` not initialized.")
+		log.Println("NewLogger() does not work in stateless contexts.")
+		log.Println("You may be looking for UnsafeNewLogger().")
+		log.Println("Creating a new (default) logger for you...")
+		l = newLogger(nil)
+	}
 	switch e.level {
 	case DEBUG:
-		if logLevel <= DEBUG {
-			l.WithFields(fields).Debug(fmt.Sprintf(e.message, args...))
+		if logLevel >= DEBUG {
+			l.logger.WithFields(fields).Debugf(e.message, args...)
 		}
 	case INFO:
-		if logLevel <= INFO {
-			l.WithFields(fields).Info(fmt.Sprintf(e.message, args...))
+		if logLevel >= INFO {
+			log.Println(e)
+			l.logger.WithFields(fields).Infof(e.message, args...)
 		}
 	case WARN:
-		if logLevel <= WARN {
-			l.WithFields(fields).Warn(fmt.Sprintf(e.message, args...))
+		if logLevel >= WARN {
+			l.logger.WithFields(fields).Warnf(e.message, args...)
 		}
 	case ERROR:
 		// Always log ERROR level log events.
-		l.WithFields(fields).Error(fmt.Sprintf(e.message, args...))
+		l.logger.WithFields(fields).Errorf(e.message, args...)
 	case FATAL:
 		// Always log FATAL level log events.
-		l.WithFields(fields).Fatal(fmt.Sprintf(e.message, args...))
+		l.logger.WithFields(fields).Fatalf(e.message, args...)
 		// We're leaving, on a jet plane...
 		os.Exit(-1)
 	}
@@ -183,6 +212,9 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 
 func (l *StandardLogger) Debug(msg string, args ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
+	if l == nil {
+		log.Println("nil here", msg)
+	}
 	l.Base(debugMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
 }
 

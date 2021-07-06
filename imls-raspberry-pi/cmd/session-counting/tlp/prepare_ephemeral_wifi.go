@@ -9,17 +9,19 @@ import (
 	"gsa.gov/18f/logwrapper"
 )
 
-// Gets the raw data ready for posting.
-func PrepareEphemeralWifi(ka *Keepalive, cfg *config.Config,
-	in_hash <-chan map[string]int, out_arr chan<- []map[string]string, ch_kill <-chan Ping) {
+// Converts raw data to a map[string]string
+// This makexs it ready for storage locally (SQLite) or
+// via an API (where everything becomes text anyway).
+func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
+	in_hash <-chan map[string]int, out_arr chan<- []map[string]string) {
 	lw := logwrapper.NewLogger(nil)
-	lw.Debug("Starting PrepareEphmeralWifi")
-
-	// If ch_kill is nill, we're live.
-	// If it is *not* nill, we're running under test/simulation conditions.
+	lw.Debug("Starting PrepEphemeralWifi")
 	var ping, pong chan interface{} = nil, nil
-	if ch_kill == nil {
-		ping, pong = ka.Subscribe("PrepareEphmeralWifi", 30)
+	var ch_kill chan interface{} = nil
+	if kb != nil {
+		ch_kill = kb.Subscribe()
+	} else {
+		ping, pong = ka.Subscribe("PrepEphemeralWifi", 30)
 	}
 
 	event_ndx := 0
@@ -27,14 +29,13 @@ func PrepareEphemeralWifi(ka *Keepalive, cfg *config.Config,
 	for {
 		select {
 		case <-ping:
-			pong <- "PrepareEphmeralWifi"
+			pong <- "PrepEphemeralWifi"
 		case <-ch_kill:
-			lw.Debug("exiting PrepareEphmeralWifi")
+			lw.Debug("exiting PrepEphemeralWifi")
 			return
 
 		// Block waiting to read the incoming hash
 		case h := <-in_hash:
-
 			// Remove all the UIDs that we saw more than 0 minutes ago
 			var remove []string
 			for k, v := range h {
@@ -45,10 +46,8 @@ func PrepareEphemeralWifi(ka *Keepalive, cfg *config.Config,
 			for _, r := range remove {
 				delete(h, r)
 			}
-
 			lw.Debug("event ndx: %v", event_ndx)
 			lw.Length("macs-to-store", remove)
-
 			// Now, bundle that as an array of hashmaps.
 			reportArr := make([]map[string]string, 0)
 			for anondevice := range h {

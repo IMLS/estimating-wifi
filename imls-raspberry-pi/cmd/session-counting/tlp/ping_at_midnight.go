@@ -6,21 +6,22 @@ import (
 	"gsa.gov/18f/logwrapper"
 )
 
-func PingAtMidnight(ka *Keepalive, cfg *config.Config, ch_reset chan<- Ping, ch_kill <-chan Ping) {
+func PingAtMidnight(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting PingAtMidnight")
-
-	// ch_kill will be nil in production
 	var ping, pong chan interface{} = nil, nil
-	if ch_kill == nil {
+	var ch_kill chan interface{} = nil
+	if kb != nil {
+		ch_kill = kb.Subscribe()
+	} else {
 		ping, pong = ka.Subscribe("PingAtMidnight", 30)
 	}
 
 	// Use the cron library to send out the pings.
-	// How to kill this in testing? Perhaps we don't...
+	// Publish a message on the reset broker.
 	c := cron.New()
 	_, err := c.AddFunc(cfg.Local.Crontab, func() {
-		ch_reset <- Ping{}
+		rb.Publish(Ping{})
 	})
 	if err != nil {
 		lw.Error("could not set up crontab entry")

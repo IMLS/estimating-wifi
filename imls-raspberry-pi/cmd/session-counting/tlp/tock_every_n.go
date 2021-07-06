@@ -5,12 +5,16 @@ import (
 	"gsa.gov/18f/logwrapper"
 )
 
-func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
+func TockEveryMinute(ka *Keepalive, kb *Broker, out chan<- bool) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryMinute")
-
-	ping, pong := ka.Subscribe("TockEveryMinute", 2)
-	// What is the best way to drive a 1-second tick?
+	var ping, pong chan interface{} = nil, nil
+	var ch_kill chan interface{} = nil
+	if kb != nil {
+		ch_kill = kb.Subscribe()
+	} else {
+		ping, pong = ka.Subscribe("TockEveryMinute", 5)
+	}
 
 	c := cron.New()
 	_, err := c.AddFunc("*/1 * * * *", func() {
@@ -45,15 +49,15 @@ func TockEveryMinute(ka *Keepalive, out chan<- bool, ch_kill <-chan Ping) {
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func TockEveryN(ka *Keepalive, n int, in <-chan bool, out chan<- bool, ch_kill <-chan Ping) {
+func TockEveryN(ka *Keepalive, kb *Broker, n int, in <-chan bool, out chan<- bool) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryN")
-	// We timeout one second beyond the number of ticks we're waiting for
-
-	// ch_kill will be nil in production
 	var ping, pong chan interface{} = nil, nil
-	if ch_kill == nil {
-		ping, pong = ka.Subscribe("tock", 2)
+	var ch_kill chan interface{} = nil
+	if kb != nil {
+		ch_kill = kb.Subscribe()
+	} else {
+		ping, pong = ka.Subscribe("TockEveryN", 5)
 	}
 
 	var counter int = 0
@@ -62,6 +66,7 @@ func TockEveryN(ka *Keepalive, n int, in <-chan bool, out chan<- bool, ch_kill <
 		case <-ping:
 			pong <- "tock"
 		case <-ch_kill:
+			lw.Debug("exiting TockEveryN")
 			return
 
 		case <-in:

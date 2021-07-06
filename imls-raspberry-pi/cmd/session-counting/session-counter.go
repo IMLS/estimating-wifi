@@ -10,6 +10,7 @@ import (
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/api"
+	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 	"gsa.gov/18f/version"
 )
@@ -23,67 +24,29 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []map[string]string)
+	ch_db := make(chan *model.TempDB)
 
-	// WARNING: If you get this length wrong, we have deadlock.
-	// That is, every one of these needs to be used/written to/read from.
-	const RESET_CHANS = 3
-	// The kill channel lets us poison the network for shutdown. Really only for testing.
-	var NIL_KILL_CHANNEL chan tlp.Ping = nil
-
-	var chs_reset [RESET_CHANS]chan tlp.Ping
-	for ndx := 0; ndx < RESET_CHANS; ndx++ {
-		chs_reset[ndx] = make(chan tlp.Ping)
-	}
+	// The reset broker signals midnight (for resetting the network/device)
+	resetbroker := tlp.NewBroker()
+	go resetbroker.Start()
+	// The kill broker lets us poison the network.
+	var killbroker *tlp.Broker = nil
 
 	// Run the process network.
 	// Driven by a 1s `tick` process.
 	// Thread the keepalive through the network
-	go tlp.TockEveryMinute(ka, ch_nsec, NIL_KILL_CHANNEL)
-	go tlp.RunWireshark(ka, cfg, ch_nsec, ch_macs, NIL_KILL_CHANNEL)
+	go tlp.TockEveryMinute(ka, killbroker, ch_nsec)
+	go tlp.RunWireshark(ka, cfg, killbroker, ch_nsec, ch_macs)
 	// The reset will never be triggered in AlgoTwo unless we're rnuning in "sqlite" storage mode.
-	go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_macs_counted, chs_reset[1], NIL_KILL_CHANNEL)
-	go tlp.PrepareEphemeralWifi(ka, cfg, ch_macs_counted, ch_data_for_report, NIL_KILL_CHANNEL)
+	go tlp.AlgorithmTwo(ka, cfg, killbroker, resetbroker, ch_macs, ch_macs_counted)
+	go tlp.PrepEphemeralWifi(ka, cfg, killbroker, ch_macs_counted, ch_data_for_report)
 
-	// We need a multiplexer of sorts that will route data to the appropriate
-	// storage processes. The storage processes can then sit there waiting.
-	// go tlp.Multiplexer(ch_data_for_report, ch_out_to_api, ch_out_to_sqlite)
-	go tlp.StoreToCloud(ka, cfg, ch_data_for_report, chs_reset[2], NIL_KILL_CHANNEL)
+	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
 
-	// We need to think about how our state is managed; currently, it is burried
-	// in StoreToSqlite, but really, that temporary state is not unique to that
-	// backend. Perhaps the temporary state is a process that lives between
-	// PrepareEphemeralWifi and the storage procs?  (Sorry... proc == gofunc)
-	// Or, perhaps the state management moves back into PrepareEphemeralWifi?
-	// Either way, the kind of state we need to reset is... well, it's threaded
-	// through the network. Anything that listens to, and takes action on, a Ping
-	// on the chs_reset[] lines, is something that we need to think about.
-
-	// As I write this... it might be that StoreToSqlite becomes the state manager.
-	// Pull out the (tiny) bit that actually writes data into its own process?
-
-	// Another thing... and I hate to mention this...
-	// should we consider moving from live storage of data to the cloud, and instead to a batch
-	// store every night. That way, we *always* store to Sqlite, and every night,
-	// we try and figure out what we have and have not submitted. This way,
-	// if there are network problems, we don't lose data. Instead, we keep track
-	// (locally) what sessions (days) have been transmitted, and which havent, and
-	// when we get through (say there's a network outage), we just send everything that hasn't
-	// been sent prior.
-
-	// Or, something to that effect. It might be a "next step" kinda thing. But,
-	// given that we have the infra in place to write wifi data to temporary SQLite
-	// dbs in the fs already... it's not actually that big a jump to write that data in
-	// a batch mode (vs. daily/live mode)...
-
-	// Writes a Ping{} to chs_reset[0]
-	// it would be more readable to have the output channel be named,
-	// and only have the Par outputs be an array. I cheated...
-	go tlp.PingAtMidnight(ka, cfg, chs_reset[0], NIL_KILL_CHANNEL)
+	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
 	// Listens for a ping to know when to reset internal state.
 	// That, too, should be abstracted out of the storage layer.
-	go tlp.StoreToSqlite(ka, cfg, ch_data_for_report, chs_reset[2], NIL_KILL_CHANNEL)
-	// Fan out the ping to multiple PROCs
-	go tlp.ParDelta(NIL_KILL_CHANNEL, chs_reset[0], chs_reset[1:]...)
+	//go tlp.StoreToSqlite(ka, cfg, resetbroker, killbroker, ch_data_for_report)
 
 }
 

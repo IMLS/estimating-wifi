@@ -16,32 +16,32 @@ import (
  * 5. WRONG Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *Keepalive, cfg *config.Config, in <-chan []string, out chan<- map[string]int, reset <-chan Ping, ch_kill <-chan Ping) {
+func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker, in <-chan []string, out chan<- map[string]int) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting AlgorithmTwo")
 
 	// This is our "tracking database"
 	umdb := model.NewUMDB(cfg)
 
-	// If we are running live, the kill channel is `nil`.
-	// When we are live, THEN init the ping/pong.
-	testing := true
-	if ch_kill == nil {
-		testing = false
-	}
-	var ping chan interface{} = nil
-	var pong chan interface{} = nil
-	if !testing {
+	// The reset broker manages comms for when we should
+	// reset our internal structures
+	ch_reset := rb.Subscribe()
+	var ping, pong chan interface{} = nil, nil
+	var ch_kill chan interface{} = nil
+	if kb != nil {
+		ch_kill = kb.Subscribe()
+	} else {
 		ping, pong = ka.Subscribe("AlgorithmTwo", 5)
 	}
+
 	for {
 		select {
+		case <-ping:
+			pong <- "AlgorithmTwo"
 		case <-ch_kill:
 			lw.Debug("exiting AlgorithmTwo")
 			return
-		case <-ping:
-			pong <- "AlgorithmTwo"
-		case <-reset:
+		case <-ch_reset:
 			// Tell our mapping "db" to wipe itself.
 			// This clears all counters, etc., and essentially
 			// resets the algorithm as if we had just launched the whole process.
