@@ -28,15 +28,15 @@ func storeSummary(cfg *config.Config, tdb *model.TempDB, c *analysis.Counter, du
 	}
 }
 
-func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB, ddb *model.TempDB) {
+func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
+	ddb := createDurationsTable(cfg)
 	events := []analysis.WifiEvent{}
 	err := wifidb.Ptr.Select(&events, fmt.Sprintf("SELECT * FROM %v", table))
 	if err != nil {
 		lw.Info("error in extracting all events: %v", table)
 		lw.Fatal(err.Error())
 	}
-
 	if len(events) > 0 {
 		lw.Length("events", events)
 		c, d := analysis.Summarize(cfg, events)
@@ -46,10 +46,11 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB, 
 	} else {
 		lw.Info("no `events` to summarize")
 	}
+	return ddb;
 }
 
 func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
-	ch_db <-chan *model.TempDB) {
+	ch_db <-chan *model.TempDB, ch_durations_db chan *model.TempDB) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting GenerateDurations")
 	var ping, pong chan interface{} = nil, nil
@@ -59,8 +60,6 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
 	} else {
 		ping, pong = ka.Subscribe("GenerateDurations", 30)
 	}
-
-	ddb := createDurationsTable(cfg)
 
 	for {
 		select {
@@ -73,7 +72,7 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
 		case wifidb := <-ch_db:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
-			processDataFromDay(cfg, "wifi", wifidb, ddb)
+			ch_durations_db <- processDataFromDay(cfg, "wifi", wifidb)
 		}
 	}
 }
