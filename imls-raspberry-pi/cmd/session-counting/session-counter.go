@@ -39,7 +39,7 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	go tlp.TockEveryMinute(ka, killbroker, ch_nsec)
 	go tlp.RunWireshark(ka, cfg, killbroker, ch_nsec, ch_macs)
 	// The reset will never be triggered in AlgoTwo unless we're rnuning in "sqlite" storage mode.
-	go tlp.AlgorithmTwo(ka, cfg, killbroker, resetbroker, ch_macs, ch_macs_counted)
+	go tlp.AlgorithmTwo(ka, cfg, resetbroker, killbroker, ch_macs, ch_macs_counted)
 	go tlp.PrepEphemeralWifi(ka, cfg, killbroker, ch_macs_counted, ch_data_for_report)
 
 	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)

@@ -85,6 +85,7 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 		lw.Fatal(err.Error())
 	}
 }
+
 func (tdb *TempDB) AddStructAsTable(table string, s interface{}) {
 	//lw := logwrapper.NewLogger(nil)
 	columns := make(map[string]string)

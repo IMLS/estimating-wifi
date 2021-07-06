@@ -184,16 +184,15 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 	}
 	switch e.level {
 	case DEBUG:
-		if DEBUG >= logLevel {
+		if logLevel >= DEBUG {
 			l.logger.WithFields(fields).Debugf(e.message, args...)
 		}
 	case INFO:
-		if INFO >= logLevel {
-			log.Println(e)
+		if logLevel >= INFO {
 			l.logger.WithFields(fields).Infof(e.message, args...)
 		}
 	case WARN:
-		if WARN >= logLevel {
+		if logLevel >= WARN {
 			l.logger.WithFields(fields).Warnf(e.message, args...)
 		}
 	case ERROR:
@@ -205,7 +204,6 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 		// We're leaving, on a jet plane...
 		os.Exit(-1)
 	}
-
 }
 
 func (l *StandardLogger) Debug(msg string, args ...interface{}) {
