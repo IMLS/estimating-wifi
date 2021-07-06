@@ -159,21 +159,8 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
 }
 
-// func assertNotEqual(t *testing.T, a interface{}, b interface{}, message string) {
-// 	if a != b {
-// 		return
-// 	}
-// 	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
-// }
-
-// func assertValueEqual(t *testing.T, a *model.UserMapping, b *model.UserMapping, message string) {
-// 	if (a.Id == b.Id) && (a.Mfg == b.Mfg) {
-// 		return
-// 	}
-// 	t.Fatal(message, "\n\texpected: ", &a, "\n\treceived: ", &b)
-// }
-
 func TestRawToUid(t *testing.T) {
+	log.Println("TestRawToUid")
 	cfg := new(config.Config)
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
@@ -200,7 +187,6 @@ func TestRawToUid(t *testing.T) {
 
 		ch_macs := make(chan []string)
 		ch_uniq := make(chan map[string]int)
-		ch_poison := make(chan tlp.Ping)
 		var u map[string]int = nil
 
 		wg.Add(1)
@@ -226,10 +212,11 @@ func TestRawToUid(t *testing.T) {
 				<-ch_uniq
 			}
 			u = <-ch_uniq
-			ch_poison <- tlp.Ping{}
+			// ch_poison <- tlp.Ping{}
+			killbroker.Publish(tlp.Ping{})
 			defer wg.Done()
 		}()
-		killbroker.Publish(tlp.Ping{})
+
 		wg.Wait()
 
 		// The last value we receive needs to have its time updated.
