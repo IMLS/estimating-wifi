@@ -68,17 +68,21 @@ func getFieldName(tag, key string, s interface{}) (fieldname string) {
 func storeSummary(cfg *config.Config, tdb *model.TempDB, c *analysis.Counter, durations map[int]*analysis.Duration) {
 	lw := logwrapper.NewLogger(nil)
 
-	values := make(map[string]interface{})
 	fields := tdb.GetFields("durations")
-	for _, duration := range durations {
+	// For each duration we want to store
+	for _, d := range durations {
+		values := make(map[string]interface{})
+		// For each field name in the DB
 		for _, field := range fields {
-			structFieldName := getFieldName(field, "db", analysis.Duration{})
-			r := reflect.ValueOf(duration)
+			// Get the struct field name.
+			structFieldName := getFieldName(field, "db", t)
+			// Reflect on the duration
+			r := reflect.ValueOf(d)
 			v := reflect.Indirect(r).FieldByName(structFieldName)
 			values[field] = v.String()
 		}
+		tdb.Insert("durations", values)
 	}
-	tdb.Insert("durations", values)
 }
 
 func processDataFromDay(cfg *config.Config, tdb *model.TempDB) {

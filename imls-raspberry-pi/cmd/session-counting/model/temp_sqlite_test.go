@@ -1,8 +1,13 @@
 package model
 
 import (
+	"log"
+	"reflect"
+	"strings"
 	"testing"
 	"time"
+
+	"gsa.gov/18f/analysis"
 )
 
 func TestDBCreate(t *testing.T) {
@@ -89,4 +94,68 @@ func TestCleanup(t *testing.T) {
 	tdb2.Close()
 	tdb1.Remove()
 	tdb2.Remove()
+}
+
+func getFieldName(tag, key string, s interface{}) (fieldname string) {
+	rt := reflect.TypeOf(s)
+	if rt.Kind() != reflect.Struct {
+		panic("bad type")
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		f := rt.Field(i)
+		v := strings.Split(f.Tag.Get(key), ",")[0]
+		if v == tag {
+			return f.Name
+		}
+	}
+	return ""
+}
+
+func TestReflection(t *testing.T) {
+	durations := make([]*analysis.Duration, 0)
+	d := &analysis.Duration{
+		PiSerial:  "12345",
+		SessionId: "asdf",
+		FCFSSeqId: "ME0000-000",
+		DeviceTag: "a-device-tag",
+		PatronId:  1,
+		MfgId:     1,
+		Start:     time.Now().Format(time.RFC3339),
+		End:       time.Now().Format(time.RFC3339),
+	}
+	log.Println("asmap", d.AsMap())
+	durations = append(durations, d)
+	log.Println("durations", durations)
+	tdb := NewSqliteDB("durations-test", "/tmp")
+	tdb.AddTable("durations", map[string]string{
+		"id":                 "INTEGER PRIMARY KEY AUTOINCREMENT",
+		"pi_serial":          "TEXT",
+		"fcfs_seq_id":        "TEXT",
+		"device_tag":         "TEXT",
+		"session_id":         "TEXT",
+		"manufacturer_index": "INTEGER",
+		"patron_index":       "INTEGER",
+		"start":              "DATE",
+		"end":                "DATE",
+	})
+	fields := tdb.GetFields("durations")
+	log.Println("fields", fields)
+	for _, d := range durations {
+		values := make(map[string]interface{})
+		// For each field name in the DB
+		for _, field := range fields {
+			// Get the struct field name.
+			fieldname := getFieldName(field, "db", analysis.Duration{})
+			if len(fieldname) > 0 {
+				// Reflect on the duration
+				r := reflect.ValueOf(d)
+				v := reflect.Indirect(r).FieldByName(fieldname)
+				log.Println("fieldname", fieldname, "value:", v)
+				values[field] = v.String()
+			}
+		}
+		tdb.Insert("durations", values)
+	}
+
+	tdb.DebugDump("durations")
 }

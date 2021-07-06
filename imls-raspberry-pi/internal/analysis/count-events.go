@@ -3,7 +3,9 @@ package analysis
 import (
 	"fmt"
 	"log"
+	"reflect"
 	"sort"
+	"strings"
 	"time"
 
 	"gsa.gov/18f/config"
@@ -38,15 +40,30 @@ func (a ByStart) Less(i, j int) bool {
 func (a ByStart) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type Duration struct {
-	Id        int    `db:"id"`
-	PiSerial  string `db:"pi_serial"`
-	SessionId string `db:"session_id"`
-	FCFSSeqId string `db:"fcfs_seq_id"`
-	DeviceTag string `db:"device_tag"`
-	PatronId  int    `db:"pid"`
-	MfgId     int    `db:"mfgid"`
-	Start     string `db:"start"`
-	End       string `db:"end"`
+	Id        int    `db:"id",sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
+	PiSerial  string `db:"pi_serial",sqlite:"TEXT"`
+	SessionId string `db:"session_id",sqlite:"TEXT"`
+	FCFSSeqId string `db:"fcfs_seq_id",sqlite:"TEXT"`
+	DeviceTag string `db:"device_tag",sqlite:"TEXT"`
+	PatronId  int    `db:"patron_index",sqlite:"INTEGER"`
+	MfgId     int    `db:"manufacturer_index",sqlite:"INTEGER"`
+	Start     string `db:"start",sqlite:"DATE"`
+	End       string `db:"end",sqlite:"DATE"`
+}
+
+func (d Duration) AsMap() map[string]interface{} {
+	m := make(map[string]interface{})
+	rt := reflect.TypeOf(d)
+	if rt.Kind() != reflect.Struct {
+		panic("bad type")
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		f := rt.Field(i)
+		col := strings.Split(f.Tag.Get("db"), ",")[0]
+		//t := strings.Split(f.Tag.Get("sqlite"), ",")[0]
+		m[col] = reflect.ValueOf(f)
+	}
+	return m
 }
 
 func NewCounter(minMinutes int, maxMinutes int) *Counter {
@@ -105,11 +122,11 @@ func getPatronFirstLast(patronId int, events []WifiEvent) (int, int) {
 
 	for _, e := range events {
 		if e.PatronIndex == patronId {
-			if e.EventId < first {
-				first = e.EventId
+			if e.ID < first {
+				first = e.ID
 			}
-			if e.EventId > last {
-				last = e.EventId
+			if e.ID > last {
+				last = e.ID
 			}
 		}
 	}
@@ -119,7 +136,7 @@ func getPatronFirstLast(patronId int, events []WifiEvent) (int, int) {
 
 func getEventIdTime(events []WifiEvent, eventId int) (t time.Time) {
 	for _, e := range events {
-		if e.EventId == eventId {
+		if e.ID == eventId {
 			t = e.Localtime
 			break
 		}
@@ -135,7 +152,7 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 	checked := make(map[int]bool)
 	for _, e := range events {
 		// If the event id changes, bump our y pointer down.
-		if e.EventId != prevEvent.EventId {
+		if e.ID != prevEvent.ID {
 			prevEvent = e
 		}
 		if _, ok := checked[e.PatronIndex]; ok {
