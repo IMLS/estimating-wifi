@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -42,18 +41,18 @@ type TempDB struct {
 func NewSqliteDB(name string, path string) *TempDB {
 	lw := logwrapper.NewLogger(nil)
 	db := TempDB{}
-	t := time.Now()
-	todaysDB := fmt.Sprintf("%v-%02d-%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), name)
-	lw.Debug("db filename: %v", todaysDB)
-	filepath := filepath.Join(path, todaysDB)
-	dbptr, err := sqlx.Open("sqlite3", filepath)
+	// t := time.Now()
+	// todaysDB := fmt.Sprintf("%v-%02d-%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), name)
+	// lw.Debug("db filename: %v", todaysDB)
+	// filepath := filepath.Join(path, todaysDB)
+	dbptr, err := sqlx.Open("sqlite3", path)
 	if err != nil {
-		lw.Debug("could not open temporary db: %v", filepath)
+		lw.Debug("could not open temporary db: %v", path)
 		lw.Fatal(err.Error())
 	}
 
 	db.DBName = name
-	db.Path = filepath
+	db.Path = path
 	db.Ptr = dbptr
 	db.Tables = make(map[string]map[string]string)
 	return &db
