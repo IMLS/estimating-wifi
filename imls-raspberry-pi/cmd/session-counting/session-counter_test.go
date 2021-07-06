@@ -360,7 +360,13 @@ func TestManyTLPCycles(t *testing.T) {
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
 	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
 	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
-
+	// Make sure we don't hang...
+	go func() {
+		for {
+			c := <-ch_db
+			log.Println("got", c)
+		}
+	}()
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {
 		// Give the rest of the network time to come alive.
@@ -376,14 +382,11 @@ func TestManyTLPCycles(t *testing.T) {
 				days := (minutes / (60 * 24))
 				memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
 				log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
-
 			}
-
 		}
 		log.Println("Killing the test network.")
 		killbroker.Publish(tlp.Ping{})
 		wg.Done()
-
 	}()
 	wg.Wait()
 	log.Println("Done waiting... exiting in 10 seconds")
