@@ -16,7 +16,7 @@ func newTempDbInFS(cfg *config.Config) *model.TempDB {
 	t := time.Now()
 	todaysDB := fmt.Sprintf("%v-%02d-%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
-	tdb := model.NewTempDB(todaysDB, path)
+	tdb := model.NewSqliteDB(todaysDB, path)
 	lw.Info("Created temporary db: %v", todaysDB)
 	// First, remove the table if it exists
 	// If we reboot midday, this means we will start a fresh table.

@@ -38,7 +38,7 @@ type TempDB struct {
 // 	return db
 // }
 
-func NewTempDB(name string, path string) *TempDB {
+func NewSqliteDB(name string, path string) *TempDB {
 	lw := logwrapper.NewLogger(nil)
 	if lw == nil {
 		log.Println("lw is nil here...")
@@ -122,7 +122,16 @@ func convert(t string, v interface{}) interface{} {
 	return v
 }
 
-func (tdb *TempDB) Insert(name string, values map[string]string) {
+func (tdb *TempDB) GetFields(table string) (fields []string) {
+	for col, t := range tdb.Tables[table] {
+		if !strings.Contains(t, "PRIMARY") {
+			fields = append(fields, col)
+		}
+	}
+	return fields
+}
+
+func (tdb *TempDB) Insert(name string, values map[string]interface{}) {
 	lw := logwrapper.NewLogger(nil)
 	db := tdb.Ptr
 
@@ -189,4 +198,15 @@ func (tdb *TempDB) DebugDump(name string) error {
 		log.Println(r)
 	}
 	return nil
+}
+
+func (tdb *TempDB) SelectAll(name string, arr interface{}) {
+	lw := logwrapper.NewLogger(nil)
+	err := tdb.Ptr.Select(&arr, fmt.Sprintf("SELECT * FROM %v", name))
+	if err != nil {
+		lw.Info("error in extracting all events: %v", name)
+		lw.Fatal(err.Error())
+	}
+
+	lw.Length(name, arr)
 }

@@ -42,6 +42,7 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	go tlp.PrepEphemeralWifi(ka, cfg, killbroker, ch_macs_counted, ch_data_for_report)
 
 	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
+	go tlp.GenerateDurations(ka, cfg, killbroker, ch_db)
 
 	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
 	// Listens for a ping to know when to reset internal state.

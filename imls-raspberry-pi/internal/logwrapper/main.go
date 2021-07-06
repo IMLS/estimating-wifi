@@ -39,9 +39,9 @@ var logLevel int = ERROR
 func (l *StandardLogger) SetLogLevel(level string) {
 	switch strings.ToLower(level) {
 	case "debug":
-                logLevel = DEBUG
+		logLevel = DEBUG
 	case "info":
-                logLevel = INFO
+		logLevel = INFO
 	case "warn":
 		logLevel = WARN
 	default:

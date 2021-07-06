@@ -7,9 +7,9 @@ type WifiEvents struct {
 }
 
 // https://stackoverflow.com/questions/18635671/how-to-define-multiple-name-tags-in-a-struct
+//EventId           int       `json:"event_id" db:"event_id"`
 type WifiEvent struct {
 	ID                int       `json:"id" db:"id"`
-	EventId           int       `json:"event_id" db:"event_id"`
 	FCFSSeqId         string    `json:"fcfs_seq_id" db:"fcfs_seq_id"`
 	DeviceTag         string    `json:"device_tag" db:"device_tag"`
 	Localtime         time.Time `json:"localtime" db:"localtime"`
