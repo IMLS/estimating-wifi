@@ -114,10 +114,8 @@ func newLogger(cfg *config.Config) *StandardLogger {
 		switch l {
 		case "local:stderr":
 			writers = append(writers, os.Stderr)
-			logLevel = DEBUG
 		case "local:stdout":
 			writers = append(writers, os.Stdout)
-			logLevel = DEBUG
 		case "local:file":
 			os.Mkdir(LOGDIR, 0755)
 			filename := filepath.Join(LOGDIR, "log.json")
@@ -186,16 +184,16 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 	}
 	switch e.level {
 	case DEBUG:
-		if logLevel >= DEBUG {
+		if DEBUG >= logLevel {
 			l.logger.WithFields(fields).Debugf(e.message, args...)
 		}
 	case INFO:
-		if logLevel >= INFO {
+		if INFO >= logLevel {
 			log.Println(e)
 			l.logger.WithFields(fields).Infof(e.message, args...)
 		}
 	case WARN:
-		if logLevel >= WARN {
+		if WARN >= logLevel {
 			l.logger.WithFields(fields).Warnf(e.message, args...)
 		}
 	case ERROR:
