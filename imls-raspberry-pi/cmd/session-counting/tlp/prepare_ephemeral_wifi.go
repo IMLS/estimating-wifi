@@ -13,7 +13,7 @@ import (
 // This makexs it ready for storage locally (SQLite) or
 // via an API (where everything becomes text anyway).
 func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
-	in_hash <-chan map[string]int, out_arr chan<- []map[string]string) {
+	in_hash <-chan map[string]int, out_arr chan<- []map[string]interface{}) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting PrepEphemeralWifi")
 	var ping, pong chan interface{} = nil, nil
@@ -49,9 +49,9 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
 			lw.Debug("event ndx: %v", event_ndx)
 			lw.Length("macs-to-store", remove)
 			// Now, bundle that as an array of hashmaps.
-			reportArr := make([]map[string]string, 0)
+			reportArr := make([]map[string]interface{}, 0)
 			for anondevice := range h {
-				data := map[string]string{
+				data := map[string]interface{}{
 					// event_id
 					// An "event" was registered before the data is inserted. This is
 					// essentially a FK into the events table.

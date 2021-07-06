@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 )
 
@@ -190,6 +191,12 @@ func TestRawToUid(t *testing.T) {
 		t.Logf("Test #%v: %v\n", testNdx, e.description)
 		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
 		var wg sync.WaitGroup
+		resetbroker := tlp.NewBroker()
+		go resetbroker.Start()
+		// The kill broker lets us poison the network.
+		// var killbroker *tlp.Broker = nil
+		killbroker := tlp.NewBroker()
+		go killbroker.Start()
 
 		ch_macs := make(chan []string)
 		ch_uniq := make(chan map[string]int)
@@ -207,7 +214,7 @@ func TestRawToUid(t *testing.T) {
 		}()
 
 		// Not using the reset here.
-		go tlp.AlgorithmTwo(ka, cfg, ch_macs, ch_uniq, nil, ch_poison)
+		go tlp.AlgorithmTwo(ka, cfg, resetbroker, killbroker, ch_macs, ch_uniq)
 
 		wg.Add(1)
 		go func() {
@@ -222,7 +229,7 @@ func TestRawToUid(t *testing.T) {
 			ch_poison <- tlp.Ping{}
 			defer wg.Done()
 		}()
-
+		killbroker.Publish(tlp.Ping{})
 		wg.Wait()
 
 		// The last value we receive needs to have its time updated.
@@ -236,15 +243,17 @@ func TestRawToUid(t *testing.T) {
 	} // end for over tests
 }
 
-func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, n_hours int, ch_tick chan bool, ch_reset chan<- tlp.Ping, ch_kill <-chan tlp.Ping) {
+func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.Broker, kb *tlp.Broker, n_hours int, ch_tick chan bool) {
 	counter := 0
+	ch_kill := kb.Subscribe()
 	for {
 		select {
 		case <-ch_tick:
 			counter += 1
 			// Ping every
 			if (counter != 0) && ((counter % (60 * n_hours)) == 0) {
-				ch_reset <- tlp.Ping{}
+				// ch_reset <- tlp.Ping{}
+				rb.Publish(tlp.Ping{})
 			}
 		case <-ch_kill:
 			log.Println("Exiting PingAfterNHours")
@@ -273,9 +282,10 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out chan []string, ch_kill <-chan tlp.Ping) {
+func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.Broker, in <-chan bool, out chan []string) {
 	NUMMACS := 40
 	NUMRANDOM := 10
+	ch_kill := kb.Subscribe()
 	// Lets have 30 consistent devices
 	macs := make([]string, NUMMACS)
 	for i := 0; i < NUMMACS-NUMRANDOM; i++ {
@@ -300,10 +310,14 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, in <-chan bool, out
 }
 
 func TestManyTLPCycles(t *testing.T) {
-	const NUMDAYSTORUN int = 7
+	const NUMDAYSTORUN int = 1
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
 	const WRITESUMMARYNHOURS int = 3
 	const SECONDSPERMINUTE int = 3
+	resetbroker := tlp.NewBroker()
+	go resetbroker.Start()
+	killbroker := tlp.NewBroker()
+	go killbroker.Start()
 
 	// This runs the TLP through 10000 cycles. This is roughly the same as week.
 	log.Println("Starting run for a week")
@@ -332,29 +346,15 @@ func TestManyTLPCycles(t *testing.T) {
 
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []map[string]string)
-
-	const NUM_KILL_CHANNELS = 7
-	var KC [NUM_KILL_CHANNELS]chan tlp.Ping
-	for i := 0; i < NUM_KILL_CHANNELS; i++ {
-		KC[i] = make(chan tlp.Ping)
-	}
-
-	// WARNING: If you get this length wrong, we have deadlock.
-	// That is, every one of these needs to be used/written to/read from.
-	// The kill channel lets us poison the network for shutdown. Really only for testing.
-	const RESET_CHANS = 3
-	var chs_reset [RESET_CHANS]chan tlp.Ping
-	for ndx := 0; ndx < RESET_CHANS; ndx++ {
-		chs_reset[ndx] = make(chan tlp.Ping)
-	}
+	ch_data_for_report := make(chan []map[string]interface{})
+	ch_db := make(chan *model.TempDB)
 
 	// See if we can wait and shut down the test...
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	// Delta this out to RunWireshark and PingAfterNHours
-	go tlp.TockEveryN(nil, SECONDSPERMINUTE, ch_sec, ch_nsec, KC[0])
+	go tlp.TockEveryN(nil, killbroker, SECONDSPERMINUTE, ch_sec, ch_nsec)
 	go func(in chan bool, o1 chan bool, o2 chan bool) {
 		for {
 			<-in
@@ -365,16 +365,14 @@ func TestManyTLPCycles(t *testing.T) {
 
 	// Need a fake RunWireshark
 	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
-	go RunFakeWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
+	go RunFakeWireshark(nil, cfg, killbroker, ch_nsec1, ch_macs)
 
-	go tlp.AlgorithmTwo(nil, cfg, ch_macs, ch_macs_counted, chs_reset[1], KC[2])
-	go tlp.PrepareDataForStorage(nil, cfg, ch_macs_counted, ch_data_for_report, KC[3])
+	go tlp.AlgorithmTwo(nil, cfg, resetbroker, killbroker, ch_macs, ch_macs_counted)
+	go tlp.PrepEphemeralWifi(nil, cfg, killbroker, ch_macs_counted, ch_data_for_report)
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
-	go PingAfterNHours(nil, cfg, WRITESUMMARYNHOURS, ch_nsec2, chs_reset[0], KC[4])
-	go tlp.StoreToSqlite(nil, cfg, ch_data_for_report, chs_reset[2], KC[5])
-	// Fan out the ping to multiple PROCs
-	go tlp.ParDelta(KC[6], chs_reset[0], chs_reset[1:]...)
+	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
+	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
 
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {
@@ -396,9 +394,7 @@ func TestManyTLPCycles(t *testing.T) {
 
 		}
 		log.Println("Killing the test network.")
-		for ndx := 0; ndx < NUM_KILL_CHANNELS; ndx++ {
-			KC[ndx] <- tlp.Ping{}
-		}
+		killbroker.Publish(tlp.Ping{})
 		wg.Done()
 
 	}()

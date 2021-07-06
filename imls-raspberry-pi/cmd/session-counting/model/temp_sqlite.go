@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -40,9 +41,6 @@ type TempDB struct {
 
 func NewSqliteDB(name string, path string) *TempDB {
 	lw := logwrapper.NewLogger(nil)
-	if lw == nil {
-		log.Println("lw is nil here...")
-	}
 	db := TempDB{}
 	t := time.Now()
 	todaysDB := fmt.Sprintf("%v-%02d-%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), name)
@@ -77,22 +75,32 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 	lw := logwrapper.NewLogger(nil)
 	tdb.Tables[name] = columns
 
-	columnstring := ""
+	fields := make([]string, 0)
 	for col, t := range columns {
-		if columnstring == "" {
-			columnstring = fmt.Sprintf("\"%v\" %v", col, t)
-		} else {
-			columnstring = fmt.Sprintf("%v, \"%v\" %v", columnstring, col, t)
-		}
+		fp := fmt.Sprintf("%v %v", col, t)
+		fields = append(fields, fp)
 	}
-
-	statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, columnstring)
-
+	statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
 	_, err := tdb.Ptr.Exec(statement)
 	if err != nil {
 		lw.Info("could not re-create %v table in temporary db.", name)
 		lw.Fatal(err.Error())
 	}
+}
+func (tdb *TempDB) AddStructAsTable(table string, s interface{}) {
+	//lw := logwrapper.NewLogger(nil)
+	columns := make(map[string]string)
+	rt := reflect.TypeOf(s)
+	if rt.Kind() != reflect.Struct {
+		log.Println("cannot add this struct as a table")
+		panic("bad type")
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		f := rt.Field(i)
+		columns[f.Tag.Get("db")] = f.Tag.Get("sqlite")
+	}
+
+	tdb.AddTable(table, columns)
 }
 
 func convert(t string, v interface{}) interface{} {
@@ -131,43 +139,55 @@ func (tdb *TempDB) GetFields(table string) (fields []string) {
 	return fields
 }
 
-func (tdb *TempDB) Insert(name string, values map[string]interface{}) {
+func (tdb *TempDB) InsertStruct(table string, s interface{}) {
+	//lw := logwrapper.NewLogger(nil)
+	values := make(map[string]interface{})
+	rt := reflect.TypeOf(s)
+
+	if rt.Kind() != reflect.Struct {
+		log.Println("cannot add this struct as a table")
+		panic("bad type")
+	}
+	// r := reflect.ValueOf(s)
+	for i := 0; i < rt.NumField(); i++ {
+		f := rt.Field(i)
+		v, _ := rt.FieldByName(f.Name)
+		values[f.Tag.Get("db")] = fmt.Sprintf("%v", v)
+
+	}
+	tdb.Insert(table, values)
+}
+
+func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 	lw := logwrapper.NewLogger(nil)
 	db := tdb.Ptr
 
-	insertstatement := fmt.Sprintf("INSERT INTO %v ", name)
-	valuestoinsert := make([]interface{}, 0)
-	numcols := 0
-	questions := "(?"
+	fields := make([]string, 0)
+	subs := make([]interface{}, 0)
+	questions := make([]string, 0)
+
 	for col, v := range values {
 		// Only process values that have matching columns in the table.
-		if _, ok := tdb.Tables[name][col]; ok {
-			t := tdb.Tables[name][col]
-			if numcols == 0 {
-				insertstatement = fmt.Sprintf("%v(%v", insertstatement, col)
-				valuestoinsert = append(valuestoinsert, convert(t, v))
-			} else if numcols == len(values)-1 {
-				insertstatement = fmt.Sprintf("%v, %v) ", insertstatement, col)
-				questions = fmt.Sprintf("%v, ?)", questions)
-				valuestoinsert = append(valuestoinsert, convert(t, v))
-			} else {
-				insertstatement = fmt.Sprintf("%v, %v", insertstatement, col)
-				questions = fmt.Sprintf("%v, ?", questions)
-				valuestoinsert = append(valuestoinsert, convert(t, v))
-			}
+		if _, ok := tdb.Tables[table][col]; ok {
+			t := tdb.Tables[table][col]
+			fields = append(fields, col)
+			subs = append(subs, convert(t, v))
+			questions = append(questions, "?")
 		}
-		numcols += 1
 	}
 
-	full := fmt.Sprintf("%v VALUES %v", insertstatement, questions)
+	full := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v)",
+		table,
+		strings.Join(fields, ", "),
+		strings.Join(questions, ", "))
 	insertS, err := db.Prepare(full)
 	if err != nil {
-		lw.Info("could not prepare %v insert statement", name)
+		lw.Info("could not prepare %v insert statement", table)
 		lw.Fatal(err.Error())
 	}
-	_, err = insertS.Exec(valuestoinsert...)
+	_, err = insertS.Exec(subs...)
 	if err != nil {
-		lw.Info("could not insert into temporary db: %v", name)
+		lw.Info("could not insert into temporary db: %v", table)
 		lw.Fatal(err.Error())
 	}
 }
@@ -192,9 +212,9 @@ func (tdb *TempDB) DebugDump(name string) error {
 		lw.Info("could not select all from %v", name)
 		return errors.New("could not select all from db")
 	}
+	r := make(map[string]interface{})
 	for rows.Next() {
-		var r map[string]string
-		rows.Scan(r)
+		rows.MapScan(r)
 		log.Println(r)
 	}
 	return nil

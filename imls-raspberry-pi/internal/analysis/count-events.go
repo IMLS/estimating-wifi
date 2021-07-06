@@ -40,15 +40,15 @@ func (a ByStart) Less(i, j int) bool {
 func (a ByStart) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type Duration struct {
-	Id        int    `db:"id",sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
-	PiSerial  string `db:"pi_serial",sqlite:"TEXT"`
-	SessionId string `db:"session_id",sqlite:"TEXT"`
-	FCFSSeqId string `db:"fcfs_seq_id",sqlite:"TEXT"`
-	DeviceTag string `db:"device_tag",sqlite:"TEXT"`
-	PatronId  int    `db:"patron_index",sqlite:"INTEGER"`
-	MfgId     int    `db:"manufacturer_index",sqlite:"INTEGER"`
-	Start     string `db:"start",sqlite:"DATE"`
-	End       string `db:"end",sqlite:"DATE"`
+	Id        int    `db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
+	PiSerial  string `db:"pi_serial" sqlite:"TEXT"`
+	SessionId string `db:"session_id" sqlite:"TEXT"`
+	FCFSSeqId string `db:"fcfs_seq_id" sqlite:"TEXT"`
+	DeviceTag string `db:"device_tag" sqlite:"TEXT"`
+	PatronId  int    `db:"patron_index" sqlite:"INTEGER"`
+	MfgId     int    `db:"manufacturer_index" sqlite:"INTEGER"`
+	Start     string `db:"start" sqlite:"DATE"`
+	End       string `db:"end" sqlite:"DATE"`
 }
 
 func (d Duration) AsMap() map[string]interface{} {
@@ -59,9 +59,11 @@ func (d Duration) AsMap() map[string]interface{} {
 	}
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
-		col := strings.Split(f.Tag.Get("db"), ",")[0]
-		//t := strings.Split(f.Tag.Get("sqlite"), ",")[0]
-		m[col] = reflect.ValueOf(f)
+		r := reflect.ValueOf(d)
+		// log.Println("tag db", f.Tag.Get("db"))
+		col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
+		nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
+		m[string(col)] = nom
 	}
 	return m
 }
