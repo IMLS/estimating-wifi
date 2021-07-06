@@ -47,10 +47,10 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker,
 	for {
 		select {
 		case <-ping:
-			pong <- "StoreToSqlite"
+			pong <- "CacheWifi"
 		case <-ch_kill:
 			tdb.Close()
-			lw.Debug("exiting StoreToSqlite")
+			lw.Debug("exiting CacheWifi")
 			return
 
 		case <-ch_reset:

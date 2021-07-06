@@ -45,11 +45,9 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 
 	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
 	go tlp.GenerateDurations(ka, cfg, killbroker, ch_db, ch_durations_db)
+	go tlp.BatchSend(ka, cfg, killbroker, ch_durations_db)
 
 	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
-	// Listens for a ping to know when to reset internal state.
-	// That, too, should be abstracted out of the storage layer.
-	//go tlp.StoreToSqlite(ka, cfg, resetbroker, killbroker, ch_data_for_report)
 
 }
 
