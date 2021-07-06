@@ -167,6 +167,7 @@ func TestRawToUid(t *testing.T) {
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
+
 	ka := tlp.NewKeepalive(cfg)
 
 	// var buf bytes.Buffer
@@ -178,6 +179,7 @@ func TestRawToUid(t *testing.T) {
 	for testNdx, e := range tests {
 		t.Logf("Test #%v: %v\n", testNdx, e.description)
 		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
+
 		var wg sync.WaitGroup
 		resetbroker := tlp.NewBroker()
 		go resetbroker.Start()
@@ -320,9 +322,12 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
+	tt := time.Now()
+	cfg.SessionId = fmt.Sprintf("%v-%02d-%02d", tt.Year(), tt.Month(), tt.Day())
+
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
 
-	cfg.NewSessionId()
+	//cfg.NewSessionId()
 	log.Println(cfg)
 
 	// Create channels for process network
