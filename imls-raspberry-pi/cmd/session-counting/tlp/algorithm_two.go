@@ -16,7 +16,7 @@ import (
  * 5. WRONG Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker, in <-chan []string, out chan<- map[string]int) {
+func AlgorithmTwo(ka *Keepalive, cfg *config.Config, kb *Broker, rb *Broker, in <-chan []string, out chan<- map[string]int) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting AlgorithmTwo")
 
