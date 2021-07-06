@@ -341,6 +341,7 @@ func TestManyTLPCycles(t *testing.T) {
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []analysis.WifiEvent)
 	ch_db := make(chan *model.TempDB)
+	ch_durations_db := make(chan *model.TempDB)
 
 	// See if we can wait and shut down the test...
 	var wg sync.WaitGroup
@@ -367,7 +368,8 @@ func TestManyTLPCycles(t *testing.T) {
 	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
 	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
 	// Make sure we don't hang...
-	go tlp.GenerateDurations(nil, cfg, killbroker, ch_db)
+	go tlp.GenerateDurations(nil, cfg, killbroker, ch_db, ch_durations_db)
+	go tlp.BatchSend(nil, cfg, killbroker, ch_durations_db)
 
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {

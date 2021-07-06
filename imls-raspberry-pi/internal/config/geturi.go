@@ -28,3 +28,10 @@ func (cfg *Config) GetLoggingUri() string {
 		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Logging)))
 	return uri
 }
+
+func (cfg *Config) GetDataUri() string {
+	var uri string = (cfg.Umbrella.Scheme + "://" +
+		removeLeadingAndTrailingSlashes(cfg.Umbrella.Host) +
+		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Data)))
+	return uri
+}
