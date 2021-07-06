@@ -1,6 +1,7 @@
 package tlp
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -52,8 +53,10 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
 			for anondevice := range h {
 				mfg, _ := strconv.Atoi(strings.Split(anondevice, ":")[0])
 				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
+				t := time.Now()
 				data := analysis.WifiEvent{
-					SessionId:         cfg.SessionId,
+					// SessionId:         cfg.SessionId,
+					SessionId:         fmt.Sprintf("%v-%02d-%02d", t.Year(), t.Month(), t.Day()),
 					Localtime:         time.Now().Format(time.RFC3339),
 					FCFSSeqId:         cfg.Auth.FCFSId,
 					DeviceTag:         cfg.Auth.DeviceTag,
