@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
@@ -299,7 +300,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.Broker, in 
 func TestManyTLPCycles(t *testing.T) {
 	const NUMDAYSTORUN int = 1
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
-	const WRITESUMMARYNHOURS int = 3
+	const WRITESUMMARYNHOURS int = 1
 	const SECONDSPERMINUTE int = 3
 	resetbroker := tlp.NewBroker()
 	go resetbroker.Start()
@@ -333,7 +334,7 @@ func TestManyTLPCycles(t *testing.T) {
 
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []map[string]interface{})
+	ch_data_for_report := make(chan []analysis.WifiEvent)
 	ch_db := make(chan *model.TempDB)
 
 	// See if we can wait and shut down the test...
@@ -361,12 +362,8 @@ func TestManyTLPCycles(t *testing.T) {
 	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
 	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
 	// Make sure we don't hang...
-	go func() {
-		for {
-			c := <-ch_db
-			log.Println("got", c)
-		}
-	}()
+	go tlp.GenerateDurations(nil, cfg, killbroker, ch_db)
+
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {
 		// Give the rest of the network time to come alive.

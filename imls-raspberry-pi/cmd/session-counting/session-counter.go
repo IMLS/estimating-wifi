@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/api"
@@ -23,7 +24,7 @@ func run(ka *tlp.Keepalive, cfg *config.Config) {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []map[string]interface{})
+	ch_data_for_report := make(chan []analysis.WifiEvent)
 	ch_db := make(chan *model.TempDB)
 
 	// The reset broker signals midnight (for resetting the network/device)

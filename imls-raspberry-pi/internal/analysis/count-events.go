@@ -29,7 +29,7 @@ type Counter struct {
 	DeviceMinutes    int
 	TransientMinutes int
 }
-type ByStart []*Duration
+type ByStart []Duration
 
 func (a ByStart) Len() int { return len(a) }
 func (a ByStart) Less(i, j int) bool {
@@ -96,12 +96,13 @@ func getDeviceType(p WifiEvent, es []WifiEvent) int {
 	latest = time.Date(1900, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	for _, e := range es {
+		elt, _ := time.Parse(time.RFC3339, e.Localtime)
 		if p.PatronIndex == e.PatronIndex {
-			if e.Localtime.Before(earliest) {
-				earliest = e.Localtime
+			if elt.Before(earliest) {
+				earliest = elt
 			}
-			if e.Localtime.After(latest) {
-				latest = e.Localtime
+			if elt.After(latest) {
+				latest = elt
 			}
 		}
 	}
@@ -139,7 +140,7 @@ func getPatronFirstLast(patronId int, events []WifiEvent) (int, int) {
 func getEventIdTime(events []WifiEvent, eventId int) (t time.Time) {
 	for _, e := range events {
 		if e.ID == eventId {
-			t = e.Localtime
+			t, _ = time.Parse(time.RFC3339, e.Localtime)
 			break
 		}
 	}
@@ -191,11 +192,11 @@ func doCounting(cfg *config.Config, events []WifiEvent) *Counter {
 	return c
 }
 
-func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
+func durationSummary(cfg *config.Config, events []WifiEvent) map[int]Duration {
 
 	// We want, for every patron_id, to know when the device started/ended.
 	checked := make(map[int]bool)
-	durations := make(map[int]*Duration)
+	durations := make(map[int]Duration)
 
 	for _, e := range events {
 		//log.Println("Patron index:", e.PatronIndex)
@@ -207,7 +208,7 @@ func durationSummary(cfg *config.Config, events []WifiEvent) map[int]*Duration {
 			firstTime := getEventIdTime(events, first)
 			lastTime := getEventIdTime(events, last)
 
-			durations[e.PatronIndex] = &Duration{
+			durations[e.PatronIndex] = Duration{
 				PiSerial:  cfg.Serial,
 				SessionId: e.SessionId,
 				FCFSSeqId: e.FCFSSeqId,
@@ -392,7 +393,7 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []WifiE
 
 // Return the drawing context where the image is drawn.
 // This can then be written to disk.
-func Summarize(cfg *config.Config, events []WifiEvent) (c *Counter, d map[int]*Duration) {
+func Summarize(cfg *config.Config, events []WifiEvent) (c *Counter, d map[int]Duration) {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].ID < events[j].ID
 	})

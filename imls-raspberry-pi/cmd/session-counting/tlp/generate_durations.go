@@ -1,6 +1,7 @@
 package tlp
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"gsa.gov/18f/analysis"
@@ -21,20 +22,25 @@ func createDurationsTable(cfg *config.Config) *model.TempDB {
 	return tdb
 }
 
-func storeSummary(cfg *config.Config, tdb *model.TempDB, c *analysis.Counter, durations map[int]*analysis.Duration) {
+func storeSummary(cfg *config.Config, tdb *model.TempDB, c *analysis.Counter, durations map[int]analysis.Duration) {
 	for _, d := range durations {
 		tdb.InsertStruct("durations", d)
 	}
 }
 
-func processDataFromDay(cfg *config.Config, tdb *model.TempDB) {
+func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB, ddb *model.TempDB) {
 	lw := logwrapper.NewLogger(nil)
 	events := []analysis.WifiEvent{}
-	tdb.SelectAll("events", events)
+	err := wifidb.Ptr.Select(&events, fmt.Sprintf("SELECT * FROM %v", table))
+	if err != nil {
+		lw.Info("error in extracting all events: %v", table)
+		lw.Fatal(err.Error())
+	}
+
 	if len(events) > 0 {
 		lw.Length("events", events)
 		c, d := analysis.Summarize(cfg, events)
-		storeSummary(cfg, tdb, c, d)
+		storeSummary(cfg, ddb, c, d)
 		//writeImages(cfg, events)
 		//writeSummaryCSV(cfg, events)
 	} else {
@@ -54,6 +60,8 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
 		ping, pong = ka.Subscribe("GenerateDurations", 30)
 	}
 
+	ddb := createDurationsTable(cfg)
+
 	for {
 		select {
 		case <-ping:
@@ -62,10 +70,10 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
 			lw.Debug("exiting GenerateDurations")
 			return
 
-		case tdb := <-ch_db:
+		case wifidb := <-ch_db:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
-			processDataFromDay(cfg, tdb)
+			processDataFromDay(cfg, "wifi", wifidb, ddb)
 		}
 	}
 }

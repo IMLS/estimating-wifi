@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -91,7 +90,7 @@ func (tdb *TempDB) AddStructAsTable(table string, s interface{}) {
 	columns := make(map[string]string)
 	rt := reflect.TypeOf(s)
 	if rt.Kind() != reflect.Struct {
-		log.Println("cannot add this struct as a table")
+		log.Println("cannot add this struct as a table in", table, s)
 		panic("bad type")
 	}
 	for i := 0; i < rt.NumField(); i++ {
@@ -117,10 +116,10 @@ func convert(t string, v interface{}) interface{} {
 		i, _ := strconv.Atoi(fmt.Sprintf("%v", v))
 		return i
 	case "text":
-		return v
+		return fmt.Sprintf("%v", v)
 	case "date":
-		t, _ := time.Parse(time.RFC3339, fmt.Sprintf("%v", v))
-		return t
+		// t, _ := time.Parse(time.RFC3339, fmt.Sprintf("%v", v))
+		return fmt.Sprintf("%v", v)
 	default:
 		log.Fatal(fmt.Sprintf("could not convert type: %v, %v", t, v))
 
@@ -131,7 +130,7 @@ func convert(t string, v interface{}) interface{} {
 
 func (tdb *TempDB) GetFields(table string) (fields []string) {
 	for col, t := range tdb.Tables[table] {
-		if !strings.Contains(t, "PRIMARY") {
+		if !strings.Contains(t, "AUTOINCREMENT") {
 			fields = append(fields, col)
 		}
 	}
@@ -144,16 +143,25 @@ func (tdb *TempDB) InsertStruct(table string, s interface{}) {
 	rt := reflect.TypeOf(s)
 
 	if rt.Kind() != reflect.Struct {
-		log.Println("cannot add this struct as a table")
+		log.Println("cannot add this struct as a table", table, s)
 		panic("bad type")
 	}
 	// r := reflect.ValueOf(s)
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
-		v, _ := rt.FieldByName(f.Name)
-		values[f.Tag.Get("db")] = fmt.Sprintf("%v", v)
-
+		r := reflect.ValueOf(s)
+		fv := reflect.Indirect(r).FieldByName(f.Name)
+		//log.Println("v", fmt.Sprintf("%v", fv))
+		tag := f.Tag
+		// log.Println("tag", tag)
+		// time.Sleep(1 * time.Second)
+		if !strings.Contains(string(tag), "AUTOINCREMENT") {
+			cleantag := strings.ReplaceAll(f.Tag.Get("db"), "\"", "")
+			cleanvalue := strings.ReplaceAll(fmt.Sprintf("%v", fv), "\"", "")
+			values[cleantag] = cleanvalue
+		}
 	}
+	// log.Println("values", values)
 	tdb.Insert(table, values)
 }
 
@@ -165,6 +173,8 @@ func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 	subs := make([]interface{}, 0)
 	questions := make([]string, 0)
 
+	// log.Println("values", values)
+
 	for col, v := range values {
 		// Only process values that have matching columns in the table.
 		if _, ok := tdb.Tables[table][col]; ok {
@@ -175,10 +185,15 @@ func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 		}
 	}
 
+	// log.Println("subs", subs)
+
 	full := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v)",
 		table,
 		strings.Join(fields, ", "),
 		strings.Join(questions, ", "))
+
+	// log.Println("full", full)
+
 	insertS, err := db.Prepare(full)
 	if err != nil {
 		lw.Info("could not prepare %v insert statement", table)
@@ -217,15 +232,4 @@ func (tdb *TempDB) DebugDump(name string) error {
 		log.Println(r)
 	}
 	return nil
-}
-
-func (tdb *TempDB) SelectAll(name string, arr interface{}) {
-	lw := logwrapper.NewLogger(nil)
-	err := tdb.Ptr.Select(&arr, fmt.Sprintf("SELECT * FROM %v", name))
-	if err != nil {
-		lw.Info("error in extracting all events: %v", name)
-		lw.Fatal(err.Error())
-	}
-
-	lw.Length(name, arr)
 }

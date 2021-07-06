@@ -29,7 +29,7 @@ func newTempDbInFS(cfg *config.Config) *model.TempDB {
 }
 
 func CacheWifi(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker,
-	ch_data <-chan []map[string]interface{}, ch_db chan<- *model.TempDB) {
+	ch_data <-chan []analysis.WifiEvent, ch_db chan<- *model.TempDB) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting CacheWifi")
 	var ping, pong chan interface{} = nil, nil
@@ -64,7 +64,8 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker,
 		case arr := <-ch_data:
 			lw.Info("storing temporary data")
 			for _, h := range arr {
-				tdb.Insert("wifi", h)
+				// log.Println("temp", h)
+				tdb.InsertStruct("wifi", h)
 			}
 			event_ndx += 1
 		}

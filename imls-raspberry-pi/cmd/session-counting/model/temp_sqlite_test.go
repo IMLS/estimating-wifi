@@ -1,6 +1,7 @@
 package model
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -8,7 +9,7 @@ import (
 )
 
 func TestDBCreate(t *testing.T) {
-	tdb := NewSqliteDB("test1", "/tmp/test")
+	tdb := NewSqliteDB("test1", "/tmp/test1.sqlite")
 	if tdb == nil {
 		t.Log("failed to create tdb.")
 		t.Fail()
@@ -21,7 +22,7 @@ func TestDBCreate(t *testing.T) {
 }
 
 func TestCreateTable(t *testing.T) {
-	tdb := NewSqliteDB("test1", "/tmp/test")
+	tdb := NewSqliteDB("test1", "/tmp/test1.sqlite")
 	if tdb == nil {
 		t.Log("failed to create tdb.")
 		t.Fail()
@@ -32,7 +33,7 @@ func TestCreateTable(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
-	tdb := NewSqliteDB("test1", "/tmp/test")
+	tdb := NewSqliteDB("test1", "/tmp/test1.sqlite")
 	if tdb == nil {
 		t.Log("failed to create tdb.")
 		t.Fail()
@@ -43,7 +44,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestInsertAgain(t *testing.T) {
-	tdb := NewSqliteDB("test1", "/tmp/test")
+	tdb := NewSqliteDB("test1", "/tmp/test1.sqlite")
 	if tdb == nil {
 		t.Log("failed to create tdb.")
 		t.Fail()
@@ -54,7 +55,7 @@ func TestInsertAgain(t *testing.T) {
 }
 
 func TestWifiTable(t *testing.T) {
-	tdb := NewSqliteDB("wifi", "/tmp")
+	tdb := NewSqliteDB("wifi", "/tmp/wifi.sqlite")
 	tdb.AddTable("wifi", map[string]string{
 		"id":                 "INTEGER PRIMARY KEY AUTOINCREMENT",
 		"event_id":           "INTEGER",
@@ -85,13 +86,12 @@ func TestWifiTable(t *testing.T) {
 }
 
 func TestWifiTable2(t *testing.T) {
-	tdb := NewSqliteDB("wifi2", "/tmp")
+	tdb := NewSqliteDB("wifi2", "/tmp/wifi2.db")
 	tdb.AddStructAsTable("wifi", analysis.WifiEvent{})
 	w := analysis.WifiEvent{
 		FCFSSeqId:         "ME0000-000",
 		DeviceTag:         "another-tag",
-		Localtime:         time.Now(),
-		Servertime:        time.Now(),
+		Localtime:         time.Now().Format(time.RFC3339),
 		SessionId:         "asdfasdfasdf",
 		ManufacturerIndex: 0,
 		PatronIndex:       1,
@@ -123,8 +123,8 @@ func TestWifiTable2(t *testing.T) {
 }
 
 func TestCleanup(t *testing.T) {
-	tdb1 := NewSqliteDB("test1", "/tmp/test")
-	tdb2 := NewSqliteDB("wifi", "/tmp")
+	tdb1 := NewSqliteDB("test1", "/tmp/test1.sqlite")
+	tdb2 := NewSqliteDB("wifi", "/tmp/wifi.sqlite")
 	tdb1.Close()
 	tdb2.Close()
 	tdb1.Remove()
@@ -145,7 +145,8 @@ func TestReflection(t *testing.T) {
 	}
 	durations = append(durations, d)
 
-	tdb := NewSqliteDB("durations", "/tmp")
+	os.Remove("/tmp/durations.sqlite")
+	tdb := NewSqliteDB("durations", "/tmp/durations.sqlite")
 	tdb.AddStructAsTable("durations", analysis.Duration{})
 
 	for _, d := range durations {

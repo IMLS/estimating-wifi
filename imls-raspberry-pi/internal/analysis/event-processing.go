@@ -3,6 +3,7 @@ package analysis
 import (
 	"fmt"
 	"sort"
+	"time"
 )
 
 func GetSessions(events []WifiEvent) []string {
@@ -66,7 +67,8 @@ func RemapEvents(events []WifiEvent) []WifiEvent {
 					// We will rewrite all session fields to the current day.
 					// Need to modify the array, not the local variable `e`
 					if pass == "first" {
-						events[ndx].SessionId = fmt.Sprint(e.Localtime.Format("2006-01-02"))
+						t, _ := time.Parse(time.RFC3339, e.Localtime)
+						events[ndx].SessionId = fmt.Sprintf("%v-%02d-%02d", t.Year(), t.Month(), t.Day())
 					}
 
 					// If we have already mapped this manufacturer, then update

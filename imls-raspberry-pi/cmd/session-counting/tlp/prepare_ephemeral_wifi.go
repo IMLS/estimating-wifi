@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 )
@@ -13,7 +14,7 @@ import (
 // This makexs it ready for storage locally (SQLite) or
 // via an API (where everything becomes text anyway).
 func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
-	in_hash <-chan map[string]int, out_arr chan<- []map[string]interface{}) {
+	in_hash <-chan map[string]int, out_arr chan<- []analysis.WifiEvent) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting PrepEphemeralWifi")
 	var ping, pong chan interface{} = nil, nil
@@ -23,8 +24,6 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
 	} else {
 		ping, pong = ka.Subscribe("PrepEphemeralWifi", 30)
 	}
-
-	event_ndx := 0
 
 	for {
 		select {
@@ -46,38 +45,25 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
 			for _, r := range remove {
 				delete(h, r)
 			}
-			lw.Debug("event ndx: %v", event_ndx)
 			lw.Length("macs-to-store", remove)
 			// Now, bundle that as an array of hashmaps.
-			reportArr := make([]map[string]interface{}, 0)
+			reportArr := make([]analysis.WifiEvent, 0)
+
 			for anondevice := range h {
-				data := map[string]interface{}{
-					// event_id
-					// An "event" was registered before the data is inserted. This is
-					// essentially a FK into the events table.
-					"event_id": strconv.Itoa(event_ndx),
-					// The session id is a unique ID that is generated at powerup.
-					"session_id": cfg.SessionId,
-					// The time on the device.
-					"localtime": time.Now().Format(time.RFC3339),
-					// The serial number of the Pi.
-					"pi_serial": config.GetSerial(),
-					// The FCFS Seq Id entered at setup time.
-					"fcfs_seq_id": cfg.Auth.FCFSId,
-					// The tag entered at setup time.
-					"device_tag": cfg.Auth.DeviceTag,
-					// The "anondevice" is now something like "0:32" or "26:384"
-					// We split that into a manufacturer ID and a device ID.
-					// The manufacturer Ids are consistent for a session (a powerup cycle)
-					// The patron id is tracked for 2 hours (or whatever the config says)
-					"manufacturer_index": strings.Split(anondevice, ":")[0],
-					"patron_index":       strings.Split(anondevice, ":")[1],
+				mfg, _ := strconv.Atoi(strings.Split(anondevice, ":")[0])
+				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
+				data := analysis.WifiEvent{
+					SessionId:         cfg.SessionId,
+					Localtime:         time.Now().Format(time.RFC3339),
+					FCFSSeqId:         cfg.Auth.FCFSId,
+					DeviceTag:         cfg.Auth.DeviceTag,
+					ManufacturerIndex: mfg,
+					PatronIndex:       pid,
 				}
 
 				reportArr = append(reportArr, data)
 			}
 
-			event_ndx += 1
 			out_arr <- reportArr
 
 		}
