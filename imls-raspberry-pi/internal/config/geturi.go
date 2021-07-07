@@ -35,3 +35,10 @@ func (cfg *Config) GetDataUri() string {
 		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Data)))
 	return uri
 }
+
+func (cfg *Config) GetDurationsUri() string {
+	var uri string = (cfg.Umbrella.Scheme + "://" +
+		removeLeadingAndTrailingSlashes(cfg.Umbrella.Host) +
+		startsWithSlash(removeLeadingSlashes("/TEST/10x-imls/v2/durations/")))
+	return uri
+}

@@ -72,7 +72,12 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
 		case wifidb := <-ch_db:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
-			ch_durations_db <- processDataFromDay(cfg, "wifi", wifidb)
+			durationsdb := processDataFromDay(cfg, "wifi", wifidb)
+			// Creates the table if it does not exist.
+			durationsdb.AddStructAsTable("batches", model.Batch{})
+			yestersession := model.GetYesterdaySessionId()
+			durationsdb.InsertStruct("batches", model.Batch{Session: yestersession, Sent: 0})
+			ch_durations_db <- durationsdb
 		}
 	}
 }

@@ -79,9 +79,10 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 		fields = append(fields, fp)
 	}
 	statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
+	lw.Debug("AddTable ", statement)
 	_, err := tdb.Ptr.Exec(statement)
 	if err != nil {
-		lw.Info("could not re-create %v table in temporary db.", name)
+		lw.Info("could not re-create '", name, "' table in temporary db.")
 		lw.Fatal(err.Error())
 	}
 }
