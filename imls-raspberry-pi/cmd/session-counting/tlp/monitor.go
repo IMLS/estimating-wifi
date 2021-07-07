@@ -107,3 +107,18 @@ func (b *Keepalive) Publish(msg interface{}) {
 	b.publishCh <- msg
 
 }
+
+// TOP LEVEL PROCESS
+
+func StayinAlive(ka *Keepalive, cfg *config.Config) {
+	lw := logwrapper.NewLogger(nil)
+	lw.Info("starting keepalive")
+	ka.Start()
+
+	var counter int64 = 0
+	for {
+		time.Sleep(time.Duration(cfg.Monitoring.PingInterval) * time.Second)
+		ka.Publish(counter)
+		counter = counter + 1
+	}
+}
