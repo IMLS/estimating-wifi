@@ -10,7 +10,7 @@ import (
 	"gsa.gov/18f/http"
 )
 
-func report(service string, cfg *config.Config, session_id int, arr []map[string]string) (http_error_count int, err error) {
+func report(service string, cfg *config.Config, session_id int, arr []map[string]interface{}) (http_error_count int, err error) {
 	http_error_count = 0
 
 	uri := http.FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
@@ -28,7 +28,7 @@ func report(service string, cfg *config.Config, session_id int, arr []map[string
 	return http_error_count, resultErr
 }
 
-func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]string, ch_reset <-chan Ping, ch_kill <-chan Ping) {
+func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string]interface{}, ch_reset <-chan Ping, ch_kill <-chan Ping) {
 
 	log.Println("Starting ReportOut")
 
@@ -67,7 +67,7 @@ func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string
 		// This is the [ uid -> ticks ] map (uid looks like "Next:0")
 		case arr := <-ch_data:
 			// TODO: event ids are broken and we need a better approach.
-			event_ndx := 1;
+			event_ndx := 1
 			// event_ndx, logerr := el.Log("logging_devices", nil)
 
 			// Overwrite the existing event IDs in the prepared data.

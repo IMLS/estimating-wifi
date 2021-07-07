@@ -3,9 +3,7 @@ package analysis
 import (
 	"fmt"
 	"log"
-	"reflect"
 	"sort"
-	"strings"
 	"time"
 
 	"gsa.gov/18f/config"

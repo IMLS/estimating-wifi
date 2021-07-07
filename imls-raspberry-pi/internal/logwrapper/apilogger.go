@@ -26,7 +26,7 @@ func NewApiLogger(cfg *config.Config) (api *ApiLogger) {
 func (a *ApiLogger) Write(p []byte) (n int, err error) {
 	fmt.Printf("API: %v\n", string(p))
 
-	data := map[string]string{
+	data := map[string]interface{}{
 		"pi_serial":   config.GetSerial(),
 		"fcfs_seq_id": a.cfg.Auth.FCFSId,
 		"device_tag":  a.cfg.Auth.DeviceTag,
@@ -36,7 +36,7 @@ func (a *ApiLogger) Write(p []byte) (n int, err error) {
 		"info":        string(p),
 	}
 
-	_, err = http.PostJSON(a.cfg, a.cfg.GetLoggingUri(), []map[string]string{data})
+	_, err = http.PostJSON(a.cfg, a.cfg.GetLoggingUri(), []map[string]interface{}{data})
 	if err != nil {
 		log.Println("could not log to API")
 		log.Println(err.Error())

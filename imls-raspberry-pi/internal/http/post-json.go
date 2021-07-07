@@ -25,7 +25,7 @@ var magic_index int = 0
 
 var slash_warned bool = false
 
-func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, error) {
+func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) (int, error) {
 
 	tok := cfg.Auth.Token
 	matched, _ := regexp.MatchString(".*/$", uri)
@@ -41,7 +41,7 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]string) (int, er
 
 	// Lets not send too much data at once. So, we'll walk through the data array in steps of 20 elements.
 	chunkSize := 20
-	var divided [][]map[string]string
+	var divided [][]map[string]interface{}
 	for i := 0; i < len(data); i += chunkSize {
 		end := i + chunkSize
 		if end > len(data) {

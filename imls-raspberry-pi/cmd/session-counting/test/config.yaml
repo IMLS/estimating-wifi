@@ -5,9 +5,9 @@ logmodes:
   - "local:file"
   - "imls:v2"
 auth:
-  api_token: CESTNESPASUNTOKEN
-  device_tag: default-tag
-  fcfs_seq_id: ME9999-999
+  api_token: ""
+  device_tag: das-tag
+  fcfs_seq_id: ME0607-001
 monitoring:
   max_http_error_count: 8
   http_error_interval_mins: 10
@@ -17,8 +17,8 @@ monitoring:
 umbrella:
   scheme: https
   host: api.data.gov
-  data: /TEST/10x-imls/v1/wifi/
-  logging: /TEST/10x-imls/v1/events/
+  data: /TEST/10x-imls/v2/wifi/
+  logging: /TEST/10x-imls/v2/events/
 wireshark:
   path: /usr/bin/tshark
   check_wlan: 1

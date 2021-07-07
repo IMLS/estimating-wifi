@@ -1,7 +1,5 @@
 package analysis
 
-import "time"
-
 // type EventEvents struct {
 // 	Data []EventEvent `json:"data"`
 // }

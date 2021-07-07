@@ -2,7 +2,6 @@ package tlp
 
 import (
 	"log"
-	"encoding/json"
 
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
@@ -40,14 +39,10 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *Broker,
 				lw.Fatal(err.Error())
 			}
 
-			// convert []Duration to an array of map[string]string
-			data := make([]map[string]string, 0)
-			// this is awful. is there a better way?
-			var inInterface map[string]string
+			// convert []Duration to an array of map[string]interface{}
+			data := make([]map[string]interface{}, 0)
 			for _, duration := range durations {
-				what, _ := json.Marshal(duration)
-				json.Unmarshal(what, &inInterface)
-				data = append(data, inInterface)
+				data = append(data, duration.AsMap())
 			}
 			_, err = http.PostJSON(cfg, cfg.GetDataUri(), data)
 			if err != nil {
