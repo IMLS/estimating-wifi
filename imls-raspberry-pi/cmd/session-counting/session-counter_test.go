@@ -323,7 +323,7 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	tt := time.Now()
-	cfg.SessionId = fmt.Sprintf("%v-%02d-%02d", tt.Year(), tt.Month(), tt.Day())
+	cfg.SessionId = fmt.Sprintf("%v%02d%02d", tt.Year(), tt.Month(), tt.Day())
 
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
 

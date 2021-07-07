@@ -1,7 +1,6 @@
 package config
 
 import (
-	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 	"log"
@@ -57,10 +56,12 @@ func (cfg *Config) ReadConfig(path string) error {
 }
 
 func (cfg *Config) NewSessionId() {
-	h := sha256.New()
-	h.Write([]byte(fmt.Sprintf("%v", time.Now())))
-	sid := fmt.Sprintf("%x", h.Sum(nil))[0:16]
-	cfg.SessionId = sid
+	// h := sha256.New()
+	// h.Write([]byte(fmt.Sprintf("%v", time.Now())))
+	// sid := fmt.Sprintf("%x", h.Sum(nil))[0:16]
+	// cfg.SessionId = sid
+	t := time.Now()
+	cfg.SessionId = fmt.Sprintf("%v%02d%02d", t.Year(), t.Month(), t.Day())
 }
 
 func (cfg *Config) GetLoggers() []string {
@@ -130,7 +131,7 @@ type Config struct {
 		DeviceTag string `yaml:"device_tag"`
 		FCFSId    string `yaml:"fcfs_seq_id"`
 	} `yaml:"auth"`
-	LogLevel     string `yaml:"log_level"`
+	LogLevel   string   `yaml:"log_level"`
 	Loggers    []string `yaml:"loggers"`
 	Monitoring struct {
 		PingInterval          int `yaml:"pinginterval"`
@@ -152,7 +153,7 @@ type Config struct {
 		Path      string `yaml:"path"`
 		CheckWlan string `yaml:"check_wlan"`
 	} `yaml:"wireshark"`
-	LshwPath string `yaml:"lshw_path"`
+	LshwPath      string `yaml:"lshw_path"`
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`

@@ -15,7 +15,7 @@ func newTempDbInFS(cfg *config.Config) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
 
 	t := time.Now()
-	todaysDB := fmt.Sprintf("%v-%02d-%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
+	todaysDB := fmt.Sprintf("%v%02d%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
 	tdb := model.NewSqliteDB(todaysDB, path)
 	lw.Info("Created temporary db: %v", todaysDB)
