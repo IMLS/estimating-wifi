@@ -42,7 +42,7 @@ func run(cfg *config.Config) {
 	go tlp.GenerateDurations(ka, cfg, killbroker, ch_db, ch_durations_db)
 	go tlp.BatchSend(ka, cfg, killbroker, ch_durations_db)
 	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
-
+	go tlp.WriteImages(ka, cfg, resetbroker, ch_durations_db)
 }
 
 func handleFlags() *config.Config {
