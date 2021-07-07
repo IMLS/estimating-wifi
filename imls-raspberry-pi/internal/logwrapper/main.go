@@ -34,9 +34,10 @@ var once sync.Once
 
 const LOGDIR = "/var/log/session-counter"
 
-var logLevel int = ERROR
+var logLevel int = -1
 
 func (l *StandardLogger) SetLogLevel(level string) {
+	// log.Println("setting log level to", level)
 	switch strings.ToLower(level) {
 	case "debug":
 		logLevel = DEBUG
@@ -47,6 +48,7 @@ func (l *StandardLogger) SetLogLevel(level string) {
 	default:
 		logLevel = ERROR
 	}
+	// log.Println("log level is now", l.GetLogLevelName())
 }
 
 func (l *StandardLogger) GetLogLevelName() string {
@@ -67,16 +69,19 @@ func (l *StandardLogger) GetLogLevelName() string {
 
 func NewLogger(cfg *config.Config) *StandardLogger {
 	once.Do(func() {
-		standardLogger = newLogger(cfg)
+		initLogger(cfg)
+		standardLogger.SetLogLevel(cfg.GetLogLevel())
 	})
 
 	if standardLogger != nil {
+		//log.Println("returning non-nil sl")
 		return standardLogger
 	}
 	if cfg == nil && standardLogger != nil {
+		//log.Println("config nil, returning non-nil sl")
 		return standardLogger
 	} else {
-		log.Println("Falling back on UnsafeNewLogger...")
+		//log.Println("Falling back on UnsafeNewLogger...")
 		return UnsafeNewLogger(cfg)
 	}
 
@@ -84,30 +89,28 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 
 // For unit testing only
 func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
-	sl = standardLogger
-	if sl != nil {
-		return sl
-	} else {
-		sl = newLogger(cfg)
+	if standardLogger == nil {
+		initLogger(cfg)
 	}
-	return sl
+	return standardLogger
 }
 
 // Convoluted for use within libraries...
-func newLogger(cfg *config.Config) *StandardLogger {
+func initLogger(cfg *config.Config) {
 	var baseLogger = logrus.New()
+	standardLogger = &StandardLogger{baseLogger}
+
 	if baseLogger == nil {
 		log.Println("baseLogger is nil")
 	}
 	// If we have a config file, grab the loggers defined there.
 	// Otherwise, use stderr.
 	loggers := make([]string, 0)
-	level := "ERROR"
+
 	if cfg == nil {
 		loggers = append(loggers, "local:stderr")
 	} else {
 		loggers = cfg.GetLoggers()
-		level = cfg.GetLogLevel()
 	}
 
 	// log.Println("loggers", loggers)
@@ -146,11 +149,7 @@ func newLogger(cfg *config.Config) *StandardLogger {
 	baseLogger.SetOutput(mw)
 
 	// If we have a valid config file, and lw is not already configured...
-	standardLogger = &StandardLogger{baseLogger}
 	standardLogger.logger.Formatter = &logrus.JSONFormatter{}
-	standardLogger.SetLogLevel(level)
-
-	return standardLogger
 }
 
 const (
@@ -183,11 +182,12 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 		log.Println("NewLogger() does not work in stateless contexts.")
 		log.Println("You may be looking for UnsafeNewLogger().")
 		log.Println("Creating a new (default) logger for you...")
-		l = newLogger(nil)
+		initLogger(nil)
 	}
 	switch e.level {
 	case DEBUG:
 		if logLevel >= DEBUG {
+			// log.Println("DEBUG", fmt.Sprintf(e.message, args...))
 			l.logger.WithFields(fields).Debugf(e.message, args...)
 		}
 	case INFO:
@@ -211,9 +211,6 @@ func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
 
 func (l *StandardLogger) Debug(msg string, args ...interface{}) {
 	_, file, _, _ := runtime.Caller(1)
-	if l == nil {
-		log.Println("nil here", msg)
-	}
 	l.Base(debugMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
 }
 

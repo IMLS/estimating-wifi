@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -49,7 +50,6 @@ func handleFlags() *config.Config {
 	showKeyPtr := flag.Bool("show-key", false, "Tests key decryption.")
 	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
 	flag.Parse()
-	lw := logwrapper.NewLogger(nil)
 
 	// If they just want the version, print and exit.
 	if *versionPtr {
@@ -59,18 +59,18 @@ func handleFlags() *config.Config {
 
 	// Make sure a config is passed.
 	if *configPathPtr == "" {
-		lw.Fatal("The flag --config MUST be provided.")
+		log.Fatal("The flag --config MUST be provided.")
 		os.Exit(1)
 	}
 
 	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
-		lw.Info("Looked for config at: %v", *configPathPtr)
-		lw.Fatal("Cannot find config file. Exiting.")
+		log.Println("Looked for config at: %v", *configPathPtr)
+		log.Fatal("Cannot find config file. Exiting.")
 	}
 
 	cfg, err := config.NewConfigFromPath(*configPathPtr)
 	if err != nil {
-		lw.Fatal("session-counter: error loading config.")
+		log.Fatal("session-counter: error loading config.")
 	}
 
 	if *showKeyPtr {
@@ -83,10 +83,12 @@ func handleFlags() *config.Config {
 }
 
 func main() {
-	// Read in a config
+	// DO NOT USE LOGGING YET
 	cfg := handleFlags()
 	cfg.NewSessionId()
+	// INIT THE LOGGER
 	lw := logwrapper.NewLogger(cfg)
+	// NOW YOU MAY USE LOGGING.
 
 	cfg.DecodeSerial()
 	// SINGLETON PATTERN
