@@ -2,6 +2,7 @@ package config
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"regexp"
 	"runtime"
@@ -35,6 +36,11 @@ func cpuinfoLines() (lines []string) {
 
 func (cfg *Config) DecodeSerial() {
 	serial := FakeSerial
+	if cfg.Serial != "" {
+		// optionally override with a pre-defined serial. note
+		// that this is only for non-arm usage.
+		serial = cfg.Serial
+	}
 	// Try and pull from the cache, so we don't keep opening up a /proc filesystem...
 	if val, ok := cache["serial"]; ok {
 		serial = val
@@ -51,9 +57,7 @@ func (cfg *Config) DecodeSerial() {
 			}
 		} else {
 			if !serialWarnGiven {
-				// if Verbose {
-				// 	log.Println("Not running on an RPi. Cannot grab serial number.")
-				// }
+				log.Println("Not running on an RPi. Cannot grab serial number.")
 				serialWarnGiven = true
 			}
 
