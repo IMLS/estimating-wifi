@@ -112,7 +112,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *Broker, in <-chan bool,
 					}
 				}
 				// How many devices did we find to keep?
-				lw.Length("wireshark keepers", keepers)
+				// lw.Length("wireshark keepers", keepers)
 				out <- keepers
 			} else {
 				lw.Info("no wifi devices found. no scanning carried out.")

@@ -45,7 +45,7 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
 			for _, r := range remove {
 				delete(h, r)
 			}
-			lw.Length("macs-to-store", remove)
+			// lw.Length("macs-to-store", remove)
 			// Now, bundle that as an array of hashmaps.
 			reportArr := make([]analysis.WifiEvent, 0)
 

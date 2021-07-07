@@ -102,7 +102,8 @@ func main() {
 	// also make sure the binary paths in the config are valid.
 	_, err := os.Stat(cfg.Wireshark.Path)
 	if os.IsNotExist(err) {
-		lw.ExeNotFound(cfg.Wireshark.Path)
+		//lw.ExeNotFound(cfg.Wireshark.Path)
+		lw.Fatal("not found: %v", cfg.Wireshark.Path)
 	}
 
 	// Run the network

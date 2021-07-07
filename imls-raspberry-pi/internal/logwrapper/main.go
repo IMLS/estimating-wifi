@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 
@@ -26,7 +25,7 @@ type Event struct {
 
 // StandardLogger enforces specific log message formats
 type StandardLogger struct {
-	logger *logrus.Logger
+	*logrus.Logger
 }
 
 var standardLogger *StandardLogger = nil
@@ -98,22 +97,19 @@ func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
 // Convoluted for use within libraries...
 func initLogger(cfg *config.Config) {
 	var baseLogger = logrus.New()
-	standardLogger = &StandardLogger{baseLogger}
 
 	if baseLogger == nil {
 		log.Println("baseLogger is nil")
 	}
 	// If we have a config file, grab the loggers defined there.
 	// Otherwise, use stderr.
-	loggers := make([]string, 0)
+	loggers := []string{"local:stderr", "local:tmp", "local:stdout"}
 
-	if cfg == nil {
-		loggers = append(loggers, "local:stderr")
-	} else {
+	if cfg != nil {
 		loggers = cfg.GetLoggers()
 	}
+	log.Println("loggers", loggers)
 
-	// log.Println("loggers", loggers)
 	writers := make([]io.Writer, 0)
 
 	for _, l := range loggers {
@@ -144,12 +140,12 @@ func initLogger(cfg *config.Config) {
 			writers = append(writers, api)
 		}
 	}
-
+	log.Println("writers", writers)
 	mw := io.MultiWriter(writers...)
 	baseLogger.SetOutput(mw)
-
-	// If we have a valid config file, and lw is not already configured...
-	standardLogger.logger.Formatter = &logrus.JSONFormatter{}
+	baseLogger.SetReportCaller(true)
+	standardLogger = &StandardLogger{baseLogger}
+	standardLogger.Formatter = &logrus.JSONFormatter{}
 }
 
 const (
@@ -173,74 +169,79 @@ var (
 	lengthMsg = Event{6, INFO, "array %v length %d"}
 )
 
-func (l *StandardLogger) Base(e Event, loc string, args ...interface{}) {
-	fields := logrus.Fields{
-		"file": loc,
-	}
-	if l == nil {
-		log.Println("logger `l` not initialized.")
-		log.Println("NewLogger() does not work in stateless contexts.")
-		log.Println("You may be looking for UnsafeNewLogger().")
-		log.Println("Creating a new (default) logger for you...")
-		initLogger(nil)
-	}
-	switch e.level {
-	case DEBUG:
-		if logLevel >= DEBUG {
-			// log.Println("DEBUG", fmt.Sprintf(e.message, args...))
-			l.logger.WithFields(fields).Debugf(e.message, args...)
-		}
-	case INFO:
-		if logLevel >= INFO {
-			l.logger.WithFields(fields).Infof(e.message, args...)
-		}
-	case WARN:
-		if logLevel >= WARN {
-			l.logger.WithFields(fields).Warnf(e.message, args...)
-		}
-	case ERROR:
-		// Always log ERROR level log events.
-		l.logger.WithFields(fields).Errorf(e.message, args...)
-	case FATAL:
-		// Always log FATAL level log events.
-		l.logger.WithFields(fields).Fatalf(e.message, args...)
-		// We're leaving, on a jet plane...
-		os.Exit(-1)
-	}
-}
+// func (l *StandardLogger) Base(e Event, file string, line int, args ...interface{}) {
+// 	fields := logrus.Fields{
+// 		"file": file,
+// 		"line": line,
+// 	}
+// 	if l == nil {
+// 		log.Println("logger `l` not initialized.")
+// 		log.Println("NewLogger() does not work in stateless contexts.")
+// 		log.Println("You may be looking for UnsafeNewLogger().")
+// 		log.Println("Creating a new (default) logger for you...")
+// 		initLogger(nil)
+// 	}
 
-func (l *StandardLogger) Debug(msg string, args ...interface{}) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(debugMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
-}
+// 	// l.WithFields(fields).Debugf(e.message, args...)
+// 	log.Printf(e.message, args...)
 
-// InvalidArg is a standard error message
-func (l *StandardLogger) Info(msg string, args ...interface{}) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(infoMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
-}
+// 	switch e.level {
+// 	case DEBUG:
+// 		if logLevel >= DEBUG {
+// 			// log.Println("DEBUG", fmt.Sprintf(e.message, args...))
+// 			l.WithFields(fields).Debugf(e.message, args...)
+// 		}
+// 	case INFO:
+// 		if logLevel >= INFO {
+// 			l.WithFields(fields).Infof(e.message, args...)
+// 		}
+// 	case WARN:
+// 		if logLevel >= WARN {
+// 			l.WithFields(fields).Warnf(e.message, args...)
+// 		}
+// 	case ERROR:
+// 		// Always log ERROR level log events.
+// 		l.WithFields(fields).Errorf(e.message, args...)
+// 	case FATAL:
+// 		// Always log FATAL level log events.
+// 		l.WithFields(fields).Fatalf(e.message, args...)
+// 		// We're leaving, on a jet plane...
+// 		os.Exit(-1)
+// 	}
+// }
 
-func (l *StandardLogger) Warn(msg string, args ...interface{}) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(warnMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
-}
+// func (l *StandardLogger) Debug(msg string, args ...interface{}) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(debugMsg, filepath.Base(file), line, fmt.Sprintf(msg, args...))
+// }
 
-func (l *StandardLogger) Error(msg string, args ...interface{}) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(errorMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
-}
+// // InvalidArg is a standard error message
+// func (l *StandardLogger) Info(msg string, args ...interface{}) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(infoMsg, filepath.Base(file), line, fmt.Sprintf(msg, args...))
+// }
 
-func (l *StandardLogger) Fatal(msg string, args ...interface{}) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(fatalMsg, filepath.Base(file), fmt.Sprintf(msg, args...))
-}
+// func (l *StandardLogger) Warn(msg string, args ...interface{}) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(warnMsg, filepath.Base(file), line, fmt.Sprintf(msg, args...))
+// }
 
-func (l *StandardLogger) ExeNotFound(path string) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(notFound, filepath.Base(file), path)
-}
+// func (l *StandardLogger) Error(msg string, args ...interface{}) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(errorMsg, filepath.Base(file), line, fmt.Sprintf(msg, args...))
+// }
 
-func (l *StandardLogger) Length(arrname string, arr ...interface{}) {
-	_, file, _, _ := runtime.Caller(1)
-	l.Base(lengthMsg, filepath.Base(file), arrname, len(arr))
-}
+// func (l *StandardLogger) Fatal(msg string, args ...interface{}) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(fatalMsg, filepath.Base(file), line, fmt.Sprintf(msg, args...))
+// }
+
+// func (l *StandardLogger) ExeNotFound(path string) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(notFound, filepath.Base(file), line, path)
+// }
+
+// func (l *StandardLogger) Length(arrname string, arr ...interface{}) {
+// 	_, file, line, _ := runtime.Caller(1)
+// 	l.Base(lengthMsg, filepath.Base(file), line, arrname, len(arr))
+// }

@@ -38,7 +38,7 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) 
 		lw.Fatal(err.Error())
 	}
 	if len(events) > 0 {
-		lw.Length("events", events)
+		//lw.Length("events", events)
 		c, d := analysis.Summarize(cfg, events)
 		storeSummary(cfg, ddb, c, d)
 		//writeImages(cfg, events)
@@ -46,7 +46,7 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) 
 	} else {
 		lw.Info("no `events` to summarize")
 	}
-	return ddb;
+	return ddb
 }
 
 func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
