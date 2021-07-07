@@ -46,7 +46,7 @@ func NewSqliteDB(name string, path string) *TempDB {
 	// filepath := filepath.Join(path, todaysDB)
 	dbptr, err := sqlx.Open("sqlite3", path)
 	if err != nil {
-		lw.Debug("could not open temporary db: %v", path)
+		lw.Debug("could not open temporary db: ", path)
 		lw.Fatal(err.Error())
 	}
 
@@ -64,7 +64,7 @@ func (tdb *TempDB) DropTable(name string) {
 		stmt := fmt.Sprintf("DROP TABLE %v", name)
 		_, err := tdb.Ptr.Exec(stmt)
 		if err != nil {
-			lw.Error("Could not drop table %v", name)
+			lw.Error("Could not drop table ", name)
 		}
 	}
 }
@@ -198,12 +198,12 @@ func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 
 	insertS, err := db.Prepare(full)
 	if err != nil {
-		lw.Info("could not prepare %v insert statement", table)
+		lw.Info("could not prepare insert statement for ", table)
 		lw.Fatal(err.Error())
 	}
 	_, err = insertS.Exec(subs...)
 	if err != nil {
-		lw.Info("could not insert into temporary db: %v", table)
+		lw.Info("could not insert into temporary db: ", table)
 		lw.Fatal(err.Error())
 	}
 }
@@ -216,7 +216,7 @@ func (tdb *TempDB) Remove() {
 	lw := logwrapper.NewLogger(nil)
 	err := os.Remove(tdb.Path)
 	if err != nil {
-		lw.Error("could not delete file: %v", tdb.Path)
+		lw.Error("could not delete file: ", tdb.Path)
 	}
 }
 
@@ -225,7 +225,7 @@ func (tdb *TempDB) DebugDump(name string) error {
 	q := fmt.Sprintf("SELECT * FROM %v", name)
 	rows, err := tdb.Ptr.Queryx(q)
 	if err != nil {
-		lw.Info("could not select all from %v", name)
+		lw.Info("could not select all from ", name)
 		return errors.New("could not select all from db")
 	}
 	r := make(map[string]interface{})

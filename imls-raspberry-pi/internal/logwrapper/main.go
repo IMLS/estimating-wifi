@@ -70,7 +70,11 @@ func (l *StandardLogger) GetLogLevelName() string {
 func NewLogger(cfg *config.Config) *StandardLogger {
 	once.Do(func() {
 		initLogger(cfg)
-		standardLogger.SetLogLevel(cfg.GetLogLevel())
+		if (cfg != nil) {
+			standardLogger.SetLogLevel(cfg.GetLogLevel())
+		} else {
+			standardLogger.SetLogLevel("FATAL")
+		}
 	})
 
 	if standardLogger != nil {
