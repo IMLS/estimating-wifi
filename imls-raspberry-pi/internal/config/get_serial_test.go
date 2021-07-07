@@ -6,11 +6,13 @@ import (
 	"testing"
 )
 
-func Test_GetSerial(t *testing.T) {
+func Test_DecodeSerial(t *testing.T) {
 	// 20200505 MCJ
 	// Only run this test on a Raspberry Pi
 	if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
-		serial := GetSerial()
+		cfg := NewConfig()
+		cfg.DecodeSerial()
+		serial := cfg.GetSerial()
 		found, err := regexp.MatchString(FakeSerialCheck, serial)
 		if err != nil {
 			t.Log("error in GetSerial regexp check")

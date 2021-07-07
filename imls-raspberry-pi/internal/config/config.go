@@ -43,6 +43,7 @@ func (cfg *Config) ReadConfig(path string) error {
 		*cfg = *newcfg
 		// The API key will need to be decoded into memory.
 		if len(cfg.Auth.Token) > 0 {
+			cfg.DecodeSerial()
 			cfg.Auth.Token = cfg.decodeAuthToken()
 		}
 		if len(cfg.LshwPath) > 0 {
@@ -110,16 +111,21 @@ func (cfg *Config) decodeAuthToken() string {
 	// It is a B64 encoded string
 	// of the API key encrypted with the device's serial.
 	// This is obscurity, but it is all we can do on a RPi
-	serial := []byte(cfg.Serial)
+	serial := []byte(cfg.GetSerial())
+	// ("serial", fmt.Sprintf("%v", serial))
 	var key [32]byte
 	copy(key[:], serial)
+	// log.Println("token", cfg.Auth.Token)
 	b64, err := base64.StdEncoding.DecodeString(cfg.Auth.Token)
 	if err != nil {
 		log.Println("config: cannot b64 decode auth token.")
+		log.Println(err.Error())
 	}
 	dec, err := cryptopasta.Decrypt(b64, &key)
 	if err != nil {
 		log.Println("config: failed to decrypt auth token after decoding")
+		// log.Println("key", fmt.Sprintf("%v", key))
+		log.Println(err.Error())
 	}
 
 	return string(dec)

@@ -65,23 +65,26 @@ func (l *StandardLogger) GetLogLevelName() string {
 	return "UNKNOWN"
 }
 
-func NewLogger(cfg *config.Config) (sl *StandardLogger) {
+func NewLogger(cfg *config.Config) *StandardLogger {
 	once.Do(func() {
-		sl = newLogger(cfg)
+		standardLogger = newLogger(cfg)
 	})
 
-	// FIXME: This comes up... we need to investigate this.
-	// It came up in testing, where it is hard to debug, because STDERR/STDOUT
-	// get clobbered...
-	// What happens if we still see nil?
-	if sl == nil {
-		sl = UnsafeNewLogger(cfg)
+	if standardLogger != nil {
+		return standardLogger
 	}
-	return sl
+	if cfg == nil && standardLogger != nil {
+		return standardLogger
+	} else {
+		log.Println("Falling back on UnsafeNewLogger...")
+		return UnsafeNewLogger(cfg)
+	}
+
 }
 
 // For unit testing only
 func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
+	sl = standardLogger
 	if sl != nil {
 		return sl
 	} else {

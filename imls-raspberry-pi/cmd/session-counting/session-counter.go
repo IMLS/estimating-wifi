@@ -86,13 +86,14 @@ func main() {
 	// Read in a config
 	cfg := handleFlags()
 	cfg.NewSessionId()
-	cfg.Serial = config.GetSerial()
+	lw := logwrapper.NewLogger(cfg)
 
+	cfg.DecodeSerial()
 	// SINGLETON PATTERN
 	// Once this is set up, all loggers (should)
 	// log through the config passed here.
-	lw := logwrapper.NewLogger(cfg)
 	lw.Info("startup")
+	lw.Info("serial: %v", cfg.GetSerial())
 
 	// Make sure the mfg database is in place and can be loaded.
 	api.CheckMfgDatabaseExists(cfg)

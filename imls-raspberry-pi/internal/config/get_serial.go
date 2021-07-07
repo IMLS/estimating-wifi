@@ -33,7 +33,7 @@ func cpuinfoLines() (lines []string) {
 	return lines
 }
 
-func GetSerial() string {
+func (cfg *Config) DecodeSerial() {
 	serial := FakeSerial
 	// Try and pull from the cache, so we don't keep opening up a /proc filesystem...
 	if val, ok := cache["serial"]; ok {
@@ -59,6 +59,9 @@ func GetSerial() string {
 
 		}
 	}
+	cfg.Serial = serial
+}
 
-	return serial
+func (cfg *Config) GetSerial() string {
+	return cfg.Serial
 }

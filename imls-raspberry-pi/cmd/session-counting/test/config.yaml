@@ -1,14 +1,11 @@
-storagemodes:
-  - "local:sqlite"
-  - "imls:v2"
-logmodes:
-  - "local:file"
-  - "imls:v2"
 auth:
-  api_token: ""
+  api_token:
   device_tag: das-tag
   fcfs_seq_id: ME0607-001
+log_level: ""
+loggers: []
 monitoring:
+  pinginterval: 0
   max_http_error_count: 8
   http_error_interval_mins: 10
   uniqueness_window: 120
@@ -20,16 +17,18 @@ umbrella:
   data: /TEST/10x-imls/v2/wifi/
   logging: /TEST/10x-imls/v2/events/
 wireshark:
-  path: /usr/bin/tshark
-  check_wlan: 1
   duration: 45
+  adapter: ""
+  path: /usr/bin/tshark
+  check_wlan: "1"
+lshw_path: ""
 manufacturers:
   db: /opt/imls/manufacturers.sqlite
+sessionid: ""
+serial: ""
+storagemode: api
 local:
-  logfile: /opt/imls/log.json
+  crontab: 0 */6 * * *
   summary_db: /opt/imls/summary.sqlite
   temporary_db: /tmp/imls.sqlite
   web_directory: /www/imls
-  # "@midnight" or "0 0 * * *" for every midnight
-  crontab: "0 */6 * * *"
-

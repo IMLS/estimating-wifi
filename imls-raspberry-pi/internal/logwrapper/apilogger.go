@@ -27,7 +27,7 @@ func (a *ApiLogger) Write(p []byte) (n int, err error) {
 	fmt.Printf("API: %v\n", string(p))
 
 	data := map[string]interface{}{
-		"pi_serial":   config.GetSerial(),
+		"pi_serial":   a.cfg.GetSerial(),
 		"fcfs_seq_id": a.cfg.Auth.FCFSId,
 		"device_tag":  a.cfg.Auth.DeviceTag,
 		"session_id":  a.cfg.SessionId,
