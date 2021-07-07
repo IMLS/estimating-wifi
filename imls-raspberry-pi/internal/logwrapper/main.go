@@ -53,16 +53,16 @@ func (l *StandardLogger) SetLogLevel(level string) {
 
 func (l *StandardLogger) GetLogLevelName() string {
 	switch logLevel {
-	case 0:
+	case logrus.DebugLevel:
 		return "DEBUG"
-	case 1:
+	case logrus.InfoLevel:
 		return "INFO"
-	case 2:
+	case logrus.WarnLevel:
 		return "WARN"
-	case 3:
+	case logrus.ErrorLevel:
 		return "ERROR"
-	case 4:
-		return "FAIL"
+	case logrus.FatalLevel:
+		return "FATAL"
 	}
 	return "UNKNOWN"
 }
