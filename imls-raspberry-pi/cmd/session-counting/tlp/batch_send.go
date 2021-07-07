@@ -49,7 +49,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *Broker,
 					data = append(data, duration.AsMap())
 				}
 				lw.Debug("PostJSONing ", len(data), " duration datas")
-				_, err = http.PostJSON(cfg, cfg.GetDurationsUri(), data)
+				_, err = http.PostJSON(cfg, cfg.GetDataUri(), data)
 				if err != nil {
 					log.Println("could not log to API")
 					log.Println(err.Error())

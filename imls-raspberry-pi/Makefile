@@ -43,9 +43,9 @@ clean:
 	rm -rf release/{bin,pkg}
 
 test:
-	go test ./internal/wifi-hardware-search/lshw/*.go
-	go test ./internal/wifi-hardware-search/search/*.go
-	go test ./internal/config/*.go
-	go test ./cmd/input-configuration/*.go
-	go test ./cmd/session-counting/*.go
-	go test ./cmd/session-counting/api/*.go
+	go test -coverprofile lshw.html   ./internal/wifi-hardware-search/lshw/*.go
+	go test -coverprofile search.html ./internal/wifi-hardware-search/search/*.go
+	go test -coverprofile ic.html     ./internal/config/*.go
+	go test -coverprofile iic.html    ./cmd/input-configuration/*.go
+	go test -coverprofile sc.html     ./cmd/session-counting/*.go
+	go test -coverprofile sca.html    ./cmd/session-counting/api/*.go

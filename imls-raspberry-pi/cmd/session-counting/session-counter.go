@@ -64,7 +64,7 @@ func handleFlags() *config.Config {
 	}
 
 	if _, err := os.Stat(*configPathPtr); os.IsNotExist(err) {
-		log.Println("Looked for config at: %v", *configPathPtr)
+		log.Println("Looked for config at ", *configPathPtr)
 		log.Fatal("Cannot find config file. Exiting.")
 	}
 
@@ -95,7 +95,7 @@ func main() {
 	// Once this is set up, all loggers (should)
 	// log through the config passed here.
 	lw.Info("startup")
-	lw.Info("serial: %v", cfg.GetSerial())
+	lw.Info("serial ", cfg.GetSerial())
 
 	// Make sure the mfg database is in place and can be loaded.
 	api.CheckMfgDatabaseExists(cfg)
@@ -103,7 +103,7 @@ func main() {
 	_, err := os.Stat(cfg.Wireshark.Path)
 	if os.IsNotExist(err) {
 		//lw.ExeNotFound(cfg.Wireshark.Path)
-		lw.Fatal("not found: %v", cfg.Wireshark.Path)
+		lw.Fatal("wireshark not found at ", cfg.Wireshark.Path)
 	}
 
 	// Run the network
