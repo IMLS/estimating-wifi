@@ -1,7 +1,6 @@
 package logwrapper
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -14,18 +13,12 @@ type ApiLogger struct {
 	cfg *config.Config
 }
 
-// type Writer interface {
-//     Write(p []byte) (n int, err error)
-// }
-
 func NewApiLogger(cfg *config.Config) (api *ApiLogger) {
 	api = &ApiLogger{cfg: cfg}
 	return api
 }
 
 func (a *ApiLogger) Write(p []byte) (n int, err error) {
-	fmt.Printf("API: %v\n", string(p))
-
 	data := map[string]interface{}{
 		"pi_serial":   a.cfg.GetSerial(),
 		"fcfs_seq_id": a.cfg.Auth.FCFSId,
