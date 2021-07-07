@@ -33,20 +33,21 @@ var once sync.Once
 
 const LOGDIR = "/var/log/session-counter"
 
-var logLevel int = -1
+var logLevel = logrus.InfoLevel
 
 func (l *StandardLogger) SetLogLevel(level string) {
 	// log.Println("setting log level to", level)
 	switch strings.ToLower(level) {
 	case "debug":
-		logLevel = DEBUG
+		logLevel = logrus.DebugLevel
 	case "info":
-		logLevel = INFO
+		logLevel = logrus.InfoLevel
 	case "warn":
-		logLevel = WARN
+		logLevel = logrus.WarnLevel
 	default:
-		logLevel = ERROR
+		logLevel = logrus.ErrorLevel
 	}
+	standardLogger.SetLevel(logLevel)
 	// log.Println("log level is now", l.GetLogLevelName())
 }
 
@@ -149,11 +150,11 @@ func initLogger(cfg *config.Config) {
 }
 
 const (
-	DEBUG = iota
-	INFO
-	WARN
+	FATAL = iota
 	ERROR
-	FATAL
+	WARN
+	INFO
+	DEBUG
 )
 
 // Declare variables to store log messages as new Events
