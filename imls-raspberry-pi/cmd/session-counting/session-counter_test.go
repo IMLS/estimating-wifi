@@ -13,7 +13,6 @@ import (
 
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 )
@@ -164,7 +163,6 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 func TestRawToUid(t *testing.T) {
 	log.Println("TestRawToUid")
 	cfg := new(config.Config)
-	logwrapper.NewLogger(cfg)
 
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
