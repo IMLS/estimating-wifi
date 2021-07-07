@@ -47,5 +47,5 @@ test:
 	go test -coverprofile search.out ./internal/wifi-hardware-search/search/*.go
 	go test -coverprofile ic.out     ./internal/config/*.go
 	go test -coverprofile iic.out    ./cmd/input-configuration/*.go
-	go test -coverprofile sc.out     ./cmd/session-counting/*.go
 	go test -coverprofile sca.out    ./cmd/session-counting/api/*.go
+	go test -coverprofile sc.out     ./cmd/session-counting/*.go

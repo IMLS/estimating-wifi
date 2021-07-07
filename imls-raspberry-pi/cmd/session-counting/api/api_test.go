@@ -10,6 +10,7 @@ import (
 
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/http"
+	"gsa.gov/18f/logwrapper"
 )
 
 // This should be much higher, like 2000
@@ -18,6 +19,7 @@ const dbIterations = 2000
 
 func Test_get_manufactuerer(t *testing.T) {
 	cfg := config.Config{}
+	logwrapper.NewLogger(&cfg)
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
 	cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
