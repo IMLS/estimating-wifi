@@ -10,6 +10,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 	"gsa.gov/18f/cryptopasta"
+	"gsa.gov/18f/wifi-hardware-search/config"
 )
 
 func NewConfig() *Config {
@@ -44,6 +45,9 @@ func (cfg *Config) ReadConfig(path string) error {
 		// The API key will need to be decoded into memory.
 		if len(cfg.Auth.Token) > 0 {
 			cfg.Auth.Token = cfg.decodeAuthToken()
+		}
+		if len(cfg.LshwPath) > 0 {
+			config.SetLSHWLocation(cfg.LshwPath)
 		}
 		return nil
 	} else {
@@ -148,6 +152,7 @@ type Config struct {
 		Path      string `yaml:"path"`
 		CheckWlan string `yaml:"check_wlan"`
 	} `yaml:"wireshark"`
+	LshwPath string `yaml:"lshw_path"`
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
