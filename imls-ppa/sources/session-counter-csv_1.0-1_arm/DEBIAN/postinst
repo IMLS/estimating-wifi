@@ -4,6 +4,12 @@ set -e
 systemctl daemon-reload
 systemctl enable imls-update.timer
 
+# set hostname
+DEVICE_TAG=$(grep device_tag /opt/imls/config.yaml | cut -d':' -f 2 | tr -d ' ')
+FCFS_SEQ_ID=$(grep fcfs_seq_id /opt/imls/config.yaml | cut -d':' -f 2 | tr -d ' ')
+hostnamectl set-hostname "${FCFS_SEQ_ID}-${DEVICE_TAG}.local"
+systemctl restart avahi-daemon
+
 # nginx
 systemctl enable nginx.service
 mkdir -p /www/imls
