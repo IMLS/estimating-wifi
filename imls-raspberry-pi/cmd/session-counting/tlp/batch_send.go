@@ -1,8 +1,12 @@
 package tlp
 
 import (
+	"log"
+	"encoding/json"
+
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/http"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/model"
 )
@@ -34,6 +38,21 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *Broker,
 			if err != nil {
 				lw.Info("error in extracting all durations")
 				lw.Fatal(err.Error())
+			}
+
+			// convert []Duration to an array of map[string]string
+			data := make([]map[string]string, 0)
+			// this is awful. is there a better way?
+			var inInterface map[string]string
+			for _, duration := range durations {
+				what, _ := json.Marshal(duration)
+				json.Unmarshal(what, &inInterface)
+				data = append(data, inInterface)
+			}
+			_, err = http.PostJSON(cfg, cfg.GetDataUri(), data)
+			if err != nil {
+				log.Println("could not log to API")
+				log.Println(err.Error())
 			}
 		}
 	}
