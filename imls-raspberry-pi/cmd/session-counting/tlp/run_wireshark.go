@@ -47,7 +47,7 @@ func tshark(cfg *config.Config) []string {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			// The program has exited with an exit code != 0
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				lw.Error("tshark exit status", status.ExitStatus())
+				lw.Fatal("tshark exit status", status.ExitStatus())
 			}
 		} else {
 			lw.Fatal("tsharkCmd.Wait()", err.Error())
