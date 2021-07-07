@@ -110,7 +110,9 @@ func main() {
 	lw.Info("startup")
 
 	// Store this so we don't keep hitting /proc/cpuinfo
-	cfg.Serial = config.GetSerial()
+	if cfg.Serial == "" {
+		cfg.Serial = config.GetSerial()
+	}
 	// Make sure the mfg database is in place and can be loaded.
 	api.CheckMfgDatabaseExists(cfg)
 

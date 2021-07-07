@@ -105,7 +105,7 @@ func (cfg *Config) decodeAuthToken() string {
 	// It is a B64 encoded string
 	// of the API key encrypted with the device's serial.
 	// This is obscurity, but it is all we can do on a RPi
-	serial := []byte(GetSerial())
+	serial := []byte(cfg.Serial)
 	var key [32]byte
 	copy(key[:], serial)
 	b64, err := base64.StdEncoding.DecodeString(cfg.Auth.Token)
