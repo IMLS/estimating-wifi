@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"strings"
+	"syscall"
 
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
@@ -39,7 +40,20 @@ func tshark(cfg *config.Config) []string {
 		lw.Info("did not read wireshark bytes")
 		lw.Error(err.Error())
 	}
-	tsharkCmd.Wait()
+
+	//tsharkCmd.Wait()
+	// From https://stackoverflow.com/questions/10385551/get-exit-code-go
+	if err := tsharkCmd.Wait(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			// The program has exited with an exit code != 0
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+				lw.Error("tshark exit status", status.ExitStatus())
+			}
+		} else {
+			lw.Fatal("tsharkCmd.Wait()", err.Error())
+		}
+	}
+
 	macs := strings.Split(string(tsharkBytes), "\n")
 
 	return macs
