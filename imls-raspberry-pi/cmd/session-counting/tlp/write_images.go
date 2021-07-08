@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
@@ -15,7 +14,7 @@ import (
 //This must happen after the data is updated for the day.
 func writeImages(cfg *config.Config, durations []analysis.Duration) {
 	lw := logwrapper.NewLogger(nil)
-	yesterday := time.Now().Add(-24 * time.Hour)
+	yesterday := model.GetYesterday()
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
@@ -36,7 +35,8 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) {
 }
 
 func WriteImages(ka *Keepalive, cfg *config.Config, kb *Broker,
-	ch_durations_db chan *model.TempDB) {
+	ch_durations_db chan *model.TempDB,
+	ch_proceed chan<- Ping) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting WriteImages")
@@ -56,13 +56,19 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *Broker,
 			lw.Debug("exiting WriteImages")
 			return
 		case db := <-ch_durations_db:
-			durations := []analysis.Duration{}
-			yestersession := model.GetYesterdaySessionId()
-			err := db.Ptr.Select(durations, `SELECT * FROM durations WHERE session_id=?`, yestersession)
-			if err != nil {
-				lw.Error("could not retrieve durations from yesterday")
+			unsents := db.GetUnsentBatches()
+			lw.Debug("write images found ", len(unsents), " unsent batches to write as images.")
+			for _, unsent := range unsents {
+				durations := []analysis.Duration{}
+				lw.Debug("looking for session ", unsent.Session, " in durations table to write images")
+				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", unsent.Session)
+				if err != nil {
+					lw.Info("error in extracting durations for session", unsent.Session)
+					lw.Error(err.Error())
+				}
+				writeImages(cfg, durations)
+				ch_proceed <- Ping{}
 			}
-			writeImages(cfg, durations)
 		}
 	}
 }

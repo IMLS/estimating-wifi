@@ -9,8 +9,13 @@ import (
 
 func GetYesterdaySessionId() string {
 	lw := logwrapper.NewLogger(nil)
-	yesterday := time.Now().Add(-1 * time.Hour)
+	yesterday := GetYesterday()
 	yestersession := fmt.Sprintf("%v%02d%02d", yesterday.Year(), yesterday.Month(), yesterday.Day())
 	lw.Debug("considering yesterday to be [", yestersession, "]")
 	return yestersession
+}
+
+func GetYesterday() time.Time {
+	yesterday := time.Now().Add(-1 * time.Hour)
+	return yesterday
 }

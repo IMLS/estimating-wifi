@@ -2,12 +2,12 @@ package analysis
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
 	"github.com/fogleman/gg"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 func DrawPatronSessionsFromWifi(cfg *config.Config, events []WifiEvent, outputPath string) {
@@ -20,6 +20,13 @@ func DrawPatronSessionsFromWifi(cfg *config.Config, events []WifiEvent, outputPa
 }
 
 func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
+	lw := logwrapper.NewLogger(nil)
+
+	if len(durations) == 0 {
+		lw.Error("DrawPatronSessions was passed zero durations to draw.")
+		lw.Error("Wanted to draw to the output path ", outputPath)
+		return
+	}
 
 	// Capture the data about the session while running in a `counter` structure.
 	durationsInRange := 0
@@ -164,11 +171,12 @@ func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath str
 	}
 
 	//baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
+	lw.Debug("writing summary image to ", outputPath)
 
 	err := dc.SavePNG(outputPath)
 	if err != nil {
-		log.Println("drawing: failed to save png")
-		log.Fatal(err)
+		lw.Info("drawing: failed to save png")
+		lw.Fatal(err.Error())
 	}
 }
 
