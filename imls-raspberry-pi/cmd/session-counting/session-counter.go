@@ -25,10 +25,12 @@ func run(cfg *config.Config) {
 	ch_data_for_report := make(chan []analysis.WifiEvent)
 	ch_wifidb := make(chan *model.TempDB)
 	ch_ddb := make(chan *model.TempDB)
-	ch_batch := make(chan *model.TempDB)
-	ch_proceed := make(chan tlp.Ping)
+	ch_ddb_par := make([]chan *model.TempDB, 2)
+	for i := 0; i < 2; i++ {
+		ch_ddb_par[i] = make(chan *model.TempDB)
+	}
 	// BROKERS
-	resetbroker := &tlp.ResetBroker{ tlp.NewBroker() }
+	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
 	go resetbroker.Start()
 	var killbroker *tlp.KillBroker = nil
 	ka := tlp.NewKeepalive(cfg)
@@ -42,9 +44,9 @@ func run(cfg *config.Config) {
 	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb)
 
 	go tlp.GenerateDurations(ka, cfg, killbroker, ch_wifidb, ch_ddb)
-	// go tlp.ParDeltaTempDB(killbroker, ch_ddb, ch_ddb_par...)
-	go tlp.BatchSend(ka, cfg, killbroker, ch_ddb, ch_batch, ch_proceed)
-	go tlp.WriteImages(ka, cfg, killbroker, ch_batch, ch_proceed)
+	go tlp.ParDeltaTempDB(killbroker, ch_ddb, ch_ddb_par...)
+	go tlp.BatchSend(ka, cfg, killbroker, ch_ddb_par[0])
+	go tlp.WriteImages(ka, cfg, killbroker, ch_ddb_par[1])
 
 	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
 }

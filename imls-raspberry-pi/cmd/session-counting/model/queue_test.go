@@ -28,6 +28,12 @@ func TestEnqueue(t *testing.T) {
 	q.Enqueue("abc")
 }
 
+func TestMultiEnqueue(t *testing.T) {
+	q := NewQueue(cfg, "queue1")
+	q.Enqueue("123")
+	q.Enqueue("123")
+}
+
 func TestPeek(t *testing.T) {
 	q := NewQueue(cfg, "queue1")
 	lw.Debug("PEEK ", q.Peek())

@@ -13,7 +13,7 @@ type Item interface{}
 
 type QueueRow struct {
 	Rowid int
-	Item  string `db:"item" sqlite:"TEXT"`
+	Item  string `db:"item" sqlite:"TEXT UNIQUE"`
 }
 
 type Queue struct {
@@ -34,8 +34,15 @@ func NewQueue(cfg *config.Config, name string) (q *Queue) {
 func (queue *Queue) Enqueue(sessionid string) {
 	queue.mutex.Lock()
 	defer queue.mutex.Unlock()
-	qr := QueueRow{Item: sessionid}
-	queue.db.InsertStruct(queue.name, qr)
+	lw := logwrapper.NewLogger(nil)
+
+	//qr := QueueRow{Item: sessionid}
+	//queue.db.InsertStruct(queue.name, qr)
+	_, err := queue.db.Ptr.Exec(fmt.Sprintf("INSERT OR IGNORE INTO %v (item) VALUES (?)", queue.name), sessionid)
+	if err != nil {
+		lw.Error("error in enqueue insert")
+		lw.Error(err.Error())
+	}
 }
 
 func (queue *Queue) Peek() Item {

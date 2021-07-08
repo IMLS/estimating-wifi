@@ -61,6 +61,10 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		ping, pong = ka.Subscribe("GenerateDurations", 30)
 	}
 
+	// Queues for processing duration data
+	sq := model.NewQueue(cfg, "sent")
+	iq := model.NewQueue(cfg, "images")
+
 	for {
 		select {
 		case <-ping:
@@ -74,9 +78,10 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			// up the chain. So, we need to process the events from the day.
 			durationsdb := processDataFromDay(cfg, "wifi", wifidb)
 			// Creates the table if it does not exist.
-			durationsdb.AddStructAsTable("batches", model.Batch{})
+			//durationsdb.AddStructAsTable("batches", model.Batch{})
 			yestersession := model.GetYesterdaySessionId()
-			durationsdb.InsertStruct("batches", model.Batch{Session: yestersession, Sent: 0})
+			sq.Enqueue(yestersession)
+			iq.Enqueue(yestersession)
 			ch_durations_db <- durationsdb
 		}
 	}

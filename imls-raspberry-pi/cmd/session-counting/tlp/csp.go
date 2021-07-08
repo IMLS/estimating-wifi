@@ -16,7 +16,7 @@ type Ping struct {
 
 // In an infinite loop, we read in from the input channel, and
 // in parallel, write out the value to the two output channels.
-func ParDeltaTempDB(kb *Broker, ch_reset_in <-chan *model.TempDB, chs_reset_out ...chan *model.TempDB) {
+func ParDeltaTempDB(kb *KillBroker, ch_reset_in <-chan *model.TempDB, chs_reset_out ...chan *model.TempDB) {
 	// Block waiting for a message
 	// It will be the zeroth channel in the group.
 	lw := logwrapper.NewLogger(nil)

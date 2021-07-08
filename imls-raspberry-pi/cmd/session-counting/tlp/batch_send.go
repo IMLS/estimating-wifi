@@ -11,9 +11,7 @@ import (
 )
 
 func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db_in <-chan *model.TempDB,
-	ch_batch chan *model.TempDB,
-	ch_proceed <-chan Ping) {
+	ch_durations_db_in <-chan *model.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting BatchSend")
@@ -33,14 +31,15 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			lw.Debug("exiting BatchSend")
 			return
 		case db := <-ch_durations_db_in:
-			unsents := db.GetUnsentBatches()
-			lw.Debug("found ", len(unsents), " batches that are unsent")
-			for _, unsent := range unsents {
+			sq := model.NewQueue(cfg, "sent")
+
+			for sq.Peek() != nil {
+				nextSessionIdToSend := sq.Peek()
 				durations := []analysis.Duration{}
-				lw.Debug("looking for session ", unsent.Session, " in durations table")
-				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", unsent.Session)
+				// lw.Debug("looking for session ", unsent.Session, " in durations table")
+				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIdToSend)
 				if err != nil {
-					lw.Info("error in extracting durations for session", unsent.Session)
+					lw.Info("error in extracting durations for session", nextSessionIdToSend)
 					lw.Error(err.Error())
 				}
 				lw.Debug("found ", len(durations), " durations to send.")
@@ -56,11 +55,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 					}
 
 					// Lets process images even if we cannot get through to the API server.
-					lw.Debug("sending unsent session ", unsent.Session, " to be written as an images.")
-					// Request/Response pattern. We send a DB to be processed into images, and expect
-					// a ping back before proceeding.
-					ch_batch <- db
-					<-ch_proceed
+					lw.Debug("sending unsent session ", nextSessionIdToSend, " to be written as an images.")
 
 					// After writing images, we come back and try and send the data remotely.
 					lw.Debug("PostJSONing ", len(data), " duration datas")
@@ -70,7 +65,8 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 						log.Println(err.Error())
 					} else {
 						// If we successfully sent the data remotely, we can now mark it is as sent.
-						db.MarkAsSent(unsent)
+						//db.MarkAsSent(unsent)
+						sq.Dequeue()
 					}
 				}
 

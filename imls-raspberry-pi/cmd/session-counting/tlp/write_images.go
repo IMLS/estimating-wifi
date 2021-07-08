@@ -12,13 +12,16 @@ import (
 )
 
 //This must happen after the data is updated for the day.
-func writeImages(cfg *config.Config, durations []analysis.Duration) {
+func writeImages(cfg *config.Config, durations []analysis.Duration) error {
 	lw := logwrapper.NewLogger(nil)
+	var reterr error
+
 	yesterday := model.GetYesterday()
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
 			lw.Error("could not create web directory: %v", cfg.Local.WebDirectory)
+			reterr = err
 		}
 	}
 	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
@@ -26,17 +29,18 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) {
 		err := os.Mkdir(imagedir, 0777)
 		if err != nil {
 			lw.Error("could not create image directory")
+			reterr = err
 		}
 	}
 
 	path := filepath.Join(imagedir, fmt.Sprintf("%04d-%02d-%02d-%v-%v-summary.png", yesterday.Year(), int(yesterday.Month()), int(yesterday.Day()), cfg.Auth.FCFSId, cfg.Auth.DeviceTag))
 	// func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
 	analysis.DrawPatronSessions(cfg, durations, path)
+	return reterr
 }
 
 func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db chan *model.TempDB,
-	ch_proceed chan<- Ping) {
+	ch_durations_db chan *model.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting WriteImages")
@@ -56,18 +60,24 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			lw.Debug("exiting WriteImages")
 			return
 		case db := <-ch_durations_db:
-			unsents := db.GetUnsentBatches()
-			lw.Debug("write images found ", len(unsents), " unsent batches to write as images.")
-			for _, unsent := range unsents {
+			iq := model.NewQueue(cfg, "images")
+			for iq.Peek() != nil {
+				nextImage := iq.Peek()
 				durations := []analysis.Duration{}
-				lw.Debug("looking for session ", unsent.Session, " in durations table to write images")
-				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", unsent.Session)
+				lw.Debug("looking for session ", nextImage, " in durations table to write images")
+				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)
 				if err != nil {
-					lw.Info("error in extracting durations for session", unsent.Session)
+					lw.Info("error in extracting durations for session", nextImage)
 					lw.Error(err.Error())
+				} else {
+					err = writeImages(cfg, durations)
+					if err != nil {
+						lw.Error("error in writing images")
+						lw.Error(err.Error())
+					} else {
+						iq.Dequeue()
+					}
 				}
-				writeImages(cfg, durations)
-				ch_proceed <- Ping{}
 			}
 		}
 	}
