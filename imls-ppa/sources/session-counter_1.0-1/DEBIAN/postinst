@@ -7,4 +7,5 @@ set -e
 raspi-config nonint do_wifi_country US
 
 systemctl daemon-reload
+systemctl enable session-counter.service
 systemctl start session-counter.service
