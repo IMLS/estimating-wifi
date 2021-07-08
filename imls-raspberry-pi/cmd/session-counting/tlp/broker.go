@@ -10,6 +10,14 @@ type Broker struct {
 	ch_sub chan chan interface{}
 }
 
+type ResetBroker struct {
+	*Broker
+}
+
+type KillBroker struct {
+	*Broker
+}
+
 func NewBroker() *Broker {
 	return &Broker{
 		ch_pub: make(chan interface{}, 1),

@@ -34,7 +34,7 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) {
 	analysis.DrawPatronSessions(cfg, durations, path)
 }
 
-func WriteImages(ka *Keepalive, cfg *config.Config, kb *Broker,
+func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	ch_durations_db chan *model.TempDB,
 	ch_proceed chan<- Ping) {
 

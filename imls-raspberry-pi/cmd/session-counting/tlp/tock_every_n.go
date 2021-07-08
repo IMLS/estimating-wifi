@@ -5,7 +5,7 @@ import (
 	"gsa.gov/18f/logwrapper"
 )
 
-func TockEveryMinute(ka *Keepalive, kb *Broker, out chan<- bool) {
+func TockEveryMinute(ka *Keepalive, kb *KillBroker, out chan<- bool) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryMinute")
 	var ping, pong chan interface{} = nil, nil
@@ -49,7 +49,7 @@ func TockEveryMinute(ka *Keepalive, kb *Broker, out chan<- bool) {
  * When `in` is every second, and `n` is 60, it turns
  * a stream of second ticks into minute `tocks`.
  */
-func TockEveryN(ka *Keepalive, kb *Broker, n int, in <-chan bool, out chan<- bool) {
+func TockEveryN(ka *Keepalive, kb *KillBroker, n int, in <-chan bool, out chan<- bool) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryN")
 	var ping, pong chan interface{} = nil, nil

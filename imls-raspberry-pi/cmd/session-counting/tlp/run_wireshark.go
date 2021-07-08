@@ -66,7 +66,7 @@ func tshark(cfg *config.Config) []string {
  * is then communicated out.
  * Empty MAC addresses are filtered out.
  */
-func RunWireshark(ka *Keepalive, cfg *config.Config, kb *Broker, in <-chan bool, out chan []string) {
+func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan bool, out chan []string) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Info("starting RunWireshark")
 	var ping, pong chan interface{} = nil, nil

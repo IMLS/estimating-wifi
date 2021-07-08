@@ -10,7 +10,7 @@ import (
 	"gsa.gov/18f/session-counter/model"
 )
 
-func BatchSend(ka *Keepalive, cfg *config.Config, kb *Broker,
+func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	ch_durations_db_in <-chan *model.TempDB,
 	ch_batch chan *model.TempDB,
 	ch_proceed <-chan Ping) {

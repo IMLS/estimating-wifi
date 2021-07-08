@@ -28,9 +28,9 @@ func run(cfg *config.Config) {
 	ch_batch := make(chan *model.TempDB)
 	ch_proceed := make(chan tlp.Ping)
 	// BROKERS
-	resetbroker := tlp.NewBroker()
+	resetbroker := &tlp.ResetBroker{ tlp.NewBroker() }
 	go resetbroker.Start()
-	var killbroker *tlp.Broker = nil
+	var killbroker *tlp.KillBroker = nil
 	ka := tlp.NewKeepalive(cfg)
 
 	// PROCESSES
@@ -47,7 +47,6 @@ func run(cfg *config.Config) {
 	go tlp.WriteImages(ka, cfg, killbroker, ch_batch, ch_proceed)
 
 	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
-
 }
 
 func handleFlags() *config.Config {
