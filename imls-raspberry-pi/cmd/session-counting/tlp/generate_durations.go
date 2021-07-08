@@ -49,7 +49,7 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) 
 	return ddb
 }
 
-func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *Broker,
+func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	ch_db <-chan *model.TempDB, ch_durations_db chan<- *model.TempDB) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting GenerateDurations")

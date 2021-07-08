@@ -28,7 +28,7 @@ func newTempDbInFS(cfg *config.Config) *model.TempDB {
 	return tdb
 }
 
-func CacheWifi(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker,
+func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker,
 	ch_data <-chan []analysis.WifiEvent, ch_db chan<- *model.TempDB) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting CacheWifi")

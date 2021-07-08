@@ -6,7 +6,7 @@ import (
 	"gsa.gov/18f/logwrapper"
 )
 
-func PingAtMidnight(ka *Keepalive, cfg *config.Config, rb *Broker, kb *Broker) {
+func PingAtMidnight(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting PingAtMidnight")
 	var ping, pong chan interface{} = nil, nil

@@ -13,7 +13,7 @@ import (
 // Converts raw data to a map[string]string
 // This makexs it ready for storage locally (SQLite) or
 // via an API (where everything becomes text anyway).
-func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *Broker,
+func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	in_hash <-chan map[string]int, out_arr chan<- []analysis.WifiEvent) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting PrepEphemeralWifi")
