@@ -40,10 +40,6 @@ type TempDB struct {
 func NewSqliteDB(name string, path string) *TempDB {
 	lw := logwrapper.NewLogger(nil)
 	db := TempDB{}
-	// t := time.Now()
-	// todaysDB := fmt.Sprintf("%v-%02d-%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), name)
-	// lw.Debug("db filename: %v", todaysDB)
-	// filepath := filepath.Join(path, todaysDB)
 	dbptr, err := sqlx.Open("sqlite3", path)
 	if err != nil {
 		lw.Debug("could not open temporary db: ", path)
@@ -92,12 +88,15 @@ func (tdb *TempDB) AddStructAsTable(table string, s interface{}) {
 	columns := make(map[string]string)
 	rt := reflect.TypeOf(s)
 	if rt.Kind() != reflect.Struct {
-		log.Println("cannot add this struct as a table in", table, s)
+		log.Println("cannot add this struct as a table in ", table, s)
 		panic("bad type")
 	}
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
-		columns[f.Tag.Get("db")] = f.Tag.Get("sqlite")
+		if f.Tag != "" {
+			columns[f.Tag.Get("db")] = f.Tag.Get("sqlite")
+
+		}
 	}
 
 	tdb.AddTable(table, columns)
@@ -157,10 +156,12 @@ func (tdb *TempDB) InsertStruct(table string, s interface{}) {
 		tag := f.Tag
 		// log.Println("tag", tag)
 		// time.Sleep(1 * time.Second)
-		if !strings.Contains(string(tag), "AUTOINCREMENT") {
-			cleantag := strings.ReplaceAll(f.Tag.Get("db"), "\"", "")
-			cleanvalue := strings.ReplaceAll(fmt.Sprintf("%v", fv), "\"", "")
-			values[cleantag] = cleanvalue
+		if f.Tag != "" {
+			if !strings.Contains(string(tag), "AUTOINCREMENT") {
+				cleantag := strings.ReplaceAll(f.Tag.Get("db"), "\"", "")
+				cleanvalue := strings.ReplaceAll(fmt.Sprintf("%v", fv), "\"", "")
+				values[cleantag] = cleanvalue
+			}
 		}
 	}
 	// log.Println("values", values)
