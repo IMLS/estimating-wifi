@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
 set -e
+
+# we have had issues with rfkill on recent raspberry OSen. so, make
+# sure wifi works.
+raspi-config nonint do_wifi_country US
+
 systemctl daemon-reload
 systemctl start session-counter.service
