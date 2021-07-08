@@ -182,11 +182,11 @@ func TestRawToUid(t *testing.T) {
 		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
 
 		var wg sync.WaitGroup
-		resetbroker := tlp.NewBroker()
+		resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
 		go resetbroker.Start()
 		// The kill broker lets us poison the network.
 		// var killbroker *tlp.Broker = nil
-		killbroker := tlp.NewBroker()
+		killbroker := &tlp.KillBroker{tlp.NewBroker()}
 		go killbroker.Start()
 
 		ch_macs := make(chan []string)
@@ -234,7 +234,7 @@ func TestRawToUid(t *testing.T) {
 	} // end for over tests
 }
 
-func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.Broker, kb *tlp.Broker, n_hours int, ch_tick chan bool) {
+func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.ResetBroker, kb *tlp.KillBroker, n_hours int, ch_tick chan bool) {
 	counter := 0
 	ch_kill := kb.Subscribe()
 	for {
@@ -273,7 +273,7 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.Broker, in <-chan bool, out chan []string) {
+func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker, in <-chan bool, out chan []string) {
 	NUMMACS := 40
 	NUMRANDOM := 10
 	ch_kill := kb.Subscribe()
@@ -301,13 +301,13 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.Broker, in 
 }
 
 func TestManyTLPCycles(t *testing.T) {
-	const NUMDAYSTORUN int = 1
+	const NUMDAYSTORUN int = 7
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
 	const WRITESUMMARYNHOURS int = 1
 	const SECONDSPERMINUTE int = 3
-	resetbroker := tlp.NewBroker()
+	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
 	go resetbroker.Start()
-	killbroker := tlp.NewBroker()
+	killbroker := &tlp.KillBroker{tlp.NewBroker()}
 	go killbroker.Start()
 
 	// This runs the TLP through 10000 cycles. This is roughly the same as week.
