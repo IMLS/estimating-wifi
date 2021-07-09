@@ -344,9 +344,13 @@ func TestManyTLPCycles(t *testing.T) {
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_db := make(chan *model.TempDB)
+	ch_wifidb := make(chan *model.TempDB)
 	ch_durations_db := make(chan *model.TempDB)
 	ch_ack := make(chan tlp.Ping)
+	ch_ddb_par := make([]chan *model.TempDB, 2)
+	for i := 0; i < 2; i++ {
+		ch_ddb_par[i] = make(chan *model.TempDB)
+	}
 
 	// See if we can wait and shut down the test...
 	var wg sync.WaitGroup
@@ -371,10 +375,13 @@ func TestManyTLPCycles(t *testing.T) {
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
 	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
-	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db, ch_ack)
+	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb, ch_ack)
 	// Make sure we don't hang...
-	go tlp.GenerateDurations(nil, cfg, killbroker, ch_db, ch_durations_db, ch_ack)
-	go tlp.BatchSend(nil, cfg, killbroker, ch_durations_db)
+	go tlp.GenerateDurations(nil, cfg, killbroker, ch_wifidb, ch_durations_db, ch_ack)
+
+	go tlp.ParDeltaTempDB(killbroker, ch_durations_db, ch_ddb_par...)
+	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
+	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
 
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {
