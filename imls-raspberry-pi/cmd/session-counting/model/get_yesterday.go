@@ -16,6 +16,6 @@ func GetYesterdaySessionId() string {
 }
 
 func GetYesterday() time.Time {
-	yesterday := time.Now().Add(-1 * time.Hour)
+	yesterday := time.Now().Add(-24 * time.Hour)
 	return yesterday
 }

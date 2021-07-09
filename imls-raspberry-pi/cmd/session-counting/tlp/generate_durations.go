@@ -7,18 +7,16 @@ import (
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/session-counter/constants"
 	"gsa.gov/18f/session-counter/model"
 )
 
-func createDurationsTable(cfg *config.Config) *model.TempDB {
+func GetDurationsDB(cfg *config.Config) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
-	durationsDB := "durations.sqlite"
-	fullpath := filepath.Join(cfg.Local.WebDirectory, durationsDB)
-	tdb := model.NewSqliteDB(durationsDB, fullpath)
-	lw.Info("Created durations db: %v", fullpath)
-	// Add in the table.
+	fullpath := filepath.Join(cfg.Local.WebDirectory, constants.DURATIONSDB)
+	tdb := model.NewSqliteDB(constants.DURATIONSDB, fullpath)
 	tdb.AddStructAsTable("durations", analysis.Duration{})
-	lw.Info("Created durations table")
+	lw.Info("Created durations table in db [", fullpath, "]")
 	return tdb
 }
 
@@ -30,9 +28,14 @@ func storeSummary(cfg *config.Config, tdb *model.TempDB, c *analysis.Counter, du
 
 func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
-	ddb := createDurationsTable(cfg)
+	ddb := GetDurationsDB(cfg)
 	events := []analysis.WifiEvent{}
+
+	lw.Debug("selecting all events from wifi table")
+	wifidb.Open()
 	err := wifidb.Ptr.Select(&events, fmt.Sprintf("SELECT * FROM %v", table))
+	wifidb.Close()
+
 	if err != nil {
 		lw.Info("error in extracting all events: %v", table)
 		lw.Fatal(err.Error())
@@ -50,7 +53,9 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) 
 }
 
 func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_db <-chan *model.TempDB, ch_durations_db chan<- *model.TempDB) {
+	ch_db <-chan *model.TempDB,
+	ch_durations_db chan<- *model.TempDB,
+	ch_ack chan<- Ping) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting GenerateDurations")
 	var ping, pong chan interface{} = nil, nil
@@ -76,13 +81,19 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		case wifidb := <-ch_db:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
-			durationsdb := processDataFromDay(cfg, "wifi", wifidb)
+			durationsdb := processDataFromDay(cfg, constants.WIFIDB, wifidb)
 			// Creates the table if it does not exist.
 			//durationsdb.AddStructAsTable("batches", model.Batch{})
 			yestersession := model.GetYesterdaySessionId()
 			sq.Enqueue(yestersession)
 			iq.Enqueue(yestersession)
+			// When we're done processing everything, let CacheWifi know
+			// that it is safe to continue.
+			ch_ack <- Ping{}
+			// Everything else is related to the duraitons DB, so that
+			// can happen in parallel with other work.
 			ch_durations_db <- durationsdb
+
 		}
 	}
 }

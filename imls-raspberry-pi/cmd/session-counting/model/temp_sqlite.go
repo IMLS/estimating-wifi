@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -19,36 +20,15 @@ type TempDB struct {
 	DBName string
 	Path   string
 	Tables map[string]map[string]string
+	mutex  sync.Mutex
 }
 
-// func newTempDbInFS(cfg *config.Config) *sqlx.DB {
-// 	lw := logwrapper.NewLogger(nil)
-
-// 	t := time.Now()
-// 	todaysDB := fmt.Sprintf("%v-%02d-%02d-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
-// 	lw.Info("Created temporary db: %v", todaysDB)
-// 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
-// 	db, err := sqlx.Open("sqlite3", path)
-// 	if err != nil {
-// 		lw.Fatal("could not open temporary db: %v", path)
-// 	}
-
-// 	createWifiTable(cfg, db)
-// 	return db
-// }
-
 func NewSqliteDB(name string, path string) *TempDB {
-	lw := logwrapper.NewLogger(nil)
+	// lw := logwrapper.NewLogger(nil)
 	db := TempDB{}
-	dbptr, err := sqlx.Open("sqlite3", path)
-	if err != nil {
-		lw.Debug("could not open temporary db: ", path)
-		lw.Fatal(err.Error())
-	}
-
 	db.DBName = name
 	db.Path = path
-	db.Ptr = dbptr
+	db.Ptr = nil
 	db.Tables = make(map[string]map[string]string)
 	return &db
 }
@@ -56,11 +36,14 @@ func NewSqliteDB(name string, path string) *TempDB {
 func (tdb *TempDB) DropTable(name string) {
 	lw := logwrapper.NewLogger(nil)
 	if _, ok := tdb.Tables[name]; ok {
-		delete(tdb.Tables, name)
+		tdb.Open()
+		defer tdb.Close()
 		stmt := fmt.Sprintf("DROP TABLE %v", name)
 		_, err := tdb.Ptr.Exec(stmt)
 		if err != nil {
 			lw.Error("Could not drop table ", name)
+		} else {
+			delete(tdb.Tables, name)
 		}
 	}
 }
@@ -76,6 +59,8 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 	}
 	statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
 	lw.Debug("AddTable ", statement)
+	tdb.Open()
+	defer tdb.Close()
 	_, err := tdb.Ptr.Exec(statement)
 	if err != nil {
 		lw.Info("could not re-create '", name, "' table in temporary db.")
@@ -84,6 +69,7 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 }
 
 func (tdb *TempDB) AddStructAsTable(table string, s interface{}) {
+
 	//lw := logwrapper.NewLogger(nil)
 	columns := make(map[string]string)
 	rt := reflect.TypeOf(s)
@@ -98,7 +84,6 @@ func (tdb *TempDB) AddStructAsTable(table string, s interface{}) {
 
 		}
 	}
-
 	tdb.AddTable(table, columns)
 }
 
@@ -139,6 +124,20 @@ func (tdb *TempDB) GetFields(table string) (fields []string) {
 }
 
 func (tdb *TempDB) InsertStruct(table string, s interface{}) {
+	tdb.Open()
+	defer tdb.Close()
+	tdb.insertStructWithoutOpen(table, s)
+}
+
+func (tdb *TempDB) InsertManyStructs(table string, ses []interface{}) {
+	tdb.Open()
+	for _, s := range ses {
+		tdb.insertStructWithoutOpen(table, s)
+	}
+	tdb.Close()
+}
+
+func (tdb *TempDB) insertStructWithoutOpen(table string, s interface{}) {
 	//lw := logwrapper.NewLogger(nil)
 	values := make(map[string]interface{})
 	rt := reflect.TypeOf(s)
@@ -165,12 +164,11 @@ func (tdb *TempDB) InsertStruct(table string, s interface{}) {
 		}
 	}
 	// log.Println("values", values)
-	tdb.Insert(table, values)
+	tdb.insertWithoutOpen(table, values)
 }
 
-func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
+func (tdb *TempDB) insertWithoutOpen(table string, values map[string]interface{}) {
 	lw := logwrapper.NewLogger(nil)
-	db := tdb.Ptr
 
 	fields := make([]string, 0)
 	subs := make([]interface{}, 0)
@@ -195,9 +193,8 @@ func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 		strings.Join(fields, ", "),
 		strings.Join(questions, ", "))
 
-	// log.Println("full", full)
-
-	insertS, err := db.Prepare(full)
+	// lw.Debug("full insert statement: [[ ", full, " ]]")
+	insertS, err := tdb.Ptr.Prepare(full)
 	if err != nil {
 		lw.Info("could not prepare insert statement for ", table)
 		lw.Fatal(err.Error())
@@ -209,21 +206,36 @@ func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 	}
 }
 
-func (tdb *TempDB) Close() {
-	tdb.Ptr.Close()
+func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
+	tdb.Open()
+	tdb.insertWithoutOpen(table, values)
+	tdb.Close()
+}
+
+func (tdb *TempDB) InsertMany(table string, values []map[string]interface{}) {
+	tdb.Open()
+	for _, h := range values {
+		tdb.insertStructWithoutOpen(table, h)
+	}
+	tdb.Close()
+
 }
 
 func (tdb *TempDB) Remove() {
 	lw := logwrapper.NewLogger(nil)
-	err := os.Remove(tdb.Path)
-	if err != nil {
-		lw.Error("could not delete file: ", tdb.Path)
+	if !strings.Contains(tdb.Path, ":memory:") {
+		err := os.Remove(tdb.Path)
+		if err != nil {
+			lw.Error("could not delete file: ", tdb.Path)
+		}
 	}
 }
 
 func (tdb *TempDB) DebugDump(name string) error {
 	lw := logwrapper.NewLogger(nil)
 	q := fmt.Sprintf("SELECT * FROM %v", name)
+	tdb.Open()
+	defer tdb.Close()
 	rows, err := tdb.Ptr.Queryx(q)
 	if err != nil {
 		lw.Info("could not select all from ", name)
@@ -235,4 +247,38 @@ func (tdb *TempDB) DebugDump(name string) error {
 		log.Println(r)
 	}
 	return nil
+}
+
+func (tdb *TempDB) Open() {
+	tdb.mutex.Lock()
+	lw := logwrapper.NewLogger(nil)
+	if tdb.Ptr == nil {
+		// lw.Debug("opening db: ", tdb.DBName, " path: ", tdb.Path)
+		dbptr, err := sqlx.Open("sqlite3", tdb.Path)
+		if err != nil {
+			lw.Error("could not open temporary db: ", tdb.Path)
+			lw.Fatal(err.Error())
+		} else {
+			tdb.Ptr = dbptr
+		}
+	} else {
+		lw.Debug("db already open: [ ", tdb.DBName, " ]")
+	}
+}
+
+func (tdb *TempDB) Close() {
+	lw := logwrapper.NewLogger(nil)
+	if strings.Contains(tdb.Path, "memory") {
+		// Do nothing. Keep memory DB open.
+	} else {
+		if tdb.Ptr != nil {
+			//lw.Debug("closing db: ", tdb.DBName)
+			err := tdb.Ptr.Close()
+			if err != nil {
+				lw.Error("could not close db [", tdb.DBName, "]")
+			}
+			tdb.Ptr = nil
+		}
+	}
+	tdb.mutex.Unlock()
 }

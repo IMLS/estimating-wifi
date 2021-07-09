@@ -18,8 +18,8 @@ func TockEveryMinute(ka *Keepalive, kb *KillBroker, out chan<- bool) {
 
 	c := cron.New()
 	_, err := c.AddFunc("*/1 * * * *", func() {
-		lw := logwrapper.NewLogger(nil)
-		lw.Debug("tock every minute")
+		// lw := logwrapper.NewLogger(nil)
+		//lw.Debug("tock every minute")
 		out <- true
 	})
 	if err != nil {
@@ -72,7 +72,7 @@ func TockEveryN(ka *Keepalive, kb *KillBroker, n int, in <-chan bool, out chan<-
 		case <-in:
 			counter = counter + 1
 			if counter == n {
-				lw.Info("tickN", counter)
+				//lw.Info("tickN", counter)
 				counter = 0
 				out <- true
 			}

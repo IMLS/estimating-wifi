@@ -32,12 +32,15 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			return
 		case db := <-ch_durations_db_in:
 			sq := model.NewQueue(cfg, "sent")
+			nextSessionIdToSend := sq.Peek()
 
-			for sq.Peek() != nil {
-				nextSessionIdToSend := sq.Peek()
+			for nextSessionIdToSend != nil {
 				durations := []analysis.Duration{}
 				// lw.Debug("looking for session ", unsent.Session, " in durations table")
+				db.Open()
 				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIdToSend)
+				db.Close()
+
 				if err != nil {
 					lw.Info("error in extracting durations for session", nextSessionIdToSend)
 					lw.Error(err.Error())
@@ -45,18 +48,15 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				lw.Debug("found ", len(durations), " durations to send.")
 
 				if len(durations) == 0 {
-					lw.Info("found zero durations to send/draw.")
+					lw.Info("found zero durations to send/draw. dequeing session [", nextSessionIdToSend, "]")
+					sq.Dequeue()
 				} else {
-					lw.Info("attempting to send a batch of durations to the API server")
+					lw.Info("attempting to send batch [", nextSessionIdToSend, "][", len(durations), "] to the API server")
 					// convert []Duration to an array of map[string]interface{}
 					data := make([]map[string]interface{}, 0)
 					for _, duration := range durations {
 						data = append(data, duration.AsMap())
 					}
-
-					// Lets process images even if we cannot get through to the API server.
-					lw.Debug("sending unsent session ", nextSessionIdToSend, " to be written as an images.")
-
 					// After writing images, we come back and try and send the data remotely.
 					lw.Debug("PostJSONing ", len(data), " duration datas")
 					_, err = http.PostJSON(cfg, cfg.GetDataUri(), data)
@@ -65,11 +65,12 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 						log.Println(err.Error())
 					} else {
 						// If we successfully sent the data remotely, we can now mark it is as sent.
-						//db.MarkAsSent(unsent)
 						sq.Dequeue()
 					}
 				}
 
+				// See if we have something else to send...
+				nextSessionIdToSend = sq.Peek()
 			}
 
 		}

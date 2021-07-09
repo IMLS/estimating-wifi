@@ -70,7 +70,7 @@ func (l *StandardLogger) GetLogLevelName() string {
 func NewLogger(cfg *config.Config) *StandardLogger {
 	once.Do(func() {
 		initLogger(cfg)
-		if (cfg != nil) {
+		if cfg != nil {
 			standardLogger.SetLogLevel(cfg.GetLogLevel())
 		} else {
 			standardLogger.SetLogLevel("FATAL")
@@ -108,7 +108,7 @@ func initLogger(cfg *config.Config) {
 	}
 	// If we have a config file, grab the loggers defined there.
 	// Otherwise, use stderr.
-	loggers := []string{"local:stderr", "local:tmp", "local:stdout"}
+	loggers := []string{"local:stderr"}
 
 	if cfg != nil {
 		loggers = cfg.GetLoggers()

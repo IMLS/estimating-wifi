@@ -13,6 +13,7 @@ import (
 
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 )
@@ -301,10 +302,10 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker,
 }
 
 func TestManyTLPCycles(t *testing.T) {
-	const NUMDAYSTORUN int = 7
+	const NUMDAYSTORUN int = 2
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
 	const WRITESUMMARYNHOURS int = 1
-	const SECONDSPERMINUTE int = 3
+	const SECONDSPERMINUTE int = 2
 	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
 	go resetbroker.Start()
 	killbroker := &tlp.KillBroker{tlp.NewBroker()}
@@ -325,11 +326,13 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	tt := time.Now()
 	cfg.SessionId = fmt.Sprintf("%v%02d%02d", tt.Year(), tt.Month(), tt.Day())
+	lw := logwrapper.NewLogger(nil)
+	lw.SetLogLevel("ERROR")
 
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
 
-	//cfg.NewSessionId()
-	log.Println(cfg)
+	cfg.NewSessionId()
+	// log.Println(cfg)
 
 	// Create channels for process network
 	ch_sec := make(chan bool)
@@ -343,6 +346,7 @@ func TestManyTLPCycles(t *testing.T) {
 	ch_data_for_report := make(chan []analysis.WifiEvent)
 	ch_db := make(chan *model.TempDB)
 	ch_durations_db := make(chan *model.TempDB)
+	ch_ack := make(chan tlp.Ping)
 
 	// See if we can wait and shut down the test...
 	var wg sync.WaitGroup
@@ -367,9 +371,9 @@ func TestManyTLPCycles(t *testing.T) {
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
 	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
-	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db)
+	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_db, ch_ack)
 	// Make sure we don't hang...
-	go tlp.GenerateDurations(nil, cfg, killbroker, ch_db, ch_durations_db)
+	go tlp.GenerateDurations(nil, cfg, killbroker, ch_db, ch_durations_db, ch_ack)
 	go tlp.BatchSend(nil, cfg, killbroker, ch_durations_db)
 
 	// We want 10000 minutes, but the tocker is every second.

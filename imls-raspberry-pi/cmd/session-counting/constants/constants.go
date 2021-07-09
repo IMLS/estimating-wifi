@@ -10,3 +10,6 @@ var ConfigPath = "/opt/imls/config.yaml"
 
 const AuthTokenKey = "AUTHTOKEN"
 const AuthEmailKey = "AUTHEMAIL"
+
+const WIFIDB = "wifi"
+const DURATIONSDB = "durations.sqlite"

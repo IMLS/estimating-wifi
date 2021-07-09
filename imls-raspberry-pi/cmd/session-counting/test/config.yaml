@@ -1,11 +1,13 @@
+log_level: DEBUG
+loggers:
+  - "local:tmp"
+  # - "api:directus"
 auth:
-  api_token:
-  device_tag: das-tag
-  fcfs_seq_id: ME0607-001
-log_level: ""
-loggers: []
+  api_token: MYAPITOKEN
+  device_tag: MYDEVICETAG
+  fcfs_seq_id: MYFCFSSEQID
 monitoring:
-  pinginterval: 0
+  pinginterval: 30
   max_http_error_count: 8
   http_error_interval_mins: 10
   uniqueness_window: 120
@@ -14,21 +16,22 @@ monitoring:
 umbrella:
   scheme: https
   host: api.data.gov
-  data: /TEST/10x-imls/v2/wifi/
+  data: /TEST/10x-imls/v2/durations/
   logging: /TEST/10x-imls/v2/events/
 wireshark:
   duration: 45
   adapter: ""
   path: /usr/bin/tshark
   check_wlan: "1"
-lshw_path: ""
 manufacturers:
   db: /opt/imls/manufacturers.sqlite
 sessionid: ""
 serial: ""
-storagemode: api
+storagemode: prod
 local:
-  crontab: 0 */6 * * *
+  logfile: /opt/imls/log.json
+  crontab: "0 0 * * *"
   summary_db: /opt/imls/summary.sqlite
   temporary_db: /tmp/imls.sqlite
-  web_directory: /www/imls
+  web_directory: /www/imls/
+lshw_path: /usr/bin/lshw

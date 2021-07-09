@@ -61,7 +61,7 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBr
 			umdb.RemoveOldMappings(cfg.Monitoring.UniquenessWindow)
 			// Get the mappings as UserMappings, and send them out
 			um := umdb.AsUserMappings()
-			lw.Debug("# user mappings: %v", len(um))
+			lw.Debug("# user mappings [", len(um), "]")
 			out <- um
 		}
 	}
