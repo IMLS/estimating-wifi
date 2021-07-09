@@ -218,8 +218,9 @@ type Config struct {
 		DeviceTag string `yaml:"device_tag"`
 		FCFSId    string `yaml:"fcfs_seq_id"`
 	} `yaml:"auth"`
-	LogLevel   string   `yaml:"log_level"`
-	Loggers    []string `yaml:"loggers"`
+	LogLevel    string   `yaml:"log_level"`
+	Loggers     []string `yaml:"loggers"`
+	NewRelicKey string   `yaml:"new_relic_key"`
 	Monitoring struct {
 		PingInterval          int `yaml:"pinginterval"`
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`

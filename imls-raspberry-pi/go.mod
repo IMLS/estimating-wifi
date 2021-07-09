@@ -25,15 +25,9 @@ replace gsa.gov/18f/analysis v0.0.0 => ./internal/analysis
 replace gsa.gov/18f/logwrapper v0.0.0 => ./internal/logwrapper
 
 require (
-	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
-	github.com/fatih/color v1.10.0 // indirect
-	github.com/jszwec/csvutil v1.5.0 // indirect
+	github.com/newrelic/go-agent/v3 v3.13.0 // indirect
 	gsa.gov/18f/input-initial-configuration v0.0.0 // indirect
 	gsa.gov/18f/log-event v0.0.0 // indirect
 	gsa.gov/18f/session-counter v0.0.0 // indirect
-	gsa.gov/18f/version v0.0.0 // indirect
-	gsa.gov/18f/wifi-hardware-search v0.0.0 // indirect
 	gsa.gov/18f/wifi-hardware-search-cli v0.0.0 // indirect
-	gsa.gov/18f/analysis v0.0.0 // indirect
-	gsa.gov/18f/logwrapper v0.0.0 // indirect
 )

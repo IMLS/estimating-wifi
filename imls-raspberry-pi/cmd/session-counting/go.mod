@@ -20,6 +20,7 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-sqlite3 v1.14.6
+	github.com/newrelic/go-agent v3.13.0+incompatible // indirect
 	github.com/robfig/cron/v3 v3.0.0
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 	gsa.gov/18f/analysis v0.0.0

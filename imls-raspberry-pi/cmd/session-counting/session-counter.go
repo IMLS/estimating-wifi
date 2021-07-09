@@ -14,6 +14,8 @@ import (
 	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
 	"gsa.gov/18f/version"
+
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 func run(cfg *config.Config) {
@@ -97,6 +99,11 @@ func main() {
 	// INIT THE LOGGER
 	lw := logwrapper.NewLogger(cfg)
 	// NOW YOU MAY USE LOGGING.
+
+	newrelic.NewApplication(
+		newrelic.ConfigAppName("session-counter"),
+		newrelic.ConfigLicense(cfg.NewRelicKey),
+	)
 
 	cfg.DecodeSerial()
 	// SINGLETON PATTERN
