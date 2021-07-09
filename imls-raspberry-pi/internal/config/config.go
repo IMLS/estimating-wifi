@@ -85,6 +85,14 @@ func (cfg *Config) GetLogLevel() string {
 	}
 }
 
+func (cfg *Config) IsProductionMode() bool {
+	return strings.Contains(strings.ToLower(cfg.RunMode), "prod")
+}
+
+func (cfg *Config) IsDeveloperMode() bool {
+	return !cfg.IsProductionMode()
+}
+
 func (cfg *Config) decodeAuthToken() string {
 	// It is a B64 encoded string
 	// of the API key encrypted with the device's serial.
