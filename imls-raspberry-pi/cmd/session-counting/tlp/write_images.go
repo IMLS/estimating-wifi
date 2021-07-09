@@ -16,7 +16,7 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) error {
 	lw := logwrapper.NewLogger(nil)
 	var reterr error
 
-	yesterday := model.GetYesterday()
+	yesterday := model.GetYesterday(cfg)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
@@ -61,11 +61,15 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			return
 		case db := <-ch_durations_db:
 			iq := model.NewQueue(cfg, "images")
-			for iq.Peek() != nil {
-				nextImage := iq.Peek()
+			nextImage := iq.Peek()
+			lw.Debug("is there a session waiting to convert to images? [ ", nextImage, "]")
+			for nextImage != nil {
 				durations := []analysis.Duration{}
 				lw.Debug("looking for session ", nextImage, " in durations table to write images")
+				db.Open()
 				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)
+				db.Close()
+				lw.Debug("found ", len(durations), " durations in WriteImages")
 				if err != nil {
 					lw.Info("error in extracting durations for session", nextImage)
 					lw.Error(err.Error())
@@ -78,6 +82,8 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 						iq.Dequeue()
 					}
 				}
+				// Anything else?
+				nextImage = iq.Peek()
 			}
 		}
 	}

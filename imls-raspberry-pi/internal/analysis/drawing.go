@@ -2,6 +2,7 @@ package analysis
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
@@ -31,22 +32,28 @@ func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath str
 	// Capture the data about the session while running in a `counter` structure.
 	durationsInRange := 0
 	sort.Sort(ByStart(durations))
+	lw.Debug("about to iterate over [", len(durations), "] durations")
 
 	for _, d := range durations {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
-		//log.Println("st", st, "et", et, "diff", diff)
+		log.Println("st", st, "et", et, "diff", diff)
 		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
 			//log.Println("id", d.PatronId, "diff", diff)
 			durationsInRange += 1
 		}
 	}
 
+	lw.Debug("durationsInRange [", durationsInRange, "]")
+
 	WIDTH := 1440
 	hourWidth := WIDTH / 24
 
 	HEIGHT := 24 * (durationsInRange + 2)
+
+	lw.Debug("image dimensions (WxH) ", WIDTH, " x ", HEIGHT)
+
 	dc := gg.NewContext(WIDTH, HEIGHT)
 	dc.SetRGBA(0.5, 0.5, 0, 0.5)
 	dc.SetLineWidth(1)
@@ -62,6 +69,7 @@ func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath str
 	dc.Pop()
 
 	for _, d := range durations {
+		// lw.Debug("duration ", d)
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())

@@ -27,8 +27,8 @@ manufacturers:
   db: /opt/imls/manufacturers.sqlite
 sessionid: ""
 serial: ""
-storagemode: api
-runmode: prod
+storagemode: sqlite
+runmode: test
 local:
   logfile: /opt/imls/log.json
   crontab: "0 0 * * *"

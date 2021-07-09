@@ -85,12 +85,32 @@ func (cfg *Config) GetLogLevel() string {
 	}
 }
 
+func (cfg *Config) IsStoringToApi() bool {
+	return strings.Contains(strings.ToLower(cfg.StorageMode), "api")
+}
+
+func (cfg *Config) IsStoringLocally() bool {
+	either := false
+	for _, s := range []string{"local", "sqlite"} {
+		either = either || strings.Contains(strings.ToLower(cfg.StorageMode), s)
+	}
+	return either
+}
+
 func (cfg *Config) IsProductionMode() bool {
 	return strings.Contains(strings.ToLower(cfg.RunMode), "prod")
 }
 
 func (cfg *Config) IsDeveloperMode() bool {
-	return !cfg.IsProductionMode()
+	either := false
+	for _, s := range []string{"dev", "test"} {
+		either = either || strings.Contains(strings.ToLower(cfg.RunMode), s)
+	}
+	return either
+}
+
+func (cfg *Config) IsTestMode() bool {
+	return strings.Contains(strings.ToLower(cfg.RunMode), "test")
 }
 
 func (cfg *Config) decodeAuthToken() string {

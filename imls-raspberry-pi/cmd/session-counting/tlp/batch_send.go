@@ -50,7 +50,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				if len(durations) == 0 {
 					lw.Info("found zero durations to send/draw. dequeing session [", nextSessionIdToSend, "]")
 					sq.Dequeue()
-				} else {
+				} else if cfg.IsStoringToApi() {
 					lw.Info("attempting to send batch [", nextSessionIdToSend, "][", len(durations), "] to the API server")
 					// convert []Duration to an array of map[string]interface{}
 					data := make([]map[string]interface{}, 0)
@@ -67,8 +67,11 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 						// If we successfully sent the data remotely, we can now mark it is as sent.
 						sq.Dequeue()
 					}
+				} else {
+					// Always dequeue. We're storing locally "for free" into the
+					// durations table before trying to do the send.
+					sq.Dequeue()
 				}
-
 				// See if we have something else to send...
 				nextSessionIdToSend = sq.Peek()
 			}

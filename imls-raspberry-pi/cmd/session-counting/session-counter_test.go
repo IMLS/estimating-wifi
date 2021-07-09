@@ -274,14 +274,28 @@ func generateFakeMac() string {
 	return string(b)
 }
 
+var consistentMacs = []string{
+	"00:03:93:60:BF:CB",
+	"00:03:93:06:5C:0E",
+	"00:03:93:3F:BB:F9",
+	"00:03:93:51:9D:26",
+	"00:00:F0:D0:25:52",
+	"00:00:F0:59:41:80",
+	"00:00:F0:F2:2C:13",
+}
+
 func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker, in <-chan bool, out chan []string) {
 	NUMMACS := 40
 	NUMRANDOM := 10
+	lw := logwrapper.NewLogger(nil)
+	lw.Debug("RunFakeWireshark in the house.")
+
 	ch_kill := kb.Subscribe()
 	// Lets have 30 consistent devices
 	macs := make([]string, NUMMACS)
 	for i := 0; i < NUMMACS-NUMRANDOM; i++ {
-		macs[i] = generateFakeMac()
+		macs[i] = consistentMacs[rand.Intn(len(consistentMacs))]
+		lw.Debug("static MAC ", macs[i])
 	}
 
 	for {
@@ -321,18 +335,19 @@ func TestManyTLPCycles(t *testing.T) {
 
 	configPath := filepath.Join(path, "test", "config.yaml")
 	cfg, _ := config.NewConfigFromPath(configPath)
+	cfg.RunMode = "test"
+	cfg.StorageMode = "sqlite"
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	tt := time.Now()
 	cfg.SessionId = fmt.Sprintf("%v%02d%02d", tt.Year(), tt.Month(), tt.Day())
 	lw := logwrapper.NewLogger(nil)
-	lw.SetLogLevel("ERROR")
+	lw.SetLogLevel("DEBUG")
 
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
 
 	cfg.NewSessionId()
-	// log.Println(cfg)
 
 	// Create channels for process network
 	ch_sec := make(chan bool)

@@ -84,7 +84,7 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			durationsdb := processDataFromDay(cfg, constants.WIFIDB, wifidb)
 			// Creates the table if it does not exist.
 			//durationsdb.AddStructAsTable("batches", model.Batch{})
-			yestersession := model.GetYesterdaySessionId()
+			yestersession := model.GetYesterdaySessionId(cfg)
 			sq.Enqueue(yestersession)
 			iq.Enqueue(yestersession)
 			// When we're done processing everything, let CacheWifi know

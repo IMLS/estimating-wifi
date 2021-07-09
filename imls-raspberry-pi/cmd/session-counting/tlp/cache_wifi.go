@@ -43,7 +43,10 @@ func newTempDbInMemory(cfg *config.Config) *model.TempDB {
 
 func newTempDb(cfg *config.Config) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
-	if cfg.IsProductionMode() {
+	lw.Debug("IsProductionMode is ", cfg.IsProductionMode())
+	lw.Debug("cfg.RunMode is ", cfg.RunMode)
+
+	if cfg.IsDeveloperMode() {
 		lw.Debug("using in-mem DB for wifi (prod)")
 		return newTempDbInMemory(cfg)
 	} else {
