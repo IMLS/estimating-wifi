@@ -250,10 +250,10 @@ func (tdb *TempDB) DebugDump(name string) error {
 }
 
 func (tdb *TempDB) Open() {
-	tdb.mutex.Lock()
 	lw := logwrapper.NewLogger(nil)
 	if tdb.Ptr == nil {
 		// lw.Debug("opening db: ", tdb.DBName, " path: ", tdb.Path)
+		tdb.mutex.Lock()
 		dbptr, err := sqlx.Open("sqlite3", tdb.Path)
 		if err != nil {
 			lw.Error("could not open temporary db: ", tdb.Path)

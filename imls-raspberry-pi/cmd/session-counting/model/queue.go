@@ -75,19 +75,20 @@ func (queue *Queue) Dequeue() Item {
 	qr := QueueRow{}
 
 	queue.db.Open()
-	defer queue.db.Close()
 	err := queue.db.Ptr.Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
-
 	if err != nil {
+		queue.db.Close()
 		return nil
 	} else {
 		res, err := queue.db.Ptr.Exec(fmt.Sprintf("DELETE FROM %v WHERE ROWID = ?", queue.name), qr.Rowid)
 		if err != nil {
+			queue.db.Close()
 			lw.Error("failed to delete ", qr.Rowid, " in queue.Dequeue()")
 			lw.Error(err.Error())
 		}
 		lw.Debug("DEQUEUE result ", res)
 		lw.Debug("DEQUEUE removed [ ", qr.Item, " ] on the queue [ ", queue.name, " ]")
+		queue.db.Close()
 		return qr.Item
 	}
 }

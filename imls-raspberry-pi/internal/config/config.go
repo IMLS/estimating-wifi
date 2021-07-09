@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
+	"regexp"
+	"strings"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
@@ -15,6 +18,7 @@ import (
 func NewConfig() *Config {
 	cfg := Config{}
 	cfg.setDefaults()
+	//cfg.Validate()
 	return &cfg
 }
 
@@ -49,6 +53,10 @@ func (cfg *Config) ReadConfig(path string) error {
 		if len(cfg.LshwPath) > 0 {
 			config.SetLSHWLocation(cfg.LshwPath)
 		}
+
+		// Validate the config before returning.
+		//cfg.Validate()
+
 		return nil
 	} else {
 		log.Printf("config: could not find config: %v\n", path)
@@ -77,36 +85,6 @@ func (cfg *Config) GetLogLevel() string {
 	}
 }
 
-func (cfg *Config) setDefaults() {
-	cfg.LogLevel = "INFO"
-	cfg.Loggers = []string{"local:stderr", "local:tmp"}
-
-	cfg.Monitoring.PingInterval = 30
-	cfg.Monitoring.MaxHTTPErrorCount = 8
-	cfg.Monitoring.HTTPErrorIntervalMins = 10
-	cfg.Monitoring.UniquenessWindow = 24 * 60
-	cfg.Monitoring.MinimumMinutes = 30
-	cfg.Monitoring.MaximumMinutes = 600
-
-	cfg.Umbrella.Scheme = "https"
-	cfg.Umbrella.Host = "api.data.gov"
-	cfg.Umbrella.Data = "/TEST/10x-imls/v2/durations/"
-	cfg.Umbrella.Logging = "/TEST/10x-imls/v2/events/"
-
-	cfg.Wireshark.Duration = 45
-	cfg.Wireshark.Path = "/usr/bin/tshark"
-	cfg.Wireshark.CheckWlan = "1"
-
-	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
-
-	cfg.StorageMode = "prod"
-
-	cfg.Local.Crontab = "0 0 * * *"
-	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
-	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
-	cfg.Local.WebDirectory = "/www/imls"
-}
-
 func (cfg *Config) decodeAuthToken() string {
 	// It is a B64 encoded string
 	// of the API key encrypted with the device's serial.
@@ -129,6 +107,81 @@ func (cfg *Config) decodeAuthToken() string {
 	}
 
 	return string(dec)
+}
+
+var states = []string{"AA,AE,AK,AL,AP,AR,AS,AZ,CA,CO,CT,CZ,DE,FL,FM,GA,GU,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MH,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,PR,PW,RI,SC,SD,TN,TX,UT,VI,VT,VA,WA,WV,WI,WY"}
+
+var patterns = map[string]string{
+	"Auth.FCFSId":    fmt.Sprintf(`[%v][0-9]{4}-[0-9]{3}`, states),
+	"Auth.DeviceTag": `[a-zA-Z-].+`,
+	"LogLevel":       "{DEBUG|debug|INFO|info|WARN|warn|ERROR|error|FATAL|fatal}",
+	"RunMode":        "{DEV|dev|PROD|prod|DEVELOP|develop|PRODUCTION|production}",
+}
+
+//BROKEN
+func getValue(chain string, s interface{}) interface{} {
+	reflectType := reflect.TypeOf(s).Elem()
+	reflectValue := reflect.ValueOf(s).Elem()
+	next := strings.Split(chain, ".")[0]
+	rest := strings.Split(chain, ".")[1:]
+	for i := 0; i < reflectType.NumField(); i++ {
+		typeName := reflectType.Field(i).Name
+		// valueType := reflectValue.Field(i).Type()
+		valueValue := reflectValue.Field(i).Interface()
+
+		log.Println("typeName", typeName)
+		if typeName == next && len(rest) == 0 {
+			return valueValue
+		} else {
+			return getValue(strings.Join(rest, "."), valueValue)
+		}
+	}
+	return nil
+}
+
+// THIS IS BROKEN.
+func (cfg *Config) Validate() {
+
+	for tag, pat := range patterns {
+		value := fmt.Sprintf("%v", getValue(tag, cfg))
+		log.Printf("tag [ %v ], pattern %v, value [ %v ]\n", tag, pat, value)
+		b, err := regexp.Match(pat, []byte(value))
+		if !b || err != nil {
+			log.Fatalf("Tag [%v] is invalid; must match pattern '%v'", tag, pat)
+		}
+
+	}
+}
+
+func (cfg *Config) setDefaults() {
+	cfg.LogLevel = "INFO"
+	cfg.Loggers = []string{"local:stderr", "local:tmp"}
+
+	cfg.Monitoring.PingInterval = 30
+	cfg.Monitoring.MaxHTTPErrorCount = 8
+	cfg.Monitoring.HTTPErrorIntervalMins = 10
+	cfg.Monitoring.UniquenessWindow = 24 * 60
+	cfg.Monitoring.MinimumMinutes = 30
+	cfg.Monitoring.MaximumMinutes = 600
+
+	cfg.Umbrella.Scheme = "https"
+	cfg.Umbrella.Host = "api.data.gov"
+	cfg.Umbrella.Data = "/TEST/10x-imls/v2/durations/"
+	cfg.Umbrella.Logging = "/TEST/10x-imls/v2/events/"
+
+	cfg.Wireshark.Duration = 45
+	cfg.Wireshark.Path = "/usr/bin/tshark"
+	cfg.Wireshark.CheckWlan = "1"
+
+	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
+
+	cfg.StorageMode = "api"
+	cfg.RunMode = "prod"
+
+	cfg.Local.Crontab = "0 0 * * *"
+	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
+	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
+	cfg.Local.WebDirectory = "/www/imls"
 }
 
 type Config struct {
@@ -166,6 +219,7 @@ type Config struct {
 	SessionId   string
 	Serial      string `yaml:"serial"`
 	StorageMode string `yaml:"storagemode"`
+	RunMode     string `yaml:"runmode"`
 	Local       struct {
 		Crontab      string `yaml:"crontab"`
 		SummaryDB    string `yaml:"summary_db"`
