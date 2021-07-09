@@ -4,9 +4,9 @@ loggers:
   - "local:tmp"
   - "api:directus"
 auth:
-  api_token: MYAPITOKEN
-  device_tag: MYDEVICETAG
-  fcfs_seq_id: MYFCFSSEQID
+  api_token: "MYAPITOKEN"
+  device_tag: "MYDEVICETAG"
+  fcfs_seq_id: "MYFCFSSEQID"
 monitoring:
   pinginterval: 30
   max_http_error_count: 8
@@ -15,24 +15,24 @@ monitoring:
   minimum_minutes: 30
   maximum_minutes: 600
 umbrella:
-  scheme: https
-  host: api.data.gov
-  data: /TEST/10x-imls/v2/durations/
-  logging: /TEST/10x-imls/v2/events/
+  scheme: "https"
+  host: "api.data.gov"
+  data: "/TEST/10x-imls/v2/durations/"
+  logging: "/TEST/10x-imls/v2/events/"
 wireshark:
   duration: 45
   adapter: ""
-  path: /usr/bin/tshark
+  path: "/usr/bin/tshark"
   check_wlan: "1"
 manufacturers:
-  db: /opt/imls/manufacturers.sqlite
+  db: "/opt/imls/manufacturers.sqlite"
 sessionid: ""
 serial: ""
-storagemode: api
+storagemode: prod
 local:
-  logfile: /opt/imls/log.json
-  crontab: 0 0 * * *
-  summary_db: /opt/imls/summary.sqlite
-  temporary_db: /tmp/imls.sqlite
-  web_directory: /www/imls/
-lshw_path: /usr/bin/lshw
+  logfile: "/opt/imls/log.json"
+  crontab: "0 0 * * *"
+  summary_db: "/opt/imls/summary.sqlite"
+  temporary_db: "/tmp/imls.sqlite"
+  web_directory: "/www/imls/"
+lshw_path: "/usr/bin/lshw"

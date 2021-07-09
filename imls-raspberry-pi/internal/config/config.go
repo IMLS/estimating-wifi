@@ -99,7 +99,7 @@ func (cfg *Config) setDefaults() {
 
 	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
 
-	cfg.StorageMode = "sqlite"
+	cfg.StorageMode = "prod"
 
 	cfg.Local.Crontab = "0 0 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
