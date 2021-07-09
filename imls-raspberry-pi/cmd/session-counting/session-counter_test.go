@@ -379,7 +379,7 @@ func TestManyTLPCycles(t *testing.T) {
 	// We want 10000 minutes, but the tocker is every second.
 	go func() {
 		// Give the rest of the network time to come alive.
-		time.Sleep(5 * time.Second)
+		time.Sleep(1 * time.Second)
 		minutes := 0
 		for secs := 0; secs < NUMMINUTESTORUN*60; secs++ {
 			ch_sec <- true
@@ -399,5 +399,5 @@ func TestManyTLPCycles(t *testing.T) {
 	}()
 	wg.Wait()
 	log.Println("Done waiting... exiting in 10 seconds")
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Second)
 }
