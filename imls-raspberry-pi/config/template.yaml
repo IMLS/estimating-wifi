@@ -36,3 +36,4 @@ local:
   temporary_db: "/tmp/imls.sqlite"
   web_directory: "/www/imls/"
 lshw_path: "/usr/bin/lshw"
+new_relic_key: "MYNEWRELICKEY"
