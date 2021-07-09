@@ -10,6 +10,7 @@ import (
 
 func TestDBCreate(t *testing.T) {
 	tdb := NewSqliteDB("test1", "/tmp/test1.sqlite")
+	tdb.Open()
 	if tdb == nil {
 		t.Log("failed to create tdb.")
 		t.Fail()
@@ -118,13 +119,14 @@ func TestWifiTable2(t *testing.T) {
 	})
 
 	tdb.DebugDump("wifi")
-	tdb.Close()
 	tdb.Remove()
 }
 
 func TestCleanup(t *testing.T) {
 	tdb1 := NewSqliteDB("test1", "/tmp/test1.sqlite")
+	tdb1.Open()
 	tdb2 := NewSqliteDB("wifi", "/tmp/wifi.sqlite")
+	tdb2.Open()
 	tdb1.Close()
 	tdb2.Close()
 	tdb1.Remove()
