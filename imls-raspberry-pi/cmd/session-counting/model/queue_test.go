@@ -40,8 +40,12 @@ func TestMultiEnqueue(t *testing.T) {
 
 func TestPeek(t *testing.T) {
 	log.Println(t.Name())
-	q := NewQueue(cfg, "queue1")
-	lw.Debug("PEEK ", q.Peek())
+	q := NewQueue(cfg, "newqueue")
+	v := q.Peek()
+	if v != nil {
+		t.Log("peek on an empty queue did not return nil")
+		t.Fail()
+	}
 }
 
 func TestDequeue(t *testing.T) {

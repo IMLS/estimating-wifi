@@ -58,7 +58,9 @@ func (queue *Queue) Peek() Item {
 	err := queue.db.Ptr.Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
 	queue.db.Close()
 
-	if err != nil {
+	// The rowid value starts at 1. From the SQLite documentation.
+	// if the Rowid is 0, we did not get anything back.
+	if err != nil || qr.Item == "" || qr.Rowid == 0 {
 		lw.Debug("nothing to peek at on the queue [", queue.name, "]")
 		lw.Debug(err.Error())
 		return nil
