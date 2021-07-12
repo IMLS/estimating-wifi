@@ -77,7 +77,10 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 				newrelic.NewApplication(
 					newrelic.ConfigAppName("session-counter"),
 					newrelic.ConfigLicense(cfg.NewRelicKey),
-					nrlogrus.ConfigStandardLogger(),
+					func(config *newrelic.Config) {
+						logrus.SetLevel(logrus.DebugLevel)
+						config.Logger = nrlogrus.StandardLogger()
+					},
 				)
 			}
 		} else {
