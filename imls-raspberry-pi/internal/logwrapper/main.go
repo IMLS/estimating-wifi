@@ -31,11 +31,31 @@ type StandardLogger struct {
 }
 
 var standardLogger *StandardLogger = nil
+
+type NewRelicApp struct {
+	*newrelic.Application
+}
+
+var newRelicApp *NewRelicApp = nil
+
 var once sync.Once
 
 const LOGDIR = "/var/log/session-counter"
 
 var logLevel = logrus.InfoLevel
+
+func (l *StandardLogger) StartTransaction(name string) *newrelic.Transaction {
+	if newRelicApp != nil {
+		return newRelicApp.StartTransaction(name)
+	}
+	return nil
+}
+
+func (l *StandardLogger) EndTransaction(txn *newrelic.Transaction) {
+	if txn != nil {
+		txn.End()
+	}
+}
 
 func (l *StandardLogger) SetLogLevel(level string) {
 	switch strings.ToLower(level) {
@@ -74,14 +94,18 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 			standardLogger.SetLogLevel(cfg.GetLogLevel())
 			if cfg.NewRelicKey != "" {
 				log.Println("New Relic logging enabled")
-				newrelic.NewApplication(
+				app, err := newrelic.NewApplication(
 					newrelic.ConfigAppName("session-counter"),
 					newrelic.ConfigLicense(cfg.NewRelicKey),
+					newrelic.ConfigDistributedTracerEnabled(true),
 					func(config *newrelic.Config) {
-						logrus.SetLevel(logrus.DebugLevel)
-						config.Logger = nrlogrus.StandardLogger()
+						config.Logger = nrlogrus.Transform(standardLogger.Logger)
 					},
 				)
+				if err != nil {
+					log.Fatal("New Relic could not log: ", err)
+				}
+				newRelicApp = &NewRelicApp{app}
 			}
 		} else {
 			standardLogger.SetLogLevel("FATAL")
@@ -99,7 +123,6 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 		//log.Println("Falling back on UnsafeNewLogger...")
 		return UnsafeNewLogger(cfg)
 	}
-
 }
 
 // For unit testing only
