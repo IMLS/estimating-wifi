@@ -29,7 +29,7 @@ func (a *ApiLogger) Write(p []byte) (n int, err error) {
 		"info":        string(p),
 	}
 
-	_, err = http.PostJSON(a.cfg, a.cfg.GetLoggingUri(), []map[string]interface{}{data})
+	err = http.PostJSON(a.cfg, a.cfg.GetLoggingUri(), []map[string]interface{}{data})
 	if err != nil {
 		log.Println("could not log to API")
 		log.Println(err.Error())

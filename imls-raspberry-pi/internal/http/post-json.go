@@ -14,23 +14,14 @@ import (
 	"gsa.gov/18f/config"
 )
 
-// A package-local counter.
-// The first thing we do is post an event. This will return a "magic index"
-// or a foreign key, that we will use in our post of the data. This associates
-// every piece of data entered with a session, and indexes the post in that session.
-// That way, we can say "this set of data was entry 293 of session ABC."
-// If it isn't an event object, we won't get a magic_index back, and it will
-// be returned as -1. Hopefully, we'll be ignoring it in those cases...
-var magic_index int = 0
+var slashWarned bool = false
 
-var slash_warned bool = false
-
-func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) (int, error) {
+func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) error {
 
 	tok := cfg.Auth.Token
 	matched, _ := regexp.MatchString(".*/$", uri)
-	if !slash_warned && !matched {
-		slash_warned = true
+	if !slashWarned && !matched {
+		slashWarned = true
 		log.Println("WARNING: api.data.gov wants a trailing slash on URIs")
 	}
 
@@ -63,13 +54,13 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) (in
 		// We have to give up if this doesn't work.
 		reqBody, err = json.Marshal(arr)
 		if err != nil {
-			return -1, errors.New("postjson: unable to marshal post of data to JSON")
+			return errors.New("postjson: unable to marshal post of data to JSON")
 		}
 
 		// Next, it's time to create a request object. Again, fail if it doesn't work.
 		req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 		if err != nil {
-			return -1, errors.New("postjson: unable to construct request for data POST")
+			return errors.New("postjson: unable to construct request for data POST")
 		}
 
 		// Lets set some headers. Perhaps we should quit here... but, we'll try and keep going
@@ -82,23 +73,23 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) (in
 		// If there was an error in the post, log it, and exit the function.
 		if err != nil {
 			message := fmt.Sprintf("postjson: failure in client attempt to POST to %v", uri)
-			log.Printf(message)
-			return -1, fmt.Errorf(message)
+			log.Print(message)
+			return fmt.Errorf(message)
 		} else {
 			// If we get things back, the errors will be encoded within the JSON.
 			if resp.StatusCode < 200 || resp.StatusCode > 299 {
 				message := fmt.Sprintf("PostJSON: bad status from POST to %v [%v]\n", uri, resp.Status)
-				log.Printf(message)
-				return magic_index, fmt.Errorf(message)
+				log.Print(message)
+				return fmt.Errorf(message)
 			} else {
 				// Parse the response. Everything comes from ReVal in our current formulation.
 				var dat RevalResponse
 				body, _ := ioutil.ReadAll(resp.Body)
 				err := json.Unmarshal(body, &dat)
 				if err != nil {
-					message := fmt.Sprintf("PostJSON: could not unmarshal response body")
-					log.Printf(message)
-					return magic_index, fmt.Errorf(message)
+					message := "PostJSON: could not unmarshal response body"
+					log.Print(message)
+					return fmt.Errorf(message)
 				}
 			}
 		}
@@ -106,6 +97,5 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) (in
 		defer resp.Body.Close()
 	}
 
-	magic_index += 1
-	return magic_index, nil
+	return nil
 }

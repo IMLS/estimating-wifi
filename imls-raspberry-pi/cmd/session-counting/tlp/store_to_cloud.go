@@ -14,7 +14,7 @@ func report(service string, cfg *config.Config, session_id int, arr []map[string
 	http_error_count = 0
 
 	uri := http.FormatUri(cfg.Umbrella.Scheme, cfg.Umbrella.Host, cfg.Umbrella.Data)
-	_, err2 := http.PostJSON(cfg, uri, arr)
+	err2 := http.PostJSON(cfg, uri, arr)
 	if err2 != nil {
 		log.Println("report2:", service, "results POST failure")
 		log.Println(err2)
