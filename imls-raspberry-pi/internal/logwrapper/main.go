@@ -53,6 +53,15 @@ func (l *StandardLogger) StartTransaction(name string) *newrelic.Transaction {
 
 func (l *StandardLogger) EndTransaction(txn *newrelic.Transaction) {
 	if txn != nil {
+		log.Print("Sending notice error")
+		txn.NoticeError(newrelic.Error{
+			Message: "testing",
+			Class:   "Testing",
+			Attributes: map[string]interface{}{
+				"important_number": 97232,
+				"relevant_string":  "zap",
+			},
+		})
 		txn.End()
 	}
 }
@@ -97,14 +106,21 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 				app, err := newrelic.NewApplication(
 					newrelic.ConfigAppName("session-counter"),
 					newrelic.ConfigLicense(cfg.NewRelicKey),
-					newrelic.ConfigDistributedTracerEnabled(true),
 					func(config *newrelic.Config) {
+						logrus.SetLevel(logrus.DebugLevel) // testing only
 						config.Logger = nrlogrus.Transform(standardLogger.Logger)
+						config.ErrorCollector.RecordPanics = true
 					},
 				)
 				if err != nil {
 					log.Fatal("New Relic could not log: ", err)
 				}
+				app.RecordCustomEvent("MyEventType", map[string]interface{}{
+					"myString": "hello",
+					"myFloat":  0.603,
+					"myInt":    123,
+					"myBool":   true,
+				})
 				newRelicApp = &NewRelicApp{app}
 			}
 		} else {
@@ -113,14 +129,11 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 	})
 
 	if standardLogger != nil {
-		//log.Println("returning non-nil sl")
 		return standardLogger
 	}
 	if cfg == nil && standardLogger != nil {
-		//log.Println("config nil, returning non-nil sl")
 		return standardLogger
 	} else {
-		//log.Println("Falling back on UnsafeNewLogger...")
 		return UnsafeNewLogger(cfg)
 	}
 }
