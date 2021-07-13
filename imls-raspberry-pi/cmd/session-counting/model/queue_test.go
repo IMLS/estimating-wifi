@@ -57,3 +57,64 @@ func TestDequeue(t *testing.T) {
 		lw.Error("DID NOT FIND APPROPRIATE NEXT ITEM.")
 	}
 }
+
+func TestList(t *testing.T) {
+	log.Println(t.Name())
+	ls := NewList(cfg, "ls1")
+	ls.Push("hello")
+	ls.Push("goodbye")
+	asls := ls.AsList()
+	shouldhave := []string{"hello", "goodbye"}
+	allthere := true
+	for _, s := range shouldhave {
+		found := false
+		for _, is := range asls {
+			if is == s {
+				found = true
+			}
+		}
+		allthere = allthere || found
+	}
+	if !allthere {
+		t.Log("missing value in list")
+		t.Fail()
+	}
+}
+
+func TestListRemove(t *testing.T) {
+	log.Println(t.Name())
+	ls := NewList(cfg, "ls1")
+	ls.Push("hello")
+	ls.Push("redshirt")
+	ls.Push("goodbye")
+
+	shouldhave := []string{"hello", "goodbye"}
+	ls.Remove("redshirt")
+	asls := ls.AsList()
+
+	allthere := true
+	redshirt := false
+	for _, s := range shouldhave {
+		found := false
+		for _, is := range asls {
+			if is == s {
+				found = true
+			}
+			if is == "redshirt" {
+				redshirt = true
+			}
+		}
+		allthere = allthere || found
+	}
+
+	lw.Debug("list after remove ", ls.AsList())
+
+	if !allthere {
+		t.Log("missing value in list")
+		t.Fail()
+	}
+	if redshirt {
+		t.Log("failed to remove the redshirt")
+		t.Fail()
+	}
+}
