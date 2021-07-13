@@ -7,11 +7,11 @@ import (
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/http"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/tempdb"
 )
 
 func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db_in <-chan *model.TempDB) {
+	ch_durations_db_in <-chan *tempdb.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting BatchSend")
@@ -32,7 +32,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			return
 		case db := <-ch_durations_db_in:
 			// This only comes in on reset...
-			sq := model.NewQueue(cfg, "sent")
+			sq := tempdb.NewQueue(cfg, "sent")
 			sessionsToSend := sq.AsList()
 
 			for _, nextSessionIdToSend := range sessionsToSend {

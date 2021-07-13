@@ -3,6 +3,7 @@ loggers:
   - "local:tmp"
   - "local:stderr"
   # - "api:directus"
+new_relic_key: 1a19ca192ef9d746f989f7374d7b6d99FFFFNRAL
 auth:
   api_token: MYAPITOKEN
   device_tag: MYDEVICETAG

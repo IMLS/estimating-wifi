@@ -16,7 +16,7 @@ import (
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/tempdb"
 )
 
 const PASS = true
@@ -32,8 +32,6 @@ type TLPSuite struct {
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
 func (suite *TLPSuite) SetupTest() {
-	suite.lw = logwrapper.NewLogger(nil)
-	suite.lw.SetLogLevel("DEBUG")
 
 	// Get a local config, so we have paths...
 	_, filename, _, _ := runtime.Caller(0)
@@ -41,12 +39,15 @@ func (suite *TLPSuite) SetupTest() {
 	path := filepath.Dir(filename)
 
 	configPath := filepath.Join(path, "..", "test", "config.yaml")
-	suite.lw.Debug("path ", configPath)
+	//suite.lw.Debug("path ", configPath)
 	cfg, _ := config.NewConfigFromPath(configPath)
+
 	if cfg == nil {
 		suite.Fail("config is nil")
 	}
 	suite.cfg = cfg
+	suite.lw = logwrapper.NewLogger(suite.cfg)
+	suite.lw.SetLogLevel("DEBUG")
 
 	mock := clock.NewMock()
 	suite.mock = mock
@@ -150,12 +151,12 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *model.TempDB)
-	ch_durations_db := make(chan *model.TempDB)
+	ch_wifidb := make(chan *tempdb.TempDB)
+	ch_durations_db := make(chan *tempdb.TempDB)
 	ch_ack := make(chan Ping)
-	ch_ddb_par := make([]chan *model.TempDB, 2)
+	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *model.TempDB)
+		ch_ddb_par[i] = make(chan *tempdb.TempDB)
 	}
 
 	// See if we can wait and shut down the test...

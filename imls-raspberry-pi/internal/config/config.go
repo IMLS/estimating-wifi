@@ -15,6 +15,8 @@ import (
 	"gsa.gov/18f/wifi-hardware-search/config"
 )
 
+const STATEDB = "state.sqlite"
+
 func NewConfig() *Config {
 	cfg := Config{}
 	cfg.setDefaults()
@@ -236,7 +238,7 @@ type Config struct {
 	LogLevel    string   `yaml:"log_level"`
 	Loggers     []string `yaml:"loggers"`
 	NewRelicKey string   `yaml:"new_relic_key"`
-	Monitoring struct {
+	Monitoring  struct {
 		PingInterval          int `yaml:"pinginterval"`
 		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
 		HTTPErrorIntervalMins int `yaml:"http_error_interval_mins"`

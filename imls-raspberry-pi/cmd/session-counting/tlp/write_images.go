@@ -9,6 +9,7 @@ import (
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/tempdb"
 )
 
 //This must happen after the data is updated for the day.
@@ -40,7 +41,7 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) error {
 }
 
 func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db chan *model.TempDB) {
+	ch_durations_db chan *tempdb.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting WriteImages")
@@ -60,7 +61,7 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			lw.Debug("exiting WriteImages")
 			return
 		case db := <-ch_durations_db:
-			iq := model.NewQueue(cfg, "images")
+			iq := tempdb.NewQueue(cfg, "images")
 			imagesToWrite := iq.AsList()
 			lw.Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")
 			for _, nextImage := range imagesToWrite {

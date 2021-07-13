@@ -7,41 +7,40 @@ import (
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/constants"
-	"gsa.gov/18f/session-counter/model"
+	"gsa.gov/18f/tempdb"
 )
 
-func newTempDbInFS(cfg *config.Config) *model.TempDB {
+func newTempDbInFS(cfg *config.Config) *tempdb.TempDB {
 	lw := logwrapper.NewLogger(nil)
 
 	t := cfg.Clock.Now()
-	todaysDB := fmt.Sprintf("%04d%02d%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), constants.WIFIDB)
+	todaysDB := fmt.Sprintf("%04d%02d%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), tempdb.WIFIDB)
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
-	tdb := model.NewSqliteDB(todaysDB, path)
+	tdb := tempdb.NewSqliteDB(todaysDB, path)
 	lw.Info("Created temporary db: [ ", todaysDB, " ]")
 	lw.Info("Path to DB: ", cfg.Local.WebDirectory)
 	// First, remove the table if it exists
 	// If we reboot midday, this means we will start a fresh table.
-	tdb.DropTable(constants.WIFIDB)
+	tdb.DropTable(tempdb.WIFIDB)
 	// Add in the table.
-	tdb.AddStructAsTable(constants.WIFIDB, analysis.WifiEvent{})
-	lw.Info("Created table ", constants.WIFIDB)
+	tdb.AddStructAsTable(tempdb.WIFIDB, analysis.WifiEvent{})
+	lw.Info("Created table ", tempdb.WIFIDB)
 	return tdb
 }
 
-func newTempDbInMemory(cfg *config.Config) *model.TempDB {
+func newTempDbInMemory(cfg *config.Config) *tempdb.TempDB {
 	lw := logwrapper.NewLogger(nil)
-	todaysDB := constants.WIFIDB
+	todaysDB := tempdb.WIFIDB
 	path := fmt.Sprintf(`file:%v?mode=memory&cache=shared`, todaysDB)
-	tdb := model.NewSqliteDB(todaysDB, path)
+	tdb := tempdb.NewSqliteDB(todaysDB, path)
 	lw.Info("Created memory db: [ ", todaysDB, " ]")
-	tdb.DropTable(constants.WIFIDB)
-	tdb.AddStructAsTable(constants.WIFIDB, analysis.WifiEvent{})
-	lw.Info("Created table ", constants.WIFIDB)
+	tdb.DropTable(tempdb.WIFIDB)
+	tdb.AddStructAsTable(tempdb.WIFIDB, analysis.WifiEvent{})
+	lw.Info("Created table ", tempdb.WIFIDB)
 	return tdb
 }
 
-func newTempDb(cfg *config.Config) *model.TempDB {
+func newTempDb(cfg *config.Config) *tempdb.TempDB {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("IsProductionMode is ", cfg.IsProductionMode())
 	lw.Debug("IsDeveloperMode is ", cfg.IsDeveloperMode())
@@ -58,7 +57,7 @@ func newTempDb(cfg *config.Config) *model.TempDB {
 
 func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker,
 	ch_data <-chan []analysis.WifiEvent,
-	ch_db chan<- *model.TempDB,
+	ch_db chan<- *tempdb.TempDB,
 	ch_ack <-chan Ping) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting CacheWifi")
@@ -101,7 +100,7 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 			for _, elem := range wifiarr {
 				data = append(data, elem)
 			}
-			tdb.InsertManyStructs(constants.WIFIDB, data)
+			tdb.InsertManyStructs(tempdb.WIFIDB, data)
 		}
 	}
 }

@@ -1,4 +1,4 @@
-module gsa.gov/18f/session-counter
+module gsa.gov/18f/tempdb
 
 go 1.16
 
@@ -16,21 +16,12 @@ replace gsa.gov/18f/analysis v0.0.0 => ../../internal/analysis
 
 replace gsa.gov/18f/logwrapper v0.0.0 => ../../internal/logwrapper
 
-replace gsa.gov/18f/tempdb v0.0.0 => ../../internal/tempdb
-
 require (
-	github.com/benbjohnson/clock v1.1.0
-	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-sqlite3 v1.14.7
-	github.com/robfig/cron/v3 v3.0.0
-	github.com/stretchr/testify v1.2.2
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
-	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
+	github.com/newrelic/go-agent/v3 v3.14.0 // indirect
+	github.com/newrelic/go-agent/v3/integrations/nrlogrus v1.0.1 // indirect
 	gsa.gov/18f/analysis v0.0.0
 	gsa.gov/18f/config v0.0.0
-	gsa.gov/18f/http v0.0.0
 	gsa.gov/18f/logwrapper v0.0.0
-	gsa.gov/18f/tempdb v0.0.0
-	gsa.gov/18f/version v0.0.0
-	gsa.gov/18f/wifi-hardware-search v0.0.0
 )

@@ -1,4 +1,4 @@
-package model
+package tempdb
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/constants"
 )
 
 type Item interface{}
@@ -33,8 +32,8 @@ func NewList(cfg *config.Config, name string) *List {
 }
 
 func NewQueue(cfg *config.Config, name string) (q *Queue) {
-	fullpath := filepath.Join(cfg.Local.WebDirectory, constants.DURATIONSDB)
-	tdb := NewSqliteDB(constants.DURATIONSDB, fullpath)
+	fullpath := filepath.Join(cfg.Local.WebDirectory, DURATIONSDB)
+	tdb := NewSqliteDB(DURATIONSDB, fullpath)
 	tdb.AddStructAsTable(name, QueueRow{})
 	q = &Queue{name: name, db: tdb}
 	return q

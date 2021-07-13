@@ -1,4 +1,4 @@
-package model
+package tempdb
 
 import (
 	"log"
