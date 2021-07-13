@@ -3,7 +3,6 @@ package tlp
 import (
 	"fmt"
 	"path/filepath"
-	"time"
 
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
@@ -15,11 +14,12 @@ import (
 func newTempDbInFS(cfg *config.Config) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
 
-	t := time.Now()
+	t := cfg.Clock.Now()
 	todaysDB := fmt.Sprintf("%04d%02d%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), constants.WIFIDB)
 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
 	tdb := model.NewSqliteDB(todaysDB, path)
 	lw.Info("Created temporary db: [ ", todaysDB, " ]")
+	lw.Info("Path to DB: ", cfg.Local.WebDirectory)
 	// First, remove the table if it exists
 	// If we reboot midday, this means we will start a fresh table.
 	tdb.DropTable(constants.WIFIDB)
@@ -44,9 +44,10 @@ func newTempDbInMemory(cfg *config.Config) *model.TempDB {
 func newTempDb(cfg *config.Config) *model.TempDB {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("IsProductionMode is ", cfg.IsProductionMode())
+	lw.Debug("IsDeveloperMode is ", cfg.IsDeveloperMode())
 	lw.Debug("cfg.RunMode is ", cfg.RunMode)
 
-	if cfg.IsDeveloperMode() {
+	if cfg.IsProductionMode() {
 		lw.Debug("using in-mem DB for wifi (prod)")
 		return newTempDbInMemory(cfg)
 	} else {

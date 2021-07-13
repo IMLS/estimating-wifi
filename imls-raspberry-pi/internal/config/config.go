@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
-	"time"
 
+	"github.com/benbjohnson/clock"
 	yaml "gopkg.in/yaml.v2"
 	"gsa.gov/18f/cryptopasta"
 	"gsa.gov/18f/wifi-hardware-search/config"
@@ -26,6 +26,15 @@ func NewConfigFromPath(path string) (*Config, error) {
 	cfg := Config{}
 	cfg.setDefaults()
 	err := cfg.ReadConfig(path)
+	if err != nil {
+		log.Println("cfg could not be read")
+		log.Fatal()
+	}
+	log.Println(cfg)
+	if cfg.Clock == nil {
+		log.Println("clock should not be nil")
+		log.Fatal()
+	}
 	return &cfg, err
 }
 
@@ -54,6 +63,10 @@ func (cfg *Config) ReadConfig(path string) error {
 			config.SetLSHWLocation(cfg.LshwPath)
 		}
 
+		// Need to reset the clock pointer...
+		// Gets wiped out by the read.
+		cfg.Clock = clock.New()
+
 		// Validate the config before returning.
 		//cfg.Validate()
 
@@ -69,7 +82,7 @@ func (cfg *Config) NewSessionId() {
 	// h.Write([]byte(fmt.Sprintf("%v", time.Now())))
 	// sid := fmt.Sprintf("%x", h.Sum(nil))[0:16]
 	// cfg.SessionId = sid
-	t := time.Now()
+	t := cfg.Clock.Now()
 	cfg.SessionId = fmt.Sprintf("%v%02d%02d", t.Year(), t.Month(), t.Day())
 }
 
@@ -105,6 +118,9 @@ func (cfg *Config) IsDeveloperMode() bool {
 	either := false
 	for _, s := range []string{"dev", "test"} {
 		either = either || strings.Contains(strings.ToLower(cfg.RunMode), s)
+	}
+	if either {
+		log.Println("running in developer mode")
 	}
 	return either
 }
@@ -205,7 +221,7 @@ func (cfg *Config) setDefaults() {
 
 	cfg.StorageMode = "api"
 	cfg.RunMode = "prod"
-
+	cfg.Clock = clock.New()
 	cfg.Local.Crontab = "0 0 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
 	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
@@ -244,10 +260,11 @@ type Config struct {
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
-	SessionId   string
-	Serial      string `yaml:"serial"`
-	StorageMode string `yaml:"storagemode"`
-	RunMode     string `yaml:"runmode"`
+	SessionId   string      // No YAML equiv.
+	Serial      string      `yaml:"serial"`
+	StorageMode string      `yaml:"storagemode"`
+	RunMode     string      `yaml:"runmode"`
+	Clock       clock.Clock // No YAML equiv.
 	Local       struct {
 		Crontab      string `yaml:"crontab"`
 		SummaryDB    string `yaml:"summary_db"`

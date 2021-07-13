@@ -31,6 +31,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			lw.Debug("exiting BatchSend")
 			return
 		case db := <-ch_durations_db_in:
+			// This only comes in on reset...
 			sq := model.NewQueue(cfg, "sent")
 			nextSessionIdToSend := sq.Peek()
 

@@ -51,7 +51,7 @@ func TestInsertAgain(t *testing.T) {
 		t.Fail()
 	}
 	tdb.AddTable("test", map[string]string{"a": "INTEGER", "b": "TEXT"})
-	tdb.Insert("test", map[string]interface{}{"a": "2", "b": time.Now().Format(time.RFC3339)})
+	tdb.Insert("test", map[string]interface{}{"a": "2", "b": cfg.Clock.Now().Format(time.RFC3339)})
 	tdb.DebugDump("test")
 }
 
@@ -70,7 +70,7 @@ func TestWifiTable(t *testing.T) {
 		"event_id":           "42",
 		"fcfs_seq_id":        "ME0000-000",
 		"device_tag":         "somewhere",
-		"localtimestamp":     time.Now().Format(time.RFC3339),
+		"localtimestamp":     cfg.Clock.Now().Format(time.RFC3339),
 		"session_id":         "asdfasdhjfkjw3er4kjwefr",
 		"manufacturer_index": "3",
 		"patron_index":       "4",
@@ -79,7 +79,7 @@ func TestWifiTable(t *testing.T) {
 		"event_id":           "43",
 		"fcfs_seq_id":        "ME0000-000",
 		"device_tag":         "somewhere",
-		"localtimestamp":     time.Now().Format(time.RFC3339),
+		"localtimestamp":     cfg.Clock.Now().Format(time.RFC3339),
 		"session_id":         "asdfasdhjfkjw3er4kjwefr",
 		"manufacturer_index": "32",
 		"patron_index":       "42",
@@ -92,7 +92,7 @@ func TestWifiTable2(t *testing.T) {
 	w := analysis.WifiEvent{
 		FCFSSeqId:         "ME0000-000",
 		DeviceTag:         "another-tag",
-		Localtime:         time.Now().Format(time.RFC3339),
+		Localtime:         cfg.Clock.Now().Format(time.RFC3339),
 		SessionId:         "asdfasdfasdf",
 		ManufacturerIndex: 0,
 		PatronIndex:       1,
@@ -103,7 +103,7 @@ func TestWifiTable2(t *testing.T) {
 		"event_id":           "42",
 		"fcfs_seq_id":        "ME0000-000",
 		"device_tag":         "somewhere",
-		"localtimestamp":     time.Now().Format(time.RFC3339),
+		"localtimestamp":     cfg.Clock.Now().Format(time.RFC3339),
 		"session_id":         "asdfasdhjfkjw3er4kjwefr",
 		"manufacturer_index": "3",
 		"patron_index":       "4",
@@ -112,7 +112,7 @@ func TestWifiTable2(t *testing.T) {
 		"event_id":           "43",
 		"fcfs_seq_id":        "ME0000-000",
 		"device_tag":         "somewhere",
-		"localtimestamp":     time.Now().Format(time.RFC3339),
+		"localtimestamp":     cfg.Clock.Now().Format(time.RFC3339),
 		"session_id":         "asdfasdhjfkjw3er4kjwefr",
 		"manufacturer_index": "32",
 		"patron_index":       "42",
@@ -142,8 +142,8 @@ func TestReflection(t *testing.T) {
 		DeviceTag: "a-device-tag",
 		PatronId:  1,
 		MfgId:     1,
-		Start:     time.Now().Format(time.RFC3339),
-		End:       time.Now().Format(time.RFC3339),
+		Start:     cfg.Clock.Now().Format(time.RFC3339),
+		End:       cfg.Clock.Now().Format(time.RFC3339),
 	}
 	durations = append(durations, d)
 

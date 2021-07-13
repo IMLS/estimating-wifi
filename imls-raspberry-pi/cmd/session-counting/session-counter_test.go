@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/benbjohnson/clock"
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
@@ -20,6 +21,11 @@ import (
 
 const PASS = true
 const FAIL = false
+
+// Lets mock the clock for testing.
+type Application struct {
+	Clock clock.Clock
+}
 
 func macs(arr ...string) []string {
 	// h := make(map[string]int)
@@ -238,18 +244,39 @@ func TestRawToUid(t *testing.T) {
 func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.ResetBroker, kb *tlp.KillBroker, n_hours int, ch_tick chan bool) {
 	counter := 0
 	ch_kill := kb.Subscribe()
+	lw := logwrapper.NewLogger(nil)
 	for {
 		select {
 		case <-ch_tick:
 			counter += 1
-			// Ping every
 			if (counter != 0) && ((counter % (60 * n_hours)) == 0) {
 				// ch_reset <- tlp.Ping{}
+				lw.Debug("PingAfterNHours is Pinging!")
 				rb.Publish(tlp.Ping{})
 			}
 		case <-ch_kill:
 			log.Println("Exiting PingAfterNHours")
 			return
+		}
+	}
+}
+
+func PingAtBogoMidnight(ka *tlp.Keepalive, cfg *config.Config,
+	rb *tlp.ResetBroker,
+	kb *tlp.KillBroker,
+	m *clock.Mock) {
+	// counter := 0
+	// ch_kill := kb.Subscribe()
+	lw := logwrapper.NewLogger(nil)
+	pinged := false
+	for {
+		if m.Now().Hour() == 0 && !pinged {
+			pinged = true
+			lw.Debug("IT IS BOGOMIDNIGHT.")
+			rb.Publish(tlp.Ping{})
+		}
+		if m.Now().Hour() != 0 {
+			pinged = false
 		}
 	}
 }
@@ -285,7 +312,7 @@ var consistentMacs = []string{
 }
 
 func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker, in <-chan bool, out chan []string) {
-	NUMMACS := 40
+	NUMMACS := 200
 	NUMRANDOM := 10
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("RunFakeWireshark in the house.")
@@ -293,19 +320,19 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker,
 	ch_kill := kb.Subscribe()
 	// Lets have 30 consistent devices
 	macs := make([]string, NUMMACS)
-	for i := 0; i < NUMMACS-NUMRANDOM; i++ {
-		macs[i] = consistentMacs[rand.Intn(len(consistentMacs))]
-		lw.Debug("static MAC ", macs[i])
+	for i := 0; i < NUMMACS; i++ {
+		macs[i] = generateFakeMac()
 	}
 
 	for {
 		select {
 		case <-in:
-			// And 10 random devices
+			// Pick NUMRANDOM devices every minute
+			send := make([]string, NUMRANDOM)
 			for i := 0; i < NUMRANDOM; i++ {
-				macs[30+i] = generateFakeMac()
+				send[i] = macs[rand.Intn(len(macs))]
 			}
-			out <- macs
+			out <- send
 
 		case <-ch_kill:
 			log.Println("Exiting RunFakeWireshark")
@@ -320,6 +347,9 @@ func TestManyTLPCycles(t *testing.T) {
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
 	const WRITESUMMARYNHOURS int = 1
 	const SECONDSPERMINUTE int = 2
+	lw := logwrapper.NewLogger(nil)
+	lw.SetLogLevel("DEBUG")
+
 	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
 	go resetbroker.Start()
 	killbroker := &tlp.KillBroker{tlp.NewBroker()}
@@ -335,18 +365,23 @@ func TestManyTLPCycles(t *testing.T) {
 
 	configPath := filepath.Join(path, "test", "config.yaml")
 	cfg, _ := config.NewConfigFromPath(configPath)
+	mock := clock.NewMock()
+	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
+	mock.Set(mt)
+	cfg.Clock = mock
+
+	if cfg.Clock == nil {
+		log.Println("clock should not be nil")
+		t.Fail()
+	}
+	lw.Debug("mock is now ", cfg.Clock.Now())
+
 	cfg.RunMode = "test"
 	cfg.StorageMode = "sqlite"
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
-	tt := time.Now()
-	cfg.SessionId = fmt.Sprintf("%v%02d%02d", tt.Year(), tt.Month(), tt.Day())
-	lw := logwrapper.NewLogger(nil)
-	lw.SetLogLevel("DEBUG")
-
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-
 	cfg.NewSessionId()
 
 	// Create channels for process network
@@ -381,6 +416,12 @@ func TestManyTLPCycles(t *testing.T) {
 		}
 	}(ch_nsec, ch_nsec1, ch_nsec2)
 
+	go func(in chan bool) {
+		for {
+			<-in
+		}
+	}(ch_nsec2)
+
 	// Need a fake RunWireshark
 	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
 	go RunFakeWireshark(nil, cfg, killbroker, ch_nsec1, ch_macs)
@@ -389,7 +430,7 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.PrepEphemeralWifi(nil, cfg, killbroker, ch_macs_counted, ch_data_for_report)
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
-	go PingAfterNHours(nil, cfg, resetbroker, killbroker, WRITESUMMARYNHOURS, ch_nsec2)
+	go PingAtBogoMidnight(nil, cfg, resetbroker, killbroker, mock)
 	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb, ch_ack)
 	// Make sure we don't hang...
 	go tlp.GenerateDurations(nil, cfg, killbroker, ch_wifidb, ch_durations_db, ch_ack)
@@ -398,21 +439,23 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
 	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
 
-	// We want 10000 minutes, but the tocker is every second.
 	go func() {
-		// Give the rest of the network time to come alive.
-		time.Sleep(1 * time.Second)
 		minutes := 0
+		skip := 20
+		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
 		for secs := 0; secs < NUMMINUTESTORUN*60; secs++ {
 			ch_sec <- true
 			if secs%SECONDSPERMINUTE == 0 {
+				mock.Add(m)
+				lw.Debug("MOCK NOW ", mock.Now())
+
 				var m runtime.MemStats
 				runtime.ReadMemStats(&m)
-				minutes += 1
-				hours := (minutes / 60) % 24
-				days := (minutes / (60 * 24))
-				memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
-				log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
+				minutes += skip
+				// hours := (minutes / 60) % 24
+				// days := (minutes / (60 * 24))
+				// memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
+				// //log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
 			}
 		}
 		log.Println("Killing the test network.")
@@ -421,5 +464,5 @@ func TestManyTLPCycles(t *testing.T) {
 	}()
 	wg.Wait()
 	log.Println("Done waiting... exiting in 10 seconds")
-	time.Sleep(1 * time.Second)
+	cfg.Clock.Sleep(1 * time.Second)
 }

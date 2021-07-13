@@ -17,6 +17,7 @@ replace gsa.gov/18f/analysis v0.0.0 => ../../internal/analysis
 replace gsa.gov/18f/logwrapper v0.0.0 => ../../internal/logwrapper
 
 require (
+	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-sqlite3 v1.14.6

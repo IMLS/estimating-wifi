@@ -84,7 +84,7 @@ func StoreToCloud(ka *Keepalive, cfg *config.Config, ch_data <-chan []map[string
 				log.Println("reportout: HTTP_ERROR_COUNT", http_error_count)
 			}
 
-		case <-time.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):
+		case <-cfg.Clock.After(time.Duration(cfg.Monitoring.HTTPErrorIntervalMins) * time.Minute):
 			// If this much time has gone by, go ahead and reset the error count.
 			if http_error_count != 0 {
 				log.Printf("reportout: RESETTING http_error_count FROM %d TO 0\n", http_error_count)

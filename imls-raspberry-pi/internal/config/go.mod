@@ -11,6 +11,7 @@ replace gsa.gov/18f/wifi-hardware-search v0.0.0 => ../wifi-hardware-search
 go 1.16
 
 require (
+	github.com/benbjohnson/clock v1.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gsa.gov/18f/cryptopasta v0.0.0
 	gsa.gov/18f/wifi-hardware-search v0.0.0
