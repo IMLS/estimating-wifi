@@ -31,8 +31,7 @@ storagemode: sqlite
 runmode: test
 local:
   logfile: /opt/imls/log.json
-  crontab: "*/3 * * * *"
+  crontab: "*/6 * * * *"
   summary_db: /opt/imls/summary.sqlite
-  temporary_db: /tmp/imls.sqlite
   web_directory: /opt/imls/www  
 lshw_path: /usr/bin/lshw

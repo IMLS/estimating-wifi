@@ -224,7 +224,6 @@ func (cfg *Config) setDefaults() {
 	cfg.Clock = clock.New()
 	cfg.Local.Crontab = "0 0 * * *"
 	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
-	cfg.Local.TemporaryDB = "/tmp/imls.sqlite"
 	cfg.Local.WebDirectory = "/www/imls"
 }
 
@@ -268,7 +267,6 @@ type Config struct {
 	Local       struct {
 		Crontab      string `yaml:"crontab"`
 		SummaryDB    string `yaml:"summary_db"`
-		TemporaryDB  string `yaml:"temporary_db"`
 		WebDirectory string `yaml:"web_directory"`
 	} `yaml:"local"`
 }
