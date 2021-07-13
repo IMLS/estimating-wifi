@@ -1,6 +1,7 @@
 log_level: DEBUG
 loggers:
   - "local:tmp"
+  - "local:stderr"
   # - "api:directus"
 auth:
   api_token: MYAPITOKEN
