@@ -1,6 +1,7 @@
 package tlp
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -80,9 +81,9 @@ func (b *Keepalive) Start() {
 					select {
 					case <-procs[c].pongCh:
 						// WARNING: This could get very noisy in the log.
-						b.eventLogger.Debug("pong from %v", procs[c].id)
+						b.eventLogger.Debug("pong from ", procs[c].id)
 					case <-b.cfg.Clock.After(procs[c].timeout):
-						b.eventLogger.Debug("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
+						b.eventLogger.Debug(fmt.Sprintf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout))
 						processTimedOut = true
 					}
 				}(ch)
@@ -91,7 +92,7 @@ func (b *Keepalive) Start() {
 		case <-b.cfg.Clock.After(interval):
 			if processTimedOut {
 				// If we timed out, exit. Hope systemd restarts us.
-				b.eventLogger.Error("exiting after %v seconds. Hopefully someone will restart us!", interval)
+				b.eventLogger.Error(fmt.Sprintf("exiting after %v seconds. Hopefully someone will restart us!", interval))
 				os.Exit(constants.ExitProcessTimeout)
 			}
 		} // end select

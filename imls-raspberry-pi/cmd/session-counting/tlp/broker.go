@@ -18,6 +18,14 @@ type KillBroker struct {
 	*Broker
 }
 
+func NewKillBroker() *KillBroker {
+	return &KillBroker{NewBroker()}
+}
+
+func NewResetBroker() *ResetBroker {
+	return &ResetBroker{NewBroker()}
+}
+
 func NewBroker() *Broker {
 	return &Broker{
 		ch_pub: make(chan interface{}, 1),

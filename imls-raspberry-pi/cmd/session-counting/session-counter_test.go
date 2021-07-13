@@ -439,11 +439,13 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
 	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
 
+	NUMCYCLESTORUN := 400
+
 	go func() {
 		minutes := 0
 		skip := 20
 		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
-		for secs := 0; secs < NUMMINUTESTORUN*60; secs++ {
+		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
 			ch_sec <- true
 			if secs%SECONDSPERMINUTE == 0 {
 				mock.Add(m)
@@ -463,6 +465,5 @@ func TestManyTLPCycles(t *testing.T) {
 		wg.Done()
 	}()
 	wg.Wait()
-	log.Println("Done waiting... exiting in 10 seconds")
-	cfg.Clock.Sleep(1 * time.Second)
+
 }

@@ -20,7 +20,7 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) error {
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
-			lw.Error("could not create web directory: %v", cfg.Local.WebDirectory)
+			lw.Error("could not create web directory: ", cfg.Local.WebDirectory)
 			reterr = err
 		}
 	}
