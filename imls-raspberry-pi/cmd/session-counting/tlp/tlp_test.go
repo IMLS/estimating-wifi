@@ -83,16 +83,6 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-var consistentMacs = []string{
-	"00:03:93:60:BF:CB",
-	"00:03:93:06:5C:0E",
-	"00:03:93:3F:BB:F9",
-	"00:03:93:51:9D:26",
-	"00:00:F0:D0:25:52",
-	"00:00:F0:59:41:80",
-	"00:00:F0:F2:2C:13",
-}
-
 func RunFakeWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan bool, out chan []string) {
 	NUMMACS := 200
 	NUMRANDOM := 10
