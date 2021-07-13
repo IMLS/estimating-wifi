@@ -1,6 +1,7 @@
 log_level: DEBUG
 loggers:
   - "local:tmp"
+  - "local:stderr"
   # - "api:directus"
 auth:
   api_token: MYAPITOKEN
@@ -11,7 +12,7 @@ monitoring:
   max_http_error_count: 8
   http_error_interval_mins: 10
   uniqueness_window: 120
-  minimum_minutes: 30
+  minimum_minutes: 5
   maximum_minutes: 600
 umbrella:
   scheme: https
@@ -31,8 +32,7 @@ storagemode: sqlite
 runmode: test
 local:
   logfile: /opt/imls/log.json
-  crontab: "0 0 * * *"
+  crontab: "*/6 * * * *"
   summary_db: /opt/imls/summary.sqlite
-  temporary_db: /tmp/imls.sqlite
-  web_directory: /www/imls/
+  web_directory: /opt/imls/www  
 lshw_path: /usr/bin/lshw

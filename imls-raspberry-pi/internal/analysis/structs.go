@@ -33,9 +33,11 @@ func (w WifiEvent) AsMap() map[string]interface{} {
 		f := rt.Field(i)
 		r := reflect.ValueOf(w)
 		// log.Println("tag db", f.Tag.Get("db"))
-		col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
-		nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
-		m[string(col)] = nom
+		if !strings.Contains(f.Tag.Get("sqlite"), "AUTOINCREMENT") {
+			col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
+			nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
+			m[string(col)] = nom
+		}
 	}
 	return m
 }
@@ -101,9 +103,11 @@ func (d Duration) AsMap() map[string]interface{} {
 		f := rt.Field(i)
 		r := reflect.ValueOf(d)
 		// log.Println("tag db", f.Tag.Get("db"))
-		col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
-		nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
-		m[string(col)] = nom
+		if !strings.Contains(f.Tag.Get("sqlite"), "AUTOINCREMENT") {
+			col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
+			nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
+			m[string(col)] = nom
+		}
 	}
 	return m
 }

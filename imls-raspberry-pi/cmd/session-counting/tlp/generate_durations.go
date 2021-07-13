@@ -37,7 +37,7 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *model.TempDB) 
 	wifidb.Close()
 
 	if err != nil {
-		lw.Info("error in extracting all events: %v", table)
+		lw.Info("error in extracting all events: ", table)
 		lw.Fatal(err.Error())
 	}
 	if len(events) > 0 {

@@ -1,6 +1,7 @@
 package tlp
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -24,6 +25,7 @@ type Keepalive struct {
 	publishCh   chan interface{}
 	subCh       chan resp
 	eventLogger *logwrapper.StandardLogger
+	cfg         *config.Config
 }
 
 func NewKeepalive(cfg *config.Config) *Keepalive {
@@ -34,6 +36,7 @@ func NewKeepalive(cfg *config.Config) *Keepalive {
 		publishCh:   make(chan interface{}, 1),
 		subCh:       make(chan resp, 1),
 		eventLogger: lw,
+		cfg:         cfg,
 	}
 }
 
@@ -78,18 +81,18 @@ func (b *Keepalive) Start() {
 					select {
 					case <-procs[c].pongCh:
 						// WARNING: This could get very noisy in the log.
-						b.eventLogger.Debug("pong from %v", procs[c].id)
-					case <-time.After(procs[c].timeout):
-						b.eventLogger.Debug("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout)
+						b.eventLogger.Debug("pong from ", procs[c].id)
+					case <-b.cfg.Clock.After(procs[c].timeout):
+						b.eventLogger.Debug(fmt.Sprintf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout))
 						processTimedOut = true
 					}
 				}(ch)
 			}
 		// Lets check
-		case <-time.After(interval):
+		case <-b.cfg.Clock.After(interval):
 			if processTimedOut {
 				// If we timed out, exit. Hope systemd restarts us.
-				b.eventLogger.Error("exiting after %v seconds. Hopefully someone will restart us!", interval)
+				b.eventLogger.Error(fmt.Sprintf("exiting after %v seconds. Hopefully someone will restart us!", interval))
 				os.Exit(constants.ExitProcessTimeout)
 			}
 		} // end select
@@ -117,7 +120,7 @@ func StayinAlive(ka *Keepalive, cfg *config.Config) {
 
 	var counter int64 = 0
 	for {
-		time.Sleep(time.Duration(cfg.Monitoring.PingInterval) * time.Second)
+		cfg.Clock.Sleep(time.Duration(cfg.Monitoring.PingInterval) * time.Second)
 		ka.Publish(counter)
 		counter = counter + 1
 	}

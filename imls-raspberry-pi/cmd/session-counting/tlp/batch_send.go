@@ -31,10 +31,11 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			lw.Debug("exiting BatchSend")
 			return
 		case db := <-ch_durations_db_in:
+			// This only comes in on reset...
 			sq := model.NewQueue(cfg, "sent")
-			nextSessionIdToSend := sq.Peek()
+			sessionsToSend := sq.AsList()
 
-			for nextSessionIdToSend != nil {
+			for _, nextSessionIdToSend := range sessionsToSend {
 				durations := []analysis.Duration{}
 				// lw.Debug("looking for session ", unsent.Session, " in durations table")
 				db.Open()
@@ -49,7 +50,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 
 				if len(durations) == 0 {
 					lw.Info("found zero durations to send/draw. dequeing session [", nextSessionIdToSend, "]")
-					sq.Dequeue()
+					sq.Remove(nextSessionIdToSend)
 				} else if cfg.IsStoringToApi() {
 					lw.Info("attempting to send batch [", nextSessionIdToSend, "][", len(durations), "] to the API server")
 					// convert []Duration to an array of map[string]interface{}
@@ -65,15 +66,13 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 						log.Println(err.Error())
 					} else {
 						// If we successfully sent the data remotely, we can now mark it is as sent.
-						sq.Dequeue()
+						sq.Remove(nextSessionIdToSend)
 					}
 				} else {
 					// Always dequeue. We're storing locally "for free" into the
 					// durations table before trying to do the send.
-					sq.Dequeue()
+					sq.Remove(nextSessionIdToSend)
 				}
-				// See if we have something else to send...
-				nextSessionIdToSend = sq.Peek()
 			}
 
 		}

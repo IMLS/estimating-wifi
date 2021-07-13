@@ -23,12 +23,72 @@ type Queue struct {
 	mutex sync.Mutex
 }
 
+type List struct {
+	*Queue
+}
+
+func NewList(cfg *config.Config, name string) *List {
+	q := NewQueue(cfg, name)
+	return &List{q}
+}
+
 func NewQueue(cfg *config.Config, name string) (q *Queue) {
 	fullpath := filepath.Join(cfg.Local.WebDirectory, constants.DURATIONSDB)
 	tdb := NewSqliteDB(constants.DURATIONSDB, fullpath)
 	tdb.AddStructAsTable(name, QueueRow{})
 	q = &Queue{name: name, db: tdb}
 	return q
+}
+
+// The list abstraction is layered over the same table.
+// Pushing to the list is the same as enqueuing w.r.t. the DB.
+func (queue *Queue) Push(sessionid string) {
+	queue.Enqueue(sessionid)
+}
+
+func (queue *Queue) AsList() []string {
+	queue.mutex.Lock()
+	defer queue.mutex.Unlock()
+	lw := logwrapper.NewLogger(nil)
+
+	stmt := fmt.Sprintf("SELECT item FROM %v", queue.name)
+	queue.db.Open()
+	defer queue.db.Close()
+
+	rows, err := queue.db.Ptr.Query(stmt)
+	if err != nil {
+		lw.Error("could not extract any items from queue/list ", queue.name)
+	}
+
+	sessions := make([]string, 0)
+	for rows.Next() {
+		var sid string
+		rows.Scan(&sid)
+		sessions = append(sessions, sid)
+	}
+
+	return sessions
+
+}
+
+func (queue *Queue) Remove(sessionid string) {
+	queue.mutex.Lock()
+	defer queue.mutex.Unlock()
+	lw := logwrapper.NewLogger(nil)
+	queue.db.Open()
+	defer queue.db.Close()
+	stmt, err := queue.db.Ptr.Prepare(fmt.Sprintf("DELETE FROM %v WHERE item = ?", queue.name))
+	if err != nil {
+		lw.Error("could not prepare delete statement for ", queue.name)
+		lw.Fatal(err.Error())
+	}
+	// lw.Debug("removing ", sessionid)
+	res, err := stmt.Exec(sessionid)
+	if err != nil {
+		lw.Error("could not delete session from queue/list ", sessionid, " ", queue.name)
+		lw.Error(res)
+		lw.Error(err.Error())
+	}
 }
 
 func (queue *Queue) Enqueue(sessionid string) {

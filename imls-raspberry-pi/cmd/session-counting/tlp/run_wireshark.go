@@ -106,7 +106,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan b
 			if dev != nil && dev.Exists {
 				// Load the config for use.
 				cfg.Wireshark.Adapter = dev.Logicalname
-				lw.Debug("found adapter: %v", cfg.Wireshark.Adapter)
+				lw.Debug("found adapter: ", cfg.Wireshark.Adapter)
 				// Set monitor mode if the adapter changes.
 				if cfg.Wireshark.Adapter != adapter {
 					lw.Debug("setting monitor mode")

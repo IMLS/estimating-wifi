@@ -20,7 +20,7 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) error {
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
-			lw.Error("could not create web directory: %v", cfg.Local.WebDirectory)
+			lw.Error("could not create web directory: ", cfg.Local.WebDirectory)
 			reterr = err
 		}
 	}
@@ -61,9 +61,9 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			return
 		case db := <-ch_durations_db:
 			iq := model.NewQueue(cfg, "images")
-			nextImage := iq.Peek()
-			lw.Debug("is there a session waiting to convert to images? [ ", nextImage, "]")
-			for nextImage != nil {
+			imagesToWrite := iq.AsList()
+			lw.Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")
+			for _, nextImage := range imagesToWrite {
 				durations := []analysis.Duration{}
 				lw.Debug("looking for session ", nextImage, " in durations table to write images")
 				db.Open()
@@ -79,11 +79,9 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 						lw.Error("error in writing images")
 						lw.Error(err.Error())
 					} else {
-						iq.Dequeue()
+						iq.Remove(nextImage)
 					}
 				}
-				// Anything else?
-				nextImage = iq.Peek()
 			}
 		}
 	}

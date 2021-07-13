@@ -18,9 +18,10 @@ func GetYesterdaySessionId(cfg *config.Config) string {
 
 func GetYesterday(cfg *config.Config) time.Time {
 	offset := -24
-	if cfg.IsTestMode() {
-		offset = -1
-	}
-	yesterday := time.Now().Add(time.Duration(offset) * time.Hour)
+	// Mocking the clock... now, time should work correctly.
+	// if cfg.IsTestMode() {
+	// 	offset = -1
+	// }
+	yesterday := cfg.Clock.Now().Add(time.Duration(offset) * time.Hour)
 	return yesterday
 }
