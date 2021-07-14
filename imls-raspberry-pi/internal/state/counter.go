@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"gsa.gov/18f/config"
+	"gsa.gov/18f/logwrapper"
 )
 
 type Counter struct {
@@ -17,6 +18,7 @@ func NewCounter(cfg *config.Config, name string) *Counter {
 	tdb := NewSqliteDB(DURATIONSDB, fullpath)
 	tdb.AddStructAsTable(name, QueueRow{})
 	q := &Queue{name: name, db: tdb}
+	q.Enqueue("0")
 	return &Counter{q}
 }
 
@@ -28,17 +30,27 @@ func GetCounter(cfg *config.Config, name string) *Counter {
 }
 
 func (q *Counter) Reset() {
+	lw := logwrapper.NewLogger(nil)
+
 	q.db.Open()
-	q.db.Ptr.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %v", q.name))
+	_, err := q.db.Ptr.Exec(fmt.Sprintf("UPDATE %v SET item = 0", q.name))
+	if err != nil {
+		lw.Error(err.Error())
+	}
 	q.db.Close()
-	q.Enqueue("0")
 }
 
 func (q *Counter) Increment() int {
-	i := q.Dequeue()
+	lw := logwrapper.NewLogger(nil)
+	i := q.Value()
 	n, _ := strconv.Atoi(fmt.Sprintf("%v", i))
 	n = n + 1
-	q.Enqueue(fmt.Sprintf("%v", n))
+	q.db.Open()
+	_, err := q.db.Ptr.Exec(fmt.Sprintf("UPDATE %v SET item = ?", q.name), n)
+	if err != nil {
+		lw.Error(err.Error())
+	}
+	q.db.Close()
 	return n
 }
 

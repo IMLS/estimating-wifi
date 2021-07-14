@@ -14,6 +14,7 @@ type SessionId struct {
 
 func NewSessionId(cfg *config.Config) *SessionId {
 	counter := NewCounter(cfg, "sessionid")
+	counter.Reset()
 	return &SessionId{name: "sessionid", cfg: cfg, counter: counter}
 }
 

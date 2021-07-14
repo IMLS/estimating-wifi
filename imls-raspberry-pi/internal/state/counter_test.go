@@ -57,17 +57,15 @@ func (suite *CounterSuite) TestIncCounter() {
 
 func (suite *CounterSuite) TestResetCounter() {
 	c := GetCounter(suite.cfg, "a")
-	c.Increment()
-	log.Println("TestResetCounter incremented value", c.Value())
+	log.Println("TestResetCounter value", c.Value())
 
-	if c.Value() != 2 {
-		suite.Fail("counter was not incremented after reset")
-	}
 	c.Reset()
 
 	if c.Value() != 0 {
 		suite.Fail("counter was not reset")
 	}
+	c.Reset()
+
 }
 
 func TestSuite(t *testing.T) {
