@@ -32,8 +32,8 @@ require (
 	gsa.gov/18f/config v0.0.0
 	gsa.gov/18f/http v0.0.0
 	gsa.gov/18f/logwrapper v0.0.0
-	gsa.gov/18f/structs v0.0.0
 	gsa.gov/18f/state v0.0.0
+	gsa.gov/18f/structs v0.0.0
 	gsa.gov/18f/version v0.0.0
 	gsa.gov/18f/wifi-hardware-search v0.0.0
 )

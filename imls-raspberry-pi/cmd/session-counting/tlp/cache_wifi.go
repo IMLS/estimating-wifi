@@ -92,6 +92,9 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 			// wait until wifi processing is complete. That means GenerateDurations must
 			// complete before we continue.
 			<-ch_ack
+
+			id := cfg.SessionId.IncrementSessionId()
+			lw.Info("UPDATING SESSION ID TO: ", id)
 			tdb = newTempDb(cfg)
 
 		case wifiarr := <-ch_data:

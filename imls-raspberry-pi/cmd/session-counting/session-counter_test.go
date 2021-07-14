@@ -341,9 +341,12 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker,
 }
 
 func TestManyTLPCycles(t *testing.T) {
-	const NUMDAYSTORUN int = 2
+	const NUMDAYSTORUN int = 6
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
-	const WRITESUMMARYNHOURS int = 1
+
+	const skip int = 20
+	const NUMCYCLESTORUN = NUMMINUTESTORUN / skip
+
 	const SECONDSPERMINUTE int = 2
 	lw := logwrapper.NewLogger(nil)
 	lw.SetLogLevel("DEBUG")
@@ -438,26 +441,18 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
 	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
 
-	NUMCYCLESTORUN := 400
-
 	go func() {
 		minutes := 0
-		skip := 20
+
 		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
 		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
 			ch_sec <- true
-			if secs%SECONDSPERMINUTE == 0 {
-				mock.Add(m)
-				lw.Debug("MOCK NOW ", mock.Now())
+			mock.Add(m)
+			lw.Debug("MOCK NOW ", mock.Now())
 
-				var m runtime.MemStats
-				runtime.ReadMemStats(&m)
-				minutes += skip
-				// hours := (minutes / 60) % 24
-				// days := (minutes / (60 * 24))
-				// memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
-				// //log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
-			}
+			var m runtime.MemStats
+			runtime.ReadMemStats(&m)
+			minutes += skip
 		}
 		log.Println("Killing the test network.")
 		killbroker.Publish(tlp.Ping{})

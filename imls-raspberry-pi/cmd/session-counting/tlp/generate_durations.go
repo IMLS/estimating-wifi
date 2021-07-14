@@ -3,11 +3,11 @@ package tlp
 import (
 	"fmt"
 	"path/filepath"
+	"strconv"
 
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/state"
 	"gsa.gov/18f/structs"
 )
@@ -87,9 +87,13 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			durationsdb := processDataFromDay(cfg, state.WIFIDB, wifidb)
 			// Creates the table if it does not exist.
 			//durationsdb.AddStructAsTable("batches", model.Batch{})
-			yestersession := model.GetYesterdaySessionId(cfg)
-			sq.Enqueue(yestersession)
-			iq.Enqueue(yestersession)
+			// yestersession := model.GetYesterdaySessionId(cfg)
+			yestersession := cfg.SessionId.PreviousSessionId()
+			sessionIdAsInt, _ := strconv.Atoi(yestersession)
+			if sessionIdAsInt >= 0 {
+				sq.Enqueue(yestersession)
+				iq.Enqueue(yestersession)
+			}
 			// When we're done processing everything, let CacheWifi know
 			// that it is safe to continue.
 			ch_ack <- Ping{}

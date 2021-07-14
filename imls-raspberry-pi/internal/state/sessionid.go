@@ -25,3 +25,7 @@ func (sid *SessionId) GetSessionId() string {
 func (sid *SessionId) IncrementSessionId() string {
 	return fmt.Sprint(sid.counter.Increment())
 }
+
+func (sid *SessionId) PreviousSessionId() string {
+	return fmt.Sprint(sid.counter.PrevValue())
+}

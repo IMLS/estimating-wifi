@@ -35,7 +35,7 @@ func run(cfg *config.Config) {
 		ch_ddb_par[i] = make(chan *state.TempDB)
 	}
 	// BROKERS
-	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
+	resetbroker := tlp.NewResetBroker()
 	go resetbroker.Start()
 	var killbroker *tlp.KillBroker = nil
 	ka := tlp.NewKeepalive(cfg)
@@ -101,13 +101,13 @@ func main() {
 	cfg.SetSessionId(sid)
 
 	// INIT THE LOGGER
+	// SINGLETON PATTERN
+	// Once this is set up, all loggers (should)
+	// log through the config passed here.
 	lw := logwrapper.NewLogger(cfg)
 	// NOW YOU MAY USE LOGGING.
 
 	cfg.DecodeSerial()
-	// SINGLETON PATTERN
-	// Once this is set up, all loggers (should)
-	// log through the config passed here.
 	lw.Info("startup")
 	lw.Info("serial ", cfg.GetSerial())
 

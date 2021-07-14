@@ -76,7 +76,7 @@ func (q *Counter) Value() int {
 	return n
 }
 
-func (q *Counter) Prev() int {
+func (q *Counter) PrevValue() int {
 	n := q.Value()
 	n = n - 1
 	return n
