@@ -26,7 +26,6 @@ wireshark:
   check_wlan: "1"
 manufacturers:
   db: "/opt/imls/manufacturers.sqlite"
-sessionid: ""
 serial: ""
 storagemode: prod
 local:
