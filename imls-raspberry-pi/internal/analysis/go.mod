@@ -12,10 +12,15 @@ replace gsa.gov/18f/logwrapper v0.0.0 => ../logwrapper
 
 replace gsa.gov/18f/http v0.0.0 => ../http
 
+replace gsa.gov/18f/structs v0.0.0 => ../structs
+
 require (
 	github.com/fogleman/gg v1.3.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/newrelic/go-agent/v3 v3.14.0 // indirect
+	github.com/newrelic/go-agent/v3/integrations/nrlogrus v1.0.1 // indirect
 	golang.org/x/image v0.0.0-20210622092929-e6eecd499c2c // indirect
 	gsa.gov/18f/config v0.0.0
 	gsa.gov/18f/logwrapper v0.0.0
+	gsa.gov/18f/structs v0.0.0
 )

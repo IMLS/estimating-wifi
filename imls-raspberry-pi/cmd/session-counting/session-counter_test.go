@@ -15,8 +15,8 @@ import (
 	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
+	"gsa.gov/18f/tempdb"
 )
 
 const PASS = true
@@ -189,11 +189,9 @@ func TestRawToUid(t *testing.T) {
 		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
 
 		var wg sync.WaitGroup
-		resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
+		resetbroker := tlp.NewResetBroker()
 		go resetbroker.Start()
-		// The kill broker lets us poison the network.
-		// var killbroker *tlp.Broker = nil
-		killbroker := &tlp.KillBroker{tlp.NewBroker()}
+		killbroker := tlp.NewKillBroker()
 		go killbroker.Start()
 
 		ch_macs := make(chan []string)
@@ -350,9 +348,9 @@ func TestManyTLPCycles(t *testing.T) {
 	lw := logwrapper.NewLogger(nil)
 	lw.SetLogLevel("DEBUG")
 
-	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
+	resetbroker := tlp.NewResetBroker()
 	go resetbroker.Start()
-	killbroker := &tlp.KillBroker{tlp.NewBroker()}
+	killbroker := tlp.NewKillBroker()
 	go killbroker.Start()
 
 	// This runs the TLP through 10000 cycles. This is roughly the same as week.
@@ -382,7 +380,8 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-	cfg.NewSessionId()
+	sid := tempdb.NewSessionId(cfg)
+	cfg.SetSessionId(sid)
 
 	// Create channels for process network
 	ch_sec := make(chan bool)
@@ -394,12 +393,12 @@ func TestManyTLPCycles(t *testing.T) {
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *model.TempDB)
-	ch_durations_db := make(chan *model.TempDB)
+	ch_wifidb := make(chan *tempdb.TempDB)
+	ch_durations_db := make(chan *tempdb.TempDB)
 	ch_ack := make(chan tlp.Ping)
-	ch_ddb_par := make([]chan *model.TempDB, 2)
+	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *model.TempDB)
+		ch_ddb_par[i] = make(chan *tempdb.TempDB)
 	}
 
 	// See if we can wait and shut down the test...

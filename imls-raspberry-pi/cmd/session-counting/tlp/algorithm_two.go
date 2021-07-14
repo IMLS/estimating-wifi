@@ -48,7 +48,7 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBr
 			lw.Debug("wiping mfg/patron mapping DB")
 			umdb.WipeDB()
 			// We need a new session ID.
-			cfg.NewSessionId()
+			cfg.SessionId.IncrementSessionId()
 
 		case arr := <-in:
 			// If we consider every message a "tick" of the clock, we need to advance time.

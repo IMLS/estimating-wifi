@@ -63,7 +63,7 @@ func (suite *TLPSuite) SetupTest() {
 	suite.cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 	suite.cfg.Local.WebDirectory = filepath.Join(path, "..", "test", "www")
 	os.Mkdir(suite.cfg.Local.WebDirectory, 0755)
-	suite.cfg.NewSessionId()
+	suite.cfg.SetSessionId(tempdb.NewSessionId(suite.cfg))
 
 }
 

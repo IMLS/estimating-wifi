@@ -1,4 +1,4 @@
-package tempdb
+package state
 
 import (
 	"fmt"
@@ -50,7 +50,7 @@ func (queue *Queue) AsList() []string {
 	defer queue.mutex.Unlock()
 	lw := logwrapper.NewLogger(nil)
 
-	stmt := fmt.Sprintf("SELECT item FROM %v", queue.name)
+	stmt := fmt.Sprintf("SELECT item FROM %v ORDER BY rowid", queue.name)
 	queue.db.Open()
 	defer queue.db.Close()
 

@@ -15,8 +15,6 @@ import (
 	"gsa.gov/18f/wifi-hardware-search/config"
 )
 
-const STATEDB = "state.sqlite"
-
 func NewConfig() *Config {
 	cfg := Config{}
 	cfg.setDefaults()
@@ -79,13 +77,8 @@ func (cfg *Config) ReadConfig(path string) error {
 	return fmt.Errorf("config: could not find config file [%v]", path)
 }
 
-func (cfg *Config) NewSessionId() {
-	// h := sha256.New()
-	// h.Write([]byte(fmt.Sprintf("%v", time.Now())))
-	// sid := fmt.Sprintf("%x", h.Sum(nil))[0:16]
-	// cfg.SessionId = sid
-	t := cfg.Clock.Now()
-	cfg.SessionId = fmt.Sprintf("%v%02d%02d", t.Year(), t.Month(), t.Day())
+func (cfg *Config) SetSessionId(sid SessionId) {
+	cfg.SessionId = sid
 }
 
 func (cfg *Config) GetLoggers() []string {
@@ -262,7 +255,7 @@ type Config struct {
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
-	SessionId   string      // No YAML equiv.
+	SessionId   SessionId   // No YAML equiv.
 	Serial      string      `yaml:"serial"`
 	StorageMode string      `yaml:"storagemode"`
 	RunMode     string      `yaml:"runmode"`

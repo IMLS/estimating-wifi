@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"sort"
 	"time"
+
+	"gsa.gov/18f/structs"
 )
 
-func GetSessions(events []WifiEvent) []string {
+func GetSessions(events []structs.WifiEvent) []string {
 	eventset := make([]string, 0)
 	for _, e := range events {
 		found := false
@@ -22,7 +24,7 @@ func GetSessions(events []WifiEvent) []string {
 	return eventset
 }
 
-func RemapEvents(events []WifiEvent) []WifiEvent {
+func RemapEvents(events []structs.WifiEvent) []structs.WifiEvent {
 	// Some sessions start and end on the same day. Because we're rewriting the session id,
 	// this means that it is possible to see a mapping get reused. The way to fix that is
 	// to clear the mapping tables, but keep the counters going up. That way, sessions that start/end
@@ -101,8 +103,8 @@ func RemapEvents(events []WifiEvent) []WifiEvent {
 	return events
 }
 
-func GetEventsFromSession(events []WifiEvent, session string) []WifiEvent {
-	filtered := make([]WifiEvent, 0)
+func GetEventsFromSession(events []structs.WifiEvent, session string) []structs.WifiEvent {
+	filtered := make([]structs.WifiEvent, 0)
 	for _, e := range events {
 		if e.SessionId == session {
 			filtered = append(filtered, e)
