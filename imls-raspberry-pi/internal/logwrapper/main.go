@@ -79,11 +79,7 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 	if standardLogger != nil {
 		return standardLogger
 	}
-	if cfg == nil && standardLogger != nil {
-		return standardLogger
-	} else {
-		return UnsafeNewLogger(cfg)
-	}
+	return UnsafeNewLogger(cfg)
 }
 
 // For unit testing only

@@ -17,19 +17,19 @@ import (
 )
 
 func run(cfg *config.Config) {
-	logwrapper.NewLogger(cfg)
+	logwrapper.NewLogger(nil)
 
 	// CHANNELS
-	ch_nsec := make(chan bool)
-	ch_macs := make(chan []string)
-	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []structs.WifiEvent)
-	ch_wifidb := make(chan *state.TempDB)
-	ch_ddb := make(chan *state.TempDB)
-	ch_ddb_par := make([]chan *state.TempDB, 2)
-	ch_ack := make(chan tlp.Ping)
+	chNsec := make(chan bool)
+	chMacs := make(chan []string)
+	chMacsCounted := make(chan map[string]int)
+	chDataForReport := make(chan []structs.WifiEvent)
+	chWifidb := make(chan *state.TempDB)
+	chDdb := make(chan *state.TempDB)
+	chDdbPar := make([]chan *state.TempDB, 2)
+	chAck := make(chan tlp.Ping)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *state.TempDB)
+		chDdbPar[i] = make(chan *state.TempDB)
 	}
 	// BROKERS
 	resetbroker := tlp.NewResetBroker()
@@ -39,17 +39,17 @@ func run(cfg *config.Config) {
 
 	// PROCESSES
 	go tlp.StayinAlive(ka, cfg)
-	go tlp.TockEveryMinute(ka, killbroker, ch_nsec)
-	go tlp.RunWireshark(ka, cfg, killbroker, ch_nsec, ch_macs)
-	go tlp.AlgorithmTwo(ka, cfg, resetbroker, killbroker, ch_macs, ch_macs_counted)
-	go tlp.PrepEphemeralWifi(ka, cfg, killbroker, ch_macs_counted, ch_data_for_report)
+	go tlp.TockEveryMinute(ka, killbroker, chNsec)
+	go tlp.RunWireshark(ka, cfg, killbroker, chNsec, chMacs)
+	go tlp.AlgorithmTwo(ka, cfg, resetbroker, killbroker, chMacs, chMacsCounted)
+	go tlp.PrepEphemeralWifi(ka, cfg, killbroker, chMacsCounted, chDataForReport)
 
-	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb, ch_ack)
-	go tlp.GenerateDurations(ka, cfg, killbroker, ch_wifidb, ch_ddb, ch_ack)
+	go tlp.CacheWifi(ka, cfg, resetbroker, killbroker, chDataForReport, chWifidb, chAck)
+	go tlp.GenerateDurations(ka, cfg, killbroker, chWifidb, chDdb, chAck)
 
-	go tlp.ParDeltaTempDB(killbroker, ch_ddb, ch_ddb_par...)
-	go tlp.BatchSend(ka, cfg, killbroker, ch_ddb_par[0])
-	go tlp.WriteImages(ka, cfg, killbroker, ch_ddb_par[1])
+	go tlp.ParDeltaTempDB(killbroker, chDdb, chDdbPar...)
+	go tlp.BatchSend(ka, cfg, killbroker, chDdbPar[0])
+	go tlp.WriteImages(ka, cfg, killbroker, chDdbPar[1])
 
 	go tlp.PingAtMidnight(ka, cfg, resetbroker, killbroker)
 }
@@ -94,8 +94,6 @@ func handleFlags() *config.Config {
 func main() {
 	// DO NOT USE LOGGING YET
 	cfg := handleFlags()
-	sid := state.NewSessionId(cfg)
-	cfg.SetSessionId(sid)
 
 	// INIT THE LOGGER
 	// SINGLETON PATTERN
@@ -103,6 +101,9 @@ func main() {
 	// log through the config passed here.
 	lw := logwrapper.NewLogger(cfg)
 	// NOW YOU MAY USE LOGGING.
+
+	sid := state.NewSessionId(cfg)
+	cfg.SetSessionId(sid)
 
 	cfg.DecodeSerial()
 	lw.Info("startup")
