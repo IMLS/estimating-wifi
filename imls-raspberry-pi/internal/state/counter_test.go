@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -17,28 +18,15 @@ type CounterSuite struct {
 	c   *Counter
 }
 
-// Make sure that VariableThatShouldStartAtFive is set to five
-// before each test
-func (suite *CounterSuite) SetupTest() {
-	cfg := config.NewConfig()
-	suite.cfg = cfg
-	suite.cfg.LogLevel = "INFO"
-	dir, _ := os.Getwd()
-	cfg.Local.WebDirectory = dir
-	suite.lw = logwrapper.NewLogger(cfg)
-	suite.c = NewCounter(suite.cfg, "a")
-}
+var s *CounterSuite
+
+// // Make sure that VariableThatShouldStartAtFive is set to five
+// // before each test
+// func (suite *CounterSuite) SetupTest() {
+
+// }
 
 func (suite *CounterSuite) TestCounter() {
-	c := GetCounter(suite.cfg, "a")
-	log.Println("TestCounter initial value", c.Value())
-	if c.Value() != 0 {
-		suite.Fail("counter was not at zero")
-	}
-}
-
-func (suite *CounterSuite) TestCounter2() {
-	// Using the "suite pointer"
 	log.Println("TestCounter initial value", suite.c.Value())
 	if suite.c.Value() != 0 {
 		suite.Fail("counter was not at zero")
@@ -46,28 +34,45 @@ func (suite *CounterSuite) TestCounter2() {
 }
 
 func (suite *CounterSuite) TestIncCounter() {
-	c := GetCounter(suite.cfg, "a")
-	c.Increment()
-	log.Println("TestIncCounter incremented value", c.Value())
+	suite.c.Reset()
+	suite.c.Increment()
+	log.Println("TestIncCounter incremented value", suite.c.Value())
 
-	if c.Value() != 1 {
+	if suite.c.Value() != 1 {
 		suite.Fail("counter was not incremented")
 	}
+
+	log.Println("Value after increment", suite.c.Value())
+
+	log.Println("Check exists", suite.c.db.CheckTableExists(suite.c.name))
 }
 
 func (suite *CounterSuite) TestResetCounter() {
-	c := GetCounter(suite.cfg, "a")
-	log.Println("TestResetCounter value", c.Value())
+	log.Println("TestResetCounter initial value", suite.c.Value())
+	for i := 0; i < 100; i++ {
+		suite.c.Increment()
+	}
 
-	c.Reset()
+	if suite.c.Value() != 101 {
+		suite.Fail(fmt.Sprintf("counter is not 101; it is %d", suite.c.Value()))
+	}
 
-	if c.Value() != 0 {
+	suite.c.Reset()
+
+	if suite.c.Value() != 0 {
 		suite.Fail("counter was not reset")
 	}
-	c.Reset()
 
 }
 
 func TestSuite(t *testing.T) {
-	suite.Run(t, new(CounterSuite))
+	cfg := config.NewConfig()
+	s := &CounterSuite{}
+	s.cfg = cfg
+	s.cfg.LogLevel = "DEBUG"
+	dir, _ := os.Getwd()
+	cfg.Local.WebDirectory = dir
+	s.lw = logwrapper.NewLogger(cfg)
+	s.c = NewCounter(s.cfg, "a")
+	suite.Run(t, s)
 }
