@@ -19,11 +19,19 @@ func NewAPILogger(cfg *config.Config) (api *APILogger) {
 }
 
 func (a *APILogger) Write(p []byte) (n int, err error) {
+
+	// work around a catch-22 where we are trying to log startup events without
+	// a session.
+	sessionID := "startup"
+	if a.cfg.SessionId != nil {
+		sessionID = a.cfg.SessionId.GetSessionId()
+	}
+
 	data := map[string]interface{}{
 		"pi_serial":   a.cfg.GetSerial(),
 		"fcfs_seq_id": a.cfg.Auth.FCFSId,
 		"device_tag":  a.cfg.Auth.DeviceTag,
-		"session_id":  a.cfg.SessionId,
+		"session_id":  sessionID,
 		"localtime":   time.Now().Format(time.RFC3339),
 		"tag":         a.l.GetLogLevelName(),
 		"info":        string(p),

@@ -87,7 +87,7 @@ func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) err
 				body, _ := ioutil.ReadAll(resp.Body)
 				err := json.Unmarshal(body, &dat)
 				if err != nil {
-					message := "PostJSON: could not unmarshal response body"
+					message := fmt.Sprintf("PostJSON: could not unmarshal response body: %v", err)
 					log.Print(message)
 					return fmt.Errorf(message)
 				}
