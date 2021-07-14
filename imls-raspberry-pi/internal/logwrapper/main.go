@@ -135,7 +135,7 @@ func initLogger(cfg *config.Config) {
 			}
 			writers = append(writers, iow)
 		case "api:directus":
-			api := NewApiLogger(cfg)
+			api := NewAPILogger(cfg)
 			writers = append(writers, api)
 		}
 	}

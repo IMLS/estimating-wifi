@@ -17,7 +17,7 @@ import (
 )
 
 func run(cfg *config.Config) {
-	logwrapper.NewLogger(nil)
+	logwrapper.NewLogger(cfg)
 
 	// CHANNELS
 	ch_nsec := make(chan bool)

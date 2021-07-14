@@ -8,17 +8,17 @@ import (
 	"gsa.gov/18f/internal/http"
 )
 
-type ApiLogger struct {
+type APILogger struct {
 	l   *StandardLogger
 	cfg *config.Config
 }
 
-func NewApiLogger(cfg *config.Config) (api *ApiLogger) {
-	api = &ApiLogger{cfg: cfg}
+func NewAPILogger(cfg *config.Config) (api *APILogger) {
+	api = &APILogger{cfg: cfg}
 	return api
 }
 
-func (a *ApiLogger) Write(p []byte) (n int, err error) {
+func (a *APILogger) Write(p []byte) (n int, err error) {
 	data := map[string]interface{}{
 		"pi_serial":   a.cfg.GetSerial(),
 		"fcfs_seq_id": a.cfg.Auth.FCFSId,
