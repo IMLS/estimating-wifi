@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/constants"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/cmd/session-counter/constants"
 )
 
 // Inspired by the broker pattern found here:

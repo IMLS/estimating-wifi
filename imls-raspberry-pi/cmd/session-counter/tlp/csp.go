@@ -3,8 +3,8 @@ package tlp
 import (
 	"sync"
 
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/tempdb"
 )
 
 type Generic interface {

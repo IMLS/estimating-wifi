@@ -3,7 +3,7 @@ package logwrapper
 import (
 	"testing"
 
-	"gsa.gov/18f/config"
+	"gsa.gov/18f/internal/config"
 )
 
 func TestSimple(t *testing.T) {

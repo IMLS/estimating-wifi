@@ -17,11 +17,11 @@ import (
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/input-initial-configuration/cryptopasta"
-	"gsa.gov/18f/input-initial-configuration/pi"
-	"gsa.gov/18f/input-initial-configuration/wordlist"
-	"gsa.gov/18f/version"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/cmd/input-initial-configuration/cryptopasta"
+	"gsa.gov/18f/cmd/input-initial-configuration/pi"
+	"gsa.gov/18f/cmd/input-initial-configuration/wordlist"
+	"gsa.gov/18f/internal/version"
 )
 
 const lookup = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 func DrawPatronSessionsFromWifi(cfg *config.Config, events []WifiEvent, outputPath string) {

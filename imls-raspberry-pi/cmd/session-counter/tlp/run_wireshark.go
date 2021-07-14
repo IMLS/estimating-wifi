@@ -7,11 +7,11 @@ import (
 	"strings"
 	"syscall"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/constants"
-	"gsa.gov/18f/wifi-hardware-search/models"
-	"gsa.gov/18f/wifi-hardware-search/search"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/cmd/session-counter/constants"
+	"gsa.gov/18f/internal/wifi-hardware-search/models"
+	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
 func tshark(cfg *config.Config) []string {

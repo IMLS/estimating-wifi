@@ -16,10 +16,10 @@ import (
 
 	"github.com/briandowns/spinner"
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/analysis"
+	"gsa.gov/18f/internal/analysis"
 
 	"github.com/jszwec/csvutil"
-	"gsa.gov/18f/version"
+	"gsa.gov/18f/internal/version"
 )
 
 // External: https://nicedoc.io/jszwec/csvutil#user-content-marshal-a-nameexamples_marshala

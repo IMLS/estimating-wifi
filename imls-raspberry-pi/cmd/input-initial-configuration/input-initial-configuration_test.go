@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"gsa.gov/18f/input-initial-configuration/wordlist"
+	"gsa.gov/18f/cmd/input-initial-configuration/wordlist"
 )
 
 type test struct {

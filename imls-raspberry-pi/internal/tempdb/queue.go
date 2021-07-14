@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 type Item interface{}

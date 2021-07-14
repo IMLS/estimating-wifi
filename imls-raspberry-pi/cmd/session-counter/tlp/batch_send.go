@@ -3,11 +3,11 @@ package tlp
 import (
 	"log"
 
-	"gsa.gov/18f/analysis"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/http"
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/http"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/tempdb"
 )
 
 func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,

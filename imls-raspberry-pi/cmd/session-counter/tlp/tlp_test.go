@@ -13,10 +13,10 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/stretchr/testify/suite"
-	"gsa.gov/18f/analysis"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/tempdb"
 )
 
 const PASS = true

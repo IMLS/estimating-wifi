@@ -4,8 +4,8 @@ import (
 	"log"
 	"testing"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 var cfg *config.Config = nil

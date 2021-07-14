@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"testing"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/http"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/http"
 )
 
 // This should be much higher, like 2000

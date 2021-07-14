@@ -2,8 +2,8 @@ package tlp
 
 import (
 	"github.com/robfig/cron/v3"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 func PingAtMidnight(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker) {

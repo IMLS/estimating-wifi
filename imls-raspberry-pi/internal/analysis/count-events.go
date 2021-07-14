@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"gsa.gov/18f/config"
+	"gsa.gov/18f/internal/config"
 )
 
 // These defaults get overridden by the config.Config file.

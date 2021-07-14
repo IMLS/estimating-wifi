@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gsa.gov/18f/analysis"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/model"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/cmd/session-counter/model"
+	"gsa.gov/18f/internal/tempdb"
 )
 
 func GetDurationsDB(cfg *config.Config) *tempdb.TempDB {

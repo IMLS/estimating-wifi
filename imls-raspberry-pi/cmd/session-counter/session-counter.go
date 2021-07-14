@@ -7,13 +7,13 @@ import (
 	"os"
 	"sync"
 
-	"gsa.gov/18f/analysis"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/tlp"
-	"gsa.gov/18f/tempdb"
-	"gsa.gov/18f/version"
+	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/cmd/session-counter/api"
+	"gsa.gov/18f/cmd/session-counter/tlp"
+	"gsa.gov/18f/internal/tempdb"
+	"gsa.gov/18f/internal/version"
 )
 
 func run(cfg *config.Config) {

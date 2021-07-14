@@ -6,8 +6,8 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 func CheckMfgDatabaseExists(cfg *config.Config) {

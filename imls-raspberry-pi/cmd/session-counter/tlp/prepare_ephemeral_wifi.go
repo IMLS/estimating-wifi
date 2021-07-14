@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"gsa.gov/18f/analysis"
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 // Converts raw data to a map[string]string

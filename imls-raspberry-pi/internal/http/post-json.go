@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"time"
 
-	"gsa.gov/18f/config"
+	"gsa.gov/18f/internal/config"
 )
 
 var slashWarned bool = false

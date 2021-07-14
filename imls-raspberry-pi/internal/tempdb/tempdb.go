@@ -12,7 +12,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 type TempDB struct {

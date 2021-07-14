@@ -11,8 +11,8 @@ import (
 
 	"github.com/benbjohnson/clock"
 	yaml "gopkg.in/yaml.v2"
-	"gsa.gov/18f/cryptopasta"
-	"gsa.gov/18f/wifi-hardware-search/config"
+	"gsa.gov/18f/internal/cryptopasta"
+	"gsa.gov/18f/internal/wifi-hardware-search/config"
 )
 
 const STATEDB = "state.sqlite"

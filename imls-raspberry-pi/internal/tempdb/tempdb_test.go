@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"gsa.gov/18f/analysis"
+	"gsa.gov/18f/internal/analysis"
 )
 
 func TestDBCreate(t *testing.T) {

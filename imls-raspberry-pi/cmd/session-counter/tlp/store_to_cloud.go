@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/http"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/http"
 )
 
 func report(service string, cfg *config.Config, session_id int, arr []map[string]interface{}) (http_error_count int, err error) {

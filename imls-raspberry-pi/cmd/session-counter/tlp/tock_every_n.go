@@ -2,7 +2,7 @@ package tlp
 
 import (
 	"github.com/robfig/cron/v3"
-	"gsa.gov/18f/logwrapper"
+	"gsa.gov/18f/internal/logwrapper"
 )
 
 func TockEveryMinute(ka *Keepalive, kb *KillBroker, out chan<- bool) {

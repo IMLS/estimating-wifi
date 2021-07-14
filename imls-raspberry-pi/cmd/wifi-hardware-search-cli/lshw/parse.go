@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"regexp"
 
-	"gsa.gov/18f/wifi-hardware-search-cli/config"
-	"gsa.gov/18f/wifi-hardware-search-cli/models"
+	"gsa.gov/18f/cmd/wifi-hardware-search-cli/config"
+	"gsa.gov/18f/cmd/wifi-hardware-search-cli/models"
 )
 
 // PURPOSE

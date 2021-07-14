@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/http"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/http"
 )
 
 type ApiLogger struct {

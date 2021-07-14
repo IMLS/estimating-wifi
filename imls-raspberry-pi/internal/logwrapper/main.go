@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
-	"gsa.gov/18f/config"
+	"gsa.gov/18f/internal/config"
 )
 
 // Code for this wrapper inspired by

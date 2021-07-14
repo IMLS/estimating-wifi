@@ -15,16 +15,16 @@ deps:
 	go mod download
 
 input-configuration: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/input-initial-configuration
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/input-initial-configuration
 
 session-counter: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/session-counter
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
 
 wifi-hardware-search-cli: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/wifi-hardware-search-cli
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
 
 log-event: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/log-event
+	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/log-event
 
 release: all
 	git tag ${VERSION}
@@ -46,7 +46,7 @@ test:
 	go test -coverprofile lshw.out ./internal/wifi-hardware-search/lshw/*.go
 	go test -coverprofile search.out ./internal/wifi-hardware-search/search/*.go
 	go test -coverprofile ic.out ./internal/config/*.go
-	go test -coverprofile iic.out ./cmd/input-configuration/*.go
-	go test -coverprofile sca.out ./cmd/session-counting/api/*.go
-	go test -coverprofile scm.out ./cmd/session-counting/model/*.go
-	go test -coverprofile sc.out -timeout 99999s ./cmd/session-counting/*.go
+	go test -coverprofile iic.out ./cmd/input-initial-configuration/*.go
+	go test -coverprofile sca.out ./cmd/session-counter/api/*.go
+	go test -coverprofile scm.out ./cmd/session-counter/model/*.go
+	go test -coverprofile sc.out -timeout 99999s ./cmd/session-counter/*.go

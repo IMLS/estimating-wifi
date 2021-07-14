@@ -12,8 +12,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/analysis"
-	"gsa.gov/18f/config"
+	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/config"
 )
 
 const PATRONMINMINS = 30

@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"gsa.gov/18f/config"
+	"gsa.gov/18f/internal/config"
 )
 
 func mapEqual(m1 map[string]int, m2 map[string]int) bool {

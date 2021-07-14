@@ -3,8 +3,8 @@ package model
 import (
 	"fmt"
 
-	"gsa.gov/18f/config"
-	"gsa.gov/18f/session-counter/api"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/cmd/session-counter/api"
 )
 
 // This probably should be a proper database.
