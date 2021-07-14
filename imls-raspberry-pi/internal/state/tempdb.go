@@ -1,4 +1,4 @@
-package tempdb
+package state
 
 import (
 	"errors"
@@ -48,6 +48,22 @@ func (tdb *TempDB) DropTable(name string) {
 	}
 }
 
+func (tdb *TempDB) CheckTableExists(name string) bool {
+	tdb.Open()
+	defer tdb.Close()
+	_, table_check := tdb.Ptr.Query("select * from " + name + ";")
+
+	return table_check == nil
+}
+
+func (tdb *TempDB) CheckTableDoesNotExist(name string) bool {
+	tdb.Open()
+	defer tdb.Close()
+	_, table_check := tdb.Ptr.Query("select * from " + name + ";")
+
+	return table_check != nil
+}
+
 func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 	lw := logwrapper.NewLogger(nil)
 	tdb.Tables[name] = columns
@@ -57,14 +73,19 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 		fp := fmt.Sprintf("%v %v", col, t)
 		fields = append(fields, fp)
 	}
-	statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
-	lw.Debug("AddTable ", statement)
-	tdb.Open()
-	defer tdb.Close()
-	_, err := tdb.Ptr.Exec(statement)
-	if err != nil {
-		lw.Info("could not re-create '", name, "' table in temporary db.")
-		lw.Fatal(err.Error())
+
+	lw.Debug("CHECKING IF "+name+" DOES NOT EXIST: ", tdb.CheckTableDoesNotExist(name))
+	if tdb.CheckTableDoesNotExist(name) {
+		statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
+		lw.Debug("AddTable ", statement)
+		tdb.Open()
+		defer tdb.Close()
+		_, err := tdb.Ptr.Exec(statement)
+		if err != nil {
+			lw.Info("could not re-create '", name, "' table in temporary db.")
+			lw.Fatal(err.Error())
+		}
+
 	}
 }
 

@@ -5,15 +5,16 @@ import (
 	"os"
 	"path/filepath"
 
+	"gsa.gov/18f/cmd/session-counter/model"
 	"gsa.gov/18f/internal/analysis"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/cmd/session-counter/model"
-	"gsa.gov/18f/internal/tempdb"
+	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/structs"
 )
 
 //This must happen after the data is updated for the day.
-func writeImages(cfg *config.Config, durations []analysis.Duration) error {
+func writeImages(cfg *config.Config, durations []structs.Duration) error {
 	lw := logwrapper.NewLogger(nil)
 	var reterr error
 
@@ -41,7 +42,7 @@ func writeImages(cfg *config.Config, durations []analysis.Duration) error {
 }
 
 func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db chan *tempdb.TempDB) {
+	ch_durations_db chan *state.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting WriteImages")
@@ -61,11 +62,11 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			lw.Debug("exiting WriteImages")
 			return
 		case db := <-ch_durations_db:
-			iq := tempdb.NewQueue(cfg, "images")
+			iq := state.NewQueue(cfg, "images")
 			imagesToWrite := iq.AsList()
 			lw.Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")
 			for _, nextImage := range imagesToWrite {
-				durations := []analysis.Duration{}
+				durations := []structs.Duration{}
 				lw.Debug("looking for session ", nextImage, " in durations table to write images")
 				db.Open()
 				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)

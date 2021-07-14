@@ -12,11 +12,12 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"gsa.gov/18f/internal/analysis"
+
+	"gsa.gov/18f/cmd/session-counter/tlp"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/cmd/session-counter/model"
-	"gsa.gov/18f/cmd/session-counter/tlp"
+	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/structs"
 )
 
 const PASS = true
@@ -189,11 +190,9 @@ func TestRawToUid(t *testing.T) {
 		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
 
 		var wg sync.WaitGroup
-		resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
+		resetbroker := tlp.NewResetBroker()
 		go resetbroker.Start()
-		// The kill broker lets us poison the network.
-		// var killbroker *tlp.Broker = nil
-		killbroker := &tlp.KillBroker{tlp.NewBroker()}
+		killbroker := tlp.NewKillBroker()
 		go killbroker.Start()
 
 		ch_macs := make(chan []string)
@@ -343,16 +342,19 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker,
 }
 
 func TestManyTLPCycles(t *testing.T) {
-	const NUMDAYSTORUN int = 2
+	const NUMDAYSTORUN int = 6
 	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
-	const WRITESUMMARYNHOURS int = 1
+
+	const skip int = 20
+	const NUMCYCLESTORUN = NUMMINUTESTORUN / skip
+
 	const SECONDSPERMINUTE int = 2
 	lw := logwrapper.NewLogger(nil)
 	lw.SetLogLevel("DEBUG")
 
-	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
+	resetbroker := tlp.NewResetBroker()
 	go resetbroker.Start()
-	killbroker := &tlp.KillBroker{tlp.NewBroker()}
+	killbroker := tlp.NewKillBroker()
 	go killbroker.Start()
 
 	// This runs the TLP through 10000 cycles. This is roughly the same as week.
@@ -382,7 +384,8 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-	cfg.NewSessionId()
+	sid := state.NewSessionId(cfg)
+	cfg.SetSessionId(sid)
 
 	// Create channels for process network
 	ch_sec := make(chan bool)
@@ -393,13 +396,13 @@ func TestManyTLPCycles(t *testing.T) {
 
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *model.TempDB)
-	ch_durations_db := make(chan *model.TempDB)
+	ch_data_for_report := make(chan []structs.WifiEvent)
+	ch_wifidb := make(chan *state.TempDB)
+	ch_durations_db := make(chan *state.TempDB)
 	ch_ack := make(chan tlp.Ping)
-	ch_ddb_par := make([]chan *model.TempDB, 2)
+	ch_ddb_par := make([]chan *state.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *model.TempDB)
+		ch_ddb_par[i] = make(chan *state.TempDB)
 	}
 
 	// See if we can wait and shut down the test...
@@ -439,26 +442,18 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
 	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
 
-	NUMCYCLESTORUN := 400
-
 	go func() {
 		minutes := 0
-		skip := 20
+
 		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
 		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
 			ch_sec <- true
-			if secs%SECONDSPERMINUTE == 0 {
-				mock.Add(m)
-				lw.Debug("MOCK NOW ", mock.Now())
+			mock.Add(m)
+			lw.Debug("MOCK NOW ", mock.Now())
 
-				var m runtime.MemStats
-				runtime.ReadMemStats(&m)
-				minutes += skip
-				// hours := (minutes / 60) % 24
-				// days := (minutes / (60 * 24))
-				// memstats := fmt.Sprintf("Alloc[%vMB] Sys[%vMB], NumGC[%v]", bToMb(m.Alloc), bToMb(m.Sys), m.NumGC)
-				// //log.Println(days, "d", hours, "h", minutes%60, "m", memstats)
-			}
+			var m runtime.MemStats
+			runtime.ReadMemStats(&m)
+			minutes += skip
 		}
 		log.Println("Killing the test network.")
 		killbroker.Publish(tlp.Ping{})

@@ -1,4 +1,4 @@
-package tempdb
+package state
 
 import (
 	"fmt"
@@ -50,7 +50,7 @@ func (queue *Queue) AsList() []string {
 	defer queue.mutex.Unlock()
 	lw := logwrapper.NewLogger(nil)
 
-	stmt := fmt.Sprintf("SELECT item FROM %v", queue.name)
+	stmt := fmt.Sprintf("SELECT item FROM %v ORDER BY rowid", queue.name)
 	queue.db.Open()
 	defer queue.db.Close()
 
@@ -108,7 +108,7 @@ func (queue *Queue) Enqueue(sessionid string) {
 }
 
 func (queue *Queue) Peek() Item {
-	lw := logwrapper.NewLogger(nil)
+	//lw := logwrapper.NewLogger(nil)
 	queue.mutex.Lock()
 	defer queue.mutex.Unlock()
 	qr := QueueRow{}
@@ -120,11 +120,11 @@ func (queue *Queue) Peek() Item {
 	// The rowid value starts at 1. From the SQLite documentation.
 	// if the Rowid is 0, we did not get anything back.
 	if err != nil || qr.Item == "" || qr.Rowid == 0 {
-		lw.Debug("nothing to peek at on the queue [", queue.name, "]")
-		lw.Debug(err.Error())
+		//lw.Debug("nothing to peek at on the queue [", queue.name, "]")
+		//lw.Debug(err.Error())
 		return nil
 	} else {
-		lw.Debug("PEEK found [ ", qr.Item, " ] on the queue [ ", queue.name, " ]")
+		//lw.Debug("PEEK found [ ", qr.Item, " ] on the queue [ ", queue.name, " ]")
 		return qr.Item
 	}
 }

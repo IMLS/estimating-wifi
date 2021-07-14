@@ -9,18 +9,19 @@ import (
 	"github.com/fogleman/gg"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/structs"
 )
 
-func DrawPatronSessionsFromWifi(cfg *config.Config, events []WifiEvent, outputPath string) {
+func DrawPatronSessionsFromWifi(cfg *config.Config, events []structs.WifiEvent, outputPath string) {
 	_, d := Summarize(cfg, events)
-	durations := make([]Duration, 0)
+	durations := make([]structs.Duration, 0)
 	for _, v := range d {
 		durations = append(durations, v)
 	}
 	DrawPatronSessions(cfg, durations, outputPath)
 }
 
-func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
+func DrawPatronSessions(cfg *config.Config, durations []structs.Duration, outputPath string) {
 	lw := logwrapper.NewLogger(nil)
 
 	if len(durations) == 0 {
@@ -31,7 +32,7 @@ func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath str
 
 	// Capture the data about the session while running in a `counter` structure.
 	durationsInRange := 0
-	sort.Sort(ByStart(durations))
+	sort.Sort(structs.ByStart(durations))
 	lw.Debug("about to iterate over [", len(durations), "] durations")
 
 	for _, d := range durations {

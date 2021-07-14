@@ -7,12 +7,12 @@ import (
 	"os"
 	"sync"
 
-	"gsa.gov/18f/internal/analysis"
-	"gsa.gov/18f/internal/config"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/cmd/session-counter/api"
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/tempdb"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
 )
 
@@ -23,16 +23,16 @@ func run(cfg *config.Config) {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *tempdb.TempDB)
-	ch_ddb := make(chan *tempdb.TempDB)
-	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
+	ch_data_for_report := make(chan []structs.WifiEvent)
+	ch_wifidb := make(chan *state.TempDB)
+	ch_ddb := make(chan *state.TempDB)
+	ch_ddb_par := make([]chan *state.TempDB, 2)
 	ch_ack := make(chan tlp.Ping)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *tempdb.TempDB)
+		ch_ddb_par[i] = make(chan *state.TempDB)
 	}
 	// BROKERS
-	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
+	resetbroker := tlp.NewResetBroker()
 	go resetbroker.Start()
 	var killbroker *tlp.KillBroker = nil
 	ka := tlp.NewKeepalive(cfg)
@@ -94,15 +94,17 @@ func handleFlags() *config.Config {
 func main() {
 	// DO NOT USE LOGGING YET
 	cfg := handleFlags()
-	cfg.NewSessionId()
+	sid := state.NewSessionId(cfg)
+	cfg.SetSessionId(sid)
+
 	// INIT THE LOGGER
+	// SINGLETON PATTERN
+	// Once this is set up, all loggers (should)
+	// log through the config passed here.
 	lw := logwrapper.NewLogger(cfg)
 	// NOW YOU MAY USE LOGGING.
 
 	cfg.DecodeSerial()
-	// SINGLETON PATTERN
-	// Once this is set up, all loggers (should)
-	// log through the config passed here.
 	lw.Info("startup")
 	lw.Info("serial ", cfg.GetSerial())
 

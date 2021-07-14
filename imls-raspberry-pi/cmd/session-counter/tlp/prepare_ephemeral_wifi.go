@@ -5,16 +5,16 @@ import (
 	"strings"
 	"time"
 
-	"gsa.gov/18f/internal/analysis"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/structs"
 )
 
 // Converts raw data to a map[string]string
 // This makexs it ready for storage locally (SQLite) or
 // via an API (where everything becomes text anyway).
 func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	in_hash <-chan map[string]int, out_arr chan<- []analysis.WifiEvent) {
+	in_hash <-chan map[string]int, out_arr chan<- []structs.WifiEvent) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting PrepEphemeralWifi")
 	var ping, pong chan interface{} = nil, nil
@@ -47,14 +47,14 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			}
 			// lw.Length("macs-to-store", remove)
 			// Now, bundle that as an array of hashmaps.
-			reportArr := make([]analysis.WifiEvent, 0)
+			reportArr := make([]structs.WifiEvent, 0)
 
 			for anondevice := range h {
 				mfg, _ := strconv.Atoi(strings.Split(anondevice, ":")[0])
 				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
 
-				data := analysis.WifiEvent{
-					SessionId:         cfg.SessionId,
+				data := structs.WifiEvent{
+					SessionId:         cfg.SessionId.GetSessionId(),
 					Localtime:         cfg.Clock.Now().Format(time.RFC3339),
 					FCFSSeqId:         cfg.Auth.FCFSId,
 					DeviceTag:         cfg.Auth.DeviceTag,

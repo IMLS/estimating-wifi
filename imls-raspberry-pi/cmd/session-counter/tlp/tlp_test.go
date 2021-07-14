@@ -13,10 +13,10 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/stretchr/testify/suite"
-	"gsa.gov/18f/internal/analysis"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/internal/tempdb"
+	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/structs"
 )
 
 const PASS = true
@@ -63,7 +63,7 @@ func (suite *TLPSuite) SetupTest() {
 	suite.cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 	suite.cfg.Local.WebDirectory = filepath.Join(path, "..", "test", "www")
 	os.Mkdir(suite.cfg.Local.WebDirectory, 0755)
-	suite.cfg.NewSessionId()
+	suite.cfg.SetSessionId(state.NewSessionId(suite.cfg))
 
 }
 
@@ -140,13 +140,13 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *tempdb.TempDB)
-	ch_durations_db := make(chan *tempdb.TempDB)
+	ch_data_for_report := make(chan []structs.WifiEvent)
+	ch_wifidb := make(chan *state.TempDB)
+	ch_durations_db := make(chan *state.TempDB)
 	ch_ack := make(chan Ping)
-	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
+	ch_ddb_par := make([]chan *state.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *tempdb.TempDB)
+		ch_ddb_par[i] = make(chan *state.TempDB)
 	}
 
 	// See if we can wait and shut down the test...

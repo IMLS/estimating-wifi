@@ -1,11 +1,11 @@
-package tempdb
+package state
 
 import (
 	"os"
 	"testing"
 	"time"
 
-	"gsa.gov/18f/internal/analysis"
+	"gsa.gov/18f/internal/structs"
 )
 
 func TestDBCreate(t *testing.T) {
@@ -88,8 +88,8 @@ func TestWifiTable(t *testing.T) {
 
 func TestWifiTable2(t *testing.T) {
 	tdb := NewSqliteDB("wifi2", "/tmp/wifi2.db")
-	tdb.AddStructAsTable("wifi", analysis.WifiEvent{})
-	w := analysis.WifiEvent{
+	tdb.AddStructAsTable("wifi", structs.WifiEvent{})
+	w := structs.WifiEvent{
 		FCFSSeqId:         "ME0000-000",
 		DeviceTag:         "another-tag",
 		Localtime:         cfg.Clock.Now().Format(time.RFC3339),
@@ -134,8 +134,8 @@ func TestCleanup(t *testing.T) {
 }
 
 func TestReflection(t *testing.T) {
-	durations := make([]*analysis.Duration, 0)
-	d := &analysis.Duration{
+	durations := make([]*structs.Duration, 0)
+	d := &structs.Duration{
 		PiSerial:  "12345",
 		SessionId: "asdf",
 		FCFSSeqId: "ME0000-000",
@@ -149,7 +149,7 @@ func TestReflection(t *testing.T) {
 
 	os.Remove("/tmp/durations.sqlite")
 	tdb := NewSqliteDB("durations", "/tmp/durations.sqlite")
-	tdb.AddStructAsTable("durations", analysis.Duration{})
+	tdb.AddStructAsTable("durations", structs.Duration{})
 
 	for _, d := range durations {
 		tdb.Insert("durations", d.AsMap())
