@@ -16,7 +16,9 @@ replace gsa.gov/18f/analysis v0.0.0 => ../../internal/analysis
 
 replace gsa.gov/18f/logwrapper v0.0.0 => ../../internal/logwrapper
 
-replace gsa.gov/18f/tempdb v0.0.0 => ../../internal/tempdb
+replace gsa.gov/18f/structs v0.0.0 => ../../internal/structs
+
+replace gsa.gov/18f/state v0.0.0 => ../../internal/state
 
 require (
 	github.com/benbjohnson/clock v1.1.0
@@ -30,7 +32,8 @@ require (
 	gsa.gov/18f/config v0.0.0
 	gsa.gov/18f/http v0.0.0
 	gsa.gov/18f/logwrapper v0.0.0
-	gsa.gov/18f/tempdb v0.0.0
+	gsa.gov/18f/structs v0.0.0
+	gsa.gov/18f/state v0.0.0
 	gsa.gov/18f/version v0.0.0
 	gsa.gov/18f/wifi-hardware-search v0.0.0
 )

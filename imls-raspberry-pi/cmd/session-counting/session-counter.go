@@ -7,12 +7,12 @@ import (
 	"os"
 	"sync"
 
-	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/api"
 	"gsa.gov/18f/session-counter/tlp"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/state"
+	"gsa.gov/18f/structs"
 	"gsa.gov/18f/version"
 )
 
@@ -26,13 +26,13 @@ func run(cfg *config.Config) {
 	ch_nsec := make(chan bool)
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *tempdb.TempDB)
-	ch_ddb := make(chan *tempdb.TempDB)
-	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
+	ch_data_for_report := make(chan []structs.WifiEvent)
+	ch_wifidb := make(chan *state.TempDB)
+	ch_ddb := make(chan *state.TempDB)
+	ch_ddb_par := make([]chan *state.TempDB, 2)
 	ch_ack := make(chan tlp.Ping)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *tempdb.TempDB)
+		ch_ddb_par[i] = make(chan *state.TempDB)
 	}
 	// BROKERS
 	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
@@ -97,7 +97,7 @@ func handleFlags() *config.Config {
 func main() {
 	// DO NOT USE LOGGING YET
 	cfg := handleFlags()
-	sid := tempdb.NewSessionId(cfg)
+	sid := state.NewSessionId(cfg)
 	cfg.SetSessionId(sid)
 
 	// INIT THE LOGGER

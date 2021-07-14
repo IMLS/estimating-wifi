@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/state"
 )
 
 type Generic interface {
@@ -16,7 +16,9 @@ type Ping struct {
 
 // In an infinite loop, we read in from the input channel, and
 // in parallel, write out the value to the two output channels.
-func ParDeltaTempDB(kb *KillBroker, ch_reset_in <-chan *tempdb.TempDB, chs_reset_out ...chan *tempdb.TempDB) {
+func ParDeltaTempDB(kb *KillBroker,
+	ch_reset_in <-chan *state.TempDB,
+	chs_reset_out ...chan *state.TempDB) {
 	// Block waiting for a message
 	// It will be the zeroth channel in the group.
 	lw := logwrapper.NewLogger(nil)

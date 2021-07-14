@@ -3,15 +3,15 @@ package tlp
 import (
 	"log"
 
-	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/http"
 	"gsa.gov/18f/logwrapper"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/state"
+	"gsa.gov/18f/structs"
 )
 
 func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db_in <-chan *tempdb.TempDB) {
+	ch_durations_db_in <-chan *state.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting BatchSend")
@@ -32,11 +32,11 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			return
 		case db := <-ch_durations_db_in:
 			// This only comes in on reset...
-			sq := tempdb.NewQueue(cfg, "sent")
+			sq := state.NewQueue(cfg, "sent")
 			sessionsToSend := sq.AsList()
 
 			for _, nextSessionIdToSend := range sessionsToSend {
-				durations := []analysis.Duration{}
+				durations := []structs.Duration{}
 				// lw.Debug("looking for session ", unsent.Session, " in durations table")
 				db.Open()
 				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIdToSend)

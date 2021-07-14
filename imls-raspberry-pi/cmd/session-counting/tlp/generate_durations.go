@@ -8,28 +8,31 @@ import (
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/model"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/state"
+	"gsa.gov/18f/structs"
 )
 
-func GetDurationsDB(cfg *config.Config) *tempdb.TempDB {
+func GetDurationsDB(cfg *config.Config) *state.TempDB {
 	lw := logwrapper.NewLogger(nil)
-	fullpath := filepath.Join(cfg.Local.WebDirectory, tempdb.DURATIONSDB)
-	tdb := tempdb.NewSqliteDB(tempdb.DURATIONSDB, fullpath)
-	tdb.AddStructAsTable("durations", analysis.Duration{})
+	fullpath := filepath.Join(cfg.Local.WebDirectory, state.DURATIONSDB)
+	tdb := state.NewSqliteDB(state.DURATIONSDB, fullpath)
+	tdb.AddStructAsTable("durations", structs.Duration{})
 	lw.Info("Created durations table in db [", fullpath, "]")
 	return tdb
 }
 
-func storeSummary(cfg *config.Config, tdb *tempdb.TempDB, c *analysis.Counter, durations map[int]analysis.Duration) {
+func storeSummary(cfg *config.Config, tdb *state.TempDB,
+	c *analysis.Counter,
+	durations map[int]structs.Duration) {
 	for _, d := range durations {
 		tdb.InsertStruct("durations", d)
 	}
 }
 
-func processDataFromDay(cfg *config.Config, table string, wifidb *tempdb.TempDB) *tempdb.TempDB {
+func processDataFromDay(cfg *config.Config, table string, wifidb *state.TempDB) *state.TempDB {
 	lw := logwrapper.NewLogger(nil)
 	ddb := GetDurationsDB(cfg)
-	events := []analysis.WifiEvent{}
+	events := []structs.WifiEvent{}
 
 	lw.Debug("selecting all events from wifi table")
 	wifidb.Open()
@@ -53,8 +56,8 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *tempdb.TempDB)
 }
 
 func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_db <-chan *tempdb.TempDB,
-	ch_durations_db chan<- *tempdb.TempDB,
+	ch_db <-chan *state.TempDB,
+	ch_durations_db chan<- *state.TempDB,
 	ch_ack chan<- Ping) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting GenerateDurations")
@@ -67,8 +70,8 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	}
 
 	// Queues for processing duration data
-	sq := tempdb.NewQueue(cfg, "sent")
-	iq := tempdb.NewQueue(cfg, "images")
+	sq := state.NewQueue(cfg, "sent")
+	iq := state.NewQueue(cfg, "images")
 
 	for {
 		select {
@@ -81,7 +84,7 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		case wifidb := <-ch_db:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
-			durationsdb := processDataFromDay(cfg, tempdb.WIFIDB, wifidb)
+			durationsdb := processDataFromDay(cfg, state.WIFIDB, wifidb)
 			// Creates the table if it does not exist.
 			//durationsdb.AddStructAsTable("batches", model.Batch{})
 			yestersession := model.GetYesterdaySessionId(cfg)

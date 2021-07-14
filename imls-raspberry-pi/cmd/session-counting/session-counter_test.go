@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"gsa.gov/18f/analysis"
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/tlp"
-	"gsa.gov/18f/tempdb"
+	"gsa.gov/18f/state"
+	"gsa.gov/18f/structs"
 )
 
 const PASS = true
@@ -380,7 +380,7 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-	sid := tempdb.NewSessionId(cfg)
+	sid := state.NewSessionId(cfg)
 	cfg.SetSessionId(sid)
 
 	// Create channels for process network
@@ -392,13 +392,13 @@ func TestManyTLPCycles(t *testing.T) {
 
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *tempdb.TempDB)
-	ch_durations_db := make(chan *tempdb.TempDB)
+	ch_data_for_report := make(chan []structs.WifiEvent)
+	ch_wifidb := make(chan *state.TempDB)
+	ch_durations_db := make(chan *state.TempDB)
 	ch_ack := make(chan tlp.Ping)
-	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
+	ch_ddb_par := make([]chan *state.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *tempdb.TempDB)
+		ch_ddb_par[i] = make(chan *state.TempDB)
 	}
 
 	// See if we can wait and shut down the test...
