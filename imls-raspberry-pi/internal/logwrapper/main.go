@@ -9,8 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/newrelic/go-agent/v3/integrations/nrlogrus"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/sirupsen/logrus"
 	"gsa.gov/18f/config"
 )
@@ -32,39 +30,11 @@ type StandardLogger struct {
 
 var standardLogger *StandardLogger = nil
 
-type NewRelicApp struct {
-	*newrelic.Application
-}
-
-var newRelicApp *NewRelicApp = nil
-
 var once sync.Once
 
 const LOGDIR = "/var/log/session-counter"
 
 var logLevel = logrus.InfoLevel
-
-func (l *StandardLogger) StartTransaction(name string) *newrelic.Transaction {
-	if newRelicApp != nil {
-		return newRelicApp.StartTransaction(name)
-	}
-	return nil
-}
-
-func (l *StandardLogger) EndTransaction(txn *newrelic.Transaction) {
-	if txn != nil {
-		log.Print("Sending notice error")
-		txn.NoticeError(newrelic.Error{
-			Message: "testing",
-			Class:   "Testing",
-			Attributes: map[string]interface{}{
-				"important_number": 97232,
-				"relevant_string":  "zap",
-			},
-		})
-		txn.End()
-	}
-}
 
 func (l *StandardLogger) SetLogLevel(level string) {
 	switch strings.ToLower(level) {
@@ -101,28 +71,6 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 		initLogger(cfg)
 		if cfg != nil {
 			standardLogger.SetLogLevel(cfg.GetLogLevel())
-			if cfg.NewRelicKey != "" {
-				log.Println("New Relic logging enabled")
-				app, err := newrelic.NewApplication(
-					newrelic.ConfigAppName("session-counter"),
-					newrelic.ConfigLicense(cfg.NewRelicKey),
-					func(config *newrelic.Config) {
-						logrus.SetLevel(logrus.DebugLevel) // testing only
-						config.Logger = nrlogrus.Transform(standardLogger.Logger)
-						config.ErrorCollector.RecordPanics = true
-					},
-				)
-				if err != nil {
-					log.Fatal("New Relic could not log: ", err)
-				}
-				app.RecordCustomEvent("MyEventType", map[string]interface{}{
-					"myString": "hello",
-					"myFloat":  0.603,
-					"myInt":    123,
-					"myBool":   true,
-				})
-				newRelicApp = &NewRelicApp{app}
-			}
 		} else {
 			standardLogger.SetLogLevel("FATAL")
 		}

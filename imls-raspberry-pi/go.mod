@@ -24,9 +24,9 @@ replace gsa.gov/18f/analysis v0.0.0 => ./internal/analysis
 
 replace gsa.gov/18f/logwrapper v0.0.0 => ./internal/logwrapper
 
+replace gsa.gov/18f/tempdb v0.0.0 => ./internal/tempdb
+
 require (
-	github.com/newrelic/go-agent/v3 v3.13.0 // indirect
-	github.com/newrelic/go-agent/v3/integrations/nrlogrus v1.0.1 // indirect
 	gsa.gov/18f/input-initial-configuration v0.0.0 // indirect
 	gsa.gov/18f/log-event v0.0.0 // indirect
 	gsa.gov/18f/session-counter v0.0.0 // indirect

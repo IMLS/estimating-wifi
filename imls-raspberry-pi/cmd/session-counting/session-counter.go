@@ -17,10 +17,7 @@ import (
 )
 
 func run(cfg *config.Config) {
-	lw := logwrapper.NewLogger(nil)
-
-	txn := lw.StartTransaction("session-counter run")
-	defer lw.EndTransaction(txn)
+	logwrapper.NewLogger(nil)
 
 	// CHANNELS
 	ch_nsec := make(chan bool)

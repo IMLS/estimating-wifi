@@ -19,8 +19,6 @@ replace gsa.gov/18f/logwrapper v0.0.0 => ../../internal/logwrapper
 require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-sqlite3 v1.14.7
-	github.com/newrelic/go-agent/v3 v3.14.0 // indirect
-	github.com/newrelic/go-agent/v3/integrations/nrlogrus v1.0.1 // indirect
 	gsa.gov/18f/analysis v0.0.0
 	gsa.gov/18f/config v0.0.0
 	gsa.gov/18f/logwrapper v0.0.0

@@ -24,7 +24,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/stretchr/testify v1.2.2
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 	gsa.gov/18f/analysis v0.0.0
 	gsa.gov/18f/config v0.0.0
