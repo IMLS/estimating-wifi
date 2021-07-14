@@ -11,8 +11,8 @@ import (
 	"gsa.gov/18f/config"
 	"gsa.gov/18f/logwrapper"
 	"gsa.gov/18f/session-counter/api"
-	"gsa.gov/18f/session-counter/model"
 	"gsa.gov/18f/session-counter/tlp"
+	"gsa.gov/18f/tempdb"
 	"gsa.gov/18f/version"
 )
 
@@ -27,12 +27,12 @@ func run(cfg *config.Config) {
 	ch_macs := make(chan []string)
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []analysis.WifiEvent)
-	ch_wifidb := make(chan *model.TempDB)
-	ch_ddb := make(chan *model.TempDB)
-	ch_ddb_par := make([]chan *model.TempDB, 2)
+	ch_wifidb := make(chan *tempdb.TempDB)
+	ch_ddb := make(chan *tempdb.TempDB)
+	ch_ddb_par := make([]chan *tempdb.TempDB, 2)
 	ch_ack := make(chan tlp.Ping)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *model.TempDB)
+		ch_ddb_par[i] = make(chan *tempdb.TempDB)
 	}
 	// BROKERS
 	resetbroker := &tlp.ResetBroker{tlp.NewBroker()}
