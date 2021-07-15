@@ -1,3 +1,4 @@
+// Package logwrapper wraps logging to various Write interfaces.
 package logwrapper
 
 import (

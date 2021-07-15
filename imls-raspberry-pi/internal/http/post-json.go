@@ -1,3 +1,4 @@
+// Package http provides primitives around http communication.
 package http
 
 import (
