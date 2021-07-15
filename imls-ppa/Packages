@@ -6,9 +6,9 @@ Depends: libc6 (>= 1),
          ufw
 Filename: ./imls-lockdown_1.0-1_arm.deb
 Size: 1300
-MD5sum: f015fa6084329c8f65f3709e995a91f2
-SHA1: ad6618159755943eb0b199afc2d5546cffc912a6
-SHA256: 76265fc1b07e960e8061e81ac9a4513fb386c1279890926b829fb8bd68a9a583
+MD5sum: 725765b03a9f3d9984d05875b4183d71
+SHA1: d42685e44cfe92acbc5300d0312515cf63345385
+SHA256: 6038f2202ab4230174ccbbcad6e1b4fa6dce3bd76a1bb00d9d52957844b4c9c5
 Section: base
 Priority: optional
 Description: Lock down the system for IMLS Pilot
@@ -19,10 +19,10 @@ Architecture: armhf
 Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
 Depends: libc6 (>= 1)
 Filename: ./input-initial-configuration_1.0-1_arm.deb
-Size: 2505364
-MD5sum: e18bd95655a4da45be82fef71c1a277d
-SHA1: 5906f3ede8bfb6b5c6501bbcbbdba7800fbb062e
-SHA256: b69b7067ca173a4451d11667a9857d5149b27793eeb4a9174882e05af5faff0d
+Size: 2493748
+MD5sum: 10c51a23533b5489ea86a4dadf684f20
+SHA1: 4190adcc5bc9393272dd8397655e661d2f7ff5d8
+SHA256: d59d40d6dce9a121709ca172e1eb2bbaee1bb4775380f6d1a9ea6fe1702e493e
 Section: base
 Priority: optional
 Description: Tool to read in IMLS settings
@@ -36,10 +36,10 @@ Depends: libc6 (>= 1),
          tshark (>= 1),
          input-initial-configuration (>= 1)
 Filename: ./session-counter_1.0-1.deb
-Size: 6364972
-MD5sum: a7da8b60e18b42b1d6285900a6db3e3e
-SHA1: a79f2c2ac55bd810193f9ec4ba0477a383c05b47
-SHA256: b842b9369d985655a7e7f24ba0423b601cd1bfc63c809a36c851305d2e23b82c
+Size: 6414772
+MD5sum: f81a32294d3caebec2fc974e5055f52c
+SHA1: d48d96dbe751f44bbb2c623bd04dde0cfeba49c0
+SHA256: eea8b6085f1efe8754ba65ec1e41d29e46fa7f1a2d54321df8251e4a80ab865c
 Section: base
 Priority: optional
 Description: Session Counter for IMLS Pilot
@@ -54,9 +54,9 @@ Depends: libc6 (>= 1),
          session-counter (>= 1)
 Filename: ./session-counter-csv_1.0-1_arm.deb
 Size: 1704
-MD5sum: 5ec8ac748bb25237c4839183d6abbfae
-SHA1: b02dd7e118f06aff27c3160db0334521e763b6cc
-SHA256: 047dcd2cce57295b57f6f8c2f9362904d10de3f3130705b91232ef15edf29e23
+MD5sum: 339d06b80b086255d963fbd3918398ef
+SHA1: 7c34b343142e0eb75dfafda38b28448e46f5a3b9
+SHA256: cab73b593d2738616f172b31a251f91bc2e9d9c92818befb31605a16abb21f8a
 Section: base
 Priority: optional
 Description: Session Counter for IMLS Pilot
