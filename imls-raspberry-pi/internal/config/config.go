@@ -22,6 +22,14 @@ func NewConfig() *Config {
 	return &cfg
 }
 
+func NewConfigFromPathMaybe(path string) *Config {
+	cfg := Config{}
+	cfg.setDefaults()
+	// silently ignore if the path is not found
+	cfg.ReadConfig(path)
+	return &cfg
+}
+
 func NewConfigFromPath(path string) (*Config, error) {
 	cfg := Config{}
 	cfg.setDefaults()

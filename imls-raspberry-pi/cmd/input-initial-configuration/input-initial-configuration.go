@@ -17,10 +17,10 @@ import (
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/cmd/input-initial-configuration/cryptopasta"
 	"gsa.gov/18f/cmd/input-initial-configuration/pi"
 	"gsa.gov/18f/cmd/input-initial-configuration/wordlist"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/version"
 )
 
@@ -59,7 +59,7 @@ func readYesOrNo(input io.Reader) bool {
 		}
 		fmt.Printf("Please enter a yes or no answer.\n\n")
 	}
-	return false;
+	return false
 }
 
 func readFCFS(input io.Reader) string {
@@ -283,10 +283,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg, err := config.NewConfigFromPath(*configPathPtr)
-	if err != nil {
-		cfg = config.NewConfig()
-	}
+	cfg := config.NewConfigFromPathMaybe(*configPathPtr)
 
 	// Dump version and exit
 	if *versionPtr {
