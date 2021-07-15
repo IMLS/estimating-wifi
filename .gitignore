@@ -1,4 +1,6 @@
 imls-playbook/Makefile
 config.yaml
+*.sqlite3
 *.sqlite
 *.out
+/.env
