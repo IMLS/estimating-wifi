@@ -202,7 +202,7 @@ func (cfg *Config) Validate() {
 
 func (cfg *Config) setDefaults() {
 	cfg.LogLevel = "DEBUG"
-	cfg.Loggers = []string{"local:stderr", "local:tmp"}
+	cfg.Loggers = []string{"local:stderr", "local:tmp", "api:directus"}
 
 	cfg.Monitoring.PingInterval = 30
 	cfg.Monitoring.MaxHTTPErrorCount = 8
