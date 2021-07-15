@@ -201,7 +201,7 @@ func (cfg *Config) Validate() {
 }
 
 func (cfg *Config) setDefaults() {
-	cfg.LogLevel = "INFO"
+	cfg.LogLevel = "DEBUG"
 	cfg.Loggers = []string{"local:stderr", "local:tmp"}
 
 	cfg.Monitoring.PingInterval = 30
@@ -262,11 +262,11 @@ type Config struct {
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
-	SessionId   SessionId   // No YAML equiv.
+	SessionId   SessionId   `yaml:"-"` // ignore
 	Serial      string      `yaml:"serial"`
 	StorageMode string      `yaml:"storagemode"`
 	RunMode     string      `yaml:"runmode"`
-	Clock       clock.Clock // No YAML equiv.
+	Clock       clock.Clock `yaml:"-"` // ignore
 	Local       struct {
 		Crontab      string `yaml:"crontab"`
 		SummaryDB    string `yaml:"summary_db"`
