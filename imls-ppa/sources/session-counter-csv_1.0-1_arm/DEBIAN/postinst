@@ -2,7 +2,7 @@
 
 set -e
 systemctl daemon-reload
-systemctl enable imls-update.timer
+systemctl enable --now imls-update.timer
 
 # set hostname
 DEVICE_TAG=$(grep device_tag /opt/imls/config.yaml | cut -d':' -f 2 | tr -d ' ')
