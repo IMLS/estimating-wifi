@@ -104,6 +104,7 @@ func main() {
 
 	sid := state.NewSessionId(cfg)
 	cfg.SetSessionId(sid)
+	lw.Debug("session id is ", cfg.SessionId.GetSessionId())
 
 	cfg.DecodeSerial()
 	lw.Info("startup")
