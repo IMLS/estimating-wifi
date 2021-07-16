@@ -42,8 +42,8 @@ CREATE TABLE public.durations_v2 (
     fcfs_seq_id character varying(16),
     device_tag character varying(32),
     session_id character varying(255),
-    pid integer,
-    mfg_id integer,
+    patron_index integer,
+    manufacturer_index integer,
     "start" text,
     "end" text
 );
