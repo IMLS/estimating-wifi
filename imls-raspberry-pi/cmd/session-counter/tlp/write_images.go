@@ -34,12 +34,14 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 		}
 	}
 
+	// FIXME: This filename kinda makes no sense if we're not running
+	// a reset on a daily basis at midnight.
 	yesterday := model.GetYesterday(cfg)
 	image_filename := fmt.Sprintf("%04d-%02d-%02d-%v-%v-%v-summary.png",
 		yesterday.Year(),
 		int(yesterday.Month()),
 		int(yesterday.Day()),
-		cfg.SessionId.GetSessionId(),
+		state.GetPreviousSessionId(cfg),
 		cfg.Auth.FCFSId,
 		cfg.Auth.DeviceTag)
 

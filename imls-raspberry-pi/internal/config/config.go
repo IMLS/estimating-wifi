@@ -85,7 +85,7 @@ func (cfg *Config) ReadConfig(path string) error {
 	return fmt.Errorf("config: could not find config file [%v]", path)
 }
 
-func (cfg *Config) SetSessionId(sid SessionId) {
+func (cfg *Config) SetSessionId(sid int) {
 	cfg.SessionId = sid
 }
 
@@ -262,7 +262,7 @@ type Config struct {
 	Manufacturers struct {
 		Db string `yaml:"db"`
 	} `yaml:"manufacturers"`
-	SessionId   SessionId   `yaml:"-"` // ignore
+	SessionId   int         `yaml:"-"` // ignore
 	Serial      string      `yaml:"serial"`
 	StorageMode string      `yaml:"storagemode"`
 	RunMode     string      `yaml:"runmode"`

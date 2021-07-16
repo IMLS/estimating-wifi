@@ -384,8 +384,7 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-	sid := state.NewSessionId(cfg)
-	cfg.SetSessionId(sid)
+	cfg.SessionId = state.GetNextSessionId(cfg)
 
 	// Create channels for process network
 	ch_sec := make(chan bool)

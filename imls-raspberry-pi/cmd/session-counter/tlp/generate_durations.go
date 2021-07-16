@@ -3,7 +3,6 @@ package tlp
 import (
 	"fmt"
 	"path/filepath"
-	"strconv"
 
 	"gsa.gov/18f/internal/analysis"
 	"gsa.gov/18f/internal/config"
@@ -88,11 +87,10 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			// Creates the table if it does not exist.
 			//durationsdb.AddStructAsTable("batches", model.Batch{})
 			// yestersession := model.GetYesterdaySessionId(cfg)
-			yestersession := cfg.SessionId.PreviousSessionId()
-			sessionIdAsInt, _ := strconv.Atoi(yestersession)
-			if sessionIdAsInt >= 0 {
-				sq.Enqueue(yestersession)
-				iq.Enqueue(yestersession)
+			yestersession := state.GetPreviousSessionId(cfg)
+			if yestersession >= 0 {
+				sq.Enqueue(fmt.Sprint(yestersession))
+				iq.Enqueue(fmt.Sprint(yestersession))
 			}
 			// When we're done processing everything, let CacheWifi know
 			// that it is safe to continue.

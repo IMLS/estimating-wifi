@@ -1,12 +1,14 @@
 package tlp
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
@@ -54,7 +56,7 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
 
 				data := structs.WifiEvent{
-					SessionId:         cfg.SessionId.GetSessionId(),
+					SessionId:         fmt.Sprint(state.GetCurrentSessionId(cfg)),
 					Localtime:         cfg.Clock.Now().Format(time.RFC3339),
 					FCFSSeqId:         cfg.Auth.FCFSId,
 					DeviceTag:         cfg.Auth.DeviceTag,

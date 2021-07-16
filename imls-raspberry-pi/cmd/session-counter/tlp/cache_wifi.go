@@ -93,8 +93,8 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 			// complete before we continue.
 			<-ch_ack
 
-			id := cfg.SessionId.IncrementSessionId()
-			lw.Info("UPDATING SESSION ID TO: ", id)
+			cfg.SetSessionId(state.GetNextSessionId(cfg))
+			lw.Info("UPDATING SESSION ID TO: ", cfg.SessionId)
 			tdb = newTempDb(cfg)
 
 		case wifiarr := <-ch_data:
