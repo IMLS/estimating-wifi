@@ -4,3 +4,5 @@ config.yaml
 *.sqlite
 *.out
 /.env
+!release/.gitkeep
+release/

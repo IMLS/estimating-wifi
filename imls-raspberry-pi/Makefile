@@ -2,10 +2,10 @@ VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 
 ifeq ($(shell uname -m),armv7l)
-RELEASEPATH = release/bin/*
+RELEASEPATH = ../release/bin/*
 ENVVARS = CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
 else
-RELEASEPATH = release/bin/linux_arm/*
+RELEASEPATH = ../release/bin/linux_arm/*
 ENVVARS = CGO_ENABLED=1 GOOS=linux
 endif
 
@@ -15,38 +15,21 @@ deps:
 	go mod download
 
 input-configuration: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/input-initial-configuration
+	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/input-initial-configuration
 
 session-counter: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
+	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
 
 wifi-hardware-search-cli: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
+	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
 
 log-event: deps
-	${ENVVARS} GOPATH=$$PWD/release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/log-event
-
-release: all
-	git tag ${VERSION}
-	git push origin --tags
-	gh release create \
-		--title '${VERSION} binaries' \
-		--notes "Release by $(shell git config user.email) on $(shell date)" \
-		${VERSION} ${RELEASEPATH}
-
-# 2020506 MCJ Do we do anything different in dev?
-dev: release
+	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/log-event
 
 clean:
-	mkdir -p release/{bin,pkg}
-	chmod -R +w release/{bin,pkg}*
-	rm -rf release/{bin,pkg}
+	mkdir -p ../release/{bin,pkg}
+	chmod -R +w ../release/{bin,pkg}*
+	rm -rf ../release/{bin,pkg}
 
 test:
-	go test -coverprofile lshw.out ./internal/wifi-hardware-search/lshw/*.go
-	go test -coverprofile search.out ./internal/wifi-hardware-search/search/*.go
-	go test -coverprofile ic.out ./internal/config/*.go
-	go test -coverprofile iic.out ./cmd/input-initial-configuration/*.go
-	go test -coverprofile sca.out ./cmd/session-counter/api/*.go
-	go test -coverprofile scm.out ./cmd/session-counter/model/*.go
-	go test -coverprofile sc.out -timeout 99999s ./cmd/session-counter/*.go
+	go test -coverprofile all.out -timeout 30m ./...
