@@ -208,7 +208,7 @@ func (cfg *Config) setDefaults() {
 	cfg.Monitoring.MaxHTTPErrorCount = 8
 	cfg.Monitoring.HTTPErrorIntervalMins = 10
 	cfg.Monitoring.UniquenessWindow = 24 * 60
-	cfg.Monitoring.MinimumMinutes = 30
+	cfg.Monitoring.MinimumMinutes = 5
 	cfg.Monitoring.MaximumMinutes = 600
 
 	cfg.Umbrella.Scheme = "https"
