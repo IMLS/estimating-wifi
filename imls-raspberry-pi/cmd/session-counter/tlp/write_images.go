@@ -18,7 +18,6 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 	lw := logwrapper.NewLogger(nil)
 	var reterr error
 
-	yesterday := model.GetYesterday(cfg)
 	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
 		if err != nil {
@@ -35,7 +34,16 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 		}
 	}
 
-	path := filepath.Join(imagedir, fmt.Sprintf("%04d-%02d-%02d-%v-%v-summary.png", yesterday.Year(), int(yesterday.Month()), int(yesterday.Day()), cfg.Auth.FCFSId, cfg.Auth.DeviceTag))
+	yesterday := model.GetYesterday(cfg)
+	image_filename := fmt.Sprintf("%04d-%02d-%02d-%v-%v-%v-summary.png",
+		yesterday.Year(),
+		int(yesterday.Month()),
+		int(yesterday.Day()),
+		cfg.SessionId.GetSessionId(),
+		cfg.Auth.FCFSId,
+		cfg.Auth.DeviceTag)
+
+	path := filepath.Join(imagedir, image_filename)
 	// func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
 	analysis.DrawPatronSessions(cfg, durations, path)
 	return reterr
