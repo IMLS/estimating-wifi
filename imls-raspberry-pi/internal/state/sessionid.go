@@ -2,6 +2,8 @@ package state
 
 import (
 	"fmt"
+	"log"
+	"path/filepath"
 
 	"gsa.gov/18f/internal/config"
 )
@@ -13,16 +15,25 @@ type SessionId struct {
 }
 
 func NewSessionId(cfg *config.Config) *SessionId {
-	ctr := GetCounter(cfg, "sessionid")
-	if ctr.db.Ptr != nil {
-		if ctr.db.CheckTableExists("sessionid") {
-			return &SessionId{name: "sessionid", cfg: cfg, counter: ctr}
-		}
+	fullpath := filepath.Join(cfg.Local.WebDirectory, DURATIONSDB)
+	tdb := NewSqliteDB(DURATIONSDB, fullpath)
+	tdb.Open()
+	// If the table doesn't exist, create a counter and return it.
+	log.Println("table does not exist: ", tdb.CheckTableDoesNotExist("sessionid"))
+	if tdb.CheckTableDoesNotExist("sessionid") {
+		counter := NewCounter(cfg, "sessionid")
+		counter.Reset()
+		return &SessionId{name: "sessionid", cfg: cfg, counter: counter}
+	} else {
+		log.Println("getting counter...")
+		ctr := GetCounter(cfg, "sessionid")
+		sid := &SessionId{name: "sessionid", cfg: cfg, counter: ctr}
+		log.Println("old session id value", sid.GetSessionId())
+		sid.IncrementSessionId()
+		log.Println("new session id value", sid.GetSessionId())
+
+		return sid
 	}
-	// implicit else...
-	counter := NewCounter(cfg, "sessionid")
-	counter.Reset()
-	return &SessionId{name: "sessionid", cfg: cfg, counter: counter}
 }
 
 func (sid *SessionId) GetSessionId() string {
