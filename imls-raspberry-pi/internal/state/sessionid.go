@@ -13,6 +13,13 @@ type SessionId struct {
 }
 
 func NewSessionId(cfg *config.Config) *SessionId {
+	ctr := GetCounter(cfg, "sessionid")
+	if ctr.db.Ptr != nil {
+		if ctr.db.CheckTableExists("sessionid") {
+			return &SessionId{name: "sessionid", cfg: cfg, counter: ctr}
+		}
+	}
+	// implicit else...
 	counter := NewCounter(cfg, "sessionid")
 	counter.Reset()
 	return &SessionId{name: "sessionid", cfg: cfg, counter: counter}
