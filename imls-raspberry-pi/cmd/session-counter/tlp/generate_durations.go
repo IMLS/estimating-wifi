@@ -84,13 +84,11 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
 			durationsdb := processDataFromDay(cfg, state.WIFIDB, wifidb)
-			// Creates the table if it does not exist.
-			//durationsdb.AddStructAsTable("batches", model.Batch{})
-			// yestersession := model.GetYesterdaySessionId(cfg)
-			yestersession := state.GetPreviousSessionId(cfg)
-			if yestersession >= 0 {
-				sq.Enqueue(fmt.Sprint(yestersession))
-				iq.Enqueue(fmt.Sprint(yestersession))
+			thissession := state.GetCurrentSessionId(cfg) //state.GetPreviousSessionId(cfg)
+			lw.Debug("queueing current session [ ", thissession, " ] to images and send queue... ")
+			if thissession >= 0 {
+				sq.Enqueue(fmt.Sprint(thissession))
+				iq.Enqueue(fmt.Sprint(thissession))
 			}
 			// When we're done processing everything, let CacheWifi know
 			// that it is safe to continue.

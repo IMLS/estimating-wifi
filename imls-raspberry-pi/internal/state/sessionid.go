@@ -15,7 +15,7 @@ func getCurrentSessionId(cfg *config.Config) int {
 		tdb.Open()
 		defer tdb.Close()
 		var sessionId int
-		err := tdb.Ptr.Get(&sessionId, "SELECT IFNULL(MAX(session_id), 0) FROM durations")
+		err := tdb.Ptr.Get(&sessionId, "SELECT MAX(session_id) FROM durations")
 		if err != nil {
 			lw.Error("error in finding max session id; returning 0")
 			lw.Error(err.Error())
@@ -28,8 +28,13 @@ func getCurrentSessionId(cfg *config.Config) int {
 	}
 }
 
-func GetCurrentSessionId(cfg *config.Config) int {
+func GetInitialSessionId(cfg *config.Config) int {
 	return getCurrentSessionId(cfg)
+
+}
+
+func GetCurrentSessionId(cfg *config.Config) int {
+	return cfg.SessionId
 }
 
 func GetNextSessionId(cfg *config.Config) int {
