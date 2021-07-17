@@ -56,19 +56,19 @@ func newTempDb(cfg *config.Config) *state.TempDB {
 }
 
 func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker,
-	ch_data <-chan []structs.WifiEvent,
-	ch_db chan<- *state.TempDB,
-	ch_ack <-chan Ping) {
+	chData <-chan []structs.WifiEvent,
+	chDB chan<- *state.TempDB,
+	chAck <-chan Ping) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting CacheWifi")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("CacheWifi", 30)
 	}
-	ch_reset := rb.Subscribe()
+	chReset := rb.Subscribe()
 
 	tdb := newTempDb(cfg)
 
@@ -76,28 +76,28 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 		select {
 		case <-ping:
 			pong <- "CacheWifi"
-		case <-ch_kill:
+		case <-chKill:
 			// TDB is now opened/closed automatically on all transactions.
 			// tdb.Close()
 			lw.Debug("exiting CacheWifi")
 			return
 
-		case <-ch_reset:
+		case <-chReset:
 			// At reset, we pass the DB pointer down the stream
 			// and let interesting things happen.
 			lw.Info("received reset message")
-			ch_db <- tdb
+			chDB <- tdb
 			// BAD! NOW FIXED! RACE HAZARD!
 			// We continue immediately, meaning the DB gets flushed. We need to
 			// wait until wifi processing is complete. That means GenerateDurations must
 			// complete before we continue.
-			<-ch_ack
+			<-chAck
 
 			cfg.SetSessionId(state.GetNextSessionId(cfg))
 			lw.Info("UPDATING SESSION ID TO: ", cfg.SessionId)
 			tdb = newTempDb(cfg)
 
-		case wifiarr := <-ch_data:
+		case wifiarr := <-chData:
 			lw.Info("storing temporary data")
 			data := make([]interface{}, 0)
 			for _, elem := range wifiarr {

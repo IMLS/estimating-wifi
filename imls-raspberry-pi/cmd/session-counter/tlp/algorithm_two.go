@@ -25,11 +25,11 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBr
 
 	// The reset broker manages comms for when we should
 	// reset our internal structures
-	ch_reset := rb.Subscribe()
+	chReset := rb.Subscribe()
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("AlgorithmTwo", 5)
 	}
@@ -38,10 +38,10 @@ func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBr
 		select {
 		case <-ping:
 			pong <- "AlgorithmTwo"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting AlgorithmTwo")
 			return
-		case <-ch_reset:
+		case <-chReset:
 			// Tell our mapping "db" to wipe itself.
 			// This clears all counters, etc., and essentially
 			// resets the algorithm as if we had just launched the whole process.

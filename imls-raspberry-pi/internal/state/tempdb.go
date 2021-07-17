@@ -37,7 +37,6 @@ func (tdb *TempDB) DropTable(name string) {
 	lw := logwrapper.NewLogger(nil)
 	if _, ok := tdb.Tables[name]; ok {
 		tdb.Open()
-		defer tdb.Close()
 		stmt := fmt.Sprintf("DROP TABLE %v", name)
 		_, err := tdb.Ptr.Exec(stmt)
 		if err != nil {
@@ -50,16 +49,16 @@ func (tdb *TempDB) DropTable(name string) {
 
 func (tdb *TempDB) CheckTableExists(name string) bool {
 	tdb.Open()
-	_, table_check := tdb.Ptr.Query("select * from " + name + ";")
+	_, tableCheck := tdb.Ptr.Query("select * from " + name + ";")
 
-	return table_check == nil
+	return tableCheck == nil
 }
 
 func (tdb *TempDB) CheckTableDoesNotExist(name string) bool {
 	tdb.Open()
-	_, table_check := tdb.Ptr.Query("select * from " + name + ";")
+	_, tableCheck := tdb.Ptr.Query("select * from " + name + ";")
 
-	return table_check != nil
+	return tableCheck != nil
 }
 
 func (tdb *TempDB) AddTable(name string, columns map[string]string) {

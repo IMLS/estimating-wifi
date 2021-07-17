@@ -16,13 +16,13 @@ import (
 // This makexs it ready for storage locally (SQLite) or
 // via an API (where everything becomes text anyway).
 func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	in_hash <-chan map[string]int, out_arr chan<- []structs.WifiEvent) {
+	inHash <-chan map[string]int, outArr chan<- []structs.WifiEvent) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting PrepEphemeralWifi")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("PrepEphemeralWifi", 30)
 	}
@@ -31,12 +31,12 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		select {
 		case <-ping:
 			pong <- "PrepEphemeralWifi"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting PrepEphemeralWifi")
 			return
 
 		// Block waiting to read the incoming hash
-		case h := <-in_hash:
+		case h := <-inHash:
 			// Remove all the UIDs that we saw more than 0 minutes ago
 			var remove []string
 			for k, v := range h {
@@ -67,7 +67,7 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				reportArr = append(reportArr, data)
 			}
 
-			out_arr <- reportArr
+			outArr <- reportArr
 
 		}
 	}

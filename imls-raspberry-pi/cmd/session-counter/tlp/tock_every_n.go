@@ -9,9 +9,9 @@ func TockEveryMinute(ka *Keepalive, kb *KillBroker, out chan<- bool) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryMinute")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("TockEveryMinute", 5)
 	}
@@ -32,7 +32,7 @@ func TockEveryMinute(ka *Keepalive, kb *KillBroker, out chan<- bool) {
 		select {
 		case <-ping:
 			pong <- "TockEveryMinute"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("Exiting TockEveryN")
 			return
 		}
@@ -53,9 +53,9 @@ func TockEveryN(ka *Keepalive, kb *KillBroker, n int, in <-chan bool, out chan<-
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryN")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("TockEveryN", 5)
 	}
@@ -65,7 +65,7 @@ func TockEveryN(ka *Keepalive, kb *KillBroker, n int, in <-chan bool, out chan<-
 		select {
 		case <-ping:
 			pong <- "tock"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting TockEveryN")
 			return
 

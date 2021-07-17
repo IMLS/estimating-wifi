@@ -6,8 +6,8 @@ package tlp
 // Must be threaded through TLP regardless.
 
 type Broker struct {
-	ch_pub chan interface{}
-	ch_sub chan chan interface{}
+	chPub chan interface{}
+	chSub chan chan interface{}
 }
 
 type ResetBroker struct {
@@ -28,8 +28,8 @@ func NewResetBroker() *ResetBroker {
 
 func NewBroker() *Broker {
 	return &Broker{
-		ch_pub: make(chan interface{}, 1),
-		ch_sub: make(chan chan interface{}, 1),
+		chPub: make(chan interface{}, 1),
+		chSub: make(chan chan interface{}, 1),
 	}
 }
 
@@ -37,12 +37,12 @@ func (b *Broker) Start() {
 	subs := map[chan interface{}]struct{}{}
 	for {
 		select {
-		case ch_msg := <-b.ch_sub:
-			subs[ch_msg] = struct{}{}
-		case msg := <-b.ch_pub:
-			for ch_msg := range subs {
+		case chMsg := <-b.chSub:
+			subs[chMsg] = struct{}{}
+		case msg := <-b.chPub:
+			for chMsg := range subs {
 				select {
-				case ch_msg <- msg:
+				case chMsg <- msg:
 				default:
 				}
 			}
@@ -51,11 +51,11 @@ func (b *Broker) Start() {
 }
 
 func (b *Broker) Subscribe() chan interface{} {
-	ch_msg := make(chan interface{}, 5)
-	b.ch_sub <- ch_msg
-	return ch_msg
+	chMsg := make(chan interface{}, 5)
+	b.chSub <- chMsg
+	return chMsg
 }
 
 func (b *Broker) Publish(msg interface{}) {
-	b.ch_pub <- msg
+	b.chPub <- msg
 }

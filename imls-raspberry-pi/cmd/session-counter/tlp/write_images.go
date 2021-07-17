@@ -37,7 +37,7 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 	// FIXME: This filename kinda makes no sense if we're not running
 	// a reset on a daily basis at midnight.
 	yesterday := model.GetYesterday(cfg)
-	image_filename := fmt.Sprintf("%04d-%02d-%02d-%v-%v-%v-summary.png",
+	imageFilename := fmt.Sprintf("%04d-%02d-%02d-%v-%v-%v-summary.png",
 		yesterday.Year(),
 		int(yesterday.Month()),
 		int(yesterday.Day()),
@@ -45,21 +45,21 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 		cfg.Auth.FCFSId,
 		cfg.Auth.DeviceTag)
 
-	path := filepath.Join(imagedir, image_filename)
+	path := filepath.Join(imagedir, imageFilename)
 	// func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
 	analysis.DrawPatronSessions(cfg, durations, path)
 	return reterr
 }
 
 func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db chan *state.TempDB) {
+	chDurationsDB chan *state.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting WriteImages")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("WriteImages", 30)
 	}
@@ -68,10 +68,10 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		select {
 		case <-ping:
 			pong <- "WriteImages"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting WriteImages")
 			return
-		case db := <-ch_durations_db:
+		case db := <-chDurationsDB:
 			iq := state.NewQueue(cfg, "images")
 			imagesToWrite := iq.AsList()
 			lw.Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")

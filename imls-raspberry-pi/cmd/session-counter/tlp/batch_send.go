@@ -11,14 +11,14 @@ import (
 )
 
 func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_durations_db_in <-chan *state.TempDB) {
+	chDurationsDBIn <-chan *state.TempDB) {
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting BatchSend")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("GenerateDurations", 30)
 	}
@@ -27,10 +27,10 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		select {
 		case <-ping:
 			pong <- "BatchSend"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting BatchSend")
 			return
-		case db := <-ch_durations_db_in:
+		case db := <-chDurationsDBIn:
 			// This only comes in on reset...
 			sq := state.NewQueue(cfg, "sent")
 			sessionsToSend := sq.AsList()

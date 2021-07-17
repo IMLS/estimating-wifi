@@ -242,18 +242,18 @@ func TestRawToUid(t *testing.T) {
 
 func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.ResetBroker, kb *tlp.KillBroker, n_hours int, ch_tick chan bool) {
 	counter := 0
-	ch_kill := kb.Subscribe()
+	chKill := kb.Subscribe()
 	lw := logwrapper.NewLogger(nil)
 	for {
 		select {
 		case <-ch_tick:
 			counter += 1
 			if (counter != 0) && ((counter % (60 * n_hours)) == 0) {
-				// ch_reset <- tlp.Ping{}
+				// chReset <- tlp.Ping{}
 				lw.Debug("PingAfterNHours is Pinging!")
 				rb.Publish(tlp.Ping{})
 			}
-		case <-ch_kill:
+		case <-chKill:
 			log.Println("Exiting PingAfterNHours")
 			return
 		}
@@ -265,7 +265,7 @@ func PingAtBogoMidnight(ka *tlp.Keepalive, cfg *config.Config,
 	kb *tlp.KillBroker,
 	m *clock.Mock) {
 	// counter := 0
-	// ch_kill := kb.Subscribe()
+	// chKill := kb.Subscribe()
 	lw := logwrapper.NewLogger(nil)
 	pinged := false
 	for {
@@ -316,7 +316,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker,
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("RunFakeWireshark in the house.")
 
-	ch_kill := kb.Subscribe()
+	chKill := kb.Subscribe()
 	// Lets have 30 consistent devices
 	macs := make([]string, NUMMACS)
 	for i := 0; i < NUMMACS; i++ {
@@ -333,7 +333,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, cfg *config.Config, kb *tlp.KillBroker,
 			}
 			out <- send
 
-		case <-ch_kill:
+		case <-chKill:
 			log.Println("Exiting RunFakeWireshark")
 			return
 		}
@@ -397,8 +397,8 @@ func TestManyTLPCycles(t *testing.T) {
 	ch_macs_counted := make(chan map[string]int)
 	ch_data_for_report := make(chan []structs.WifiEvent)
 	ch_wifidb := make(chan *state.TempDB)
-	ch_durations_db := make(chan *state.TempDB)
-	ch_ack := make(chan tlp.Ping)
+	chDurationsDB := make(chan *state.TempDB)
+	chAck := make(chan tlp.Ping)
 	ch_ddb_par := make([]chan *state.TempDB, 2)
 	for i := 0; i < 2; i++ {
 		ch_ddb_par[i] = make(chan *state.TempDB)
@@ -433,11 +433,11 @@ func TestManyTLPCycles(t *testing.T) {
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
 	go PingAtBogoMidnight(nil, cfg, resetbroker, killbroker, mock)
-	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb, ch_ack)
+	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb, chAck)
 	// Make sure we don't hang...
-	go tlp.GenerateDurations(nil, cfg, killbroker, ch_wifidb, ch_durations_db, ch_ack)
+	go tlp.GenerateDurations(nil, cfg, killbroker, ch_wifidb, chDurationsDB, chAck)
 
-	go tlp.ParDeltaTempDB(killbroker, ch_durations_db, ch_ddb_par...)
+	go tlp.ParDeltaTempDB(killbroker, chDurationsDB, ch_ddb_par...)
 	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
 	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
 

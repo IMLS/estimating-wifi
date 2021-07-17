@@ -10,9 +10,9 @@ func PingAtMidnight(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *Kill
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting PingAtMidnight")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("PingAtMidnight", 30)
 	}
@@ -31,7 +31,7 @@ func PingAtMidnight(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *Kill
 
 	for {
 		select {
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting PingAtMidnight")
 			// Stop the cron scheduler.
 			c.Stop()

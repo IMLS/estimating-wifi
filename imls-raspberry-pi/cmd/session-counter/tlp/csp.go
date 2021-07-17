@@ -17,31 +17,31 @@ type Ping struct {
 // In an infinite loop, we read in from the input channel, and
 // in parallel, write out the value to the two output channels.
 func ParDeltaTempDB(kb *KillBroker,
-	ch_reset_in <-chan *state.TempDB,
-	chs_reset_out ...chan *state.TempDB) {
+	chResetIn <-chan *state.TempDB,
+	chsResetOut ...chan *state.TempDB) {
 	// Block waiting for a message
 	// It will be the zeroth channel in the group.
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting ParDelta")
 
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	}
 
 	for {
 		select {
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting ParDelta")
 			return
-		case v := <-ch_reset_in:
+		case v := <-chResetIn:
 			var wg sync.WaitGroup
 			// Launch two goroutines.
-			wg.Add(len(chs_reset_out))
+			wg.Add(len(chsResetOut))
 			// Don't send to the input channel!
-			for ndx := 0; ndx < len(chs_reset_out); ndx++ {
+			for ndx := 0; ndx < len(chsResetOut); ndx++ {
 				go func(i int) {
-					chs_reset_out[i] <- v
+					chsResetOut[i] <- v
 					wg.Done()
 				}(ndx)
 			}
@@ -53,30 +53,30 @@ func ParDeltaTempDB(kb *KillBroker,
 
 // In an infinite loop, we read in from the input channel, and
 // in parallel, write out the value to the two output channels.
-func ParDeltaPing(kb *Broker, ch_reset_in <-chan Ping, chs_reset_out ...chan Ping) {
+func ParDeltaPing(kb *Broker, chResetIn <-chan Ping, chsResetOut ...chan Ping) {
 	// Block waiting for a message
 	// It will be the zeroth channel in the group.
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting ParDelta")
 
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	}
 
 	for {
 		select {
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting ParDelta")
 			return
-		case v := <-ch_reset_in:
+		case v := <-chResetIn:
 			var wg sync.WaitGroup
 			// Launch two goroutines.
-			wg.Add(len(chs_reset_out))
+			wg.Add(len(chsResetOut))
 			// Don't send to the input channel!
-			for ndx := 0; ndx < len(chs_reset_out); ndx++ {
+			for ndx := 0; ndx < len(chsResetOut); ndx++ {
 				go func(i int) {
-					chs_reset_out[i] <- v
+					chsResetOut[i] <- v
 					wg.Done()
 				}(ndx)
 			}

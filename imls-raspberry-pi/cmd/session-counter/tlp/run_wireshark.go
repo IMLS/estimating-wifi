@@ -70,9 +70,9 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan b
 	lw := logwrapper.NewLogger(nil)
 	lw.Info("starting RunWireshark")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("RunWireshark", 15)
 	}
@@ -90,7 +90,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan b
 			// enough timeout that we will *eventually* catch up with all of the pings.
 			pong <- "RunWireshark"
 
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting RunWireshark")
 			return
 

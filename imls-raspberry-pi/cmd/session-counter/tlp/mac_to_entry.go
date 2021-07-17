@@ -12,13 +12,13 @@ import (
  * of manufacturer IDs and counts.
  * Uses "unknown" for all unknown manufacturers.
  */
-func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry, ch_kill <-chan Ping) {
+func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry, chKill <-chan Ping) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting MacToEntry")
 
-	// ch_kill will be nil in production
+	// chKill will be nil in production
 	var ping, pong chan interface{} = nil, nil
-	if ch_kill == nil {
+	if chKill == nil {
 		ping, pong = ka.Subscribe("macToEntry", 5)
 	}
 
@@ -26,7 +26,7 @@ func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int,
 		select {
 		case <-ping:
 			pong <- "macToEntry"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting MacToEntry")
 			return
 

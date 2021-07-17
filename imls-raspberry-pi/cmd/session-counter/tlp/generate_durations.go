@@ -55,15 +55,15 @@ func processDataFromDay(cfg *config.Config, table string, wifidb *state.TempDB) 
 }
 
 func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	ch_db <-chan *state.TempDB,
-	ch_durations_db chan<- *state.TempDB,
-	ch_ack chan<- Ping) {
+	chDB <-chan *state.TempDB,
+	chDurationsDB chan<- *state.TempDB,
+	chAck chan<- Ping) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting GenerateDurations")
 	var ping, pong chan interface{} = nil, nil
-	var ch_kill chan interface{} = nil
+	var chKill chan interface{} = nil
 	if kb != nil {
-		ch_kill = kb.Subscribe()
+		chKill = kb.Subscribe()
 	} else {
 		ping, pong = ka.Subscribe("GenerateDurations", 30)
 	}
@@ -76,11 +76,11 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		select {
 		case <-ping:
 			pong <- "GenerateDurations"
-		case <-ch_kill:
+		case <-chKill:
 			lw.Debug("exiting GenerateDurations")
 			return
 
-		case wifidb := <-ch_db:
+		case wifidb := <-chDB:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
 			durationsdb := processDataFromDay(cfg, state.WIFIDB, wifidb)
@@ -92,10 +92,10 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			}
 			// When we're done processing everything, let CacheWifi know
 			// that it is safe to continue.
-			ch_ack <- Ping{}
+			chAck <- Ping{}
 			// Everything else is related to the duraitons DB, so that
 			// can happen in parallel with other work.
-			ch_durations_db <- durationsdb
+			chDurationsDB <- durationsdb
 
 		}
 	}
