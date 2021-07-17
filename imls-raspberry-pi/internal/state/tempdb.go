@@ -50,7 +50,6 @@ func (tdb *TempDB) DropTable(name string) {
 
 func (tdb *TempDB) CheckTableExists(name string) bool {
 	tdb.Open()
-	defer tdb.Close()
 	_, table_check := tdb.Ptr.Query("select * from " + name + ";")
 
 	return table_check == nil
@@ -58,7 +57,6 @@ func (tdb *TempDB) CheckTableExists(name string) bool {
 
 func (tdb *TempDB) CheckTableDoesNotExist(name string) bool {
 	tdb.Open()
-	defer tdb.Close()
 	_, table_check := tdb.Ptr.Query("select * from " + name + ";")
 
 	return table_check != nil
@@ -79,7 +77,6 @@ func (tdb *TempDB) AddTable(name string, columns map[string]string) {
 		statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
 		lw.Debug("AddTable ", statement)
 		tdb.Open()
-		defer tdb.Close()
 		_, err := tdb.Ptr.Exec(statement)
 		if err != nil {
 			lw.Info("could not re-create '", name, "' table in temporary db.")
@@ -146,7 +143,6 @@ func (tdb *TempDB) GetFields(table string) (fields []string) {
 
 func (tdb *TempDB) InsertStruct(table string, s interface{}) {
 	tdb.Open()
-	defer tdb.Close()
 	tdb.insertStructWithoutOpen(table, s)
 }
 
@@ -155,7 +151,6 @@ func (tdb *TempDB) InsertManyStructs(table string, ses []interface{}) {
 	for _, s := range ses {
 		tdb.insertStructWithoutOpen(table, s)
 	}
-	tdb.Close()
 }
 
 func (tdb *TempDB) insertStructWithoutOpen(table string, s interface{}) {
@@ -230,7 +225,6 @@ func (tdb *TempDB) insertWithoutOpen(table string, values map[string]interface{}
 func (tdb *TempDB) Insert(table string, values map[string]interface{}) {
 	tdb.Open()
 	tdb.insertWithoutOpen(table, values)
-	tdb.Close()
 }
 
 func (tdb *TempDB) InsertMany(table string, values []map[string]interface{}) {
@@ -238,7 +232,6 @@ func (tdb *TempDB) InsertMany(table string, values []map[string]interface{}) {
 	for _, h := range values {
 		tdb.insertStructWithoutOpen(table, h)
 	}
-	tdb.Close()
 
 }
 
@@ -256,7 +249,6 @@ func (tdb *TempDB) DebugDump(name string) error {
 	lw := logwrapper.NewLogger(nil)
 	q := fmt.Sprintf("SELECT * FROM %v", name)
 	tdb.Open()
-	defer tdb.Close()
 	rows, err := tdb.Ptr.Queryx(q)
 	if err != nil {
 		lw.Info("could not select all from ", name)

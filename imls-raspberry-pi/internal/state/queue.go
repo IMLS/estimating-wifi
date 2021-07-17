@@ -52,7 +52,6 @@ func (queue *Queue) AsList() []string {
 
 	stmt := fmt.Sprintf("SELECT item FROM %v ORDER BY rowid", queue.name)
 	queue.db.Open()
-	defer queue.db.Close()
 
 	rows, err := queue.db.Ptr.Query(stmt)
 	if err != nil {
@@ -75,7 +74,6 @@ func (queue *Queue) Remove(sessionid string) {
 	defer queue.mutex.Unlock()
 	lw := logwrapper.NewLogger(nil)
 	queue.db.Open()
-	defer queue.db.Close()
 	stmt, err := queue.db.Ptr.Prepare(fmt.Sprintf("DELETE FROM %v WHERE item = ?", queue.name))
 	if err != nil {
 		lw.Error("could not prepare delete statement for ", queue.name)
@@ -100,7 +98,6 @@ func (queue *Queue) Enqueue(sessionid string) {
 	stmt := fmt.Sprintf("INSERT OR IGNORE INTO %v (item) VALUES (?)", queue.name)
 	queue.db.Open()
 	_, err := queue.db.Ptr.Exec(stmt, sessionid)
-	queue.db.Close()
 	if err != nil {
 		lw.Error("error in enqueue insert")
 		lw.Error(err.Error())
@@ -115,7 +112,6 @@ func (queue *Queue) Peek() Item {
 
 	queue.db.Open()
 	err := queue.db.Ptr.Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
-	queue.db.Close()
 
 	// The rowid value starts at 1. From the SQLite documentation.
 	// if the Rowid is 0, we did not get anything back.
@@ -138,18 +134,15 @@ func (queue *Queue) Dequeue() Item {
 	queue.db.Open()
 	err := queue.db.Ptr.Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
 	if err != nil {
-		queue.db.Close()
 		return nil
 	} else {
 		res, err := queue.db.Ptr.Exec(fmt.Sprintf("DELETE FROM %v WHERE ROWID = ?", queue.name), qr.Rowid)
 		if err != nil {
-			queue.db.Close()
 			lw.Error("failed to delete ", qr.Rowid, " in queue.Dequeue()")
 			lw.Error(err.Error())
 		}
 		lw.Debug("DEQUEUE result ", res)
 		lw.Debug("DEQUEUE removed [ ", qr.Item, " ] on the queue [ ", queue.name, " ]")
-		queue.db.Close()
 		return qr.Item
 	}
 }

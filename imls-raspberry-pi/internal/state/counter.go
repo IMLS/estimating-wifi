@@ -28,7 +28,6 @@ func NewCounter(cfg *config.Config, name string) *Counter {
 	tdb.AddStructAsTable(name, QueueRow{})
 	q := &Queue{name: name, db: tdb}
 	q.db.Open()
-	defer q.db.Close()
 	_, err = q.db.Ptr.Exec(fmt.Sprintf("INSERT INTO %v (item) VALUES (0)", name))
 	if err != nil {
 		lw.Error(err.Error())
@@ -52,7 +51,6 @@ func (q *Counter) Reset() {
 	if err != nil {
 		lw.Error(err.Error())
 	}
-	q.db.Close()
 }
 
 func (q *Counter) Increment() int {
@@ -66,7 +64,6 @@ func (q *Counter) Increment() int {
 	if err != nil {
 		lw.Error(err.Error())
 	}
-	q.db.Close()
 	return n
 }
 
