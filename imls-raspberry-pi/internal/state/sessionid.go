@@ -7,40 +7,39 @@ import (
 	"gsa.gov/18f/internal/logwrapper"
 )
 
-func getCurrentSessionId(cfg *config.Config) int {
+func getCurrentSessionID(cfg *config.Config) int {
 	lw := logwrapper.NewLogger(nil)
 	fullpath := filepath.Join(cfg.Local.WebDirectory, DURATIONSDB)
 	tdb := NewSqliteDB(DURATIONSDB, fullpath)
 	if tdb.CheckTableExists("durations") {
 		tdb.Open()
 		defer tdb.Close()
-		var sessionId int
-		err := tdb.Ptr.Get(&sessionId, "SELECT MAX(session_id) FROM durations")
+		var sessionID int
+		err := tdb.Ptr.Get(&sessionID, "SELECT MAX(session_id) FROM durations")
 		if err != nil {
 			lw.Error("error in finding max session id; returning 0")
 			lw.Error(err.Error())
 			return 0
 		}
-		return sessionId
+		return sessionID
 	} else {
 		lw.Error("durations table did not exist; returning session id 0")
 		return 0
 	}
 }
 
-func GetInitialSessionId(cfg *config.Config) int {
-	return getCurrentSessionId(cfg)
-
+func GetInitialSessionID(cfg *config.Config) int {
+	return getCurrentSessionID(cfg)
 }
 
-func GetCurrentSessionId(cfg *config.Config) int {
+func GetCurrentSessionID(cfg *config.Config) int {
 	return cfg.SessionId
 }
 
-func GetNextSessionId(cfg *config.Config) int {
+func GetNextSessionID(cfg *config.Config) int {
 	return cfg.SessionId + 1
 }
 
-func GetPreviousSessionId(cfg *config.Config) int {
+func GetPreviousSessionID(cfg *config.Config) int {
 	return cfg.SessionId - 1
 }

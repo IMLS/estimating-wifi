@@ -101,8 +101,8 @@ func main() {
 	// log through the config passed here.
 	lw := logwrapper.NewLogger(cfg)
 	// NOW YOU MAY USE LOGGING.
-	cfg.SessionId = state.GetInitialSessionId(cfg)
-	cfg.SessionId = state.GetNextSessionId(cfg)
+	cfg.SessionId = state.GetInitialSessionID(cfg)
+	cfg.SessionId = state.GetNextSessionID(cfg)
 	lw.Debug("session id at startup is is ", cfg.SessionId)
 
 	cfg.DecodeSerial()

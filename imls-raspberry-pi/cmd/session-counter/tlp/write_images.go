@@ -41,7 +41,7 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 		yesterday.Year(),
 		int(yesterday.Month()),
 		int(yesterday.Day()),
-		state.GetPreviousSessionId(cfg),
+		state.GetPreviousSessionID(cfg),
 		cfg.Auth.FCFSId,
 		cfg.Auth.DeviceTag)
 

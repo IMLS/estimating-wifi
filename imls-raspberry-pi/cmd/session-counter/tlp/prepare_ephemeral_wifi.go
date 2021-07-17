@@ -12,9 +12,9 @@ import (
 	"gsa.gov/18f/internal/structs"
 )
 
-// Converts raw data to a map[string]string
-// This makexs it ready for storage locally (SQLite) or
-// via an API (where everything becomes text anyway).
+// PrepEphemeralWifi converts raw data to a map[string]string. This makes it
+// ready for storage locally (SQLite) or via an API (where everything becomes
+// text anyway).
 func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	inHash <-chan map[string]int, outArr chan<- []structs.WifiEvent) {
 	lw := logwrapper.NewLogger(nil)
@@ -56,7 +56,7 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
 
 				data := structs.WifiEvent{
-					SessionId:         fmt.Sprint(state.GetCurrentSessionId(cfg)),
+					SessionId:         fmt.Sprint(state.GetCurrentSessionID(cfg)),
 					Localtime:         cfg.Clock.Now().Format(time.RFC3339),
 					FCFSSeqId:         cfg.Auth.FCFSId,
 					DeviceTag:         cfg.Auth.DeviceTag,

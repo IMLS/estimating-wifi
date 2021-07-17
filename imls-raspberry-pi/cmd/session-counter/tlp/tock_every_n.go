@@ -42,13 +42,10 @@ func TockEveryMinute(ka *Keepalive, kb *KillBroker, out chan<- bool) {
 // ******* WARNING
 // This is only used in testing. It lets us drive a variable clock.
 
-/* PROCESS tockEveryN
- * consumes a tag (for logging purposes) as well as
- * a driving `tick` on `in`. Every `n` ticks, it outputs
- * a boolean `tock` on the channel `out`.
- * When `in` is every second, and `n` is 60, it turns
- * a stream of second ticks into minute `tocks`.
- */
+// TockEveryN consumes a tag (for logging purposes) as well as a driving `tick`
+// on `in`. Every `n` ticks, it outputs a boolean `tock` on the channel `out`.
+// When `in` is every second, and `n` is 60, it turns a stream of second ticks
+// into minute `tocks`.
 func TockEveryN(ka *Keepalive, kb *KillBroker, n int, in <-chan bool, out chan<- bool) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting TockEveryN")

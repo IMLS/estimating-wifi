@@ -10,7 +10,7 @@ import (
 	"gsa.gov/18f/internal/structs"
 )
 
-func newTempDbInFS(cfg *config.Config) *state.TempDB {
+func newTempDBInFS(cfg *config.Config) *state.TempDB {
 	lw := logwrapper.NewLogger(nil)
 
 	t := cfg.Clock.Now()
@@ -28,7 +28,7 @@ func newTempDbInFS(cfg *config.Config) *state.TempDB {
 	return tdb
 }
 
-func newTempDbInMemory(cfg *config.Config) *state.TempDB {
+func newTempDBInMemory(cfg *config.Config) *state.TempDB {
 	lw := logwrapper.NewLogger(nil)
 	todaysDB := state.WIFIDB
 	path := fmt.Sprintf(`file:%v?mode=memory&cache=shared`, todaysDB)
@@ -40,7 +40,7 @@ func newTempDbInMemory(cfg *config.Config) *state.TempDB {
 	return tdb
 }
 
-func newTempDb(cfg *config.Config) *state.TempDB {
+func newTempDB(cfg *config.Config) *state.TempDB {
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("IsProductionMode is ", cfg.IsProductionMode())
 	lw.Debug("IsDeveloperMode is ", cfg.IsDeveloperMode())
@@ -48,10 +48,10 @@ func newTempDb(cfg *config.Config) *state.TempDB {
 
 	if cfg.IsProductionMode() {
 		lw.Debug("using in-mem DB for wifi (prod)")
-		return newTempDbInMemory(cfg)
+		return newTempDBInMemory(cfg)
 	} else {
 		lw.Debug("using in-filesystem DB for wifi (dev)")
-		return newTempDbInFS(cfg)
+		return newTempDBInFS(cfg)
 	}
 }
 
@@ -70,7 +70,7 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 	}
 	chReset := rb.Subscribe()
 
-	tdb := newTempDb(cfg)
+	tdb := newTempDB(cfg)
 
 	for {
 		select {
@@ -93,9 +93,9 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 			// complete before we continue.
 			<-chAck
 
-			cfg.SetSessionId(state.GetNextSessionId(cfg))
+			cfg.SetSessionId(state.GetNextSessionID(cfg))
 			lw.Info("UPDATING SESSION ID TO: ", cfg.SessionId)
-			tdb = newTempDb(cfg)
+			tdb = newTempDB(cfg)
 
 		case wifiarr := <-chData:
 			lw.Info("storing temporary data")

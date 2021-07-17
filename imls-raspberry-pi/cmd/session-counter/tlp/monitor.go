@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"gsa.gov/18f/cmd/session-counter/constants"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/cmd/session-counter/constants"
 )
 
 // Inspired by the broker pattern found here:
@@ -40,11 +40,6 @@ func NewKeepalive(cfg *config.Config) *Keepalive {
 	}
 }
 
-// UPDATE 20210402 MCJ
-// We're just going to exit(-1) if things go bad.
-// systemd notify does not seem to be working.
-// Given that the github repos has build failures...
-// I'm going to stop trying to debug this.
 func (b *Keepalive) Start() {
 
 	// Internal state for the broker.

@@ -58,12 +58,12 @@ var m = map[string]string{
 }
 
 var tests = []struct {
-	description       string
-	passfail          bool
-	uniqueness_window int
-	initMap           []string
-	loopMaps          [][]string
-	resultMap         map[string]int
+	description      string
+	passfail         bool
+	uniquenessWindow int
+	initMap          []string
+	loopMaps         [][]string
+	resultMap        map[string]int
 }{
 	// One input hash.
 	{"one input mac, one loop mac",
@@ -187,7 +187,7 @@ func TestRawToUid(t *testing.T) {
 
 	for testNdx, e := range tests {
 		t.Logf("Test #%v: %v\n", testNdx, e.description)
-		cfg.Monitoring.UniquenessWindow = e.uniqueness_window
+		cfg.Monitoring.UniquenessWindow = e.uniquenessWindow
 
 		var wg sync.WaitGroup
 		resetbroker := tlp.NewResetBroker()
@@ -195,33 +195,33 @@ func TestRawToUid(t *testing.T) {
 		killbroker := tlp.NewKillBroker()
 		go killbroker.Start()
 
-		ch_macs := make(chan []string)
-		ch_uniq := make(chan map[string]int)
+		chMacs := make(chan []string)
+		chUniq := make(chan map[string]int)
 		var u map[string]int = nil
 
 		wg.Add(1)
 		go func() {
-			ch_macs <- e.initMap
+			chMacs <- e.initMap
 			for _, sarr := range e.loopMaps {
 
-				ch_macs <- sarr
+				chMacs <- sarr
 			}
 			defer wg.Done()
 		}()
 
 		// Not using the reset here.
-		go tlp.AlgorithmTwo(ka, cfg, resetbroker, killbroker, ch_macs, ch_uniq)
+		go tlp.AlgorithmTwo(ka, cfg, resetbroker, killbroker, chMacs, chUniq)
 
 		wg.Add(1)
 		go func() {
 			// The init map
-			<-ch_uniq
+			<-chUniq
 			count := len(e.loopMaps) - 1
 			for i := 0; i < count; i++ {
 				// This reads in the intervening maps.
-				<-ch_uniq
+				<-chUniq
 			}
-			u = <-ch_uniq
+			u = <-chUniq
 			// ch_poison <- tlp.Ping{}
 			killbroker.Publish(tlp.Ping{})
 			defer wg.Done()
@@ -240,15 +240,15 @@ func TestRawToUid(t *testing.T) {
 	} // end for over tests
 }
 
-func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.ResetBroker, kb *tlp.KillBroker, n_hours int, ch_tick chan bool) {
+func PingAfterNHours(ka *tlp.Keepalive, cfg *config.Config, rb *tlp.ResetBroker, kb *tlp.KillBroker, nHours int, chTick chan bool) {
 	counter := 0
 	chKill := kb.Subscribe()
 	lw := logwrapper.NewLogger(nil)
 	for {
 		select {
-		case <-ch_tick:
+		case <-chTick:
 			counter += 1
-			if (counter != 0) && ((counter % (60 * n_hours)) == 0) {
+			if (counter != 0) && ((counter % (60 * nHours)) == 0) {
 				// chReset <- tlp.Ping{}
 				lw.Debug("PingAfterNHours is Pinging!")
 				rb.Publish(tlp.Ping{})
@@ -384,24 +384,24 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-	cfg.SessionId = state.GetNextSessionId(cfg)
+	cfg.SessionId = state.GetNextSessionID(cfg)
 
 	// Create channels for process network
-	ch_sec := make(chan bool)
+	chSec := make(chan bool)
 
-	ch_nsec := make(chan bool)
-	ch_nsec1 := make(chan bool)
-	ch_nsec2 := make(chan bool)
+	chNsec := make(chan bool)
+	chNsec1 := make(chan bool)
+	chNsec2 := make(chan bool)
 
-	ch_macs := make(chan []string)
-	ch_macs_counted := make(chan map[string]int)
-	ch_data_for_report := make(chan []structs.WifiEvent)
-	ch_wifidb := make(chan *state.TempDB)
+	chMacs := make(chan []string)
+	chMacsCounted := make(chan map[string]int)
+	chDataForReport := make(chan []structs.WifiEvent)
+	chWifiDB := make(chan *state.TempDB)
 	chDurationsDB := make(chan *state.TempDB)
 	chAck := make(chan tlp.Ping)
-	ch_ddb_par := make([]chan *state.TempDB, 2)
+	chDdbPar := make([]chan *state.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		ch_ddb_par[i] = make(chan *state.TempDB)
+		chDdbPar[i] = make(chan *state.TempDB)
 	}
 
 	// See if we can wait and shut down the test...
@@ -409,44 +409,44 @@ func TestManyTLPCycles(t *testing.T) {
 	wg.Add(1)
 
 	// Delta this out to RunWireshark and PingAfterNHours
-	go tlp.TockEveryN(nil, killbroker, SECONDSPERMINUTE, ch_sec, ch_nsec)
+	go tlp.TockEveryN(nil, killbroker, SECONDSPERMINUTE, chSec, chNsec)
 	go func(in chan bool, o1 chan bool, o2 chan bool) {
 		for {
 			<-in
 			o1 <- true
 			o2 <- true
 		}
-	}(ch_nsec, ch_nsec1, ch_nsec2)
+	}(chNsec, chNsec1, chNsec2)
 
 	go func(in chan bool) {
 		for {
 			<-in
 		}
-	}(ch_nsec2)
+	}(chNsec2)
 
 	// Need a fake RunWireshark
 	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
-	go RunFakeWireshark(nil, cfg, killbroker, ch_nsec1, ch_macs)
+	go RunFakeWireshark(nil, cfg, killbroker, chNsec1, chMacs)
 
-	go tlp.AlgorithmTwo(nil, cfg, resetbroker, killbroker, ch_macs, ch_macs_counted)
-	go tlp.PrepEphemeralWifi(nil, cfg, killbroker, ch_macs_counted, ch_data_for_report)
+	go tlp.AlgorithmTwo(nil, cfg, resetbroker, killbroker, chMacs, chMacsCounted)
+	go tlp.PrepEphemeralWifi(nil, cfg, killbroker, chMacsCounted, chDataForReport)
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
 	go PingAtBogoMidnight(nil, cfg, resetbroker, killbroker, mock)
-	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, ch_data_for_report, ch_wifidb, chAck)
+	go tlp.CacheWifi(nil, cfg, resetbroker, killbroker, chDataForReport, chWifiDB, chAck)
 	// Make sure we don't hang...
-	go tlp.GenerateDurations(nil, cfg, killbroker, ch_wifidb, chDurationsDB, chAck)
+	go tlp.GenerateDurations(nil, cfg, killbroker, chWifiDB, chDurationsDB, chAck)
 
-	go tlp.ParDeltaTempDB(killbroker, chDurationsDB, ch_ddb_par...)
-	go tlp.BatchSend(nil, cfg, killbroker, ch_ddb_par[0])
-	go tlp.WriteImages(nil, cfg, killbroker, ch_ddb_par[1])
+	go tlp.ParDeltaTempDB(killbroker, chDurationsDB, chDdbPar...)
+	go tlp.BatchSend(nil, cfg, killbroker, chDdbPar[0])
+	go tlp.WriteImages(nil, cfg, killbroker, chDdbPar[1])
 
 	go func() {
 		minutes := 0
 
 		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
 		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
-			ch_sec <- true
+			chSec <- true
 			mock.Add(m)
 			lw.Debug("MOCK NOW ", mock.Now())
 

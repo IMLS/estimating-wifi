@@ -7,9 +7,9 @@ import (
 	"strings"
 	"syscall"
 
+	"gsa.gov/18f/cmd/session-counter/constants"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/cmd/session-counter/constants"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
@@ -59,13 +59,10 @@ func tshark(cfg *config.Config) []string {
 	return macs
 }
 
-/* PROCESS runWireshark
- * Runs a subprocess for a duration of OBSERVE_SECONDS.
- * Therefore, this process effectively blocks for that time.
- * Gathers a hashmap of [MAC -> count] values. This hashmap
- * is then communicated out.
- * Empty MAC addresses are filtered out.
- */
+// RunWireshark runs a subprocess for a duration of OBSERVE_SECONDS. Therefore,
+// this process effectively blocks for that time. Gathers a hashmap of [MAC ->
+// count] values. This hashmap is then communicated out. Empty MAC addresses are
+// filtered out.
 func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan bool, out chan []string) {
 	lw := logwrapper.NewLogger(nil)
 	lw.Info("starting RunWireshark")

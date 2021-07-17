@@ -1,3 +1,4 @@
+// Package state provides state manipulation primitives
 package state
 
 import (
@@ -39,8 +40,8 @@ func NewQueue(cfg *config.Config, name string) (q *Queue) {
 	return q
 }
 
-// The list abstraction is layered over the same table.
-// Pushing to the list is the same as enqueuing w.r.t. the DB.
+// Push is a list abstraction layered over the same table. Pushing to the list
+// is the same as enqueuing w.r.t. the DB.
 func (queue *Queue) Push(sessionid string) {
 	queue.Enqueue(sessionid)
 }

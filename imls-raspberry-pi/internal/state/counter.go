@@ -13,9 +13,9 @@ type Counter struct {
 	*Queue
 }
 
-// All of this needs to be refactored down into the TempDB space...
-// Some convoluted things happen here. :/
 func NewCounter(cfg *config.Config, name string) *Counter {
+	// All of this needs to be refactored down into the TempDB space...
+	// Some convoluted things happen here. :/
 	lw := logwrapper.NewLogger(nil)
 	fullpath := filepath.Join(cfg.Local.WebDirectory, DURATIONSDB)
 	tdb := NewSqliteDB(DURATIONSDB, fullpath)

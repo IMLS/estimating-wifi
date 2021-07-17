@@ -14,8 +14,8 @@ type Generic interface {
 type Ping struct {
 }
 
-// In an infinite loop, we read in from the input channel, and
-// in parallel, write out the value to the two output channels.
+// ParDeltaTempDB reads in from the input channel, and in parallel, writes out
+// the value to the two output channels.
 func ParDeltaTempDB(kb *KillBroker,
 	chResetIn <-chan *state.TempDB,
 	chsResetOut ...chan *state.TempDB) {
@@ -51,8 +51,8 @@ func ParDeltaTempDB(kb *KillBroker,
 	}
 }
 
-// In an infinite loop, we read in from the input channel, and
-// in parallel, write out the value to the two output channels.
+// ParDeltaPing reads in from the input channel, and in parallel, writes out the
+// value to the two output channels.
 func ParDeltaPing(kb *Broker, chResetIn <-chan Ping, chsResetOut ...chan Ping) {
 	// Block waiting for a message
 	// It will be the zeroth channel in the group.
