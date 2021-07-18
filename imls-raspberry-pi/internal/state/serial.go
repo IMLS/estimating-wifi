@@ -1,5 +1,4 @@
-// Package config provides functions to work with IMLS config files.
-package config
+package state
 
 import (
 	"bufio"
@@ -35,12 +34,12 @@ func cpuinfoLines() (lines []string) {
 	return lines
 }
 
-func (cfg *Config) DecodeSerial() {
+func decodeSerial() {
 	serial := FakeSerial
-	if cfg.Serial != "" {
+	if the_config.Serial != "" {
 		// optionally override with a pre-defined serial. note
 		// that this is only for non-arm usage.
-		serial = cfg.Serial
+		serial = the_config.Serial
 	}
 	// Try and pull from the cache, so we don't keep opening up a /proc filesystem...
 	if val, ok := cache["serial"]; ok {
@@ -64,9 +63,9 @@ func (cfg *Config) DecodeSerial() {
 
 		}
 	}
-	cfg.Serial = serial
+	the_config.Serial = serial
 }
 
-func (cfg *Config) GetSerial() string {
-	return cfg.Serial
+func GetSerial() string {
+	return the_config.Serial
 }

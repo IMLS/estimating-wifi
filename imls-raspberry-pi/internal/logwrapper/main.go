@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 )
 
 // Code for this wrapper inspired by
@@ -66,7 +66,7 @@ func (l *StandardLogger) GetLogLevelName() string {
 	return "UNKNOWN"
 }
 
-func NewLogger(cfg *config.Config) *StandardLogger {
+func NewLogger(cfg interfaces.Config) *StandardLogger {
 	once.Do(func() {
 		initLogger(cfg)
 		if cfg != nil {
@@ -83,7 +83,7 @@ func NewLogger(cfg *config.Config) *StandardLogger {
 }
 
 // UnsafeNewLogger is for  unit testing only.
-func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
+func UnsafeNewLogger(cfg interfaces.Config) (sl *StandardLogger) {
 	if standardLogger == nil {
 		initLogger(cfg)
 	}
@@ -91,7 +91,7 @@ func UnsafeNewLogger(cfg *config.Config) (sl *StandardLogger) {
 }
 
 // Convoluted for use within libraries...
-func initLogger(cfg *config.Config) {
+func initLogger(cfg interfaces.Config) {
 	var baseLogger = logrus.New()
 
 	if baseLogger == nil {

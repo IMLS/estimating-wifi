@@ -1,3 +1,4 @@
+// +build refactor
 package state
 
 import (

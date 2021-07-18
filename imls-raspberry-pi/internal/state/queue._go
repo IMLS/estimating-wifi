@@ -1,12 +1,10 @@
-// Package state provides state manipulation primitives
+// +build refactor
 package state
 
 import (
 	"fmt"
-	"path/filepath"
 	"sync"
 
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
 )
 
@@ -27,14 +25,13 @@ type List struct {
 	*Queue
 }
 
-func NewList(cfg *config.Config, name string) *List {
+func NewList(cfg *Config, name string) *List {
 	q := NewQueue(cfg, name)
 	return &List{q}
 }
 
-func NewQueue(cfg *config.Config, name string) (q *Queue) {
-	fullpath := filepath.Join(cfg.Local.WebDirectory, DURATIONSDB)
-	tdb := NewSqliteDB(DURATIONSDB, fullpath)
+func NewQueue(cfg *Config, name string) (q *Queue) {
+	tdb := NewSqliteDB(the_config.Databases.Queues)
 	tdb.AddStructAsTable(name, QueueRow{})
 	q = &Queue{name: name, db: tdb}
 	return q

@@ -12,21 +12,21 @@ import (
 	"regexp"
 	"time"
 
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 )
 
 var slashWarned bool = false
 
-func PostJSON(cfg *config.Config, uri string, data []map[string]interface{}) error {
+func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) error {
 
-	tok := cfg.Auth.Token
+	tok := cfg.GetAPIKey()
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slashWarned && !matched {
 		slashWarned = true
 		log.Println("WARNING: api.data.gov wants a trailing slash on URIs")
 	}
 
-	timeout := time.Duration(5 * time.Second)
+	timeout := time.Duration(15 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}

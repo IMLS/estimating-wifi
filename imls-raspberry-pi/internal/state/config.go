@@ -1,52 +1,49 @@
-package config
+package state
 
 import (
 	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
-	"reflect"
-	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/benbjohnson/clock"
+	"github.com/jmoiron/sqlx"
 	yaml "gopkg.in/yaml.v2"
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/wifi-hardware-search/config"
 )
 
-func NewConfig() *Config {
-	cfg := Config{}
-	cfg.setDefaults()
-	//cfg.Validate()
-	return &cfg
+var the_config *CFG
+var once sync.Once
+
+// The config is a singleton. We can get a new,
+// empty config once.
+func NewConfig() *CFG {
+	once.Do(func() {
+		the_config = &CFG{}
+		setDefaults()
+	})
+	return the_config
 }
 
-func NewConfigFromPathMaybe(path string) *Config {
-	cfg := Config{}
-	cfg.setDefaults()
-	// silently ignore if the path is not found
-	cfg.ReadConfig(path)
-	return &cfg
+// Or, we can get a new config from a path.
+// We cannot get both.
+func NewConfigFromPath(path string) {
+	once.Do(func() {
+		the_config = &CFG{}
+		setDefaults()
+		readConfig(path)
+		if the_config.Clock == nil {
+			log.Println("clock should not be nil")
+			log.Fatal()
+		}
+		the_config.InitializeSessionId()
+	})
 }
 
-func NewConfigFromPath(path string) (*Config, error) {
-	cfg := Config{}
-	cfg.setDefaults()
-	err := cfg.ReadConfig(path)
-	if err != nil {
-		log.Println("cfg could not be read")
-		log.Fatal()
-	}
-	log.Println(cfg)
-	if cfg.Clock == nil {
-		log.Println("clock should not be nil")
-		log.Fatal()
-	}
-	return &cfg, err
-}
-
-func (cfg *Config) ReadConfig(path string) error {
+func readConfig(path string) {
 	_, err := os.Stat(path)
 	// Stat will set an error if the file cannot be found.
 	if err == nil {
@@ -55,72 +52,114 @@ func (cfg *Config) ReadConfig(path string) error {
 			log.Fatal("config: could not open configuration file. Exiting.")
 		}
 		defer f.Close()
-		var newcfg *Config
+		var newcfg *CFG
 		decoder := yaml.NewDecoder(f)
 		err = decoder.Decode(&newcfg)
 		if err != nil {
 			log.Fatalf("config: could not decode YAML:\n%v\n", err)
 		}
-		*cfg = *newcfg
+		the_config = newcfg
+
 		// The API key will need to be decoded into memory.
-		if len(cfg.Auth.Token) > 0 {
-			cfg.DecodeSerial()
-			cfg.Auth.Token = cfg.decodeAuthToken()
+		if len(the_config.Device.Token) > 0 {
+			decodeAuthToken()
 		}
-		if len(cfg.LshwPath) > 0 {
-			config.SetLSHWLocation(cfg.LshwPath)
+
+		// FIXME: Because this is an external lib, we need to set the
+		// path there. Or, pass the config?
+		if len(the_config.Executables.LshwPath) > 0 {
+			config.SetLSHWLocation(the_config.Executables.LshwPath)
 		}
 
 		// Need to reset the clock pointer...
 		// Gets wiped out by the read.
-		cfg.Clock = clock.New()
+		the_config.Clock = clock.New()
 
-		// Validate the config before returning.
-		//cfg.Validate()
-
-		return nil
 	} else {
-		log.Printf("config: could not find config: %v\n", path)
+		log.Fatalf("could not find config: %v\n", path)
 	}
-	return fmt.Errorf("config: could not find config file [%v]", path)
 }
 
-func (cfg *Config) SetSessionID(sid int) {
-	cfg.SessionID = sid
+// We can return the existing singleton as many
+// times as we like. However, if it is not initialized,
+// the program should exit.
+func GetConfig() *CFG {
+	if the_config == nil {
+		log.Fatal("cannot retrieve nil config")
+	}
+	return the_config
 }
 
-func (cfg *Config) GetLoggers() []string {
-	return cfg.Loggers
+// interface Config
+
+// See serial.go for GetSerial()
+
+func (cfg *CFG) GetFCFSSeqId() string {
+	return the_config.Device.FCFSId
 }
 
-func (cfg *Config) GetLogLevel() string {
-	if cfg.LogLevel == "" {
+func (cfg *CFG) GetDeviceTag() string {
+	return the_config.Device.DeviceTag
+}
+
+func (cfg *CFG) GetAPIKey() string {
+	return the_config.Device.Token
+}
+
+func (cfg *CFG) GetLogLevel() string {
+	valid := []string{"DEBUG", "INFO", "WARN", "ERROR"}
+	ok := false
+	for _, v := range valid {
+		if the_config.Logging.LogLevel == v {
+			ok = true
+		}
+		if the_config.Logging.LogLevel == strings.ToLower(v) {
+			ok = true
+		}
+	}
+	if !ok {
+		log.Printf("invalid log level in config: %v\n",
+			the_config.Logging.LogLevel)
 		return "ERROR"
 	} else {
-		return cfg.LogLevel
+		return the_config.Logging.LogLevel
 	}
 }
 
-func (cfg *Config) IsStoringToAPI() bool {
-	return strings.Contains(strings.ToLower(cfg.StorageMode), "api")
+func (cfg *CFG) GetLoggers() []string {
+	return the_config.Logging.Loggers
 }
 
-func (cfg *Config) IsStoringLocally() bool {
+func (cfg *CFG) GetEventsUri() string {
+	return the_config.Umbrella.Paths.Events
+}
+
+func (cfg *CFG) GetDurationsUri() string {
+	return the_config.Umbrella.Paths.Durations
+}
+
+// See sessionid.go for related interface implementation
+
+func IsStoringToApi() bool {
+	return strings.Contains(strings.ToLower(the_config.StorageMode), "api")
+}
+
+func IsStoringLocally() bool {
 	either := false
 	for _, s := range []string{"local", "sqlite"} {
-		either = either || strings.Contains(strings.ToLower(cfg.StorageMode), s)
+		either = either || strings.Contains(strings.ToLower(the_config.StorageMode), s)
 	}
 	return either
 }
 
-func (cfg *Config) IsProductionMode() bool {
-	return strings.Contains(strings.ToLower(cfg.RunMode), "prod")
+func IsProductionMode() bool {
+	return strings.Contains(strings.ToLower(the_config.RunMode), "prod")
 }
 
-func (cfg *Config) IsDeveloperMode() bool {
+func IsDeveloperMode() bool {
 	either := false
 	for _, s := range []string{"dev", "test"} {
-		either = either || strings.Contains(strings.ToLower(cfg.RunMode), s)
+		either = either || strings.Contains(strings.ToLower(the_config.RunMode), s)
 	}
 	if either {
 		log.Println("running in developer mode")
@@ -128,20 +167,22 @@ func (cfg *Config) IsDeveloperMode() bool {
 	return either
 }
 
-func (cfg *Config) IsTestMode() bool {
-	return strings.Contains(strings.ToLower(cfg.RunMode), "test")
+func IsTestMode() bool {
+	return strings.Contains(strings.ToLower(the_config.RunMode), "test")
 }
 
-func (cfg *Config) decodeAuthToken() string {
+func decodeAuthToken() string {
+	decodeSerial()
+	the_config.Device.Token = decodeAuthToken()
 	// It is a B64 encoded string
 	// of the API key encrypted with the device's serial.
 	// This is obscurity, but it is all we can do on a RPi
-	serial := []byte(cfg.GetSerial())
+	serial := []byte(GetSerial())
 	// ("serial", fmt.Sprintf("%v", serial))
 	var key [32]byte
 	copy(key[:], serial)
 	// log.Println("token", cfg.Auth.Token)
-	b64, err := base64.StdEncoding.DecodeString(cfg.Auth.Token)
+	b64, err := base64.StdEncoding.DecodeString(the_config.Device.Token)
 	if err != nil {
 		log.Println("config: cannot b64 decode auth token.")
 		log.Println(err.Error())
@@ -165,110 +206,83 @@ var patterns = map[string]string{
 	"RunMode":        "{DEV|dev|PROD|prod|DEVELOP|develop|PRODUCTION|production}",
 }
 
-func getValue(chain string, s interface{}) interface{} {
-	// TODO: THIS IS BROKEN
-	reflectType := reflect.TypeOf(s).Elem()
-	reflectValue := reflect.ValueOf(s).Elem()
-	next := strings.Split(chain, ".")[0]
-	rest := strings.Split(chain, ".")[1:]
-	for i := 0; i < reflectType.NumField(); i++ {
-		typeName := reflectType.Field(i).Name
-		// valueType := reflectValue.Field(i).Type()
-		valueValue := reflectValue.Field(i).Interface()
+func setDefaults() {
+	the_config.Logging.LogLevel = "DEBUG"
+	the_config.Logging.Loggers = []string{"local:stderr", "local:tmp", "api:directus"}
 
-		log.Println("typeName", typeName)
-		if typeName == next && len(rest) == 0 {
-			return valueValue
-		} else {
-			return getValue(strings.Join(rest, "."), valueValue)
-		}
-	}
-	return nil
+	the_config.Monitoring.UniquenessWindow = 24 * 60
+	the_config.Monitoring.MinimumMinutes = 5
+	the_config.Monitoring.MaximumMinutes = 600
+
+	the_config.Umbrella.Scheme = "https"
+	the_config.Umbrella.Host = "api.data.gov"
+	the_config.Umbrella.Paths.Durations = "/TEST/10x-imls/v2/durations/"
+	the_config.Umbrella.Paths.Events = "/TEST/10x-imls/v2/events/"
+
+	the_config.Executables.Wireshark.Duration = 45
+	the_config.Executables.Wireshark.Path = "/usr/bin/tshark"
+
+	the_config.Databases.Manufacturers = "/opt/imls/manufacturers.sqlite"
+
+	the_config.StorageMode = "api"
+	the_config.RunMode = "prod"
+	the_config.Clock = clock.New()
+	the_config.Monitoring.ResetCron = "0 0 * * *"
+
+	the_config.Paths.WWW.Root = "/www/imls"
+	the_config.Paths.WWW.Images = "/www/imls/images"
 }
 
-func (cfg *Config) Validate() {
-	// TODO: THIS IS BROKEN.
-	for tag, pat := range patterns {
-		value := fmt.Sprintf("%v", getValue(tag, cfg))
-		log.Printf("tag [ %v ], pattern %v, value [ %v ]\n", tag, pat, value)
-		b, err := regexp.Match(pat, []byte(value))
-		if !b || err != nil {
-			log.Fatalf("Tag [%v] is invalid; must match pattern '%v'", tag, pat)
-		}
-
-	}
-}
-
-func (cfg *Config) setDefaults() {
-	cfg.LogLevel = "DEBUG"
-	cfg.Loggers = []string{"local:stderr", "local:tmp", "api:directus"}
-
-	cfg.Monitoring.PingInterval = 30
-	cfg.Monitoring.MaxHTTPErrorCount = 8
-	cfg.Monitoring.HTTPErrorIntervalMins = 10
-	cfg.Monitoring.UniquenessWindow = 24 * 60
-	cfg.Monitoring.MinimumMinutes = 5
-	cfg.Monitoring.MaximumMinutes = 600
-
-	cfg.Umbrella.Scheme = "https"
-	cfg.Umbrella.Host = "api.data.gov"
-	cfg.Umbrella.Data = "/TEST/10x-imls/v2/durations/"
-	cfg.Umbrella.Logging = "/TEST/10x-imls/v2/events/"
-
-	cfg.Wireshark.Duration = 45
-	cfg.Wireshark.Path = "/usr/bin/tshark"
-	cfg.Wireshark.CheckWlan = "1"
-
-	cfg.Manufacturers.DB = "/opt/imls/manufacturers.sqlite"
-
-	cfg.StorageMode = "api"
-	cfg.RunMode = "prod"
-	cfg.Clock = clock.New()
-	cfg.Local.Crontab = "0 0 * * *"
-	cfg.Local.SummaryDB = "/opt/imls/summary.sqlite"
-	cfg.Local.WebDirectory = "/www/imls"
-}
-
-type Config struct {
-	Auth struct {
+type CFG struct {
+	Device struct {
 		Token     string `yaml:"api_token"`
 		DeviceTag string `yaml:"device_tag"`
 		FCFSId    string `yaml:"fcfs_seq_id"`
-	} `yaml:"auth"`
-	LogLevel   string   `yaml:"log_level"`
-	Loggers    []string `yaml:"loggers"`
+	} `yaml:"device"`
+	Logging struct {
+		LogLevel string   `yaml:"log_level"`
+		Loggers  []string `yaml:"loggers"`
+	} `yaml:"logging"`
 	Monitoring struct {
-		PingInterval          int `yaml:"pinginterval"`
-		MaxHTTPErrorCount     int `yaml:"max_http_error_count"`
-		HTTPErrorIntervalMins int `yaml:"http_error_interval_mins"`
-		UniquenessWindow      int `yaml:"uniqueness_window"`
-		MinimumMinutes        int `yaml:"minimum_minutes"`
-		MaximumMinutes        int `yaml:"maximum_minutes"`
+		UniquenessWindow int    `yaml:"uniqueness_window"`
+		MinimumMinutes   int    `yaml:"minimum_minutes"`
+		MaximumMinutes   int    `yaml:"maximum_minutes"`
+		ResetCron        string `yaml:"reset_cron"`
 	} `yaml:"monitoring"`
 	Umbrella struct {
-		Scheme  string `yaml:"scheme"`
-		Host    string `yaml:"host"`
-		Data    string `yaml:"data"`
-		Logging string `yaml:"logging"`
+		Scheme string `yaml:"scheme"`
+		Host   string `yaml:"host"`
+		Paths  struct {
+			Durations string `yaml:"durations"`
+			Events    string `yaml:"events"`
+		} `yaml:"paths"`
 	} `yaml:"umbrella"`
-	Wireshark struct {
-		Duration  int    `yaml:"duration"`
-		Adapter   string `yaml:"adapter"`
-		Path      string `yaml:"path"`
-		CheckWlan string `yaml:"check_wlan"`
-	} `yaml:"wireshark"`
-	LshwPath      string `yaml:"lshw_path"`
-	Manufacturers struct {
-		DB string `yaml:"db"`
-	} `yaml:"manufacturers"`
-	SessionID   int         `yaml:"-"` // ignore
+	Executables struct {
+		Wireshark struct {
+			Duration int    `yaml:"duration"`
+			Path     string `yaml:"wireshark_path"`
+		} `yaml:"wireshark"`
+		LshwPath string `yaml:"lshw_path"`
+		IpPath   string `yaml:"ip_path"`
+	} `yaml:"executables"`
+	Databases struct {
+		Manufacturers    string   `yaml:"manufacturers"`
+		ManufacturersPtr *sqlx.DB `yaml:"-"`
+		Durations        string   `yaml:"durations"`
+		DurationsPtr     *sqlx.DB `yaml:"-"`
+		Queues           string   `yaml:"queues"`
+		QueuesPtr        *sqlx.DB `yaml:"-"`
+	} `yaml:"databases"`
+	Paths struct {
+		WWW struct {
+			Root   string `yaml:"root"`
+			Images string `yaml:"images"`
+		} `yaml:"www"`
+	} `yaml:"paths"`
 	Serial      string      `yaml:"serial"`
 	StorageMode string      `yaml:"storagemode"`
 	RunMode     string      `yaml:"runmode"`
+	SessionId   int         `yaml:"-"` // ignore
 	Clock       clock.Clock `yaml:"-"` // ignore
-	Local       struct {
-		Crontab      string `yaml:"crontab"`
-		SummaryDB    string `yaml:"summary_db"`
-		WebDirectory string `yaml:"web_directory"`
-	} `yaml:"local"`
+
 }

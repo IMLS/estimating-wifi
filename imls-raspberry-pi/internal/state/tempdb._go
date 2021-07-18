@@ -1,4 +1,4 @@
-package state
+// +build refactor
 
 import (
 	"errors"
@@ -15,22 +15,79 @@ import (
 	"gsa.gov/18f/internal/logwrapper"
 )
 
-type TempDB struct {
+type SqliteDB struct {
 	Ptr    *sqlx.DB
-	DBName string
 	Path   string
 	Tables map[string]map[string]string
 	mutex  sync.Mutex
 }
 
-func NewSqliteDB(name string, path string) *TempDB {
+func NewSqliteDB(path string) *SqliteDB {
 	// lw := logwrapper.NewLogger(nil)
-	db := TempDB{}
-	db.DBName = name
+	db := SqliteDB{}
 	db.Path = path
 	db.Ptr = nil
 	db.Tables = make(map[string]map[string]string)
 	return &db
+}
+
+func (db *SqliteDB) Open() {
+	lw := logwrapper.NewLogger(nil)
+	if db.Ptr == nil {
+		// lw.Debug("opening db: ", tdb.DBName, " path: ", tdb.Path)
+		dbptr, err := sqlx.Open("sqlite3", db.Path)
+		if err != nil {
+			lw.Error("could not open temporary db: ", db.Path)
+			lw.Fatal(err.Error())
+		} else {
+			db.Ptr = dbptr
+		}
+	} else {
+		lw.Debug("db already open: [ ", db.Path, " ]")
+	}
+}
+
+func (db *SqliteDB) Close() {
+	lw := logwrapper.NewLogger(nil)
+	if strings.Contains(db.Path, "memory") {
+		// Do nothing. Keep memory DB open.
+	} else {
+		if db.Ptr != nil {
+			//lw.Debug("closing db: ", tdb.DBName)
+			err := db.Ptr.Close()
+			if err != nil {
+				lw.Error("could not close db [", db.Path, "]")
+			}
+			db.Ptr = nil
+		}
+	}
+}
+
+func (db *SqliteDB) CreateTable(name string, coltypes map[string]string) {
+	lw := logwrapper.NewLogger(nil)
+	db.Tables[name] = coltypes
+	fields := make([]string, 0)
+	for col, t := range coltypes {
+		fp := fmt.Sprintf("%v %v", col, t)
+		fields = append(fields, fp)
+	}
+	doesNotExist := !db.CheckTableExists(name)
+	lw.Debug("CHECKING IF "+name+" DOES NOT EXIST: ", doesNotExist)
+	if doesNotExist {
+		statement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v (%v)", name, strings.Join(fields, ", "))
+		lw.Debug(statement)
+		_, err := db.Ptr.Exec(statement)
+		if err != nil {
+			lw.Info("could not re-create '", name, "' table in temporary db.")
+			lw.Fatal(err.Error())
+		}
+
+	}
+}
+
+func (db *SqliteDB) CheckTableExists(name string) bool {
+	_, tableCheck := db.Ptr.Query("select * from " + name + ";")
+	return tableCheck == nil
 }
 
 func (tdb *TempDB) DropTable(name string) {
@@ -45,13 +102,6 @@ func (tdb *TempDB) DropTable(name string) {
 			delete(tdb.Tables, name)
 		}
 	}
-}
-
-func (tdb *TempDB) CheckTableExists(name string) bool {
-	tdb.Open()
-	_, tableCheck := tdb.Ptr.Query("select * from " + name + ";")
-
-	return tableCheck == nil
 }
 
 func (tdb *TempDB) CheckTableDoesNotExist(name string) bool {
@@ -259,38 +309,4 @@ func (tdb *TempDB) DebugDump(name string) error {
 		log.Println(r)
 	}
 	return nil
-}
-
-func (tdb *TempDB) Open() {
-	tdb.mutex.Lock()
-	lw := logwrapper.NewLogger(nil)
-	if tdb.Ptr == nil {
-		// lw.Debug("opening db: ", tdb.DBName, " path: ", tdb.Path)
-		dbptr, err := sqlx.Open("sqlite3", tdb.Path)
-		if err != nil {
-			lw.Error("could not open temporary db: ", tdb.Path)
-			lw.Fatal(err.Error())
-		} else {
-			tdb.Ptr = dbptr
-		}
-	} else {
-		lw.Debug("db already open: [ ", tdb.DBName, " ]")
-	}
-}
-
-func (tdb *TempDB) Close() {
-	lw := logwrapper.NewLogger(nil)
-	if strings.Contains(tdb.Path, "memory") {
-		// Do nothing. Keep memory DB open.
-	} else {
-		if tdb.Ptr != nil {
-			//lw.Debug("closing db: ", tdb.DBName)
-			err := tdb.Ptr.Close()
-			if err != nil {
-				lw.Error("could not close db [", tdb.DBName, "]")
-			}
-			tdb.Ptr = nil
-		}
-	}
-	tdb.mutex.Unlock()
 }

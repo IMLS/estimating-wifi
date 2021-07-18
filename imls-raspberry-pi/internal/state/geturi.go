@@ -1,4 +1,4 @@
-package config
+package state
 
 import "strings"
 
@@ -18,20 +18,16 @@ func startsWithSlash(uri string) string {
 	return "/" + uri
 }
 
-// func endsWithSlash(uri string) string {
-// 	return uri + "/"
-// }
-
-func (cfg *Config) GetLoggingURI() string {
-	var uri string = (cfg.Umbrella.Scheme + "://" +
-		removeLeadingAndTrailingSlashes(cfg.Umbrella.Host) +
-		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Logging)))
+func GetEventsURI() string {
+	var uri string = (the_config.Umbrella.Scheme + "://" +
+		removeLeadingAndTrailingSlashes(the_config.Umbrella.Host) +
+		startsWithSlash(removeLeadingSlashes(the_config.Umbrella.Paths.Events)))
 	return uri
 }
 
-func (cfg *Config) GetDataURI() string {
-	var uri string = (cfg.Umbrella.Scheme + "://" +
-		removeLeadingAndTrailingSlashes(cfg.Umbrella.Host) +
-		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Data)))
+func GetDurationsURI() string {
+	var uri string = (the_config.Umbrella.Scheme + "://" +
+		removeLeadingAndTrailingSlashes(the_config.Umbrella.Host) +
+		startsWithSlash(removeLeadingSlashes(the_config.Umbrella.Paths.Durations)))
 	return uri
 }
