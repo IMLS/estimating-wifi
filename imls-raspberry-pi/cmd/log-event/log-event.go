@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	config "gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
 )
 
@@ -29,11 +29,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg, err := config.NewConfigFromPath(*configPathPtr)
-	if err != nil {
-		log.Fatal("log-event: error loading config.")
-	}
+	config.NewConfigFromPath(*configPathPtr)
+	config.InitConfig()
 
-	lw := logwrapper.NewLogger(cfg)
-	lw.Info(strings.Join(rest, " "));
+	lw := logwrapper.NewLogger(nil)
+	lw.Info(strings.Join(rest, " "))
 }

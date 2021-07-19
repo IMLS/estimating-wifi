@@ -27,13 +27,7 @@ func NewConfig() *CFG {
 	return theConfig
 }
 
-func UnsafeNewConfig() *CFG {
-	theConfig = &CFG{}
-	setDefaults()
-	return theConfig
-}
-
-func (cfg *CFG) InitConfig() {
+func InitConfig() {
 	theConfig.Logging.Log = logwrapper.NewLogger(theConfig)
 	theConfig.Databases.DurationsDB = NewSqliteDB(theConfig.Databases.DurationsPath)
 	theConfig.Databases.QueuesDB = NewSqliteDB(theConfig.Databases.QueuesPath)
