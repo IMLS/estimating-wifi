@@ -13,10 +13,15 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jszwec/csvutil v1.5.0
+	github.com/kisielk/gotool v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
+	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
+	golang.org/x/tools v0.1.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0
+	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
+	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
 )

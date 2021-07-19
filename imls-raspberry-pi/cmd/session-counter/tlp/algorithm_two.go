@@ -1,9 +1,9 @@
 package tlp
 
 import (
-	"gsa.gov/18f/internal/config"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/cmd/session-counter/model"
+	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
 )
 
 /*
@@ -16,7 +16,8 @@ import (
  * 5. WRONG Report this UID:timestamp pairing.
  */
 
-func AlgorithmTwo(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker, in <-chan []string, out chan<- map[string]int) {
+func AlgorithmTwo(ka *Keepalive, rb *ResetBroker, kb *KillBroker, in <-chan []string, out chan<- map[string]int) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting AlgorithmTwo")
 

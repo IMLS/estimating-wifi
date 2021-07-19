@@ -5,59 +5,51 @@ import (
 	"path/filepath"
 
 	"gsa.gov/18f/internal/analysis"
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
-func GetDurationsDB(cfg *config.Config) *state.TempDB {
+func GetDurationsDB() interfaces.Database {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
-	fullpath := filepath.Join(cfg.Local.WebDirectory, state.DURATIONSDB)
-	tdb := state.NewSqliteDB(state.DURATIONSDB, fullpath)
-	tdb.AddStructAsTable("durations", structs.Duration{})
+	fullpath := filepath.Join(cfg.Paths.WWW.Root, state.DURATIONSDB)
+	tdb := state.NewSqliteDB(fullpath)
+	tdb.CreateTableFromStruct(structs.Duration{})
 	lw.Info("Created durations table in db [", fullpath, "]")
 	return tdb
 }
 
-func storeSummary(cfg *config.Config, tdb *state.TempDB,
+func storeSummary(tdb interfaces.Database,
 	c *analysis.Counter,
 	durations map[int]structs.Duration) {
 	for _, d := range durations {
-		tdb.InsertStruct("durations", d)
+		tdb.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
 	}
 }
 
-func processDataFromDay(cfg *config.Config, table string, wifidb *state.TempDB) *state.TempDB {
-	lw := logwrapper.NewLogger(nil)
-	ddb := GetDurationsDB(cfg)
-	events := []structs.WifiEvent{}
-
-	lw.Debug("selecting all events from wifi table")
-	wifidb.Open()
-	err := wifidb.Ptr.Select(&events, fmt.Sprintf("SELECT * FROM %v", table))
-	wifidb.Close()
-
-	if err != nil {
-		lw.Info("error in extracting all events: ", table)
-		lw.Fatal(err.Error())
-	}
+func processDataFromDay(wifidb interfaces.Database) interfaces.Database {
+	cfg := state.GetConfig()
+	ddb := GetDurationsDB()
+	cfg.Log().Debug("selecting all events from wifi table")
+	events := structs.WifiEvent{}.SelectAll(wifidb)
 	if len(events) > 0 {
-		//lw.Length("events", events)
-		c, d := analysis.Summarize(cfg, events)
-		storeSummary(cfg, ddb, c, d)
+		c, d := analysis.Summarize(events)
+		storeSummary(ddb, c, d)
 		//writeImages(cfg, events)
 		//writeSummaryCSV(cfg, events)
 	} else {
-		lw.Info("no `events` to summarize")
+		cfg.Log().Info("no `events` to summarize")
 	}
 	return ddb
 }
 
-func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	chDB <-chan *state.TempDB,
-	chDurationsDB chan<- *state.TempDB,
+func GenerateDurations(ka *Keepalive, kb *KillBroker,
+	chDB <-chan interfaces.Database,
+	chDurationsDB chan<- interfaces.Database,
 	chAck chan<- Ping) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting GenerateDurations")
 	var ping, pong chan interface{} = nil, nil
@@ -69,8 +61,8 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 	}
 
 	// Queues for processing duration data
-	sq := state.NewQueue(cfg, "sent")
-	iq := state.NewQueue(cfg, "images")
+	sq := state.NewQueue("sent")
+	iq := state.NewQueue("images")
 
 	for {
 		select {
@@ -83,8 +75,8 @@ func GenerateDurations(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		case wifidb := <-chDB:
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
-			durationsdb := processDataFromDay(cfg, state.WIFIDB, wifidb)
-			thissession := state.GetCurrentSessionID(cfg) //state.GetPreviousSessionId(cfg)
+			durationsdb := processDataFromDay(wifidb)
+			thissession := cfg.GetCurrentSessionId()
 			lw.Debug("queueing current session [ ", thissession, " ] to images and send queue... ")
 			if thissession >= 0 {
 				sq.Enqueue(fmt.Sprint(thissession))

@@ -19,15 +19,15 @@ func startsWithSlash(uri string) string {
 }
 
 func GetEventsURI() string {
-	var uri string = (the_config.Umbrella.Scheme + "://" +
-		removeLeadingAndTrailingSlashes(the_config.Umbrella.Host) +
-		startsWithSlash(removeLeadingSlashes(the_config.Umbrella.Paths.Events)))
+	var uri string = (theConfig.Umbrella.Scheme + "://" +
+		removeLeadingAndTrailingSlashes(theConfig.Umbrella.Host) +
+		startsWithSlash(removeLeadingSlashes(theConfig.Umbrella.Paths.Events)))
 	return uri
 }
 
 func GetDurationsURI() string {
-	var uri string = (the_config.Umbrella.Scheme + "://" +
-		removeLeadingAndTrailingSlashes(the_config.Umbrella.Host) +
-		startsWithSlash(removeLeadingSlashes(the_config.Umbrella.Paths.Durations)))
+	var uri string = (theConfig.Umbrella.Scheme + "://" +
+		removeLeadingAndTrailingSlashes(theConfig.Umbrella.Host) +
+		startsWithSlash(removeLeadingSlashes(theConfig.Umbrella.Paths.Durations)))
 	return uri
 }

@@ -7,27 +7,27 @@ import (
 
 	"gsa.gov/18f/cmd/session-counter/model"
 	"gsa.gov/18f/internal/analysis"
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
 //This must happen after the data is updated for the day.
-func writeImages(cfg *config.Config, durations []structs.Duration) error {
+func writeImages(durations []structs.Duration) error {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	var reterr error
 
-	if _, err := os.Stat(cfg.Local.WebDirectory); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.Local.WebDirectory, 0777)
+	if _, err := os.Stat(cfg.Paths.WWW.Root); os.IsNotExist(err) {
+		err := os.Mkdir(cfg.Paths.WWW.Root, 0777)
 		if err != nil {
-			lw.Error("could not create web directory: ", cfg.Local.WebDirectory)
+			lw.Error("could not create web directory: ", cfg.Paths.WWW.Root)
 			reterr = err
 		}
 	}
-	imagedir := filepath.Join(cfg.Local.WebDirectory, "images")
-	if _, err := os.Stat(imagedir); os.IsNotExist(err) {
-		err := os.Mkdir(imagedir, 0777)
+	if _, err := os.Stat(cfg.Paths.WWW.Images); os.IsNotExist(err) {
+		err := os.Mkdir(cfg.Paths.WWW.Images, 0777)
 		if err != nil {
 			lw.Error("could not create image directory")
 			reterr = err
@@ -37,25 +37,24 @@ func writeImages(cfg *config.Config, durations []structs.Duration) error {
 	// FIXME: This filename kinda makes no sense if we're not running
 	// a reset on a daily basis at midnight.
 	yesterday := model.GetYesterday(cfg)
-	imageFilename := fmt.Sprintf("%04d-%02d-%02d-%v-%v-%v-summary.png",
+	imageFilename := fmt.Sprintf("%04d%02d%02d-%v-%v_%v.png",
 		yesterday.Year(),
 		int(yesterday.Month()),
 		int(yesterday.Day()),
-		state.GetPreviousSessionID(cfg),
-		cfg.Auth.FCFSId,
-		cfg.Auth.DeviceTag)
+		cfg.GetPreviousSessionId(),
+		cfg.GetFCFSSeqId(),
+		cfg.GetDeviceTag())
 
-	path := filepath.Join(imagedir, imageFilename)
+	path := filepath.Join(cfg.Paths.WWW.Images, imageFilename)
 	// func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
-	analysis.DrawPatronSessions(cfg, durations, path)
+	analysis.DrawPatronSessions(durations, path)
 	return reterr
 }
 
-func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	chDurationsDB chan *state.TempDB) {
-
-	lw := logwrapper.NewLogger(nil)
-	lw.Debug("Starting WriteImages")
+func WriteImages(ka *Keepalive, kb *KillBroker,
+	chDurationsDB chan interfaces.Database) {
+	cfg := state.GetConfig()
+	cfg.Log().Debug("Starting WriteImages")
 	var ping, pong chan interface{} = nil, nil
 	var chKill chan interface{} = nil
 	if kb != nil {
@@ -69,27 +68,25 @@ func WriteImages(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 		case <-ping:
 			pong <- "WriteImages"
 		case <-chKill:
-			lw.Debug("exiting WriteImages")
+			cfg.Log().Debug("exiting WriteImages")
 			return
 		case db := <-chDurationsDB:
-			iq := state.NewQueue(cfg, "images")
+			iq := state.NewQueue("images")
 			imagesToWrite := iq.AsList()
-			lw.Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")
+			cfg.Log().Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")
 			for _, nextImage := range imagesToWrite {
 				durations := []structs.Duration{}
-				lw.Debug("looking for session ", nextImage, " in durations table to write images")
-				db.Open()
-				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)
-				db.Close()
-				lw.Debug("found ", len(durations), " durations in WriteImages")
+				cfg.Log().Debug("looking for session ", nextImage, " in durations table to write images")
+				err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)
+				cfg.Log().Debug("found ", len(durations), " durations in WriteImages")
 				if err != nil {
-					lw.Info("error in extracting durations for session", nextImage)
-					lw.Error(err.Error())
+					cfg.Log().Info("error in extracting durations for session", nextImage)
+					cfg.Log().Error(err.Error())
 				} else {
-					err = writeImages(cfg, durations)
+					err = writeImages(durations)
 					if err != nil {
-						lw.Error("error in writing images")
-						lw.Error(err.Error())
+						cfg.Log().Error("error in writing images")
+						cfg.Log().Error(err.Error())
 					} else {
 						iq.Remove(nextImage)
 					}

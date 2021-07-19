@@ -2,31 +2,11 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
-	"gsa.gov/18f/internal/config"
-	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/interfaces"
 )
-
-func CheckMfgDatabaseExists(cfg *config.Config) {
-	lw := logwrapper.NewLogger(nil)
-
-	_, err := os.Stat(cfg.Manufacturers.DB)
-
-	if os.IsNotExist(err) {
-		lw.Fatal("cannot find mfg database: ", cfg.Manufacturers.DB)
-	}
-
-	db, dberr := sql.Open("sqlite3", cfg.Manufacturers.DB)
-	if err != nil {
-		lw.Info("failed to open manufacturer database: ", cfg.Manufacturers.DB)
-		lw.Fatal(dberr.Error())
-	}
-	defer db.Close()
-}
 
 // FUNC Mac_to_mfg
 // Looks up a MAC address in the manufactuerer's database.
@@ -35,41 +15,28 @@ func CheckMfgDatabaseExists(cfg *config.Config) {
 // We hit this *all the time*. Perhaps we can speed it up?
 var cache map[string]string = make(map[string]string)
 
-func MacToMfg(cfg *config.Config, mac string) string {
-	lw := logwrapper.NewLogger(nil)
-	db, err := sql.Open("sqlite3", cfg.Manufacturers.DB)
-	if err != nil {
-		lw.Fatal("Failed to open manufacturer database: ", cfg.Manufacturers.DB)
-	}
-	// Close the DB at the end of the function.
-	// If not, it's a resource leak.
-	defer db.Close()
-
+func MacToMfg(cfg interfaces.Config, mac string) string {
+	db := cfg.GetManufacturerDatabase()
 	// We need to try the longest to the shortest MAC address
 	// in order to match.
 	// Start with aa:bb:cc:dd:ee
 	// ... then   aa:bb:cc:dd
 	// ... then   aa:bb:cc
 	lengths := []int{14, 11, 8}
-
 	for _, length := range lengths {
 		// If we're given a short MAC address, don't
 		// try and slice more of the string than exists.
 		if len(mac) >= length {
 			substr := mac[0:length]
-
 			// Can we pull this out of the "memoized" cache?
 			if v, ok := cache[substr]; ok {
 				return v
 			} else {
-
 				q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
 				rows, err := db.Query(q)
-				// Close the rows down, too...
-				// Another possible leak?
 				if err != nil {
-					lw.Debug("manufactuerer not found: ", q)
-					lw.Debug(err.Error())
+					cfg.Log().Debug("manufactuerer not found: ", q)
+					cfg.Log().Debug(err.Error())
 				} else {
 					var id string
 
@@ -78,7 +45,7 @@ func MacToMfg(cfg *config.Config, mac string) string {
 					for rows.Next() {
 						err = rows.Scan(&id)
 						if err != nil {
-							lw.Fatal("failed in DB result row scanning")
+							cfg.Log().Fatal("failed in DB result row scanning")
 						}
 						if id != "" {
 							cache[substr] = id

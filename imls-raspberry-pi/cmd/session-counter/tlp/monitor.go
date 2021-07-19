@@ -7,8 +7,9 @@ import (
 
 	"github.com/coreos/go-systemd/daemon"
 	"gsa.gov/18f/cmd/session-counter/constants"
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
 )
 
 // Inspired by the broker pattern found here:
@@ -25,11 +26,11 @@ type Keepalive struct {
 	publishCh   chan interface{}
 	subCh       chan resp
 	eventLogger *logwrapper.StandardLogger
-	cfg         *config.Config
+	cfg         interfaces.Config
 }
 
-func NewKeepalive(cfg *config.Config) *Keepalive {
-	// el := http.NewEventLogger(cfg)
+func NewKeepalive() *Keepalive {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 
 	return &Keepalive{
@@ -77,14 +78,14 @@ func (b *Keepalive) Start() {
 					case <-procs[c].pongCh:
 						// WARNING: This could get very noisy in the log.
 						b.eventLogger.Debug("pong from ", procs[c].id)
-					case <-b.cfg.Clock.After(procs[c].timeout):
+					case <-b.cfg.GetClock().After(procs[c].timeout):
 						b.eventLogger.Debug(fmt.Sprintf("TIMEOUT [%v :: %v]\n", procs[c].id, procs[c].timeout))
 						processTimedOut = true
 					}
 				}(ch)
 			}
 		// Lets check
-		case <-b.cfg.Clock.After(interval):
+		case <-b.cfg.GetClock().After(interval):
 			if processTimedOut {
 				// If we timed out, exit. Hope systemd restarts us.
 				b.eventLogger.Error(fmt.Sprintf("exiting after %v seconds. Hopefully someone will restart us!", interval))
@@ -108,14 +109,16 @@ func (b *Keepalive) Publish(msg interface{}) {
 
 // TOP LEVEL PROCESS
 
-func StayinAlive(ka *Keepalive, cfg *config.Config) {
+func StayinAlive(ka *Keepalive) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Info("starting keepalive")
 	ka.Start()
 
 	var counter int64 = 0
 	for {
-		cfg.Clock.Sleep(time.Duration(cfg.Monitoring.PingInterval) * time.Second)
+		// Ping every 30 seconds.
+		cfg.Clock.Sleep(time.Duration(30) * time.Second)
 		ka.Publish(counter)
 		counter = counter + 1
 	}

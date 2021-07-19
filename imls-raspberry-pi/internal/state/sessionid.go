@@ -10,7 +10,7 @@ var sid_once sync.Once
 func (cfg *CFG) InitializeSessionId() {
 	sid_once.Do(func() {
 		sid := 0
-		tdb := NewSqliteDB(the_config.Databases.Durations)
+		tdb := NewSqliteDB(theConfig.Databases.DurationsPath)
 		if tdb.CheckTableExists("durations") {
 			tdb.Open()
 			defer tdb.Close()
@@ -25,19 +25,19 @@ func (cfg *CFG) InitializeSessionId() {
 			log.Println("durations table did not exist; returning session id 0")
 			sid = 0
 		}
-		the_config.SessionId = sid
+		theConfig.SessionId = sid + 1
 	})
 }
 
 func (cfg *CFG) GetCurrentSessionID() int {
-	return the_config.SessionID
+	return theConfig.SessionId
 }
 
 func (cfg *CFG) IncrementSessionID() int {
-	the_config.SessionId = the_config.SessionId + 1
-	return the_config.SessionID
+	theConfig.SessionId = theConfig.SessionId + 1
+	return theConfig.SessionId
 }
 
 func (cfg *CFG) GetPreviousSessionID() int {
-	return the_config.SessionID - 1
+	return theConfig.SessionId - 1
 }

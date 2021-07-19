@@ -1,5 +1,7 @@
 package interfaces
 
+import "github.com/benbjohnson/clock"
+
 type Config interface {
 	GetSerial() string
 	GetFCFSSeqId() string
@@ -8,6 +10,7 @@ type Config interface {
 
 	GetLogLevel() string
 	GetLoggers() []string
+	Log() Logger
 
 	GetEventsUri() string
 	GetDurationsUri() string
@@ -22,4 +25,17 @@ type Config interface {
 	IsProductionMode() bool
 	IsDeveloperMode() bool
 	IsTestMode() bool
+
+	GetManufacturerDatabase() Database
+
+	GetClock() clock.Clock
+	GetMinimumMinutes() int
+	GetMaximumMinutes() int
+}
+
+type Logger interface {
+	Debug(args ...interface{})
+	Info(args ...interface{})
+	Error(args ...interface{})
+	Fatal(args ...interface{})
 }

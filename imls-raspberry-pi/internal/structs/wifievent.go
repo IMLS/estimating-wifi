@@ -3,8 +3,11 @@ package structs
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
+
+	"gsa.gov/18f/internal/interfaces"
 )
 
 type WifiEvents struct {
@@ -38,4 +41,14 @@ func (w WifiEvent) AsMap() map[string]interface{} {
 		}
 	}
 	return m
+}
+
+func (wes WifiEvent) SelectAll(db interfaces.Database) []WifiEvent {
+	we := []WifiEvent{}
+	err := db.GetPtr().Select(&we, "SELECT * FROM WifiEvents")
+	if err != nil {
+		log.Println("Found no WifiEvents")
+		log.Println(err.Error())
+	}
+	return we
 }

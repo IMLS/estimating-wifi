@@ -3,8 +3,8 @@ package tlp
 import (
 	"sync"
 
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/internal/state"
 )
 
 type Generic interface {
@@ -17,8 +17,8 @@ type Ping struct {
 // ParDeltaTempDB reads in from the input channel, and in parallel, writes out
 // the value to the two output channels.
 func ParDeltaTempDB(kb *KillBroker,
-	chResetIn <-chan *state.TempDB,
-	chsResetOut ...chan *state.TempDB) {
+	chResetIn <-chan interfaces.Database,
+	chsResetOut ...chan interfaces.Database) {
 	// Block waiting for a message
 	// It will be the zeroth channel in the group.
 	lw := logwrapper.NewLogger(nil)

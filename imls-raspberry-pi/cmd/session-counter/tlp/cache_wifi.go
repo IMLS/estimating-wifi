@@ -4,61 +4,73 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
-func newTempDBInFS(cfg *config.Config) *state.TempDB {
-	lw := logwrapper.NewLogger(nil)
+// func newTempDBInFS() interfaces.Database {
+// 	cfg := state.GetConfig()
+// 	lw := logwrapper.NewLogger(nil)
 
-	t := cfg.Clock.Now()
-	todaysDB := fmt.Sprintf("%04d%02d%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), state.WIFIDB)
-	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
-	tdb := state.NewSqliteDB(todaysDB, path)
-	lw.Info("Created temporary db: [ ", todaysDB, " ]")
-	lw.Info("Path to DB: ", cfg.Local.WebDirectory)
-	// First, remove the table if it exists
-	// If we reboot midday, this means we will start a fresh table.
-	tdb.DropTable(state.WIFIDB)
-	// Add in the table.
-	tdb.AddStructAsTable(state.WIFIDB, structs.WifiEvent{})
-	lw.Info("Created table ", state.WIFIDB)
-	return tdb
-}
+// 	t := cfg.Clock.Now()
+// 	todaysDB := fmt.Sprintf("%04d%02d%02d-%v.sqlite", t.Year(), int(t.Month()), int(t.Day()), state.WIFIDB)
+// 	path := filepath.Join(cfg.Local.WebDirectory, todaysDB)
+// 	tdb := state.NewSqliteDB(todaysDB, path)
+// 	lw.Info("Created temporary db: [ ", todaysDB, " ]")
+// 	lw.Info("Path to DB: ", cfg.Local.WebDirectory)
+// 	// First, remove the table if it exists
+// 	// If we reboot midday, this means we will start a fresh table.
+// 	tdb.DropTable(state.WIFIDB)
+// 	// Add in the table.
+// 	tdb.AddStructAsTable(state.WIFIDB, structs.WifiEvent{})
+// 	lw.Info("Created table ", state.WIFIDB)
+// 	return tdb
+// }
 
-func newTempDBInMemory(cfg *config.Config) *state.TempDB {
-	lw := logwrapper.NewLogger(nil)
-	todaysDB := state.WIFIDB
-	path := fmt.Sprintf(`file:%v?mode=memory&cache=shared`, todaysDB)
-	tdb := state.NewSqliteDB(todaysDB, path)
-	lw.Info("Created memory db: [ ", todaysDB, " ]")
-	tdb.DropTable(state.WIFIDB)
-	tdb.AddStructAsTable(state.WIFIDB, structs.WifiEvent{})
-	lw.Info("Created table ", state.WIFIDB)
-	return tdb
-}
+// func newTempDBInMemory() *state.TempDB {
+// 	cfg := state.GetConfig()
+// 	lw := logwrapper.NewLogger(nil)
+// 	todaysDB := state.WIFIDB
+// 	path := fmt.Sprintf(`file:%v?mode=memory&cache=shared`, todaysDB)
+// 	tdb := state.NewSqliteDB(todaysDB, path)
+// 	lw.Info("Created memory db: [ ", todaysDB, " ]")
+// 	tdb.DropTable(state.WIFIDB)
+// 	tdb.AddStructAsTable(state.WIFIDB, structs.WifiEvent{})
+// 	lw.Info("Created table ", state.WIFIDB)
+// 	return tdb
+// }
 
-func newTempDB(cfg *config.Config) *state.TempDB {
-	lw := logwrapper.NewLogger(nil)
-	lw.Debug("IsProductionMode is ", cfg.IsProductionMode())
-	lw.Debug("IsDeveloperMode is ", cfg.IsDeveloperMode())
-	lw.Debug("cfg.RunMode is ", cfg.RunMode)
-
+func newTempDB() interfaces.Database {
+	cfg := state.GetConfig()
+	var db interfaces.Database
+	// lw.Debug("IsProductionMode is ", cfg.IsProductionMode())
+	// lw.Debug("IsDeveloperMode is ", cfg.IsDeveloperMode())
+	// lw.Debug("cfg.RunMode is ", cfg.RunMode)
 	if cfg.IsProductionMode() {
-		lw.Debug("using in-mem DB for wifi (prod)")
-		return newTempDBInMemory(cfg)
+		cfg.Log().Debug("using in-mem DB for wifi (prod)")
+		db = state.NewSqliteDB(":memory:")
+		db.CreateTableFromStruct(structs.WifiEvent{})
+		return db
 	} else {
-		lw.Debug("using in-filesystem DB for wifi (dev)")
-		return newTempDBInFS(cfg)
+		cfg.Log().Debug("using in-filesystem DB for wifi (dev)")
+		t := cfg.Clock.Now()
+		todaysDB := fmt.Sprintf("%04d%02d%02d-temp-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
+		path := filepath.Join(cfg.Paths.WWW.Root, todaysDB)
+		db = state.NewSqliteDB(path)
+		cfg.Log().Debug(db)
+		db.GetTableFromStruct(structs.WifiEvent{}).Drop()
+		db.CreateTableFromStruct(structs.WifiEvent{})
 	}
+	return db
 }
 
-func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroker,
+func CacheWifi(ka *Keepalive, rb *ResetBroker, kb *KillBroker,
 	chData <-chan []structs.WifiEvent,
-	chDB chan<- *state.TempDB,
+	chDB chan<- interfaces.Database,
 	chAck <-chan Ping) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting CacheWifi")
 	var ping, pong chan interface{} = nil, nil
@@ -70,7 +82,7 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 	}
 	chReset := rb.Subscribe()
 
-	tdb := newTempDB(cfg)
+	tdb := newTempDB()
 
 	for {
 		select {
@@ -93,17 +105,19 @@ func CacheWifi(ka *Keepalive, cfg *config.Config, rb *ResetBroker, kb *KillBroke
 			// complete before we continue.
 			<-chAck
 
-			cfg.SetSessionID(state.GetNextSessionID(cfg))
+			cfg.IncrementSessionID()
 			lw.Info("UPDATING SESSION ID TO: ", cfg.SessionID)
-			tdb = newTempDB(cfg)
+			tdb = newTempDB()
 
 		case wifiarr := <-chData:
 			lw.Info("storing temporary data")
-			data := make([]interface{}, 0)
-			for _, elem := range wifiarr {
-				data = append(data, elem)
+			// data := make([]interface{}, 0)
+			// for _, elem := range wifiarr {
+			// 	data = append(data, elem)
+			// }
+			for _, e := range wifiarr {
+				tdb.GetTableFromStruct(structs.WifiEvent{}).InsertStruct(e)
 			}
-			tdb.InsertManyStructs(state.WIFIDB, data)
 		}
 	}
 }

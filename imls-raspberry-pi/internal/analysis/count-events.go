@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
@@ -80,8 +80,9 @@ func getEventIDTime(events []structs.WifiEvent, eventID int) (t time.Time) {
 	return t
 }
 
-func doCounting(cfg *config.Config, events []structs.WifiEvent) *Counter {
-	c := NewCounter(cfg.Monitoring.MinimumMinutes, cfg.Monitoring.MaximumMinutes)
+func doCounting(events []structs.WifiEvent) *Counter {
+	cfg := state.GetConfig()
+	c := NewCounter(cfg.GetMinimumMinutes(), cfg.GetMaximumMinutes())
 
 	prevEvent := events[0]
 	checked := make(map[int]bool)
@@ -124,8 +125,8 @@ func doCounting(cfg *config.Config, events []structs.WifiEvent) *Counter {
 	return c
 }
 
-func durationSummary(cfg *config.Config, events []structs.WifiEvent) map[int]structs.Duration {
-
+func durationSummary(events []structs.WifiEvent) map[int]structs.Duration {
+	cfg := state.GetConfig()
 	// We want, for every patron_id, to know when the device started/ended.
 	checked := make(map[int]bool)
 	durations := make(map[int]structs.Duration)
@@ -141,9 +142,9 @@ func durationSummary(cfg *config.Config, events []structs.WifiEvent) map[int]str
 			lastTime := getEventIDTime(events, last)
 
 			durations[e.PatronIndex] = structs.Duration{
-				PiSerial:  cfg.Serial,
-				SessionID: e.SessionID,
-				FCFSSeqID: e.FCFSSeqID,
+				PiSerial:  cfg.GetSerial(),
+				SessionId: e.SessionID,
+				FCFSSeqId: e.FCFSSeqID,
 				DeviceTag: e.DeviceTag,
 				PatronID:  e.PatronIndex,
 				MfgID:     e.ManufacturerIndex,
@@ -172,10 +173,10 @@ func tomorrow(t time.Time) time.Time {
 // 	return t.Add(24 * time.Hours)
 // }
 
-func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []structs.WifiEvent) (map[int]*structs.Duration, int) {
+func MultiDayDurations(swap bool, newPid int, events []structs.WifiEvent) (map[int]*structs.Duration, int) {
 	// FIXME: note the swap of times when things are borked in the DB...
 	// is that the best way to fix things?
-
+	cfg := state.GetConfig()
 	// We want, for every patron_id, to know when the device started/ended.
 	checked := make(map[int]bool)
 	durations := make(map[int]*structs.Duration)
@@ -230,7 +231,7 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 						// Insert the duration between the firstTime and the endOfToday, with a unique id.
 						//log.Println("splitting", e.SessionId, e.PatronIndex, "to", maxPatronId)
 						durations[maxPatronID] = &structs.Duration{
-							PiSerial:  cfg.Serial,
+							PiSerial:  cfg.GetSerial(),
 							SessionID: e.SessionID,
 							FCFSSeqID: e.FCFSSeqID,
 							DeviceTag: e.DeviceTag,
@@ -250,7 +251,7 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 					firstTime = bod(lastTime)
 					// When done looping, insert the remainder...
 					durations[maxPatronID] = &structs.Duration{
-						PiSerial:  cfg.Serial,
+						PiSerial:  cfg.GetSerial(),
 						SessionID: e.SessionID,
 						FCFSSeqID: e.FCFSSeqID,
 						DeviceTag: e.DeviceTag,
@@ -262,7 +263,7 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 
 				} else {
 					durations[e.PatronIndex] = &structs.Duration{
-						PiSerial:  cfg.Serial,
+						PiSerial:  cfg.GetSerial(),
 						SessionID: e.SessionID,
 						FCFSSeqID: e.FCFSSeqID,
 						DeviceTag: e.DeviceTag,
@@ -324,11 +325,11 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 
 // Summarize returns the drawing context where the image is drawn. This can then
 // be written to disk.
-func Summarize(cfg *config.Config, events []structs.WifiEvent) (c *Counter, d map[int]structs.Duration) {
+func Summarize(events []structs.WifiEvent) (c *Counter, d map[int]structs.Duration) {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].ID < events[j].ID
 	})
-	c = doCounting(cfg, events)
-	d = durationSummary(cfg, events)
+	c = doCounting(events)
+	d = durationSummary(events)
 	return c, d
 }

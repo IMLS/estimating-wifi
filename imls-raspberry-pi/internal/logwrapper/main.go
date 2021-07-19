@@ -16,13 +16,6 @@ import (
 // Code for this wrapper inspired by
 // https://www.datadoghq.com/blog/go-logging/
 
-// Event stores messages to log later, from our standard interface
-type Event struct {
-	id      int
-	level   int
-	message string
-}
-
 // StandardLogger enforces specific log message formats
 type StandardLogger struct {
 	*logrus.Logger

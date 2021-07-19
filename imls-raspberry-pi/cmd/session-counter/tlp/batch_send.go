@@ -3,16 +3,16 @@ package tlp
 import (
 	"log"
 
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/http"
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
-func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
-	chDurationsDBIn <-chan *state.TempDB) {
-
+func BatchSend(ka *Keepalive, kb *KillBroker,
+	chDurationsDBIn <-chan interfaces.Database) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting BatchSend")
 	var ping, pong chan interface{} = nil, nil
@@ -32,15 +32,13 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 			return
 		case db := <-chDurationsDBIn:
 			// This only comes in on reset...
-			sq := state.NewQueue(cfg, "sent")
+			sq := state.NewQueue("sent")
 			sessionsToSend := sq.AsList()
 
 			for _, nextSessionIDToSend := range sessionsToSend {
 				durations := []structs.Duration{}
-				// lw.Debug("looking for session ", unsent.Session, " in durations table")
-				db.Open()
-				err := db.Ptr.Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIDToSend)
-				db.Close()
+				// FIXME: Leaky Abstraction
+				err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIDToSend)
 
 				if err != nil {
 					lw.Info("error in extracting durations for session", nextSessionIDToSend)
@@ -60,7 +58,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 					}
 					// After writing images, we come back and try and send the data remotely.
 					lw.Debug("PostJSONing ", len(data), " duration datas")
-					err = http.PostJSON(cfg, cfg.GetDataURI(), data)
+					err = http.PostJSON(cfg, cfg.GetDurationsURI(), data)
 					if err != nil {
 						log.Println("could not log to API")
 						log.Println(err.Error())

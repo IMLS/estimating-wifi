@@ -4,14 +4,15 @@ package tlp
 import (
 	"gsa.gov/18f/cmd/session-counter/api"
 	"gsa.gov/18f/cmd/session-counter/model"
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
 )
 
 // MacToEntry takes in a hashmap of MAC addresses and counts, and passes on a
 // hashmap of manufacturer IDs and counts. Uses "unknown" for all unknown
 // manufacturers.
-func MacToEntry(ka *Keepalive, cfg *config.Config, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry, chKill <-chan Ping) {
+func MacToEntry(ka *Keepalive, macmap <-chan map[string]int, mfgmap chan<- map[string]model.Entry, chKill <-chan Ping) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("starting MacToEntry")
 

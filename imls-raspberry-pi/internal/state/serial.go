@@ -36,10 +36,10 @@ func cpuinfoLines() (lines []string) {
 
 func decodeSerial() {
 	serial := FakeSerial
-	if the_config.Serial != "" {
+	if theConfig.Serial != "" {
 		// optionally override with a pre-defined serial. note
 		// that this is only for non-arm usage.
-		serial = the_config.Serial
+		serial = theConfig.Serial
 	}
 	// Try and pull from the cache, so we don't keep opening up a /proc filesystem...
 	if val, ok := cache["serial"]; ok {
@@ -63,9 +63,9 @@ func decodeSerial() {
 
 		}
 	}
-	the_config.Serial = serial
+	theConfig.Serial = serial
 }
 
-func GetSerial() string {
-	return the_config.Serial
+func (cfg *CFG) GetSerial() string {
+	return theConfig.Serial
 }

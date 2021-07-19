@@ -8,17 +8,18 @@ import (
 	"syscall"
 
 	"gsa.gov/18f/cmd/session-counter/constants"
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
-func tshark(cfg *config.Config) []string {
+func tshark(adapter string) []string {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
-	tsharkCmd := exec.Command(cfg.Wireshark.Path,
-		"-a", fmt.Sprintf("duration:%d", cfg.Wireshark.Duration),
-		"-I", "-i", cfg.Wireshark.Adapter,
+	tsharkCmd := exec.Command(cfg.Executables.Wireshark.Path,
+		"-a", fmt.Sprintf("duration:%d", cfg.Executables.Wireshark.Duration),
+		"-I", "-i", adapter,
 		"-Tfields", "-e", "wlan.sa")
 
 	tsharkOut, err := tsharkCmd.StdoutPipe()
@@ -63,9 +64,9 @@ func tshark(cfg *config.Config) []string {
 // this process effectively blocks for that time. Gathers a hashmap of [MAC ->
 // count] values. This hashmap is then communicated out. Empty MAC addresses are
 // filtered out.
-func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan bool, out chan []string) {
-	lw := logwrapper.NewLogger(nil)
-	lw.Info("starting RunWireshark")
+func RunWireshark(ka *Keepalive, kb *KillBroker, in <-chan bool, out chan []string) {
+	cfg := state.GetConfig()
+	cfg.Log().Info("starting RunWireshark")
 	var ping, pong chan interface{} = nil, nil
 	var chKill chan interface{} = nil
 	if kb != nil {
@@ -88,7 +89,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan b
 			pong <- "RunWireshark"
 
 		case <-chKill:
-			lw.Debug("exiting RunWireshark")
+			cfg.Log().Debug("exiting RunWireshark")
 			return
 
 		case <-in:
@@ -102,17 +103,17 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan b
 			// if we find an adapter.
 			if dev != nil && dev.Exists {
 				// Load the config for use.
-				cfg.Wireshark.Adapter = dev.Logicalname
-				lw.Debug("found adapter: ", cfg.Wireshark.Adapter)
+				// cfg.Wireshark.Adapter = dev.Logicalname
+				cfg.Log().Debug("found adapter: ", dev.Logicalname)
 				// Set monitor mode if the adapter changes.
-				if cfg.Wireshark.Adapter != adapter {
-					lw.Debug("setting monitor mode")
+				if dev.Logicalname != adapter {
+					cfg.Log().Debug("setting monitor mode")
 					search.SetMonitorMode(dev)
-					adapter = cfg.Wireshark.Adapter
+					adapter = dev.Logicalname
 				}
 
 				// This will block for [cfg.Wireshark.Duration] seconds.
-				macmap := tshark(cfg)
+				macmap := tshark(dev.Logicalname)
 				// Mark and remove too-short MAC addresses
 				// for removal from the tshark findings.
 				var keepers []string
@@ -126,7 +127,7 @@ func RunWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan b
 				// lw.Length("wireshark keepers", keepers)
 				out <- keepers
 			} else {
-				lw.Info("no wifi devices found. no scanning carried out.")
+				cfg.Log().Info("no wifi devices found. no scanning carried out.")
 				// Report an empty array of keepers
 				out <- make([]string, 0)
 			}

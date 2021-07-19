@@ -7,21 +7,22 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
-func DrawPatronSessionsFromWifi(cfg *config.Config, events []structs.WifiEvent, outputPath string) {
-	_, d := Summarize(cfg, events)
+func DrawPatronSessionsFromWifi(events []structs.WifiEvent, outputPath string) {
+	_, d := Summarize(events)
 	durations := make([]structs.Duration, 0)
 	for _, v := range d {
 		durations = append(durations, v)
 	}
-	DrawPatronSessions(cfg, durations, outputPath)
+	DrawPatronSessions(durations, outputPath)
 }
 
-func DrawPatronSessions(cfg *config.Config, durations []structs.Duration, outputPath string) {
+func DrawPatronSessions(durations []structs.Duration, outputPath string) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 
 	if len(durations) == 0 {
@@ -141,7 +142,7 @@ func DrawPatronSessions(cfg *config.Config, durations []structs.Duration, output
 	}
 
 	day, _ := time.Parse(time.RFC3339, durations[0].Start)
-	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.Auth.FCFSId, cfg.Auth.DeviceTag)
+	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.GetFCFSSeqId(), cfg.GetDeviceTag())
 	summaryA := fmt.Sprintf("%v devices seen", totalPatrons)
 	summaryP := fmt.Sprintf("%v patron devices", durationsInRange)
 	summaryM := fmt.Sprintf("%v minutes served", totalMinutes)

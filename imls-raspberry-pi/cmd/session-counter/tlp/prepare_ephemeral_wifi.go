@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
@@ -15,8 +14,9 @@ import (
 // PrepEphemeralWifi converts raw data to a map[string]string. This makes it
 // ready for storage locally (SQLite) or via an API (where everything becomes
 // text anyway).
-func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
+func PrepEphemeralWifi(ka *Keepalive, kb *KillBroker,
 	inHash <-chan map[string]int, outArr chan<- []structs.WifiEvent) {
+	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	lw.Debug("Starting PrepEphemeralWifi")
 	var ping, pong chan interface{} = nil, nil
@@ -56,10 +56,10 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
 
 				data := structs.WifiEvent{
-					SessionID:         fmt.Sprint(state.GetCurrentSessionID(cfg)),
+					SessionID:         fmt.Sprint(cfg.GetCurrentSessionID()),
 					Localtime:         cfg.Clock.Now().Format(time.RFC3339),
-					FCFSSeqID:         cfg.Auth.FCFSId,
-					DeviceTag:         cfg.Auth.DeviceTag,
+					FCFSSeqID:         cfg.GetFCFSSeqID(),
+					DeviceTag:         cfg.GetDeviceTag(),
 					ManufacturerIndex: mfg,
 					PatronIndex:       pid,
 				}

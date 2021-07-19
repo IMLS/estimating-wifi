@@ -9,24 +9,26 @@ type Database interface {
 	Open()
 	Close()
 	GetPtr() *sqlx.DB
-	CreateTable(name string) Table
+	GetPath() string
+	InitTable(name string) Table
 	CreateTableFromStruct(s interface{}) Table
+	RemoveTable(name string)
 	CheckTableExists(name string) bool
 	ListTables() []string
-	//GetTable(name string) Table
 	GetTableFromStruct(s interface{}) Table
-	Exec() error
-	Query()
+	GetTableByName(name string) Table
+	Query(string) (*sqlx.Rows, error)
 }
 
 type Table interface {
 	AddColumn(name string, sqltype string)
-	// AddColumns(namestypes map[string]string)
+	Create()
 	InsertStruct(s interface{})
-
+	Drop()
 	GetIntegerType() string
 	GetTextType() string
 	GetDateType() string
+	GetDB() Database
 	//FieldToDate(field string) time.Time
 	//DateToField(t time.Time) string
 }
