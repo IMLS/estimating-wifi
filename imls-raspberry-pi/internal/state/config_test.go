@@ -1,7 +1,10 @@
 package state
 
 import (
+	"fmt"
 	"log"
+	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -11,7 +14,33 @@ import (
 func Test_Config(t *testing.T) {
 	cfg := NewConfig()
 	//cfg.Validate()
-	log.Println(cfg)
+	if cfg.Databases.DurationsPath != "/www/imls/durations.sqlite" {
+		t.Fatal()
+	}
+}
+
+func TestReadConfig(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	fmt.Println(filename)
+	path := filepath.Dir(filename)
+	configPath := filepath.Join(path, "..", "..", "cmd", "session-counter", "test", "config.yaml")
+	UnsafeNewConfigFromPath(configPath)
+	cfg := GetConfig()
+	expected := map[string]string{
+		cfg.Databases.DurationsPath: "/opt/imls/www/durations.sqlite",
+		cfg.Device.DeviceTag:        "MYDEVICETAG",
+	}
+	unexpected := false
+	for k, v := range expected {
+		log.Println("comparing", k, v)
+		if k != v {
+			unexpected = true
+			log.Println(k, "not equal to", v)
+		}
+	}
+	if unexpected {
+		t.Fail()
+	}
 }
 
 func TestMock(t *testing.T) {

@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
@@ -71,8 +70,7 @@ func CacheWifi(ka *Keepalive, rb *ResetBroker, kb *KillBroker,
 	chDB chan<- interfaces.Database,
 	chAck <-chan Ping) {
 	cfg := state.GetConfig()
-	lw := logwrapper.NewLogger(nil)
-	lw.Debug("starting CacheWifi")
+	cfg.Log().Debug("starting CacheWifi")
 	var ping, pong chan interface{} = nil, nil
 	var chKill chan interface{} = nil
 	if kb != nil {
@@ -91,13 +89,13 @@ func CacheWifi(ka *Keepalive, rb *ResetBroker, kb *KillBroker,
 		case <-chKill:
 			// TDB is now opened/closed automatically on all transactions.
 			// tdb.Close()
-			lw.Debug("exiting CacheWifi")
+			cfg.Log().Info("exiting CacheWifi")
 			return
 
 		case <-chReset:
 			// At reset, we pass the DB pointer down the stream
 			// and let interesting things happen.
-			lw.Info("received reset message")
+			cfg.Log().Info("received reset message")
 			chDB <- tdb
 			// BAD! NOW FIXED! RACE HAZARD!
 			// We continue immediately, meaning the DB gets flushed. We need to
@@ -106,15 +104,11 @@ func CacheWifi(ka *Keepalive, rb *ResetBroker, kb *KillBroker,
 			<-chAck
 
 			cfg.IncrementSessionID()
-			lw.Info("UPDATING SESSION ID TO: ", cfg.SessionID)
+			cfg.Log().Info("UPDATING SESSION ID TO: ", cfg.GetCurrentSessionID())
 			tdb = newTempDB()
 
 		case wifiarr := <-chData:
-			lw.Info("storing temporary data")
-			// data := make([]interface{}, 0)
-			// for _, elem := range wifiarr {
-			// 	data = append(data, elem)
-			// }
+			cfg.Log().Debug("storing temporary data")
 			for _, e := range wifiarr {
 				tdb.GetTableFromStruct(structs.WifiEvent{}).InsertStruct(e)
 			}

@@ -10,12 +10,10 @@ var sid_once sync.Once
 func (cfg *CFG) InitializeSessionId() {
 	sid_once.Do(func() {
 		sid := 0
-		tdb := NewSqliteDB(theConfig.Databases.DurationsPath)
+		tdb := theConfig.Databases.DurationsDB
 		if tdb.CheckTableExists("durations") {
-			tdb.Open()
-			defer tdb.Close()
 			var sessionId int
-			err := tdb.Ptr.Get(&sessionId, "SELECT MAX(session_id) FROM durations")
+			err := tdb.GetPtr().Get(&sessionId, "SELECT MAX(session_id) FROM durations")
 			if err != nil {
 				log.Println("error in finding max session id; returning 0")
 				log.Println(err.Error())

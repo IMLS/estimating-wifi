@@ -170,7 +170,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 
 func TestRawToUid(t *testing.T) {
 	log.Println("TestRawToUid")
-	cfg := state.NewConfig()
+	cfg := state.UnsafeNewConfig()
 
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
@@ -264,16 +264,16 @@ func PingAfterNHours(ka *tlp.Keepalive, rb *tlp.ResetBroker, kb *tlp.KillBroker,
 
 func PingAtBogoMidnight(ka *tlp.Keepalive,
 	rb *tlp.ResetBroker,
-	kb *tlp.KillBroker,
-	m *clock.Mock) {
+	kb *tlp.KillBroker) {
 	// counter := 0
 	// chKill := kb.Subscribe()
-	lw := logwrapper.NewLogger(nil)
+	cfg := state.GetConfig()
+	m := cfg.Clock
 	pinged := false
 	for {
 		if m.Now().Hour() == 0 && !pinged {
 			pinged = true
-			lw.Debug("IT IS BOGOMIDNIGHT.")
+			cfg.Log().Debug("IT IS BOGOMIDNIGHT.")
 			rb.Publish(tlp.Ping{})
 		}
 		if m.Now().Hour() != 0 {
@@ -343,59 +343,16 @@ func RunFakeWireshark(ka *tlp.Keepalive, kb *tlp.KillBroker, in <-chan bool, out
 
 }
 
-func TestManyTLPCycles(t *testing.T) {
-	const NUMDAYSTORUN int = 6
-	const NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
-
+func runMockNetwork(NUMDAYSTORUN int, cfg *state.CFG) {
+	var NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
 	const skip int = 20
-	const NUMCYCLESTORUN = NUMMINUTESTORUN / skip
-
+	var NUMCYCLESTORUN = NUMMINUTESTORUN / skip
 	const SECONDSPERMINUTE int = 2
-	lw := logwrapper.NewLogger(nil)
-	lw.SetLogLevel("DEBUG")
 
 	resetbroker := tlp.NewResetBroker()
 	go resetbroker.Start()
 	killbroker := tlp.NewKillBroker()
 	go killbroker.Start()
-
-	// This runs the TLP through 10000 cycles. This is roughly the same as week.
-	log.Println("Starting run for a week")
-
-	// Get a local config, so we have paths...
-	_, filename, _, _ := runtime.Caller(0)
-	fmt.Println(filename)
-	path := filepath.Dir(filename)
-
-	configPath := filepath.Join(path, "test", "config.yaml")
-	state.NewConfigFromPath(configPath)
-	mock := clock.NewMock()
-	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
-	mock.Set(mt)
-	cfg := state.GetConfig()
-	cfg.Clock = mock
-
-	if cfg.Clock == nil {
-		log.Println("clock should not be nil")
-		t.Fail()
-	}
-	lw.Debug("mock is now ", cfg.Clock.Now())
-
-	cfg.RunMode = "test"
-	cfg.StorageMode = "sqlite"
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "test", "manufacturers.sqlite")
-	cfg.Databases.QueuesPath = filepath.Join(path, "test", "queues.sqlite")
-	cfg.Databases.DurationsPath = filepath.Join(path, "test", "durations.sqlite")
-	cfg.Paths.WWW.Root = filepath.Join(path, "test", "www")
-	cfg.Paths.WWW.Images = filepath.Join(path, "test", "www", "images")
-	cfg.Device.FCFSId = "ME0000-001"
-	cfg.Device.DeviceTag = "testing"
-	cfg.InitConfig()
-	os.Mkdir(cfg.Paths.WWW.Root, 0755)
-	os.Mkdir(cfg.Paths.WWW.Images, 0755)
-	// cfg.SessionId = cfg.GetNextSessionId()
-	cfg.InitializeSessionId()
-
 	// Create channels for process network
 	chSec := make(chan bool)
 
@@ -442,7 +399,7 @@ func TestManyTLPCycles(t *testing.T) {
 	go tlp.PrepEphemeralWifi(nil, killbroker, chMacsCounted, chDataForReport)
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
-	go PingAtBogoMidnight(nil, resetbroker, killbroker, mock)
+	go PingAtBogoMidnight(nil, resetbroker, killbroker)
 	go tlp.CacheWifi(nil, resetbroker, killbroker, chDataForReport, chWifiDB, chAck)
 	// Make sure we don't hang...
 	go tlp.GenerateDurations(nil, killbroker, chWifiDB, chDurationsDB, chAck)
@@ -457,8 +414,8 @@ func TestManyTLPCycles(t *testing.T) {
 		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
 		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
 			chSec <- true
-			mock.Add(m)
-			lw.Debug("MOCK NOW ", mock.Now())
+			cfg.Clock.(*clock.Mock).Add(m)
+			cfg.Log().Debug("MOCK NOW ", cfg.Clock.Now())
 
 			var m runtime.MemStats
 			runtime.ReadMemStats(&m)
@@ -470,4 +427,104 @@ func TestManyTLPCycles(t *testing.T) {
 	}()
 	wg.Wait()
 
+}
+
+func T0(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	fmt.Println(filename)
+	path := filepath.Dir(filename)
+	configPath := filepath.Join(path, "test", "config.yaml")
+	state.UnsafeNewConfigFromPath(configPath)
+	cfg := state.GetConfig()
+	cfg.RunMode = "test"
+	cfg.StorageMode = "sqlite"
+	cfg.Databases.ManufacturersPath = filepath.Join(path, "test", "manufacturers.sqlite")
+	cfg.Databases.QueuesPath = filepath.Join(path, "test", "queues.sqlite")
+	cfg.Databases.DurationsPath = filepath.Join(path, "test", "durations.sqlite")
+	cfg.Paths.WWW.Root = filepath.Join(path, "test", "www")
+	cfg.Paths.WWW.Images = filepath.Join(path, "test", "www", "images")
+	cfg.Device.FCFSId = "ME0000-001"
+	cfg.Device.DeviceTag = "testing"
+
+	cfg.InitConfig()
+	cfg.Logging.LogLevel = "INFO"
+	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
+
+	os.Mkdir(cfg.Paths.WWW.Root, 0755)
+	os.Mkdir(cfg.Paths.WWW.Images, 0755)
+	mock := clock.NewMock()
+	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
+	mock.Set(mt)
+	cfg.Clock = mock
+
+	if cfg.Clock == nil {
+		log.Println("clock should not be nil")
+		t.Fail()
+	}
+	cfg.Log().Debug("mock is now ", cfg.Clock.Now())
+}
+
+func T1(t *testing.T) {
+	cfg := state.GetConfig()
+	cfg.Logging.LogLevel = "INFO"
+	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
+	cfg.RunMode = "prod"
+}
+
+func T2(t *testing.T) {
+	cfg := state.GetConfig()
+	cfg.Logging.LogLevel = "ERROR"
+	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
+	cfg.RunMode = "prod"
+}
+
+func cleanupTempFiles() {
+	cfg := state.GetConfig()
+
+	f1, err := filepath.Glob(filepath.Join(cfg.Paths.WWW.Root, "*.sqlite"))
+	if err != nil {
+		panic(err)
+	}
+	f2, err := filepath.Glob(filepath.Join(cfg.Paths.WWW.Images, "*.png"))
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range append(f1, f2...) {
+		if err := os.Remove(f); err != nil {
+			panic(err)
+		}
+	}
+}
+
+func TLPNCycles(t *testing.T, N int) {
+	log.Println("Running " + fmt.Sprint(N) + " cycles")
+	T0(t)
+	T2(t)
+	cfg := state.GetConfig()
+	cleanupTempFiles()
+	time.Sleep(1 * time.Second)
+
+	runMockNetwork(N, cfg)
+	time.Sleep(2 * time.Second)
+}
+
+func TestTLPCycles2(t *testing.T) {
+	T0(t)
+	cfg := state.GetConfig()
+	const NUMDAYSTORUN int = 2
+
+	cleanupTempFiles()
+	time.Sleep(1 * time.Second)
+
+	runMockNetwork(NUMDAYSTORUN, cfg)
+	time.Sleep(2 * time.Second)
+}
+
+func TestTLPCyclesMany(t *testing.T) {
+	TLPNCycles(t, 15)
+	TLPNCycles(t, 30)
+	TLPNCycles(t, 45)
+	TLPNCycles(t, 60)
+	TLPNCycles(t, 90)
 }

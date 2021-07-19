@@ -37,8 +37,6 @@ func processDataFromDay(wifidb interfaces.Database) interfaces.Database {
 	if len(events) > 0 {
 		c, d := analysis.Summarize(events)
 		storeSummary(ddb, c, d)
-		//writeImages(cfg, events)
-		//writeSummaryCSV(cfg, events)
 	} else {
 		cfg.Log().Info("no `events` to summarize")
 	}

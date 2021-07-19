@@ -6,7 +6,7 @@ device:
   device_tag: "MYDEVICETAG"
   fcfs_seq_id: 'MYFCFSSEQID'
 logging:
-  log_level: DEBUG
+  log_level: INFO
   loggers:
     - "local:stderr"
     # - "local:tmp"

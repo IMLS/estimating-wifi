@@ -2,7 +2,6 @@ package analysis
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
@@ -205,8 +204,8 @@ func MultiDayDurations(swap bool, newPid int, events []structs.WifiEvent) (map[i
 			firstTime := getEventIDTime(events, first)
 			lastTime := getEventIDTime(events, last)
 			if lastTime.Before(firstTime) {
-				log.Println("start", firstTime, "end", lastTime)
-				log.Println("cannot start after end! swapping...")
+				cfg.Log().Error("start", firstTime, "end", lastTime)
+				cfg.Log().Error("cannot start after end! swapping...")
 				if swap {
 					tmp := lastTime
 					lastTime = firstTime

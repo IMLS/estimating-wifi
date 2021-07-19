@@ -2,9 +2,9 @@ serial: ""
 storagemode: sqlite
 runmode: test
 device:
-  api_token: MYAPITOKEN
-  device_tag: MYDEVICETAG
-  fcfs_seq_id: MYFCFSSEQID
+  api_token: "MYAPITOKEN"
+  device_tag: "MYDEVICETAG"
+  fcfs_seq_id: "MYFCFSSEQID"
 logging:
   log_level: DEBUG
   loggers:
@@ -34,6 +34,6 @@ databases:
   queues_path: /opt/imls/www/queues.sqlite
 paths:
   www:
-    root: /www/imls
-    images: /www/imls/images
+    root: /opt/imls/www
+    images: /opt/imls/www/images
 

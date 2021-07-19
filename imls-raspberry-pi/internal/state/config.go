@@ -22,9 +22,14 @@ var once sync.Once
 // empty config once.
 func NewConfig() *CFG {
 	once.Do(func() {
-		theConfig = &CFG{}
-		setDefaults()
+		UnsafeNewConfig()
 	})
+	return theConfig
+}
+
+func UnsafeNewConfig() *CFG {
+	theConfig = &CFG{}
+	setDefaults()
 	return theConfig
 }
 
@@ -40,14 +45,18 @@ func (cfg *CFG) InitConfig() {
 // We cannot get both.
 func NewConfigFromPath(path string) {
 	once.Do(func() {
-		theConfig = &CFG{}
-		setDefaults()
-		readConfig(path)
-		if theConfig.Clock == nil {
-			log.Println("clock should not be nil")
-			log.Fatal()
-		}
+		UnsafeNewConfigFromPath(path)
 	})
+}
+
+func UnsafeNewConfigFromPath(path string) {
+	theConfig = &CFG{}
+	setDefaults()
+	readConfig(path)
+	if theConfig.Clock == nil {
+		log.Println("clock should not be nil")
+		log.Fatal()
+	}
 }
 
 func readConfig(path string) {
