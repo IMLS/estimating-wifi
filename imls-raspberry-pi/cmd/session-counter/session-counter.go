@@ -9,15 +9,12 @@ import (
 
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
 )
 
-func run(cfg interfaces.Config) {
-	logwrapper.NewLogger(nil)
-
+func run() {
 	// CHANNELS
 	chNsec := make(chan bool)
 	chMacs := make(chan []string)
@@ -83,23 +80,13 @@ func main() {
 	// DO NOT USE LOGGING YET
 	initConfigFromFlags()
 	cfg := state.GetConfig()
-
 	// NOW YOU MAY USE LOGGING.
-	cfg.Log().Debug("session id at startup is is ", cfg.GetCurrentSessionId())
-
-	// Make sure the mfg database is in place and can be loaded.
-	// api.CheckMfgDatabaseExists(cfg)
-	// also make sure the binary paths in the config are valid.
-	// _, err := os.Stat(cfg.Wireshark.Path)
-	// if os.IsNotExist(err) {
-	// 	//lw.ExeNotFound(cfg.Wireshark.Path)
-	// 	cfg.Log().Fatal("wireshark not found at ", cfg.Wireshark.Path)
-	// }
+	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionId())
 
 	// Run the network
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go run(cfg)
+	go run()
 	// Wait forever.
 	wg.Wait()
 }
