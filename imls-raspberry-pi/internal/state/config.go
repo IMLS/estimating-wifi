@@ -92,7 +92,7 @@ func readConfig(path string) {
 		theConfig.Clock = clock.New()
 		theConfig.InitializeSessionId()
 	} else {
-		log.Fatalf("could not find config: %v\n", path)
+		log.Printf("could not find config: %v\n", path)
 	}
 }
 
@@ -212,6 +212,37 @@ func (cfg *CFG) GetMinimumMinutes() int {
 
 func (cfg *CFG) GetMaximumMinutes() int {
 	return cfg.Monitoring.MaximumMinutes
+}
+
+func SetToken(token string) {
+	theConfig.Device.Token = token
+}
+
+func SetFCFSId(id string) {
+	theConfig.Device.FCFSId = id
+}
+
+func SetTag(tag string) {
+	theConfig.Device.DeviceTag = tag
+}
+
+func SetStorageMode(mode string) {
+	theConfig.StorageMode = mode
+}
+
+func DumpConfig(path string) {
+	dump, err := yaml.Marshal(&theConfig)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	s := string(dump)
+	// This will truncate the file if it exists.
+	f, err := os.Create(path)
+	if err != nil {
+		log.Fatal("could not open config for writing")
+	}
+	f.WriteString(s)
+	f.Close()
 }
 
 /////////

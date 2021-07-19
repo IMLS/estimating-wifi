@@ -13,14 +13,12 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
 	"gsa.gov/18f/cmd/input-initial-configuration/cryptopasta"
 	"gsa.gov/18f/cmd/input-initial-configuration/pi"
 	"gsa.gov/18f/cmd/input-initial-configuration/wordlist"
-	"gsa.gov/18f/internal/config"
+	config "gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
 )
 
@@ -249,21 +247,6 @@ func readTag(input io.Reader) string {
 	return tag
 }
 
-func writeYAML(cfg *config.Config, path string) {
-	dump, err := yaml.Marshal(&cfg)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-	s := string(dump)
-	// This will truncate the file if it exists.
-	f, err := os.Create(path)
-	if err != nil {
-		log.Fatal("could not open config for writing")
-	}
-	f.WriteString(s)
-	f.Close()
-}
-
 func main() {
 	// Shortcuts to exit
 	versionPtr := flag.Bool("version", false, "Get version and exit.")
@@ -283,7 +266,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cfg := config.NewConfigFromPathMaybe(*configPathPtr)
+	config.NewConfigFromPath(*configPathPtr)
 
 	// Dump version and exit
 	if *versionPtr {
@@ -298,8 +281,8 @@ func main() {
 	// version of the key for a given Pi, this must be run ON THAT Pi.
 	if *readTokenPtr {
 		fmt.Println()
-		cfg.Auth.Token = readToken(os.Stdin)
-		fmt.Println(cfg.Auth.Token)
+		token := readToken(os.Stdin)
+		config.SetToken(token)
 		os.Exit(0)
 	}
 
@@ -313,28 +296,30 @@ func main() {
 	// Read in the FCFS Seq Id
 	if *readFCFSPtr {
 		fmt.Println()
-		cfg.Auth.FCFSId = readFCFS(os.Stdin)
+		id := readFCFS(os.Stdin)
+		config.SetFCFSId(id)
 	}
 
 	// Read in the hardware tag
 	if *tagPtr {
 		fmt.Println()
-		cfg.Auth.DeviceTag = readTag(os.Stdin)
+		tag := readTag(os.Stdin)
+		config.SetTag(tag)
 	}
 
 	// Read in the word pairs
 	if *readWordPairPtr {
 		if readYesOrNo(os.Stdin) {
 			fmt.Println()
-			cfg.StorageMode = "api"
-			cfg.Auth.Token = readWordPairs(os.Stdin)
+			config.SetStorageMode("api")
+			token := readWordPairs(os.Stdin)
+			config.SetToken(token)
 		} else {
-			cfg.StorageMode = "sqlite"
+			config.SetStorageMode("sqlite")
 		}
 	}
 
-	// Only writes to file if --write is set to `true`
-	writeYAML(cfg, *configPathPtr)
+	config.DumpConfig(*configPathPtr)
 
 	fmt.Println()
 	fmt.Println(box(color.New(color.FgHiBlue), color.New(color.FgYellow).Sprint("All done!")))
