@@ -1,38 +1,38 @@
-serial: ""
-storagemode: sqlite
-runmode: test
 device:
-  api_token: "MYAPITOKEN"
-  device_tag: "MYDEVICETAG"
-  fcfs_seq_id: 'MYFCFSSEQID'
+  api_token: MYAPITOKENHERE
+  device_tag: MYDEVICETAGHERE
+  fcfs_seq_id: MYFCFSSEQIDHERE
 logging:
-  log_level: INFO
+  log_level: DEBUG
   loggers:
-    - "local:stderr"
-    # - "local:tmp"
-    # - "api:directus"
+  - local:stderr
+  - local:tmp
+  - api:directus
 monitoring:
-  uniqueness_window: 120
+  uniqueness_window: 1440
   minimum_minutes: 5
   maximum_minutes: 600
-  reset_cron: "*/6 * * * *"
+  reset_cron: 0 0 * * *
 umbrella:
   scheme: https
   host: api.data.gov
   paths:
     durations: /TEST/10x-imls/v2/durations/
     events: /TEST/10x-imls/v2/events/
-executables:  
+executables:
   wireshark:
     duration: 45
-    path: /usr/bin/tshark
+    wireshark_path: /usr/bin/tshark
   lshw_path: /usr/bin/lshw
-  ip_path: 
+  ip_path: /usr/bin/ip
 databases:
   manufacturers_path: /opt/imls/manufacturers.sqlite
-  durations_path: /opt/imls/www/durations.sqlite
-  queues_path: /opt/imls/www/queues.sqlite
+  durations_path: /www/imls/durations.sqlite
+  queues_path: /www/imls/queues.sqlite
 paths:
   www:
     root: /www/imls
     images: /www/imls/images
+serial: ""
+storagemode: sqlite
+runmode: prod
