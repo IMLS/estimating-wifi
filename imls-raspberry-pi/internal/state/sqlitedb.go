@@ -40,8 +40,6 @@ func (db *SqliteDB) Open() {
 		} else {
 			db.Ptr = ptr
 		}
-	} else {
-		// cfg.Log().Debug("db already open: [ ", db.Path, " ]")
 	}
 }
 
