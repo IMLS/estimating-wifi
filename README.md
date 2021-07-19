@@ -14,7 +14,7 @@ No PII (personally identifiable information) is logged as part of this project. 
 
 ## Installation instructions
 
-Please see the [wiki](https://github.com/cantsin/imls-pi-stack/wiki).
+Please see the [wiki](https://github.com/18F/imls-pi-stack/wiki).
 
 # About
 
