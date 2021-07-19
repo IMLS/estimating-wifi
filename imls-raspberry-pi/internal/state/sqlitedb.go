@@ -140,10 +140,9 @@ func (db *SqliteDB) ListTables() []string {
 }
 
 func (db *SqliteDB) GetTableFromStruct(s interface{}) interfaces.Table {
-	cfg := GetConfig()
 	name := reflect.TypeOf(s).Name()
 	db.InitTable(name)
-	cfg.Log().Debug(db.Tables)
+	// cfg.Log().Debug(db.Tables)
 	return db.Tables[name]
 }
 
@@ -196,16 +195,18 @@ func (t *SqliteTable) InsertStruct(s interface{}) {
 			f := reflect.TypeOf(s).Field(i)
 			if f.Tag != "" {
 				col := f.Tag.Get("db")
-				columns = append(columns, col)
-			}
-			switch v.Field(i).Kind() {
-			case reflect.Int:
-				values = append(values, fmt.Sprint(v.Field(i).Int()))
-			case reflect.String:
-				values = append(values, fmt.Sprintf("\"%v\"", v.Field(i).String()))
-			default:
-				fmt.Println("Unsupported field type in " + name)
-				return
+				if !strings.Contains(f.Tag.Get("type"), "AUTOINCREMENT") {
+					columns = append(columns, col)
+					switch v.Field(i).Kind() {
+					case reflect.Int:
+						values = append(values, fmt.Sprint(v.Field(i).Int()))
+					case reflect.String:
+						values = append(values, fmt.Sprintf("\"%v\"", v.Field(i).String()))
+					default:
+						fmt.Println("Unsupported field type in " + name)
+						return
+					}
+				}
 			}
 		}
 		query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",

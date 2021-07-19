@@ -22,7 +22,7 @@ type Durations struct {
 }
 
 type Duration struct {
-	ID        int    `json:"id" db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
+	ID        int    `json:"id" db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"`
 	PiSerial  string `json:"pi_serial" db:"pi_serial" sqlite:"TEXT"`
 	SessionID string `json:"session_id" db:"session_id" sqlite:"TEXT"`
 	FCFSSeqID string `json:"fcfs_seq_id" db:"fcfs_seq_id" sqlite:"TEXT"`
@@ -43,7 +43,7 @@ func (d Duration) AsMap() map[string]interface{} {
 		f := rt.Field(i)
 		r := reflect.ValueOf(d)
 		// log.Println("tag db", f.Tag.Get("db"))
-		if !strings.Contains(f.Tag.Get("sqlite"), "AUTOINCREMENT") {
+		if !strings.Contains(f.Tag.Get("type"), "AUTOINCREMENT") {
 			col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
 			nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
 			m[string(col)] = nom

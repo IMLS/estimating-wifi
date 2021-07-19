@@ -15,13 +15,13 @@ type WifiEvents struct {
 }
 
 type WifiEvent struct {
-	ID                int    `json:"id" db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
-	FCFSSeqID         string `json:"fcfs_seq_id" db:"fcfs_seq_id" sqlite:"TEXT NOT NULL"`
-	DeviceTag         string `json:"device_tag" db:"device_tag" sqlite:"TEXT NOT NULL"`
-	Localtime         string `json:"localtimestamp" db:"localtimestamp" sqlite:"DATE NOT NULL"`
-	SessionID         string `json:"session_id" db:"session_id" sqlite:"TEXT NOT NULL"`
-	ManufacturerIndex int    `json:"manufacturer_index" db:"manufacturer_index" sqlite:"INTEGER NOT NULL"`
-	PatronIndex       int    `json:"patron_index" db:"patron_index" sqlite:"INTEGER NOT NULL"`
+	ID                int    `json:"rowid" db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"`
+	FCFSSeqID         string `json:"fcfs_seq_id" db:"fcfs_seq_id" type:"TEXT NOT NULL"`
+	DeviceTag         string `json:"device_tag" db:"device_tag" type:"TEXT NOT NULL"`
+	Localtime         string `json:"localtimestamp" db:"localtimestamp" type:"DATE NOT NULL"`
+	SessionID         string `json:"session_id" db:"session_id" type:"TEXT NOT NULL"`
+	ManufacturerIndex int    `json:"manufacturer_index" db:"manufacturer_index" type:"INTEGER NOT NULL"`
+	PatronIndex       int    `json:"patron_index" db:"patron_index" type:"INTEGER NOT NULL"`
 }
 
 func (w WifiEvent) AsMap() map[string]interface{} {
@@ -34,7 +34,7 @@ func (w WifiEvent) AsMap() map[string]interface{} {
 		f := rt.Field(i)
 		r := reflect.ValueOf(w)
 		// log.Println("tag db", f.Tag.Get("db"))
-		if !strings.Contains(f.Tag.Get("sqlite"), "AUTOINCREMENT") {
+		if !strings.Contains(f.Tag.Get("type"), "AUTOINCREMENT") {
 			col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
 			nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
 			m[string(col)] = nom

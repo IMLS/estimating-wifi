@@ -388,6 +388,8 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.Databases.DurationsPath = filepath.Join(path, "test", "durations.sqlite")
 	cfg.Paths.WWW.Root = filepath.Join(path, "test", "www")
 	cfg.Paths.WWW.Images = filepath.Join(path, "test", "www", "images")
+	cfg.Device.FCFSId = "ME0000-001"
+	cfg.Device.DeviceTag = "testing"
 	cfg.InitConfig()
 	os.Mkdir(cfg.Paths.WWW.Root, 0755)
 	os.Mkdir(cfg.Paths.WWW.Images, 0755)
