@@ -18,24 +18,39 @@ type SqliteDB struct {
 	Tables map[string]*SqliteTable
 }
 
-func NewSqliteDB(path string) *SqliteDB {
-	// lw := logwrapper.NewLogger(nil)
-	db := SqliteDB{}
-	db.Path = path
-	db.Ptr = nil
-	//db.Tables = make(map[string]map[string]string)
-	db.Tables = make(map[string]*SqliteTable)
-	db.Open()
-	return &db
+var ptrCache map[string]*SqliteDB = make(map[string]*SqliteDB)
+
+func FlushCache() {
+	for _, ptr := range ptrCache {
+		ptr.Close()
+	}
+	ptrCache = make(map[string]*SqliteDB)
 }
 
+func NewSqliteDB(path string) *SqliteDB {
+	var db *SqliteDB
+
+	if ptr, ok := ptrCache[path]; ok {
+		db = ptr
+	} else {
+		cfg := GetConfig()
+		cfg.Log().Debug("opening db at " + path)
+		db = &SqliteDB{}
+		db.Path = path
+		db.Ptr = nil
+		//db.Tables = make(map[string]map[string]string)
+		db.Tables = make(map[string]*SqliteTable)
+		db.Open()
+		ptrCache[path] = db
+	}
+	return db
+}
 func (db *SqliteDB) Open() {
 	cfg := GetConfig()
 	if db.Ptr == nil {
-		// lw.Debug("opening db: ", tdb.DBName, " path: ", tdb.Path)
-		ptr, err := sqlx.Open("sqlite3", db.Path)
+		ptr, err := sqlx.Open("sqlite3", db.Path+"?mode=rwc")
 		if err != nil {
-			cfg.Log().Error("could not open temporary db: ", db.Path)
+			cfg.Log().Error("could not open db: ", db.Path)
 			cfg.Log().Fatal(err.Error())
 		} else {
 			db.Ptr = ptr
@@ -68,16 +83,20 @@ func (db *SqliteDB) GetPath() string {
 }
 
 func (db *SqliteDB) initTable(name string) *SqliteTable {
-	t := &SqliteTable{}
-	t.Name = name
-	t.ColumnsAndTypes = make(map[string]string)
-	t.DB = db
-	return t
+	if tptr, ok := db.Tables[name]; ok {
+		return tptr
+	} else {
+		t := &SqliteTable{}
+		t.Name = name
+		t.ColumnsAndTypes = make(map[string]string)
+		t.DB = db
+		db.Tables[name] = t
+		return t
+	}
 }
 
 func (db *SqliteDB) InitTable(name string) interfaces.Table {
 	t := db.initTable(name)
-	db.Tables[name] = t
 	return t
 }
 
@@ -120,7 +139,6 @@ func (db *SqliteDB) CreateTableFromStruct(s interface{}) interfaces.Table {
 		log.Fatalf("Failed to create table from struct: " + t.Name)
 	}
 
-	db.Tables[name] = t
 	return t
 }
 

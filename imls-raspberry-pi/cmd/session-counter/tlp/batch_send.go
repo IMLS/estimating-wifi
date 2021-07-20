@@ -44,7 +44,7 @@ func BatchSend(ka *Keepalive, kb *KillBroker,
 					lw.Info("error in extracting durations for session", nextSessionIDToSend)
 					lw.Error(err.Error())
 				}
-				lw.Debug("found ", len(durations), " durations to send.")
+				lw.Debug("found ", len(durations), " durations to send in session ", nextSessionIDToSend)
 
 				if len(durations) == 0 {
 					lw.Info("found zero durations to send/draw. dequeing session [", nextSessionIDToSend, "]")

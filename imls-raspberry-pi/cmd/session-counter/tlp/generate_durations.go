@@ -13,11 +13,9 @@ import (
 
 func GetDurationsDB() interfaces.Database {
 	cfg := state.GetConfig()
-	lw := logwrapper.NewLogger(nil)
 	fullpath := filepath.Join(cfg.Paths.WWW.Root, state.DURATIONSDB)
 	tdb := state.NewSqliteDB(fullpath)
 	tdb.CreateTableFromStruct(structs.Duration{})
-	lw.Info("Created durations table in db [", fullpath, "]")
 	return tdb
 }
 

@@ -1,8 +1,13 @@
 package state
 
 import (
+	"fmt"
 	"log"
 	"testing"
+	"time"
+
+	"net/http"
+	_ "net/http/pprof"
 
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/internal/interfaces"
@@ -32,6 +37,7 @@ func AsApples(is []interface{}) []Apple {
 }
 
 func TestSqliteDB(test *testing.T) {
+	NewConfig()
 	d := NewSqliteDB("/tmp/test.sqlite")
 	t := d.InitTable("oranges")
 	t.AddColumn("count", t.GetIntegerType())
@@ -67,5 +73,20 @@ func TestSelectAll(test *testing.T) {
 	if len(apples) != 0 {
 		log.Println(apples)
 		log.Fatal("found apples on a dropped table?")
+	}
+}
+
+func TestManyOpens(test *testing.T) {
+	go http.ListenAndServe("localhost:8080", nil)
+	for i := 0; i < 8000; i++ {
+		log.Print(fmt.Sprint(i) + " ")
+		d := NewSqliteDB("/tmp/test.sqlite")
+		d.CreateTableFromStruct(Apple{})
+	}
+	time.Sleep(10 * time.Second)
+	for i := 0; i < 16000; i++ {
+		log.Print(fmt.Sprint(i) + " ")
+		d := NewSqliteDB("/tmp/test.sqlite")
+		d.CreateTableFromStruct(Apple{})
 	}
 }

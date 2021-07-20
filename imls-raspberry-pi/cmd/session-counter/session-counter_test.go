@@ -439,13 +439,15 @@ func T0(t *testing.T) {
 	cfg.RunMode = "test"
 	cfg.StorageMode = "sqlite"
 	cfg.Databases.ManufacturersPath = filepath.Join(path, "test", "manufacturers.sqlite")
-	cfg.Databases.QueuesPath = filepath.Join(path, "test", "queues.sqlite")
-	cfg.Databases.DurationsPath = filepath.Join(path, "test", "durations.sqlite")
+	cfg.Databases.QueuesPath = filepath.Join(path, "test", "www", "queues.sqlite")
+	cfg.Databases.DurationsPath = filepath.Join(path, "test", "www", "durations.sqlite")
 	cfg.Paths.WWW.Root = filepath.Join(path, "test", "www")
 	cfg.Paths.WWW.Images = filepath.Join(path, "test", "www", "images")
 	cfg.Device.FCFSId = "ME0000-001"
 	cfg.Device.DeviceTag = "testing"
 
+	state.FlushCache()
+	cleanupTempFiles()
 	cfg.InitConfig()
 	cfg.Logging.LogLevel = "INFO"
 	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
@@ -473,7 +475,7 @@ func T1(t *testing.T) {
 
 func T2(t *testing.T) {
 	cfg := state.GetConfig()
-	cfg.Logging.LogLevel = "ERROR"
+	cfg.Logging.LogLevel = "DEBUG"
 	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
 	cfg.RunMode = "prod"
 }
@@ -497,18 +499,6 @@ func cleanupTempFiles() {
 	}
 }
 
-func TLPNCycles(t *testing.T, N int) {
-	log.Println("Running " + fmt.Sprint(N) + " cycles")
-	T0(t)
-	T2(t)
-	cfg := state.GetConfig()
-	cleanupTempFiles()
-	time.Sleep(1 * time.Second)
-
-	runMockNetwork(N, cfg)
-	time.Sleep(2 * time.Second)
-}
-
 func TestTLPCycles2(t *testing.T) {
 	T0(t)
 	cfg := state.GetConfig()
@@ -521,6 +511,18 @@ func TestTLPCycles2(t *testing.T) {
 	time.Sleep(2 * time.Second)
 }
 
+func TLPNCycles(t *testing.T, N int) {
+	log.Println("Running " + fmt.Sprint(N) + " cycles")
+
+	T0(t)
+	T2(t)
+
+	cfg := state.GetConfig()
+	time.Sleep(1 * time.Second)
+
+	runMockNetwork(N, cfg)
+	time.Sleep(20 * time.Second)
+}
 func TestTLPCyclesMany(t *testing.T) {
 	TLPNCycles(t, 15)
 	TLPNCycles(t, 30)
