@@ -11,8 +11,8 @@ import (
 )
 
 // These defaults get overridden by the config.Config file.
-var patron_min_mins float64 = 30
-var patron_max_mins float64 = 10 * 60
+var patronMinMins float64 = 30
+var patronMaxMins float64 = 10 * 60
 
 const (
 	Patron = iota
@@ -40,9 +40,9 @@ func getDeviceType(p structs.WifiEvent, es []structs.WifiEvent) int {
 	}
 
 	diff := latest.Sub(earliest).Minutes()
-	if diff < patron_min_mins {
+	if diff < patronMinMins {
 		return Transient
-	} else if diff > patron_max_mins {
+	} else if diff > patronMaxMins {
 		// log.Println("id", p.PatronIndex, "diff", diff)
 		return Device
 	} else {
@@ -51,12 +51,12 @@ func getDeviceType(p structs.WifiEvent, es []structs.WifiEvent) int {
 	}
 }
 
-func getPatronFirstLast(patronId int, events []structs.WifiEvent) (int, int) {
+func getPatronFirstLast(patronID int, events []structs.WifiEvent) (int, int) {
 	first := 1000000000
 	last := -1000000000
 
 	for _, e := range events {
-		if e.PatronIndex == patronId {
+		if e.PatronIndex == patronID {
 			if e.ID < first {
 				first = e.ID
 			}
@@ -69,9 +69,9 @@ func getPatronFirstLast(patronId int, events []structs.WifiEvent) (int, int) {
 	return first, last
 }
 
-func getEventIdTime(events []structs.WifiEvent, eventId int) (t time.Time) {
+func getEventIDTime(events []structs.WifiEvent, eventID int) (t time.Time) {
 	for _, e := range events {
-		if e.ID == eventId {
+		if e.ID == eventID {
 			t, _ = time.Parse(time.RFC3339, e.Localtime)
 			break
 		}
@@ -98,20 +98,20 @@ func doCounting(cfg *config.Config, events []structs.WifiEvent) *Counter {
 			switch isP {
 			case Patron:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
-				firstTime := getEventIdTime(events, first)
-				lastTime := getEventIdTime(events, last)
+				firstTime := getEventIDTime(events, first)
+				lastTime := getEventIDTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
 				c.Add(Patron, minutes)
 			case Device:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
-				firstTime := getEventIdTime(events, first)
-				lastTime := getEventIdTime(events, last)
+				firstTime := getEventIDTime(events, first)
+				lastTime := getEventIDTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
 				c.Add(Device, minutes)
 			case Transient:
 				first, last := getPatronFirstLast(e.PatronIndex, events)
-				firstTime := getEventIdTime(events, first)
-				lastTime := getEventIdTime(events, last)
+				firstTime := getEventIDTime(events, first)
+				lastTime := getEventIDTime(events, last)
 				minutes := int(lastTime.Sub(firstTime).Minutes())
 				if minutes <= 0 {
 					minutes = 1
@@ -137,8 +137,8 @@ func durationSummary(cfg *config.Config, events []structs.WifiEvent) map[int]str
 		} else {
 			checked[e.PatronIndex] = true
 			first, last := getPatronFirstLast(e.PatronIndex, events)
-			firstTime := getEventIdTime(events, first)
-			lastTime := getEventIdTime(events, last)
+			firstTime := getEventIDTime(events, first)
+			lastTime := getEventIDTime(events, last)
 
 			durations[e.PatronIndex] = structs.Duration{
 				PiSerial:  cfg.Serial,
@@ -172,9 +172,9 @@ func tomorrow(t time.Time) time.Time {
 // 	return t.Add(24 * time.Hours)
 // }
 
-// FIXME: note the swap of times when things are borked in the DB...
-// is that the best way to fix things?
 func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []structs.WifiEvent) (map[int]*structs.Duration, int) {
+	// FIXME: note the swap of times when things are borked in the DB...
+	// is that the best way to fix things?
 
 	// We want, for every patron_id, to know when the device started/ended.
 	checked := make(map[int]bool)
@@ -183,13 +183,13 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 
 	// Get the largest patron ID in this set. Use it for new,
 	// unique patron IDs.
-	maxPatronId := -1
+	maxPatronID := -1
 	for _, e := range events {
-		if e.PatronIndex > maxPatronId {
-			maxPatronId = e.PatronIndex
+		if e.PatronIndex > maxPatronID {
+			maxPatronID = e.PatronIndex
 		}
 	}
-	maxPatronId += 1
+	maxPatronID += 1
 
 	for _, e := range events {
 		// For later
@@ -201,8 +201,8 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 		} else {
 			checked[e.PatronIndex] = true
 			first, last := getPatronFirstLast(e.PatronIndex, events)
-			firstTime := getEventIdTime(events, first)
-			lastTime := getEventIdTime(events, last)
+			firstTime := getEventIDTime(events, first)
+			lastTime := getEventIDTime(events, last)
 			if lastTime.Before(firstTime) {
 				log.Println("start", firstTime, "end", lastTime)
 				log.Println("cannot start after end! swapping...")
@@ -229,16 +229,16 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 						endOfToday := eod(firstTime)
 						// Insert the duration between the firstTime and the endOfToday, with a unique id.
 						//log.Println("splitting", e.SessionId, e.PatronIndex, "to", maxPatronId)
-						durations[maxPatronId] = &structs.Duration{
+						durations[maxPatronID] = &structs.Duration{
 							PiSerial:  cfg.Serial,
 							SessionId: e.SessionId,
 							FCFSSeqId: e.FCFSSeqId,
 							DeviceTag: e.DeviceTag,
-							PatronId:  maxPatronId,
+							PatronId:  maxPatronID,
 							MfgId:     e.ManufacturerIndex,
 							Start:     firstTime.Format(time.RFC3339),
 							End:       endOfToday.Format(time.RFC3339)}
-						maxPatronId += 1
+						maxPatronID += 1
 						firstTime = bod(tomorrow(firstTime))
 						firstDay = firstTime.Day()
 
@@ -249,16 +249,16 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 					endOfToday := lastTime
 					firstTime = bod(lastTime)
 					// When done looping, insert the remainder...
-					durations[maxPatronId] = &structs.Duration{
+					durations[maxPatronID] = &structs.Duration{
 						PiSerial:  cfg.Serial,
 						SessionId: e.SessionId,
 						FCFSSeqId: e.FCFSSeqId,
 						DeviceTag: e.DeviceTag,
-						PatronId:  maxPatronId,
+						PatronId:  maxPatronID,
 						MfgId:     e.ManufacturerIndex,
 						Start:     firstTime.Format(time.RFC3339),
 						End:       endOfToday.Format(time.RFC3339)}
-					maxPatronId += 1
+					maxPatronID += 1
 
 				} else {
 					durations[e.PatronIndex] = &structs.Duration{
@@ -322,8 +322,8 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 	return newmap, pid
 }
 
-// Return the drawing context where the image is drawn.
-// This can then be written to disk.
+// Summarize returns the drawing context where the image is drawn. This can then
+// be written to disk.
 func Summarize(cfg *config.Config, events []structs.WifiEvent) (c *Counter, d map[int]structs.Duration) {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].ID < events[j].ID

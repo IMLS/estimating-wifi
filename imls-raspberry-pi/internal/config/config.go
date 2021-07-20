@@ -186,9 +186,8 @@ func getValue(chain string, s interface{}) interface{} {
 	return nil
 }
 
-// THIS IS BROKEN.
 func (cfg *Config) Validate() {
-
+	// TODO: THIS IS BROKEN.
 	for tag, pat := range patterns {
 		value := fmt.Sprintf("%v", getValue(tag, cfg))
 		log.Printf("tag [ %v ], pattern %v, value [ %v ]\n", tag, pat, value)

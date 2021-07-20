@@ -1,3 +1,4 @@
+// Package analysis provides visualization primitives.
 package analysis
 
 import (
@@ -103,8 +104,8 @@ func DrawPatronSessions(cfg *config.Config, durations []structs.Duration, output
 
 			// Therefore...
 			// log.Println("eod", eod(st))
-			st_in_minutes := 1440 - int(eod(st).Sub(st).Minutes())
-			x := st_in_minutes
+			stInMinutes := 1440 - int(eod(st).Sub(st).Minutes())
+			x := stInMinutes
 			y := 20 + (ystep * 20)
 			// log.Println("start time", st, "end time", et)
 			// log.Println("rect", x, y, diff, 20)

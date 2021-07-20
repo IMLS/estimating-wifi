@@ -1,3 +1,4 @@
+// Package lshw is a thin wrapper around `lshw`
 package lshw
 
 import (
@@ -10,9 +11,8 @@ import (
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
-// PURPOSE
-// This function calls out to `lshw` and
-// then passes it off for parsing into a hashmap.
+// GetDeviceHash calls out to `lshw` and then passes it off for parsing into a
+// hashmap.
 func GetDeviceHash(wlan *models.Device) []map[string]string {
 	wlan.Exists = false
 
@@ -52,12 +52,11 @@ func deepCopy(h map[string]string) map[string]string {
 	return nh
 }
 
-// PURPOSE
-// This function takes an array of strings (representing the output of `lshw`)
-// and parses them into a list of hashes. Each map represents a piece of hardware
-// attached to the machine. The keys are the descriptors provided by
-// `lshw`, and the values are... the values reported by `lshw`.
-func ParseLSHW(string_array []string) []map[string]string {
+// ParseLSHW takes an array of strings (representing the output of `lshw`) and
+// parses them into a list of hashes. Each map represents a piece of hardware
+// attached to the machine. The keys are the descriptors provided by `lshw`, and
+// the values are... the values reported by `lshw`.
+func ParseLSHW(stringArray []string) []map[string]string {
 	sectionHeading := regexp.MustCompile(`^\s*\*-(usb|network)((?:\:\d))?\s*`)
 	entryPattern := regexp.MustCompile(`\s*([a-z ]+):\s+(.*)\s*`)
 
@@ -69,7 +68,7 @@ func ParseLSHW(string_array []string) []map[string]string {
 	// Start looking for a section heading.
 	// state := constants.LOOKING_FOR_SECTION_HEADING
 
-	for _, line := range string_array {
+	for _, line := range stringArray {
 		newSecMatch := sectionHeading.MatchString(line)
 		hashMatch := entryPattern.MatchString(line)
 

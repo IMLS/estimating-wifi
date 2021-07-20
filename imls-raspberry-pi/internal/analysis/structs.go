@@ -10,8 +10,8 @@ type Counter struct {
 }
 
 func NewCounter(minMinutes int, maxMinutes int) *Counter {
-	patron_min_mins = float64(minMinutes)
-	patron_max_mins = float64(maxMinutes)
+	patronMinMins = float64(minMinutes)
+	patronMaxMins = float64(maxMinutes)
 	return &Counter{0, 0, 0, 0, 0, 0}
 }
 

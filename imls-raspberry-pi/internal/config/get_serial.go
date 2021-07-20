@@ -1,3 +1,4 @@
+// Package config provides functions to work with IMLS config files.
 package config
 
 import (

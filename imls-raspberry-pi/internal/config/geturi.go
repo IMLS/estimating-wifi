@@ -22,14 +22,14 @@ func startsWithSlash(uri string) string {
 // 	return uri + "/"
 // }
 
-func (cfg *Config) GetLoggingUri() string {
+func (cfg *Config) GetLoggingURI() string {
 	var uri string = (cfg.Umbrella.Scheme + "://" +
 		removeLeadingAndTrailingSlashes(cfg.Umbrella.Host) +
 		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Logging)))
 	return uri
 }
 
-func (cfg *Config) GetDataUri() string {
+func (cfg *Config) GetDataURI() string {
 	var uri string = (cfg.Umbrella.Scheme + "://" +
 		removeLeadingAndTrailingSlashes(cfg.Umbrella.Host) +
 		startsWithSlash(removeLeadingSlashes(cfg.Umbrella.Data)))

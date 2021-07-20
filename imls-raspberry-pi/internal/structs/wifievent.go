@@ -1,3 +1,4 @@
+// Package structs holds internal state.
 package structs
 
 import (
@@ -10,8 +11,6 @@ type WifiEvents struct {
 	Data []WifiEvent `json:"data"`
 }
 
-// https://stackoverflow.com/questions/18635671/how-to-define-multiple-name-tags-in-a-struct
-//EventId           int       `json:"event_id" db:"event_id"`
 type WifiEvent struct {
 	ID                int    `json:"id" db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
 	FCFSSeqId         string `json:"fcfs_seq_id" db:"fcfs_seq_id" sqlite:"TEXT NOT NULL"`

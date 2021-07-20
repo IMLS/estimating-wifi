@@ -60,7 +60,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 					}
 					// After writing images, we come back and try and send the data remotely.
 					lw.Debug("PostJSONing ", len(data), " duration datas")
-					err = http.PostJSON(cfg, cfg.GetDataUri(), data)
+					err = http.PostJSON(cfg, cfg.GetDataURI(), data)
 					if err != nil {
 						log.Println("could not log to API")
 						log.Println(err.Error())
