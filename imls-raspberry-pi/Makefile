@@ -9,6 +9,12 @@ RELEASEPATH = ../release/bin/linux_arm/*
 ENVVARS = CGO_ENABLED=1 GOOS=linux
 endif
 
+check-install:
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
+
+check:
+	golangci-lint run ./...
+
 all: input-configuration session-counter wifi-hardware-search-cli log-event cache-to-sqlite waterfall
 
 deps:
