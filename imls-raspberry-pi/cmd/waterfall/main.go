@@ -366,7 +366,7 @@ func readDurationsFromSqlite(path string) []*structs.Duration {
 	}
 
 	events := []*structs.Duration{}
-	rows, err := db.Query("SELECT * FROM durations")
+	rows, err := db.Query("SELECT *, cast((JulianDay(end) - JulianDay(start)) * 24 * 60 as integer) as minutes FROM durations")
 	if err != nil {
 		log.Println("error in read query")
 		log.Fatal(err)

@@ -134,7 +134,10 @@ func generateSqlite(cfg *config, ch <-chan []structs.Duration, wg *sync.WaitGrou
 			return
 		} else {
 			for _, e := range events {
-				stat.Exec(e.Id, e.PiSerial, e.SessionId, e.FCFSSeqId, e.DeviceTag, e.PatronId, e.MfgId, e.Start, e.End)
+				_, err := stat.Exec(e.Id, e.PiSerial, e.SessionId, e.FCFSSeqId, e.DeviceTag, e.PatronId, e.MfgId, e.Start, e.End)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 			// This is the same as .Close()
 			// Do all 10K inserts at once.
