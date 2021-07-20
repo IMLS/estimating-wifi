@@ -9,7 +9,7 @@ RELEASEPATH = ../release/bin/linux_arm/*
 ENVVARS = CGO_ENABLED=1 GOOS=linux
 endif
 
-all: input-configuration session-counter wifi-hardware-search-cli log-event cache-to-sqlite
+all: input-configuration session-counter wifi-hardware-search-cli log-event cache-to-sqlite waterfall
 
 deps:
 	go mod download
@@ -28,6 +28,9 @@ log-event: deps
 
 cache-to-sqlite: deps
 	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/cache-to-sqlite
+
+waterfall: deps
+	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/waterfall
 
 clean:
 	mkdir -p ../release/{bin,pkg}
