@@ -424,7 +424,7 @@ func main() {
 			cfg.Auth.FCFSId = fcfs
 			cfg.Auth.DeviceTag = dt
 			pngName := fmt.Sprintf("%v-%.2v-%.2v-%v-%v-patron-sessions", dtime.Year(), int(dtime.Month()), int(dtime.Day()), fcfs, dt)
-			//log.Println("writing to", pngName)
+			log.Println("writing to", pngName)
 			analysis.DrawPatronSessions(cfg, subset, buildImagePath(fcfs, dt, pngName))
 		}
 
@@ -432,5 +432,4 @@ func main() {
 		events := readWifiEventsFromCSV(*srcPtr)
 		drawOldWaterfalls(events, dataPtr)
 	}
-
 }

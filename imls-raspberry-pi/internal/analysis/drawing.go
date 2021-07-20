@@ -2,7 +2,6 @@ package analysis
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
@@ -39,7 +38,7 @@ func DrawPatronSessions(cfg *config.Config, durations []structs.Duration, output
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
-		log.Println("st", st, "et", et, "diff", diff)
+		// log.Println("st", st, "et", et, "diff", diff)
 		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
 			//log.Println("id", d.PatronId, "diff", diff)
 			durationsInRange += 1
