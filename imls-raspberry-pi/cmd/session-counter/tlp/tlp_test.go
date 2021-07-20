@@ -60,10 +60,10 @@ func (suite *TLPSuite) SetupTest() {
 	suite.lw.Debug("mock is now ", suite.cfg.Clock.Now())
 	suite.cfg.RunMode = "test"
 	suite.cfg.StorageMode = "sqlite"
-	suite.cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	suite.cfg.Manufacturers.DB = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 	suite.cfg.Local.WebDirectory = filepath.Join(path, "..", "test", "www")
 	os.Mkdir(suite.cfg.Local.WebDirectory, 0755)
-	suite.cfg.SetSessionId(state.GetNextSessionID(suite.cfg))
+	suite.cfg.SetSessionID(state.GetNextSessionID(suite.cfg))
 
 }
 
@@ -350,7 +350,7 @@ func (suite *TLPSuite) TestRawToUid(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
+	cfg.Manufacturers.DB = filepath.Join(path, "test", "manufacturers.sqlite")
 
 	ka := NewKeepalive(cfg)
 

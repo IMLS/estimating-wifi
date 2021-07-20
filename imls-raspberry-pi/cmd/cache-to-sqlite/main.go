@@ -134,7 +134,7 @@ func generateSqlite(cfg *config, ch <-chan []structs.Duration, wg *sync.WaitGrou
 			return
 		} else {
 			for _, e := range events {
-				_, err := stat.Exec(e.Id, e.PiSerial, e.SessionId, e.FCFSSeqId, e.DeviceTag, e.PatronId, e.MfgId, e.Start, e.End)
+				_, err := stat.Exec(e.ID, e.PiSerial, e.SessionID, e.FCFSSeqID, e.DeviceTag, e.PatronID, e.MfgID, e.Start, e.End)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -181,7 +181,7 @@ func getLibraries(cfg *config) map[string][]string {
 		json.Unmarshal(body, &evts)
 
 		for _, e := range evts.Data {
-			set[fmt.Sprint(e.FCFSSeqId, e.DeviceTag)] = []string{e.FCFSSeqId, e.DeviceTag}
+			set[fmt.Sprint(e.FCFSSeqID, e.DeviceTag)] = []string{e.FCFSSeqID, e.DeviceTag}
 		}
 	}
 	s.Stop()

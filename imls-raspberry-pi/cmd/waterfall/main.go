@@ -36,8 +36,8 @@ func readWifiEventsFromCSV(path string) []structs.Duration {
 func buildImagePath(fcfs string, deviceTag string, pngName string) string {
 
 	_ = os.Mkdir("output", 0777)
-	fcfs_tag := fmt.Sprintf("%v-%v", fcfs, deviceTag)
-	outdir := filepath.Join("output", fcfs_tag)
+	fcfsTag := fmt.Sprintf("%v-%v", fcfs, deviceTag)
+	outdir := filepath.Join("output", fcfsTag)
 	_ = os.Mkdir(outdir, 0777)
 	baseFilename := fmt.Sprint(filepath.Join(outdir, pngName))
 	fullPath := fmt.Sprintf("%v.png", baseFilename)
@@ -61,7 +61,7 @@ func readDurationsFromSqlite(path string) []structs.Duration {
 		d := structs.Duration{}
 		var id int
 		var minutes int
-		err = rows.Scan(&id, &d.PiSerial, &d.SessionId, &d.FCFSSeqId, &d.DeviceTag, &d.PatronId, &d.MfgId, &d.Start, &d.End, &minutes)
+		err = rows.Scan(&id, &d.PiSerial, &d.SessionID, &d.FCFSSeqID, &d.DeviceTag, &d.PatronID, &d.MfgID, &d.Start, &d.End, &minutes)
 		if err != nil {
 			log.Println("could not scan")
 			log.Fatal(err)
@@ -92,18 +92,18 @@ func main() {
 
 	sessions := make(map[string]string)
 	for _, d := range durations {
-		sessions[d.SessionId] = d.SessionId
+		sessions[d.SessionID] = d.SessionID
 	}
 
 	for _, s := range sessions {
 		subset := make([]structs.Duration, 0)
 		for _, d := range durations {
-			if d.SessionId == s {
+			if d.SessionID == s {
 				subset = append(subset, d)
 			}
 		}
 
-		fcfs := subset[0].FCFSSeqId
+		fcfs := subset[0].FCFSSeqID
 		dt := subset[0].DeviceTag
 		d := subset[0].Start
 		dtime, _ := time.Parse(time.RFC3339, d)

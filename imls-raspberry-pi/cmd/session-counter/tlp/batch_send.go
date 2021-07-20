@@ -51,7 +51,7 @@ func BatchSend(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				if len(durations) == 0 {
 					lw.Info("found zero durations to send/draw. dequeing session [", nextSessionIDToSend, "]")
 					sq.Remove(nextSessionIDToSend)
-				} else if cfg.IsStoringToApi() {
+				} else if cfg.IsStoringToAPI() {
 					lw.Info("attempting to send batch [", nextSessionIDToSend, "][", len(durations), "] to the API server")
 					// convert []Duration to an array of map[string]interface{}
 					data := make([]map[string]interface{}, 0)

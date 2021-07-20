@@ -1,6 +1,6 @@
 package config
 
-type SessionId interface {
+type SessionID interface {
 	GetSessionId() string
 	IncrementSessionId() string
 	PreviousSessionId() string

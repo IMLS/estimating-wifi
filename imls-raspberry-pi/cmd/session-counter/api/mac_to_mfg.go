@@ -1,3 +1,4 @@
+// Package api provides auxilary functions for API integration
 package api
 
 import (
@@ -13,15 +14,15 @@ import (
 func CheckMfgDatabaseExists(cfg *config.Config) {
 	lw := logwrapper.NewLogger(nil)
 
-	_, err := os.Stat(cfg.Manufacturers.Db)
+	_, err := os.Stat(cfg.Manufacturers.DB)
 
 	if os.IsNotExist(err) {
-		lw.Fatal("cannot find mfg database: ", cfg.Manufacturers.Db)
+		lw.Fatal("cannot find mfg database: ", cfg.Manufacturers.DB)
 	}
 
-	db, dberr := sql.Open("sqlite3", cfg.Manufacturers.Db)
+	db, dberr := sql.Open("sqlite3", cfg.Manufacturers.DB)
 	if err != nil {
-		lw.Info("failed to open manufacturer database: ", cfg.Manufacturers.Db)
+		lw.Info("failed to open manufacturer database: ", cfg.Manufacturers.DB)
 		lw.Fatal(dberr.Error())
 	}
 	defer db.Close()
@@ -36,9 +37,9 @@ var cache map[string]string = make(map[string]string)
 
 func MacToMfg(cfg *config.Config, mac string) string {
 	lw := logwrapper.NewLogger(nil)
-	db, err := sql.Open("sqlite3", cfg.Manufacturers.Db)
+	db, err := sql.Open("sqlite3", cfg.Manufacturers.DB)
 	if err != nil {
-		lw.Fatal("Failed to open manufacturer database: ", cfg.Manufacturers.Db)
+		lw.Fatal("Failed to open manufacturer database: ", cfg.Manufacturers.DB)
 	}
 	// Close the DB at the end of the function.
 	// If not, it's a resource leak.

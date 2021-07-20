@@ -52,7 +52,7 @@ func TestAsUserMappings(t *testing.T) {
 	cfg := new(config.Config)
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.Manufacturers.DB = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 
 	umdb := NewUMDB(cfg)
 	m1 := umdb.AsUserMappings()

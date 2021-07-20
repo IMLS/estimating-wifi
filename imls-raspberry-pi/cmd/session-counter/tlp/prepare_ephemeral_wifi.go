@@ -56,9 +56,9 @@ func PrepEphemeralWifi(ka *Keepalive, cfg *config.Config, kb *KillBroker,
 				pid, _ := strconv.Atoi(strings.Split(anondevice, ":")[1])
 
 				data := structs.WifiEvent{
-					SessionId:         fmt.Sprint(state.GetCurrentSessionID(cfg)),
+					SessionID:         fmt.Sprint(state.GetCurrentSessionID(cfg)),
 					Localtime:         cfg.Clock.Now().Format(time.RFC3339),
-					FCFSSeqId:         cfg.Auth.FCFSId,
+					FCFSSeqID:         cfg.Auth.FCFSId,
 					DeviceTag:         cfg.Auth.DeviceTag,
 					ManufacturerIndex: mfg,
 					PatronIndex:       pid,

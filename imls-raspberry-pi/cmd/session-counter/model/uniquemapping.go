@@ -1,10 +1,11 @@
+// Package model manipulates internal state during execution
 package model
 
 import (
 	"fmt"
 
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/cmd/session-counter/api"
+	"gsa.gov/18f/internal/config"
 )
 
 // This probably should be a proper database.

@@ -90,10 +90,10 @@ func TestWifiTable2(t *testing.T) {
 	tdb := NewSqliteDB("wifi2", "/tmp/wifi2.db")
 	tdb.AddStructAsTable("wifi", structs.WifiEvent{})
 	w := structs.WifiEvent{
-		FCFSSeqId:         "ME0000-000",
+		FCFSSeqID:         "ME0000-000",
 		DeviceTag:         "another-tag",
 		Localtime:         cfg.Clock.Now().Format(time.RFC3339),
-		SessionId:         "asdfasdfasdf",
+		SessionID:         "asdfasdfasdf",
 		ManufacturerIndex: 0,
 		PatronIndex:       1,
 	}
@@ -137,11 +137,11 @@ func TestReflection(t *testing.T) {
 	durations := make([]*structs.Duration, 0)
 	d := &structs.Duration{
 		PiSerial:  "12345",
-		SessionId: "asdf",
-		FCFSSeqId: "ME0000-000",
+		SessionID: "asdf",
+		FCFSSeqID: "ME0000-000",
 		DeviceTag: "a-device-tag",
-		PatronId:  1,
-		MfgId:     1,
+		PatronID:  1,
+		MfgID:     1,
 		Start:     cfg.Clock.Now().Format(time.RFC3339),
 		End:       cfg.Clock.Now().Format(time.RFC3339),
 	}

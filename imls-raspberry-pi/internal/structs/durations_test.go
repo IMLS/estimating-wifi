@@ -7,14 +7,14 @@ import (
 
 func TestAsMapDuration(t *testing.T) {
 	e := Duration{
-		Id:        1,
+		ID:        1,
 		PiSerial:  "asdf",
 		DeviceTag: "abd-dc",
 		Start:     time.Now().Format(time.RFC3339),
 		End:       time.Now().Format(time.RFC3339),
-		SessionId: "hello",
-		MfgId:     0,
-		PatronId:  0,
+		SessionID: "hello",
+		MfgID:     0,
+		PatronID:  0,
 	}
 
 	m := e.AsMap()

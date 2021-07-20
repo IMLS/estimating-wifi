@@ -20,7 +20,7 @@ func Test_get_manufactuerer(t *testing.T) {
 	cfg := config.Config{}
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	cfg.Manufacturers.Db = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.Manufacturers.DB = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 
 	var tests = []struct {
 		mac  string

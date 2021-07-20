@@ -24,7 +24,7 @@ func (a *APILogger) Write(p []byte) (n int, err error) {
 
 	// work around a catch-22 where we are trying to log startup events without
 	// a session.
-	sessionID := a.cfg.SessionId
+	sessionID := a.cfg.SessionID
 	// if a.cfg.SessionId != nil {
 	// 	sessionID = a.cfg.SessionId.GetSessionId()
 	// }

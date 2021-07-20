@@ -175,7 +175,7 @@ func TestRawToUid(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
+	cfg.Manufacturers.DB = filepath.Join(path, "test", "manufacturers.sqlite")
 
 	ka := tlp.NewKeepalive(cfg)
 
@@ -381,10 +381,10 @@ func TestManyTLPCycles(t *testing.T) {
 	cfg.RunMode = "test"
 	cfg.StorageMode = "sqlite"
 	cfg.Local.SummaryDB = filepath.Join(path, "summarydb.sqlite")
-	cfg.Manufacturers.Db = filepath.Join(path, "test", "manufacturers.sqlite")
+	cfg.Manufacturers.DB = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Local.WebDirectory = filepath.Join(path, "test", "www")
 	os.Mkdir(cfg.Local.WebDirectory, 0755)
-	cfg.SessionId = state.GetNextSessionID(cfg)
+	cfg.SessionID = state.GetNextSessionID(cfg)
 
 	// Create channels for process network
 	chSec := make(chan bool)

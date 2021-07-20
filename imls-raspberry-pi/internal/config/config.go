@@ -85,8 +85,8 @@ func (cfg *Config) ReadConfig(path string) error {
 	return fmt.Errorf("config: could not find config file [%v]", path)
 }
 
-func (cfg *Config) SetSessionId(sid int) {
-	cfg.SessionId = sid
+func (cfg *Config) SetSessionID(sid int) {
+	cfg.SessionID = sid
 }
 
 func (cfg *Config) GetLoggers() []string {
@@ -101,7 +101,7 @@ func (cfg *Config) GetLogLevel() string {
 	}
 }
 
-func (cfg *Config) IsStoringToApi() bool {
+func (cfg *Config) IsStoringToAPI() bool {
 	return strings.Contains(strings.ToLower(cfg.StorageMode), "api")
 }
 
@@ -165,8 +165,8 @@ var patterns = map[string]string{
 	"RunMode":        "{DEV|dev|PROD|prod|DEVELOP|develop|PRODUCTION|production}",
 }
 
-//BROKEN
 func getValue(chain string, s interface{}) interface{} {
+	// TODO: THIS IS BROKEN
 	reflectType := reflect.TypeOf(s).Elem()
 	reflectValue := reflect.ValueOf(s).Elem()
 	next := strings.Split(chain, ".")[0]
@@ -219,7 +219,7 @@ func (cfg *Config) setDefaults() {
 	cfg.Wireshark.Path = "/usr/bin/tshark"
 	cfg.Wireshark.CheckWlan = "1"
 
-	cfg.Manufacturers.Db = "/opt/imls/manufacturers.sqlite"
+	cfg.Manufacturers.DB = "/opt/imls/manufacturers.sqlite"
 
 	cfg.StorageMode = "api"
 	cfg.RunMode = "prod"
@@ -259,9 +259,9 @@ type Config struct {
 	} `yaml:"wireshark"`
 	LshwPath      string `yaml:"lshw_path"`
 	Manufacturers struct {
-		Db string `yaml:"db"`
+		DB string `yaml:"db"`
 	} `yaml:"manufacturers"`
-	SessionId   int         `yaml:"-"` // ignore
+	SessionID   int         `yaml:"-"` // ignore
 	Serial      string      `yaml:"serial"`
 	StorageMode string      `yaml:"storagemode"`
 	RunMode     string      `yaml:"runmode"`

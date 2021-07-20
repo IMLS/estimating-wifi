@@ -8,7 +8,7 @@ import (
 	"gsa.gov/18f/internal/logwrapper"
 )
 
-func GetYesterdaySessionId(cfg *config.Config) string {
+func GetYesterdaySessionID(cfg *config.Config) string {
 	lw := logwrapper.NewLogger(nil)
 	yesterday := GetYesterday(cfg)
 	yestersession := fmt.Sprintf("%v%02d%02d", yesterday.Year(), yesterday.Month(), yesterday.Day())

@@ -8,10 +8,10 @@ import (
 func TestAsMapWifi(t *testing.T) {
 	e := WifiEvent{
 		ID:                1,
-		FCFSSeqId:         "asdf",
+		FCFSSeqID:         "asdf",
 		DeviceTag:         "abd-dc",
 		Localtime:         time.Now().Format(time.RFC3339),
-		SessionId:         "hello",
+		SessionID:         "hello",
 		ManufacturerIndex: 0,
 		PatronIndex:       0,
 	}

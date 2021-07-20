@@ -142,11 +142,11 @@ func durationSummary(cfg *config.Config, events []structs.WifiEvent) map[int]str
 
 			durations[e.PatronIndex] = structs.Duration{
 				PiSerial:  cfg.Serial,
-				SessionId: e.SessionId,
-				FCFSSeqId: e.FCFSSeqId,
+				SessionID: e.SessionID,
+				FCFSSeqID: e.FCFSSeqID,
 				DeviceTag: e.DeviceTag,
-				PatronId:  e.PatronIndex,
-				MfgId:     e.ManufacturerIndex,
+				PatronID:  e.PatronIndex,
+				MfgID:     e.ManufacturerIndex,
 				Start:     firstTime.Format(time.RFC3339),
 				End:       lastTime.Format(time.RFC3339)}
 		}
@@ -193,7 +193,7 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 
 	for _, e := range events {
 		// For later
-		uniqsessions[e.SessionId] = e.SessionId
+		uniqsessions[e.SessionID] = e.SessionID
 
 		//log.Println("Patron index:", e.PatronIndex)
 		if _, ok := checked[e.PatronIndex]; ok {
@@ -231,11 +231,11 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 						//log.Println("splitting", e.SessionId, e.PatronIndex, "to", maxPatronId)
 						durations[maxPatronID] = &structs.Duration{
 							PiSerial:  cfg.Serial,
-							SessionId: e.SessionId,
-							FCFSSeqId: e.FCFSSeqId,
+							SessionID: e.SessionID,
+							FCFSSeqID: e.FCFSSeqID,
 							DeviceTag: e.DeviceTag,
-							PatronId:  maxPatronID,
-							MfgId:     e.ManufacturerIndex,
+							PatronID:  maxPatronID,
+							MfgID:     e.ManufacturerIndex,
 							Start:     firstTime.Format(time.RFC3339),
 							End:       endOfToday.Format(time.RFC3339)}
 						maxPatronID += 1
@@ -251,11 +251,11 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 					// When done looping, insert the remainder...
 					durations[maxPatronID] = &structs.Duration{
 						PiSerial:  cfg.Serial,
-						SessionId: e.SessionId,
-						FCFSSeqId: e.FCFSSeqId,
+						SessionID: e.SessionID,
+						FCFSSeqID: e.FCFSSeqID,
 						DeviceTag: e.DeviceTag,
-						PatronId:  maxPatronID,
-						MfgId:     e.ManufacturerIndex,
+						PatronID:  maxPatronID,
+						MfgID:     e.ManufacturerIndex,
 						Start:     firstTime.Format(time.RFC3339),
 						End:       endOfToday.Format(time.RFC3339)}
 					maxPatronID += 1
@@ -263,11 +263,11 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 				} else {
 					durations[e.PatronIndex] = &structs.Duration{
 						PiSerial:  cfg.Serial,
-						SessionId: e.SessionId,
-						FCFSSeqId: e.FCFSSeqId,
+						SessionID: e.SessionID,
+						FCFSSeqID: e.FCFSSeqID,
 						DeviceTag: e.DeviceTag,
-						PatronId:  e.PatronIndex,
-						MfgId:     e.ManufacturerIndex,
+						PatronID:  e.PatronIndex,
+						MfgID:     e.ManufacturerIndex,
 						Start:     firstTime.Format(time.RFC3339),
 						End:       lastTime.Format(time.RFC3339)}
 				}
@@ -307,13 +307,13 @@ func MultiDayDurations(cfg *config.Config, swap bool, newPid int, events []struc
 		newv := structs.Duration{}
 		newv.DeviceTag = v.DeviceTag
 		newv.End = v.End
-		newv.FCFSSeqId = v.FCFSSeqId
-		newv.MfgId = v.MfgId
+		newv.FCFSSeqID = v.FCFSSeqID
+		newv.MfgID = v.MfgID
 		//log.Println(v.PatronId, "becomes", pid)
-		newv.PatronId = pid
+		newv.PatronID = pid
 		newv.PiSerial = v.PiSerial
 		st, _ := time.Parse(time.RFC3339, v.Start)
-		newv.SessionId = fmt.Sprintf("%v%02d%02d", st.Year(), st.Month(), st.Day())
+		newv.SessionID = fmt.Sprintf("%v%02d%02d", st.Year(), st.Month(), st.Day())
 		newv.Start = v.Start
 		newmap[pid] = &newv
 		pid = pid + 1

@@ -13,10 +13,10 @@ type WifiEvents struct {
 
 type WifiEvent struct {
 	ID                int    `json:"id" db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
-	FCFSSeqId         string `json:"fcfs_seq_id" db:"fcfs_seq_id" sqlite:"TEXT NOT NULL"`
+	FCFSSeqID         string `json:"fcfs_seq_id" db:"fcfs_seq_id" sqlite:"TEXT NOT NULL"`
 	DeviceTag         string `json:"device_tag" db:"device_tag" sqlite:"TEXT NOT NULL"`
 	Localtime         string `json:"localtimestamp" db:"localtimestamp" sqlite:"DATE NOT NULL"`
-	SessionId         string `json:"session_id" db:"session_id" sqlite:"TEXT NOT NULL"`
+	SessionID         string `json:"session_id" db:"session_id" sqlite:"TEXT NOT NULL"`
 	ManufacturerIndex int    `json:"manufacturer_index" db:"manufacturer_index" sqlite:"INTEGER NOT NULL"`
 	PatronIndex       int    `json:"patron_index" db:"patron_index" sqlite:"INTEGER NOT NULL"`
 }

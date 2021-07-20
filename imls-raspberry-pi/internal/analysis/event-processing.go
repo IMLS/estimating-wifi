@@ -13,12 +13,12 @@ func GetSessions(events []structs.WifiEvent) []string {
 	for _, e := range events {
 		found := false
 		for _, uniq := range eventset {
-			if e.SessionId == uniq {
+			if e.SessionID == uniq {
 				found = true
 			}
 		}
 		if !found {
-			eventset = append(eventset, e.SessionId)
+			eventset = append(eventset, e.SessionID)
 		}
 	}
 	return eventset
@@ -65,12 +65,12 @@ func RemapEvents(events []structs.WifiEvent) []structs.WifiEvent {
 			// This means putting it in a new session (based on days instead of event ids)
 			// and renumbering the patron/
 			for ndx, e := range events {
-				if e.SessionId == s {
+				if e.SessionID == s {
 					// We will rewrite all session fields to the current day.
 					// Need to modify the array, not the local variable `e`
 					if pass == "first" {
 						t, _ := time.Parse(time.RFC3339, e.Localtime)
-						events[ndx].SessionId = fmt.Sprintf("%v%02d%02d", t.Year(), t.Month(), t.Day())
+						events[ndx].SessionID = fmt.Sprintf("%v%02d%02d", t.Year(), t.Month(), t.Day())
 					}
 
 					// If we have already mapped this manufacturer, then update
@@ -106,7 +106,7 @@ func RemapEvents(events []structs.WifiEvent) []structs.WifiEvent {
 func GetEventsFromSession(events []structs.WifiEvent, session string) []structs.WifiEvent {
 	filtered := make([]structs.WifiEvent, 0)
 	for _, e := range events {
-		if e.SessionId == session {
+		if e.SessionID == session {
 			filtered = append(filtered, e)
 		}
 	}

@@ -33,13 +33,13 @@ func GetInitialSessionID(cfg *config.Config) int {
 }
 
 func GetCurrentSessionID(cfg *config.Config) int {
-	return cfg.SessionId
+	return cfg.SessionID
 }
 
 func GetNextSessionID(cfg *config.Config) int {
-	return cfg.SessionId + 1
+	return cfg.SessionID + 1
 }
 
 func GetPreviousSessionID(cfg *config.Config) int {
-	return cfg.SessionId - 1
+	return cfg.SessionID - 1
 }
