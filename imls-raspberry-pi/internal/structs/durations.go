@@ -17,6 +17,10 @@ func (a ByStart) Less(i, j int) bool {
 }
 func (a ByStart) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
+type Durations struct {
+	Data []Duration `json:"data"`
+}
+
 type Duration struct {
 	Id        int    `db:"id" sqlite:"INTEGER PRIMARY KEY AUTOINCREMENT"`
 	PiSerial  string `db:"pi_serial" sqlite:"TEXT"`

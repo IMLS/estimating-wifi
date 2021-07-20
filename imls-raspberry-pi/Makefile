@@ -9,7 +9,7 @@ RELEASEPATH = ../release/bin/linux_arm/*
 ENVVARS = CGO_ENABLED=1 GOOS=linux
 endif
 
-all: input-configuration session-counter wifi-hardware-search-cli log-event
+all: input-configuration session-counter wifi-hardware-search-cli log-event cache-to-sqlite
 
 deps:
 	go mod download
@@ -25,6 +25,9 @@ wifi-hardware-search-cli: deps
 
 log-event: deps
 	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/log-event
+
+cache-to-sqlite: deps
+	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/cache-to-sqlite
 
 clean:
 	mkdir -p ../release/{bin,pkg}
