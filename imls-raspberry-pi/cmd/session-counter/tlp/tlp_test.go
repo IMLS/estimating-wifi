@@ -13,7 +13,7 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/stretchr/testify/suite"
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
@@ -24,7 +24,7 @@ const FAIL = false
 
 type TLPSuite struct {
 	suite.Suite
-	cfg  *config.Config
+	cfg  *state.CFG
 	mock *clock.Mock
 	lw   *logwrapper.StandardLogger
 }
@@ -40,13 +40,13 @@ func (suite *TLPSuite) SetupTest() {
 
 	configPath := filepath.Join(path, "..", "test", "config.yaml")
 	//suite.lw.Debug("path ", configPath)
-	cfg, _ := config.NewConfigFromPath(configPath)
+	state.NewConfigFromPath(configPath)
+	cfg := state.GetConfig()
 
 	if cfg == nil {
 		suite.Fail("config is nil")
 	}
-	suite.cfg = cfg
-	suite.lw = logwrapper.NewLogger(suite.cfg)
+	suite.lw = logwrapper.NewLogger(cfg)
 	suite.lw.SetLogLevel("DEBUG")
 
 	mock := clock.NewMock()
@@ -56,15 +56,20 @@ func (suite *TLPSuite) SetupTest() {
 	}
 	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
 	mock.Set(mt)
-	suite.cfg.Clock = mock
-	suite.lw.Debug("mock is now ", suite.cfg.Clock.Now())
-	suite.cfg.RunMode = "test"
-	suite.cfg.StorageMode = "sqlite"
-	suite.cfg.Manufacturers.DB = filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	suite.cfg.Local.WebDirectory = filepath.Join(path, "..", "test", "www")
-	os.Mkdir(suite.cfg.Local.WebDirectory, 0755)
-	suite.cfg.SetSessionID(state.GetNextSessionID(suite.cfg))
+	cfg.Clock = mock
+	suite.lw.Debug("mock is now ", cfg.Clock.Now())
+	cfg.RunMode = "test"
+	cfg.StorageMode = "sqlite"
+	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.Databases.QueuesPath = filepath.Join(path, "..", "test", "queue.sqlite")
+	cfg.Paths.WWW.Root = filepath.Join(path, "..", "test", "www")
+	cfg.Paths.WWW.Images = filepath.Join(path, "..", "test", "www", "images")
 
+	state.InitConfig()
+
+	suite.cfg = cfg
+
+	os.Mkdir(suite.cfg.Paths.WWW.Root, 0755)
 }
 
 func generateFakeMac() string {
@@ -83,7 +88,7 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-func RunFakeWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-chan bool, out chan []string) {
+func RunFakeWireshark(ka *Keepalive, cfg *state.CFG, kb *KillBroker, in <-chan bool, out chan []string) {
 	NUMMACS := 200
 	NUMRANDOM := 10
 	lw := logwrapper.NewLogger(nil)
@@ -113,7 +118,7 @@ func RunFakeWireshark(ka *Keepalive, cfg *config.Config, kb *KillBroker, in <-ch
 	}
 }
 
-func PingAtBogoMidnight(ka *Keepalive, cfg *config.Config,
+func PingAtBogoMidnight(ka *Keepalive,
 	rb *ResetBroker,
 	kb *KillBroker,
 	m *clock.Mock) {
@@ -141,12 +146,14 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 	chMacs := make(chan []string)
 	chMacsCounted := make(chan map[string]int)
 	chDataForReport := make(chan []structs.WifiEvent)
-	chWifiDB := make(chan *state.TempDB)
-	chDurationsDB := make(chan *state.TempDB)
+
+	chWifiDB := make(chan interfaces.Database)
+	chDurationsDB := make(chan interfaces.Database)
+	chDdbPar := make([]chan interfaces.Database, 2)
+
 	chAck := make(chan Ping)
-	chDdbPar := make([]chan *state.TempDB, 2)
 	for i := 0; i < 2; i++ {
-		chDdbPar[i] = make(chan *state.TempDB)
+		chDdbPar[i] = make(chan interfaces.Database)
 	}
 
 	// See if we can wait and shut down the test...
@@ -165,18 +172,18 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
 	go RunFakeWireshark(nil, suite.cfg, killbroker, chNsec, chMacs)
 
-	go AlgorithmTwo(nil, suite.cfg, resetbroker, killbroker, chMacs, chMacsCounted)
-	go PrepEphemeralWifi(nil, suite.cfg, killbroker, chMacsCounted, chDataForReport)
+	go AlgorithmTwo(nil, resetbroker, killbroker, chMacs, chMacsCounted)
+	go PrepEphemeralWifi(nil, killbroker, chMacsCounted, chDataForReport)
 	// At midnight, flush internal structures and restart.
 	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
-	go PingAtBogoMidnight(nil, suite.cfg, resetbroker, killbroker, suite.mock)
-	go CacheWifi(nil, suite.cfg, resetbroker, killbroker, chDataForReport, chWifiDB, chAck)
+	go PingAtBogoMidnight(nil, resetbroker, killbroker, suite.mock)
+	go CacheWifi(nil, resetbroker, killbroker, chDataForReport, chWifiDB, chAck)
 	// Make sure we don't hang...
-	go GenerateDurations(nil, suite.cfg, killbroker, chWifiDB, chDurationsDB, chAck)
+	go GenerateDurations(nil, killbroker, chWifiDB, chDurationsDB, chAck)
 
 	go ParDeltaTempDB(killbroker, chDurationsDB, chDdbPar...)
-	go BatchSend(nil, suite.cfg, killbroker, chDdbPar[0])
-	go WriteImages(nil, suite.cfg, killbroker, chDdbPar[1])
+	go BatchSend(nil, killbroker, chDdbPar[0])
+	go WriteImages(nil, killbroker, chDdbPar[1])
 
 	NUMCYCLESTORUN := 400
 
@@ -336,32 +343,20 @@ var tests = []struct {
 	},
 }
 
-func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
+func assertEqual(a interface{}, b interface{}, message string) {
 	if a == b {
 		return
 	}
-	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
+	log.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
 }
 
-func (suite *TLPSuite) TestRawToUid(t *testing.T) {
+func (suite *TLPSuite) TestRawToUid() {
 	log.Println("TestRawToUid")
-	cfg := new(config.Config)
-
-	_, filename, _, _ := runtime.Caller(0)
-	fmt.Println(filename)
-	path := filepath.Dir(filename)
-	cfg.Manufacturers.DB = filepath.Join(path, "test", "manufacturers.sqlite")
-
-	ka := NewKeepalive(cfg)
-
-	// var buf bytes.Buffer
-	// log.SetOutput(&buf)
-	// defer func() {
-	// 	log.SetOutput(os.Stderr)
-	// }()
+	cfg := state.GetConfig()
+	ka := NewKeepalive()
 
 	for testNdx, e := range tests {
-		t.Logf("Test #%v: %v\n", testNdx, e.description)
+		log.Printf("Test #%v: %v\n", testNdx, e.description)
 		cfg.Monitoring.UniquenessWindow = e.uniquenessWindow
 
 		var wg sync.WaitGroup
@@ -387,7 +382,7 @@ func (suite *TLPSuite) TestRawToUid(t *testing.T) {
 		}()
 
 		// Not using the reset here.
-		go AlgorithmTwo(ka, cfg, resetbroker, killbroker, chMacs, chUniq)
+		go AlgorithmTwo(ka, resetbroker, killbroker, chMacs, chUniq)
 
 		wg.Add(1)
 		go func() {
@@ -411,7 +406,7 @@ func (suite *TLPSuite) TestRawToUid(t *testing.T) {
 		//log.Println("expected", expected, "received", received)
 
 		if e.passfail {
-			assertEqual(t, expected, received, "not equal")
+			assertEqual(expected, received, "not equal")
 		}
 	} // end for over tests
 }
