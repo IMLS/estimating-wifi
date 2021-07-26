@@ -17,7 +17,7 @@ func TestAsMapWifi(t *testing.T) {
 	}
 
 	m := e.AsMap()
-	if v, ok := m["id"]; ok {
+	if v, ok := m["ID"]; ok {
 		t.Log("map should not have `id` in it", v)
 		t.Fail()
 	}
