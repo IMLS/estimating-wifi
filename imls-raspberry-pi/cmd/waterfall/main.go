@@ -13,7 +13,7 @@ import (
 	"github.com/jszwec/csvutil"
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/internal/analysis"
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
@@ -82,7 +82,9 @@ func main() {
 		log.Fatal("Must provide valid config file.")
 	}
 
-	cfg, _ := config.NewConfigFromPath(*cfgPath)
+	state.NewConfigFromPath(*cfgPath)
+	cfg := state.GetConfig()
+
 	var durations []structs.Duration
 	if *typeFlag == "sqlite" {
 		durations = readDurationsFromSqlite(*srcPtr)
@@ -110,10 +112,10 @@ func main() {
 		// This is necessary... in case we're testing with a
 		// bogus config.yaml file. Better to pull the identifiers from
 		// the actual event stream than trust the file passed.
-		cfg.Auth.FCFSId = fcfs
-		cfg.Auth.DeviceTag = dt
+		cfg.Device.FCFSId = fcfs
+		cfg.Device.DeviceTag = dt
 		pngName := fmt.Sprintf("%v-%.2v-%.2v-%v-%v-patron-sessions", dtime.Year(), int(dtime.Month()), int(dtime.Day()), fcfs, dt)
 		log.Println("writing to", pngName)
-		analysis.DrawPatronSessions(cfg, subset, buildImagePath(fcfs, dt, pngName))
+		analysis.DrawPatronSessions(subset, buildImagePath(fcfs, dt, pngName))
 	}
 }
