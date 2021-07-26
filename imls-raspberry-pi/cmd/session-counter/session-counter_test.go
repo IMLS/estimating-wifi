@@ -177,7 +177,7 @@ func TestRawToUid(t *testing.T) {
 	path := filepath.Dir(filename)
 	cfg.Databases.ManufacturersPath = filepath.Join(path, "test", "manufacturers.sqlite")
 	cfg.Logging.Loggers = []string{"local:stderr"}
-	cfg.InitConfig()
+	state.InitConfig()
 
 	ka := tlp.NewKeepalive()
 
@@ -448,7 +448,7 @@ func T0(t *testing.T) {
 
 	state.FlushCache()
 	cleanupTempFiles()
-	cfg.InitConfig()
+	state.InitConfig()
 	cfg.Logging.LogLevel = "INFO"
 	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
 

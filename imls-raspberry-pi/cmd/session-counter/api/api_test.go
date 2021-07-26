@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"testing"
 
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/http"
+	"gsa.gov/18f/internal/state"
 )
 
 // This should be much higher, like 2000
@@ -17,10 +17,13 @@ import (
 const dbIterations = 2000
 
 func Test_get_manufactuerer(t *testing.T) {
-	cfg := config.Config{}
+
+	state.NewConfig()
+	cfg := state.GetConfig()
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	cfg.Manufacturers.DB = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	state.InitConfig()
 
 	var tests = []struct {
 		mac  string
@@ -36,7 +39,7 @@ func Test_get_manufactuerer(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(fmt.Sprintf("Get Manufactuerer = %v", tc.mfgs), func(t *testing.T) {
-			got := MacToMfg(&cfg, tc.mac)
+			got := MacToMfg(cfg, tc.mac)
 			if got != tc.mfgs {
 				t.Fatalf("got [ %v ] want [ %v ]", got, tc.mfgs)
 			} else {
@@ -54,7 +57,8 @@ func Test_thrash_db(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
 
-	cfg, _ := config.NewConfigFromPath(filepath.Join(path, "..", "test", "config.yaml"))
+	state.NewConfigFromPath(filepath.Join(path, "..", "test", "config.yaml"))
+	cfg := state.GetConfig()
 
 	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {

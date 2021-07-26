@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/state"
 )
 
 func mapEqual(m1 map[string]int, m2 map[string]int) bool {
@@ -49,10 +49,12 @@ var tests = []struct {
 
 func TestAsUserMappings(t *testing.T) {
 	//cfg := config.ReadConfig()
-	cfg := new(config.Config)
+	state.NewConfig()
+	cfg := state.GetConfig()
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	cfg.Manufacturers.DB = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	state.InitConfig()
 
 	umdb := NewUMDB(cfg)
 	m1 := umdb.AsUserMappings()
