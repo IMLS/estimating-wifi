@@ -11,7 +11,7 @@ func (cfg *CFG) InitializeSessionID() {
 	sid_once.Do(func() {
 		sid := 0
 		tdb := theConfig.Databases.DurationsDB
-		if tdb.CheckTableExists("durations") {
+		if tdb != nil && tdb.CheckTableExists("durations") {
 			var sessionId int
 			err := tdb.GetPtr().Get(&sessionId, "SELECT MAX(session_id) FROM durations")
 			if err != nil {

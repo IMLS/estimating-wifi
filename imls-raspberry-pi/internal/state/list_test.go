@@ -14,7 +14,7 @@ func TestListSetup(t *testing.T) {
 	listcfg.Logging.Loggers = []string{"local:stderr"}
 	listcfg.Databases.QueuesPath = "/tmp/queues.sqlite"
 	listcfg.Databases.DurationsPath = "/tmp/durations.sqlite"
-	listcfg.InitConfig()
+	InitConfig()
 }
 
 func TestList(t *testing.T) {

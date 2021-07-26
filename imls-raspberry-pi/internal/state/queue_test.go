@@ -8,13 +8,14 @@ import (
 var cfg *CFG
 
 func TestSetup(t *testing.T) {
-	cfg = NewConfig()
+	NewConfig()
+	cfg = GetConfig()
 	cfg.Paths.WWW.Root = "/tmp"
 	cfg.Logging.LogLevel = "DEBUG"
 	cfg.Logging.Loggers = []string{"local:stderr"}
 	cfg.Databases.QueuesPath = "/tmp/queues.sqlite"
 	cfg.Databases.DurationsPath = "/tmp/durations.sqlite"
-	cfg.InitConfig()
+	InitConfig()
 }
 func TestQueueCreate(t *testing.T) {
 	log.Println(t.Name())
