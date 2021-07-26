@@ -27,12 +27,18 @@ func NewConfig() *CFG {
 	return theConfig
 }
 
+func UnsafeNewConfig() *CFG {
+	theConfig = &CFG{}
+	setDefaults()
+	return theConfig
+}
+
 func InitConfig() {
 	theConfig.Logging.Log = logwrapper.NewLogger(theConfig)
 	theConfig.Databases.DurationsDB = NewSqliteDB(theConfig.Databases.DurationsPath)
 	theConfig.Databases.QueuesDB = NewSqliteDB(theConfig.Databases.QueuesPath)
 	theConfig.Databases.ManufacturersDB = NewSqliteDB(theConfig.Databases.ManufacturersPath)
-	theConfig.InitializeSessionId()
+	theConfig.InitializeSessionID()
 }
 
 // Or, we can get a new config from a path.
@@ -84,7 +90,7 @@ func readConfig(path string) {
 		// Need to reset the clock pointer...
 		// Gets wiped out by the read.
 		theConfig.Clock = clock.New()
-		theConfig.InitializeSessionId()
+		theConfig.InitializeSessionID()
 	} else {
 		log.Printf("could not find config: %v\n", path)
 	}
@@ -104,7 +110,7 @@ func GetConfig() *CFG {
 
 // See serial.go for GetSerial()
 
-func (cfg *CFG) GetFCFSSeqId() string {
+func (cfg *CFG) GetFCFSSeqID() string {
 	return theConfig.Device.FCFSId
 }
 
@@ -144,17 +150,17 @@ func (cfg *CFG) Log() interfaces.Logger {
 	return theConfig.Logging.Log
 }
 
-func (cfg *CFG) GetEventsUri() string {
+func (cfg *CFG) GetEventsURI() string {
 	return theConfig.Umbrella.Paths.Events
 }
 
-func (cfg *CFG) GetDurationsUri() string {
+func (cfg *CFG) GetDurationsURI() string {
 	return theConfig.Umbrella.Paths.Durations
 }
 
 // See sessionid.go for related interface implementation
 
-func (cfg *CFG) IsStoringToApi() bool {
+func (cfg *CFG) IsStoringToAPI() bool {
 	return strings.Contains(strings.ToLower(theConfig.StorageMode), "api")
 }
 

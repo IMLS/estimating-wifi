@@ -42,7 +42,7 @@ func RemapEvents(events []structs.WifiEvent) []structs.WifiEvent {
 		// the manufacturer and patron indicies.
 		sort.Slice(events, func(i, j int) bool {
 			// return events[i].Localtime.Before(events[j].Localtime)
-			return events[i].Id < events[j].Id
+			return events[i].ID < events[j].ID
 		})
 
 		manufacturerNdx = 0

@@ -142,7 +142,7 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	}
 
 	day, _ := time.Parse(time.RFC3339, durations[0].Start)
-	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.GetFCFSSeqId(), cfg.GetDeviceTag())
+	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.GetFCFSSeqID(), cfg.GetDeviceTag())
 	summaryA := fmt.Sprintf("%v devices seen", totalPatrons)
 	summaryP := fmt.Sprintf("%v patron devices", durationsInRange)
 	summaryM := fmt.Sprintf("%v minutes served", totalMinutes)

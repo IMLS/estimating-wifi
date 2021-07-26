@@ -7,7 +7,7 @@ import (
 
 var sid_once sync.Once
 
-func (cfg *CFG) InitializeSessionId() {
+func (cfg *CFG) InitializeSessionID() {
 	sid_once.Do(func() {
 		sid := 0
 		tdb := theConfig.Databases.DurationsDB

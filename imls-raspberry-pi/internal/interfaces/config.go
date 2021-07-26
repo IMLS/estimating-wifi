@@ -4,7 +4,7 @@ import "github.com/benbjohnson/clock"
 
 type Config interface {
 	GetSerial() string
-	GetFCFSSeqId() string
+	GetFCFSSeqID() string
 	GetDeviceTag() string
 	GetAPIKey() string
 
@@ -12,15 +12,15 @@ type Config interface {
 	GetLoggers() []string
 	Log() Logger
 
-	GetEventsUri() string
-	GetDurationsUri() string
+	GetEventsURI() string
+	GetDurationsURI() string
 
-	InitializeSessionId()
-	IncrementSessionId() int
-	GetCurrentSessionId() int
-	GetPreviousSessionId() int
+	InitializeSessionID()
+	IncrementSessionID() int
+	GetCurrentSessionID() int
+	GetPreviousSessionID() int
 
-	IsStoringToApi() bool
+	IsStoringToAPI() bool
 	IsStoringLocally() bool
 	IsProductionMode() bool
 	IsDeveloperMode() bool

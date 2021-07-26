@@ -81,7 +81,7 @@ func main() {
 	initConfigFromFlags()
 	cfg := state.GetConfig()
 	// NOW YOU MAY USE LOGGING.
-	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionId())
+	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())
 
 	// Run the network
 	var wg sync.WaitGroup

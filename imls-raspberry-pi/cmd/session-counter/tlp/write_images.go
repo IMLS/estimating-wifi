@@ -42,7 +42,7 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 		int(yesterday.Month()),
 		int(yesterday.Day()),
 		sessionid,
-		cfg.GetFCFSSeqId(),
+		cfg.GetFCFSSeqID(),
 		cfg.GetDeviceTag())
 
 	path := filepath.Join(cfg.Paths.WWW.Images, imageFilename)

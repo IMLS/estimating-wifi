@@ -72,7 +72,7 @@ func GenerateDurations(ka *Keepalive, kb *KillBroker,
 			// When we're passed the DB pointer, that means a reset has been triggered
 			// up the chain. So, we need to process the events from the day.
 			durationsdb := processDataFromDay(wifidb)
-			thissession := cfg.GetCurrentSessionId()
+			thissession := cfg.GetCurrentSessionID()
 			lw.Debug("queueing current session [ ", thissession, " ] to images and send queue... ")
 			if thissession >= 0 {
 				sq.Enqueue(fmt.Sprint(thissession))
