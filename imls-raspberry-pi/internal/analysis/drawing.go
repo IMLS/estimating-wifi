@@ -41,7 +41,7 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
 		// log.Println("st", st, "et", et, "diff", diff)
-		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
+		if (diff > cfg.GetMinimumMinutes()) && (diff < cfg.GetMaximumMinutes()) {
 			//log.Println("id", d.PatronId, "diff", diff)
 			durationsInRange += 1
 		}
@@ -79,7 +79,7 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 		totalPatrons += 1
 		totalMinutes += diff
 
-		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
+		if (diff > cfg.GetMinimumMinutes()) && (diff < cfg.GetMaximumMinutes()) {
 			ystep += 1
 
 			// Draw the hour lines

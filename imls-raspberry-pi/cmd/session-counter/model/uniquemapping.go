@@ -54,14 +54,14 @@ func (umdb uniqueMappingDB) UpdateMapping(mac string) {
 		// Increment for the next found address.
 		*umdb.lastid = *umdb.lastid + 1
 		// 20210412 MCJ
-		// Now manufactuerers are being numbered as they come in.
+		// Now manufacturers are being numbered as they come in.
 		// This makes sure that we don't leak info. If the first device
 		// we see after powerup is an "Apple" device, it will become
 		// mfg "0". If the third device we see is an "Apple" device, then
 		// Apple devices will be mfg 3. Effectively random, and does not
 		// leak any info.
 
-		// Get the actual manufactuerer. This pares down the MAC appropriately.
+		// Get the actual manufacturer. This pares down the MAC appropriately.
 		// Grab a manufacturer for this MAC
 		mfg := api.MacToMfg(umdb.cfg, mac)
 		// Do we have a mfg mapping?

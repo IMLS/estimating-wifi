@@ -18,7 +18,7 @@ type Queue struct {
 
 func NewQueue(name string) (q *Queue) {
 	cfg := GetConfig()
-	tdb := NewSqliteDB(cfg.Databases.QueuesPath)
+	tdb := cfg.GetQueuesDatabase()
 	t := tdb.InitTable(name)
 	t.AddColumn("item", "TEXT UNIQUE")
 	t.Create()

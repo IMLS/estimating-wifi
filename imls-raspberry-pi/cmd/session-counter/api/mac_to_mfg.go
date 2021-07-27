@@ -9,14 +9,14 @@ import (
 )
 
 // FUNC Mac_to_mfg
-// Looks up a MAC address in the manufactuerer's database.
+// Looks up a MAC address in the manufacturer's database.
 // Returns a valid name or "unknown" if the name cannot be found.
 
 // We hit this *all the time*. Perhaps we can speed it up?
 var cache map[string]string = make(map[string]string)
 
 func MacToMfg(cfg interfaces.Config, mac string) string {
-	db := cfg.GetManufacturerDatabase()
+	db := cfg.GetManufacturersDatabase()
 	// We need to try the longest to the shortest MAC address
 	// in order to match.
 	// Start with aa:bb:cc:dd:ee
@@ -35,7 +35,7 @@ func MacToMfg(cfg interfaces.Config, mac string) string {
 				q := fmt.Sprintf("SELECT id FROM oui WHERE mac LIKE %s", "'"+substr+"%'")
 				rows, err := db.Query(q)
 				if err != nil {
-					cfg.Log().Debug("manufactuerer not found: ", q)
+					cfg.Log().Debug("manufacturer not found: ", q)
 					cfg.Log().Debug(err.Error())
 				} else {
 					var id string

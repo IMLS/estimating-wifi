@@ -17,8 +17,8 @@ import (
 func tshark(adapter string) []string {
 	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
-	tsharkCmd := exec.Command(cfg.Executables.Wireshark.Path,
-		"-a", fmt.Sprintf("duration:%d", cfg.Executables.Wireshark.Duration),
+	tsharkCmd := exec.Command(cfg.GetWiresharkPath(),
+		"-a", fmt.Sprintf("duration:%d", cfg.GetWiresharkDuration()),
 		"-I", "-i", adapter,
 		"-Tfields", "-e", "wlan.sa")
 

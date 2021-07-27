@@ -17,17 +17,3 @@ func removeLeadingAndTrailingSlashes(uri string) string {
 func startsWithSlash(uri string) string {
 	return "/" + uri
 }
-
-func GetEventsURI() string {
-	var uri string = (theConfig.Umbrella.Scheme + "://" +
-		removeLeadingAndTrailingSlashes(theConfig.Umbrella.Host) +
-		startsWithSlash(removeLeadingSlashes(theConfig.Umbrella.Paths.Events)))
-	return uri
-}
-
-func GetDurationsURI() string {
-	var uri string = (theConfig.Umbrella.Scheme + "://" +
-		removeLeadingAndTrailingSlashes(theConfig.Umbrella.Host) +
-		startsWithSlash(removeLeadingSlashes(theConfig.Umbrella.Paths.Durations)))
-	return uri
-}

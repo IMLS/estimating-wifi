@@ -13,7 +13,7 @@ import (
 
 func GetDurationsDB() interfaces.Database {
 	cfg := state.GetConfig()
-	fullpath := filepath.Join(cfg.Paths.WWW.Root, state.DURATIONSDB)
+	fullpath := filepath.Join(cfg.GetWWWRoot(), state.DURATIONSDB)
 	tdb := state.NewSqliteDB(fullpath)
 	tdb.CreateTableFromStruct(structs.Duration{})
 	return tdb

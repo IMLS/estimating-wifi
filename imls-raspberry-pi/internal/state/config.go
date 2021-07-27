@@ -3,183 +3,199 @@ package state
 import (
 	"encoding/base64"
 	"log"
-	"os"
 	"strings"
-	"sync"
 
-	"github.com/benbjohnson/clock"
-	yaml "gopkg.in/yaml.v2"
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
-	"gsa.gov/18f/internal/wifi-hardware-search/config"
 )
 
-var theConfig *CFG
-var once sync.Once
-
-// The config is a singleton. We can get a new,
-// empty config once.
-func NewConfig() *CFG {
-	once.Do(func() {
-		UnsafeNewConfig()
-	})
-	return theConfig
+type databaseConfig struct {
+	configDB  interfaces.Database
+	config    interfaces.Table
+	sessionID int
+	logger    interfaces.Logger
 }
 
-func UnsafeNewConfig() *CFG {
-	theConfig = &CFG{}
-	setDefaults()
-	return theConfig
-}
+var singletonConfig databaseConfig
 
-func InitConfig() {
-	theConfig.Logging.Log = logwrapper.NewLogger(theConfig)
-	theConfig.Databases.DurationsDB = NewSqliteDB(theConfig.Databases.DurationsPath)
-	theConfig.Databases.QueuesDB = NewSqliteDB(theConfig.Databases.QueuesPath)
-	theConfig.Databases.ManufacturersDB = NewSqliteDB(theConfig.Databases.ManufacturersPath)
-	theConfig.InitializeSessionID()
-}
-
-// Or, we can get a new config from a path.
-// We cannot get both.
-func NewConfigFromPath(path string) {
-	once.Do(func() {
-		UnsafeNewConfigFromPath(path)
-	})
-}
-
-func UnsafeNewConfigFromPath(path string) {
-	theConfig = &CFG{}
-	setDefaults()
-	readConfig(path)
-	if theConfig.Clock == nil {
-		log.Println("clock should not be nil")
-		log.Fatal()
+func GetConfig() *databaseConfig {
+	if singletonConfig.configDB == nil {
+		panic("config database was not initialized")
 	}
+	return &singletonConfig
 }
 
-func readConfig(path string) {
-	_, err := os.Stat(path)
-	// Stat will set an error if the file cannot be found.
-	if err == nil {
-		f, err := os.Open(path)
-		if err != nil {
-			log.Fatal("config: could not open configuration file. Exiting.")
-		}
-		defer f.Close()
-		var newcfg *CFG
-		decoder := yaml.NewDecoder(f)
-		err = decoder.Decode(&newcfg)
-		if err != nil {
-			log.Fatalf("config: could not decode YAML:\n%v\n", err)
-		}
-		theConfig = newcfg
+func SetConfigAtPath(configDBPath string) *databaseConfig {
+	singletonConfig = newConfig(configDBPath)
+	return &singletonConfig
+}
 
-		// The API key will need to be decoded into memory.
-		if len(theConfig.Device.Token) > 0 {
-			decodeAuthToken()
-		}
-
-		// FIXME: Because this is an external lib, we need to set the
-		// path there. Or, pass the config?
-		if len(theConfig.Executables.LshwPath) > 0 {
-			config.SetLSHWLocation(theConfig.Executables.LshwPath)
-		}
-
-		// Need to reset the clock pointer...
-		// Gets wiped out by the read.
-		theConfig.Clock = clock.New()
-		theConfig.InitializeSessionID()
+// NewConfig creates a sqlite file and corresponding config table if not already
+// extant
+func newConfig(configDBPath string) databaseConfig {
+	db := NewSqliteDB(configDBPath)
+	var table interfaces.Table
+	if !db.CheckTableExists("config") {
+		table = db.CreateTableFromStruct(ConfigDB{})
+		defaults := ConfigDefaults()
+		table.InsertStruct(defaults)
 	} else {
-		log.Printf("could not find config: %v\n", path)
+		table = db.GetTableByName("config")
 	}
+	// TODO: incorporate manu db as well?
+
+	// TODO: this is awkward: bootstrapping issue. we're getting rid of
+	// sessionid fairly soon so I won't worry too much about it.
+	path := table.GetTextField("durations_path")
+	durationsDB := NewSqliteDB(path)
+	sessionID := InitializeSessionID(durationsDB)
+
+	dc := databaseConfig{db, table, sessionID, nil}
+	dc.logger = logwrapper.NewLogger(&dc)
+	return dc
 }
 
-// We can return the existing singleton as many
-// times as we like. However, if it is not initialized,
-// the program should exit.
-func GetConfig() *CFG {
-	if theConfig == nil {
-		log.Fatal("cannot retrieve nil config")
+func (dc *databaseConfig) GetSerial() string {
+	// allow the serial to be stored so we can test out different serial and api
+	// key settings. if not, default to reading from /proc (as a cached read)
+	serial := dc.config.GetTextField("serial")
+	if serial == "" {
+		return getCachedSerial()
 	}
-	return theConfig
+	return serial
 }
 
-// interface Config
-
-// See serial.go for GetSerial()
-
-func (cfg *CFG) GetFCFSSeqID() string {
-	return theConfig.Device.FCFSId
+func (dc *databaseConfig) GetFCFSSeqID() string {
+	return dc.config.GetTextField("fcfs_seq_id")
 }
 
-func (cfg *CFG) GetDeviceTag() string {
-	return theConfig.Device.DeviceTag
+func (dc *databaseConfig) GetDeviceTag() string {
+	return dc.config.GetTextField("device_tag")
 }
 
-func (cfg *CFG) GetAPIKey() string {
-	return theConfig.Device.Token
-}
-
-func (cfg *CFG) GetLogLevel() string {
-	valid := []string{"DEBUG", "INFO", "WARN", "ERROR"}
-	ok := false
-	for _, v := range valid {
-		if theConfig.Logging.LogLevel == v {
-			ok = true
-		}
-		if theConfig.Logging.LogLevel == strings.ToLower(v) {
-			ok = true
-		}
+// GetAPIKey decodes the api key stored in the database.
+func (dc *databaseConfig) GetAPIKey() string {
+	apiKey := dc.config.GetTextField("api_key")
+	serial := dc.GetSerial()
+	var key [32]byte
+	copy(key[:], serial)
+	b64, err := base64.StdEncoding.DecodeString(apiKey)
+	if err != nil {
+		log.Print("config: cannot b64 decode auth token: ", err)
 	}
-	if !ok {
-		log.Printf("invalid log level in config: %v\n",
-			theConfig.Logging.LogLevel)
-		return "ERROR"
-	} else {
-		return theConfig.Logging.LogLevel
+	dec, err := cryptopasta.Decrypt(b64, &key)
+	if err != nil {
+		log.Print("config: failed to decrypt auth token after decoding: ", err)
 	}
+	return string(dec)
 }
 
-func (cfg *CFG) GetLoggers() []string {
-	return theConfig.Logging.Loggers
+func (dc *databaseConfig) SetFCFSSeqID(id string) {
+	dc.config.SetTextField("fcfs_seq_id", id)
 }
 
-func (cfg *CFG) Log() interfaces.Logger {
-	return theConfig.Logging.Log
+func (dc *databaseConfig) SetDeviceTag(tag string) {
+	dc.config.SetTextField("device_tag", tag)
 }
 
-func (cfg *CFG) GetEventsURI() string {
-	return theConfig.Umbrella.Paths.Events
+func (dc *databaseConfig) SetAPIKey(key string) {
+	dc.config.SetTextField("api_key", key)
 }
 
-func (cfg *CFG) GetDurationsURI() string {
-	return theConfig.Umbrella.Paths.Durations
+func (dc *databaseConfig) SetStorageMode(mode string) {
+	dc.config.SetTextField("storage_mode", mode)
+}
+
+func (dc *databaseConfig) SetRunMode(mode string) {
+	dc.config.SetTextField("run_mode", mode)
+}
+
+func (dc *databaseConfig) SetManufacturersPath(mode string) {
+	dc.config.SetTextField("manufacturers_path", mode)
+}
+
+func (dc *databaseConfig) SetQueuesPath(mode string) {
+	dc.config.SetTextField("queues_path", mode)
+}
+
+func (dc *databaseConfig) SetDurationsPath(mode string) {
+	dc.config.SetTextField("durations_path", mode)
+}
+
+func (dc *databaseConfig) SetRootPath(mode string) {
+	dc.config.SetTextField("www_root", mode)
+}
+
+func (dc *databaseConfig) SetImagesPath(mode string) {
+	dc.config.SetTextField("www_images", mode)
+}
+
+func (dc *databaseConfig) SetUniquenessWindow(window int) {
+	dc.config.SetIntegerField("uniqueness_window", window)
+}
+
+func (dc *databaseConfig) GetLogLevel() string {
+	return dc.config.GetTextField("log_level")
+}
+
+func (dc *databaseConfig) GetLoggers() []string {
+	loggers := dc.config.GetTextField("loggers")
+	return strings.Split(loggers, ",")
+}
+
+func (dc *databaseConfig) Log() interfaces.Logger {
+	return dc.logger
+}
+
+func (dc *databaseConfig) GetEventsURI() string {
+	scheme := dc.config.GetTextField("umbrella_scheme")
+	host := dc.config.GetTextField("umbrella_host")
+	path := dc.config.GetTextField("events_uri")
+	return (scheme + "://" +
+		removeLeadingAndTrailingSlashes(host) +
+		startsWithSlash(removeLeadingSlashes(path)))
+}
+
+func (dc *databaseConfig) GetDurationsURI() string {
+	scheme := dc.config.GetTextField("umbrella_scheme")
+	host := dc.config.GetTextField("umbrella_host")
+	path := dc.config.GetTextField("durations_uri")
+	return (scheme + "://" +
+		removeLeadingAndTrailingSlashes(host) +
+		startsWithSlash(removeLeadingSlashes(path)))
 }
 
 // See sessionid.go for related interface implementation
+// InitializeSessionID()
+// IncrementSessionID() int
+// GetCurrentSessionID() int
+// GetPreviousSessionID() int
 
-func (cfg *CFG) IsStoringToAPI() bool {
-	return strings.Contains(strings.ToLower(theConfig.StorageMode), "api")
+func (dc *databaseConfig) IsStoringToAPI() bool {
+	mode := dc.config.GetTextField("storage_mode")
+	return strings.Contains(strings.ToLower(mode), "api")
 }
 
-func (cfg *CFG) IsStoringLocally() bool {
+func (dc *databaseConfig) IsStoringLocally() bool {
+	mode := dc.config.GetTextField("storage_mode")
 	either := false
 	for _, s := range []string{"local", "sqlite"} {
-		either = either || strings.Contains(strings.ToLower(theConfig.StorageMode), s)
+		either = either || strings.Contains(strings.ToLower(mode), s)
 	}
 	return either
 }
 
-func (cfg *CFG) IsProductionMode() bool {
-	return strings.Contains(strings.ToLower(theConfig.RunMode), "prod")
+func (dc *databaseConfig) IsProductionMode() bool {
+	mode := dc.config.GetTextField("run_mode")
+	return strings.Contains(strings.ToLower(mode), "prod")
 }
 
-func (cfg *CFG) IsDeveloperMode() bool {
+func (dc *databaseConfig) IsDeveloperMode() bool {
+	mode := dc.config.GetTextField("run_mode")
 	either := false
 	for _, s := range []string{"dev", "test"} {
-		either = either || strings.Contains(strings.ToLower(theConfig.RunMode), s)
+		either = either || strings.Contains(strings.ToLower(mode), s)
 	}
 	if either {
 		log.Println("running in developer mode")
@@ -187,174 +203,111 @@ func (cfg *CFG) IsDeveloperMode() bool {
 	return either
 }
 
-func (cfg *CFG) IsTestMode() bool {
-	return strings.Contains(strings.ToLower(theConfig.RunMode), "test")
+func (dc *databaseConfig) IsTestMode() bool {
+	mode := dc.config.GetTextField("run_mode")
+	return strings.Contains(strings.ToLower(mode), "test")
 }
 
-func (cfg *CFG) GetDurationsDatabase() interfaces.Database {
-	return cfg.Databases.DurationsDB
+func (dc *databaseConfig) GetManufacturersDatabase() interfaces.Database {
+	path := dc.config.GetTextField("manufacturers_path")
+	return NewSqliteDB(path)
 }
 
-func (cfg *CFG) GetQueuesDatabase() interfaces.Database {
-	return cfg.Databases.QueuesDB
-}
-func (cfg *CFG) GetManufacturerDatabase() interfaces.Database {
-	return cfg.Databases.ManufacturersDB
+func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
+	path := dc.config.GetTextField("durations_path")
+	return NewSqliteDB(path)
 }
 
-func (cfg *CFG) GetClock() clock.Clock {
-	return cfg.Clock
+func (dc *databaseConfig) GetQueuesDatabase() interfaces.Database {
+	path := dc.config.GetTextField("queues_path")
+	return NewSqliteDB(path)
 }
 
-func (cfg *CFG) GetMinimumMinutes() int {
-	return cfg.Monitoring.MinimumMinutes
+func (dc *databaseConfig) GetWiresharkPath() string {
+	return dc.config.GetTextField("wireshark_path")
 }
 
-func (cfg *CFG) GetMaximumMinutes() int {
-	return cfg.Monitoring.MaximumMinutes
+func (dc *databaseConfig) GetWiresharkDuration() int {
+	return dc.config.GetIntegerField("wireshark_duration")
 }
 
-func SetToken(token string) {
-	theConfig.Device.Token = token
+func (dc *databaseConfig) GetMinimumMinutes() int {
+	return dc.config.GetIntegerField("minimum_minutes")
 }
 
-func SetFCFSId(id string) {
-	theConfig.Device.FCFSId = id
+func (dc *databaseConfig) GetMaximumMinutes() int {
+	return dc.config.GetIntegerField("maximum_minutes")
 }
 
-func SetTag(tag string) {
-	theConfig.Device.DeviceTag = tag
+func (dc *databaseConfig) GetUniquenessWindow() int {
+	return dc.config.GetIntegerField("uniqueness_window")
 }
 
-func SetStorageMode(mode string) {
-	theConfig.StorageMode = mode
+func (dc *databaseConfig) GetResetCron() string {
+	return dc.config.GetTextField("reset_cron")
 }
 
-func DumpConfig(path string) {
-	dump, err := yaml.Marshal(&theConfig)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-	s := string(dump)
-	// This will truncate the file if it exists.
-	f, err := os.Create(path)
-	if err != nil {
-		log.Fatal("could not open config for writing")
-	}
-	f.WriteString(s)
-	f.Close()
+func (dc *databaseConfig) GetWWWRoot() string {
+	return dc.config.GetTextField("www_root")
 }
 
-/////////
-
-func decodeAuthToken() {
-	decodeSerial()
-	// theConfig.Device.Token = decodeAuthToken()
-	// It is a B64 encoded string
-	// of the API key encrypted with the device's serial.
-	// This is obscurity, but it is all we can do on a RPi
-	serial := []byte(theConfig.GetSerial())
-	// ("serial", fmt.Sprintf("%v", serial))
-	var key [32]byte
-	copy(key[:], serial)
-	// log.Println("token", cfg.Auth.Token)
-	b64, err := base64.StdEncoding.DecodeString(theConfig.Device.Token)
-	if err != nil {
-		log.Println("config: cannot b64 decode auth token.")
-		log.Println(err.Error())
-	}
-	dec, err := cryptopasta.Decrypt(b64, &key)
-	if err != nil {
-		log.Println("config: failed to decrypt auth token after decoding")
-		// log.Println("key", fmt.Sprintf("%v", key))
-		log.Println(err.Error())
-	}
-	theConfig.Device.Token = string(dec)
+func (dc *databaseConfig) GetWWWImages() string {
+	return dc.config.GetTextField("www_images")
 }
 
-// var states = []string{"AA,AE,AK,AL,AP,AR,AS,AZ,CA,CO,CT,CZ,DE,FL,FM,GA,GU,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MH,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,PR,PW,RI,SC,SD,TN,TX,UT,VI,VT,VA,WA,WV,WI,WY"}
-
-func setDefaults() {
-	theConfig.Logging.LogLevel = "DEBUG"
-	theConfig.Logging.Loggers = []string{"local:stderr", "local:tmp", "api:directus"}
-
-	theConfig.Monitoring.UniquenessWindow = 24 * 60
-	theConfig.Monitoring.MinimumMinutes = 5
-	theConfig.Monitoring.MaximumMinutes = 600
-
-	theConfig.Umbrella.Scheme = "https"
-	theConfig.Umbrella.Host = "api.data.gov"
-	theConfig.Umbrella.Paths.Durations = "/TEST/10x-imls/v2/durations/"
-	theConfig.Umbrella.Paths.Events = "/TEST/10x-imls/v2/events/"
-
-	theConfig.Executables.Wireshark.Duration = 45
-	theConfig.Executables.Wireshark.Path = "/usr/bin/tshark"
-
-	theConfig.Databases.ManufacturersPath = "/opt/imls/manufacturers.sqlite"
-	theConfig.Databases.DurationsPath = "/www/imls/durations.sqlite"
-	theConfig.Databases.QueuesPath = "/www/imls/queues.sqlite"
-
-	theConfig.StorageMode = "api"
-	theConfig.RunMode = "prod"
-	theConfig.Clock = clock.New()
-	theConfig.Monitoring.ResetCron = "0 0 * * *"
-
-	theConfig.Paths.WWW.Root = "/www/imls"
-	theConfig.Paths.WWW.Images = "/www/imls/images"
-
+func (dc *databaseConfig) Close() {
+	dc.configDB.Close()
 }
 
-type CFG struct {
-	Device struct {
-		Token     string `yaml:"api_token"`
-		DeviceTag string `yaml:"device_tag"`
-		FCFSId    string `yaml:"fcfs_seq_id"`
-	} `yaml:"device"`
-	Logging struct {
-		LogLevel string            `yaml:"log_level"`
-		Loggers  []string          `yaml:"loggers"`
-		Log      interfaces.Logger `yaml:"-"`
-	} `yaml:"logging"`
-	Monitoring struct {
-		UniquenessWindow int    `yaml:"uniqueness_window"`
-		MinimumMinutes   int    `yaml:"minimum_minutes"`
-		MaximumMinutes   int    `yaml:"maximum_minutes"`
-		ResetCron        string `yaml:"reset_cron"`
-	} `yaml:"monitoring"`
-	Umbrella struct {
-		Scheme string `yaml:"scheme"`
-		Host   string `yaml:"host"`
-		Paths  struct {
-			Durations string `yaml:"durations"`
-			Events    string `yaml:"events"`
-		} `yaml:"paths"`
-	} `yaml:"umbrella"`
-	Executables struct {
-		Wireshark struct {
-			Duration int    `yaml:"duration"`
-			Path     string `yaml:"wireshark_path"`
-		} `yaml:"wireshark"`
-		LshwPath string `yaml:"lshw_path"`
-		IpPath   string `yaml:"ip_path"`
-	} `yaml:"executables"`
-	Databases struct {
-		ManufacturersPath string              `yaml:"manufacturers_path"`
-		ManufacturersDB   interfaces.Database `yaml:"-"`
-		DurationsPath     string              `yaml:"durations_path"`
-		DurationsDB       interfaces.Database `yaml:"-"`
-		QueuesPath        string              `yaml:"queues_path"`
-		QueuesDB          interfaces.Database `yaml:"-"`
-	} `yaml:"databases"`
-	Paths struct {
-		WWW struct {
-			Root   string `yaml:"root"`
-			Images string `yaml:"images"`
-		} `yaml:"www"`
-	} `yaml:"paths"`
-	Serial      string      `yaml:"serial"`
-	StorageMode string      `yaml:"storagemode"`
-	RunMode     string      `yaml:"runmode"`
-	SessionId   int         `yaml:"-"` // ignore
-	Clock       clock.Clock `yaml:"-"` // ignore
+type ConfigDB struct {
+	logLevel          string `db:"log_level" sqlite:"TEXT"`
+	loggers           string `db:"loggers" sqlite:"TEXT"` // comma separated
+	apiKey            string `db:"api_key" sqlite:"TEXT"`
+	deviceTag         string `db:"device_tag" sqlite:"TEXT"`
+	fcfsSeqID         string `db:"fcfs_seq_id" sqlite:"TEXT"`
+	serial            string `db:"serial" sqlite:"TEXT"`
+	storageMode       string `db:"storage_mode" sqlite:"TEXT"`
+	runMode           string `db:"run_mode" sqlite:"TEXT"`
+	manufacturersPath string `db:"manufacturers_path" sqlite:"TEXT"`
+	durationsPath     string `db:"durations_path" sqlite:"TEXT"`
+	queuesPath        string `db:"queues_path" sqlite:"TEXT"`
+	umbrellaScheme    string `db:"umbrella_scheme" sqlite:"TEXT"`
+	umbrellaHost      string `db:"umbrella_host" sqlite:"TEXT"`
+	eventsURI         string `db:"events_uri" sqlite:"TEXT"`
+	durationsURI      string `db:"durations_uri" sqlite:"TEXT"`
+	minimumMinutes    int    `db:"minimum_minutes" sqlite:"INTEGER"`
+	maximumMinutes    int    `db:"maximum_minutes" sqlite:"INTEGER"`
+	uniquenessWindow  int    `db:"uniqueness_window" sqlite:"INTEGER"`
+	wiresharkPath     string `db:"wireshark_path" sqlite:"TEXT"`
+	wiresharkDuration int    `db:"wireshark_duration" sqlite:"INTEGER"`
+	resetCron         string `db:"reset_cron" sqlite:"TEXT"`
+	wwwRoot           string `db:"www_root" sqlite:"TEXT"`
+	wwwImages         string `db:"www_images" sqlite:"TEXT"`
+}
 
+func ConfigDefaults() ConfigDB {
+	var defaults ConfigDB
+	defaults.logLevel = "DEBUG"
+	defaults.loggers = "local:stderr,local:tmp,api:directus"
+	// APIKey filled in by user
+	// DeviceTag filled in by user
+	// FCFSSeqID filled in by user
+	// Serial filled in by device or user
+	defaults.storageMode = "api"
+	defaults.runMode = "prod"
+	defaults.manufacturersPath = "/opt/imls/manufacturers.sqlite"
+	defaults.durationsPath = "/www/imls/durations.sqlite"
+	defaults.queuesPath = "/www/imls/queues.sqlite"
+	defaults.umbrellaScheme = "https"
+	defaults.umbrellaHost = "api.data.gov"
+	defaults.eventsURI = "/TEST/10x-imls/v2/events/"
+	defaults.durationsURI = "/TEST/10x-imls/v2/durations/"
+	defaults.minimumMinutes = 5
+	defaults.maximumMinutes = 600
+	defaults.wiresharkDuration = 45
+	defaults.wiresharkPath = "/usr/bin/tshark"
+	defaults.resetCron = "0 0 * * *"
+	defaults.wwwRoot = "/www/imls"
+	defaults.wwwImages = "/www/imls/images"
+	return defaults
 }

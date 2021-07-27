@@ -9,7 +9,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/logwrapper"
 )
 
 type SqliteDB struct {
@@ -33,8 +32,8 @@ func NewSqliteDB(path string) *SqliteDB {
 	if ptr, ok := ptrCache[path]; ok {
 		db = ptr
 	} else {
-		cfg := GetConfig()
-		cfg.Log().Debug("opening db at " + path)
+		// cfg := GetConfig()
+		// cfg.Log().Debug("opening db at " + path)
 		db = &SqliteDB{}
 		db.Path = path
 		db.Ptr = nil
@@ -45,13 +44,15 @@ func NewSqliteDB(path string) *SqliteDB {
 	}
 	return db
 }
+
 func (db *SqliteDB) Open() {
-	cfg := GetConfig()
+	// cfg := GetConfig()
 	if db.Ptr == nil {
 		ptr, err := sqlx.Open("sqlite3", db.Path+"?mode=rwc")
 		if err != nil {
-			cfg.Log().Error("could not open db: ", db.Path)
-			cfg.Log().Fatal(err.Error())
+			// cfg.Log().Error("could not open db: ", db.Path)
+			// cfg.Log().Fatal(err.Error())
+			log.Panic("could not open db ", err)
 		} else {
 			db.Ptr = ptr
 		}
@@ -59,15 +60,16 @@ func (db *SqliteDB) Open() {
 }
 
 func (db *SqliteDB) Close() {
-	lw := logwrapper.NewLogger(nil)
+	// lw := logwrapper.NewLogger(nil)
 	if strings.Contains(db.Path, "memory") {
 		// Do nothing. Keep memory DB open.
 	} else {
+		delete(ptrCache, db.Path) // clear db cache, we are explicitly closing
 		if db.Ptr != nil {
 			//lw.Debug("closing db: ", tdb.DBName)
 			err := db.Ptr.Close()
 			if err != nil {
-				lw.Error("could not close db [", db.Path, "]")
+				log.Panic("could not close db [", db.Path, "]")
 			}
 			db.Ptr = nil
 		}
@@ -265,4 +267,44 @@ func (t *SqliteTable) GetDateType() string {
 
 func (t *SqliteTable) GetDB() interfaces.Database {
 	return t.DB
+}
+
+func (t *SqliteTable) GetIntegerField(name string) int {
+	var result int
+	ptr := t.DB.GetPtr()
+	query := fmt.Sprintf("SELECT %s FROM %s LIMIT 1", name, t.Name)
+	err := ptr.Get(&result, query)
+	if err != nil {
+		log.Panic("GetIntegerField failed ", err)
+	}
+	return result
+}
+
+func (t *SqliteTable) GetTextField(name string) string {
+	var result string
+	ptr := t.DB.GetPtr()
+	query := fmt.Sprintf("SELECT %s FROM %s LIMIT 1", name, t.Name)
+	err := ptr.Get(&result, query)
+	if err != nil {
+		log.Panic("GetTextField failed ", err)
+	}
+	return result
+}
+
+func (t *SqliteTable) SetIntegerField(name string, value int) {
+	ptr := t.DB.GetPtr()
+	stmt := fmt.Sprintf("UPDATE %s SET '%s' = '%d'", t.Name, name, value)
+	_, err := ptr.Exec(stmt)
+	if err != nil {
+		log.Panic("SetIntegerField failed ", err)
+	}
+}
+
+func (t *SqliteTable) SetTextField(name string, value string) {
+	ptr := t.DB.GetPtr()
+	stmt := fmt.Sprintf("UPDATE %s SET '%s' = '%s'", t.Name, name, value)
+	_, err := ptr.Exec(stmt)
+	if err != nil {
+		log.Panic("SetTextField failed ", err)
+	}
 }

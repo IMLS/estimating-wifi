@@ -1,78 +1,54 @@
 package state
 
 import (
-	"fmt"
-	"log"
-	"path/filepath"
-	"runtime"
+	"os"
 	"testing"
-	"time"
 
-	"github.com/benbjohnson/clock"
+	"github.com/stretchr/testify/suite"
 )
 
-func Test_Config(t *testing.T) {
-	cfg := NewConfig()
-	//cfg.Validate()
-	if cfg.Databases.DurationsPath != "/www/imls/durations.sqlite" {
-		t.Fatal()
-	}
+type ConfigSuite struct {
+	suite.Suite
 }
 
-func TestReadConfig(t *testing.T) {
-	_, filename, _, _ := runtime.Caller(0)
-	fmt.Println(filename)
-	path := filepath.Dir(filename)
-	configPath := filepath.Join(path, "..", "..", "cmd", "session-counter", "test", "config.yaml")
-	UnsafeNewConfigFromPath(configPath)
-	cfg := GetConfig()
-	expected := map[string]string{
-		cfg.Databases.DurationsPath: "/opt/imls/www/durations.sqlite",
-		cfg.Device.DeviceTag:        "MYDEVICETAG",
-	}
-	unexpected := false
-	for k, v := range expected {
-		log.Println("comparing", k, v)
-		if k != v {
-			unexpected = true
-			log.Println(k, "not equal to", v)
+var configDBPath = "/tmp/config-test.sql"
+
+func (suite *ConfigSuite) SetupTest() {
+	os.Create(configDBPath)
+	os.Chmod(configDBPath, 0777)
+	SetConfigAtPath(configDBPath)
+}
+
+func (suite *ConfigSuite) AfterTest(suiteName, testName string) {
+	dc := GetConfig()
+	dc.Close()
+	// ensure a clean run.
+	os.Remove(configDBPath)
+}
+
+func (suite *ConfigSuite) TestConfigDefaults() {
+	dc := GetConfig()
+	var expected []string = []string{"local:stderr", "local:tmp", "api:directus"}
+	result := dc.GetLoggers()
+	for i := 0; i < 3; i += 1 {
+		if result[i] != expected[i] {
+			suite.Fail("loggers were not equal")
 		}
 	}
-	if unexpected {
-		t.Fail()
+	if dc.GetDurationsDatabase().GetPath() != "/www/imls/durations.sqlite" {
+		suite.Fail("duration path was not equal")
 	}
 }
 
-func TestMock(t *testing.T) {
-	cfg := NewConfig()
-	cfg.Clock = clock.NewMock()
-	year := cfg.Clock.Now().UTC().Year()
-	if year != 1970 {
-		t.Log("year is", year)
-		t.Log(cfg.Clock.Now())
-		t.Fail()
+func (suite *ConfigSuite) TestConfigWrite() {
+	dc := GetConfig()
+	dc.SetDeviceTag("a random string")
+	result := dc.GetDeviceTag()
+	if result != "a random string" {
+		suite.Fail("write was not reflected")
 	}
 }
 
-func TestSetMock(t *testing.T) {
-	cfg := NewConfig()
-	mock := clock.NewMock()
-	cfg.Clock = mock
-	if cfg.Clock.Now().UTC().Year() != 1970 {
-		t.Fail()
-	}
-
-	d, e := time.ParseDuration("24h")
-	if e != nil {
-		t.Log("could not parse duration")
-		t.Log(e.Error())
-		t.Fail()
-	}
-	mock.Set(cfg.Clock.Now().UTC().Add(3 * 365 * d))
-	year := cfg.Clock.Now().UTC().Year()
-	log.Println(year)
-	if year != 1972 {
-		t.Log("year is", year)
-		t.Fail()
-	}
+func TestConfigSuite(t *testing.T) {
+	suite.Run(t, new(ConfigSuite))
 }

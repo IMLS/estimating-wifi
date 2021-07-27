@@ -24,28 +24,24 @@ const FAIL = false
 
 type TLPSuite struct {
 	suite.Suite
-	cfg  *state.CFG
 	mock *clock.Mock
 	lw   *logwrapper.StandardLogger
 }
+
+var tlpDBPath = "/tmp/config-test.sql"
 
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
 func (suite *TLPSuite) SetupTest() {
 
-	// Get a local config, so we have paths...
-	_, filename, _, _ := runtime.Caller(0)
-	fmt.Println(filename)
-	path := filepath.Dir(filename)
+	os.Create(tlpDBPath)
+	os.Chmod(tlpDBPath, 0777)
+	state.SetConfigAtPath(tlpDBPath)
 
-	configPath := filepath.Join(path, "..", "test", "config.yaml")
-	//suite.lw.Debug("path ", configPath)
-	state.NewConfigFromPath(configPath)
 	cfg := state.GetConfig()
+	cfg.SetRunMode("test")
+	cfg.SetStorageMode("sqlite")
 
-	if cfg == nil {
-		suite.Fail("config is nil")
-	}
 	suite.lw = logwrapper.NewLogger(cfg)
 	suite.lw.SetLogLevel("DEBUG")
 
@@ -56,20 +52,29 @@ func (suite *TLPSuite) SetupTest() {
 	}
 	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
 	mock.Set(mt)
-	cfg.Clock = mock
-	suite.lw.Debug("mock is now ", cfg.Clock.Now())
-	cfg.RunMode = "test"
-	cfg.StorageMode = "sqlite"
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	cfg.Databases.QueuesPath = filepath.Join(path, "..", "test", "queue.sqlite")
-	cfg.Paths.WWW.Root = filepath.Join(path, "..", "test", "www")
-	cfg.Paths.WWW.Images = filepath.Join(path, "..", "test", "www", "images")
+	state.SetClock(mock)
+	suite.lw.Debug("mock is now ", state.GetClock().Now())
 
-	state.InitConfig()
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	manuPath := filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.SetManufacturersPath(manuPath)
+	queuePath := filepath.Join(path, "..", "test", "queue.sqlite")
+	cfg.SetQueuesPath(queuePath)
 
-	suite.cfg = cfg
+	rootPath := filepath.Join(path, "..", "test", "www")
+	cfg.SetRootPath(rootPath)
+	imagesPath := filepath.Join(path, "..", "test", "www", "images")
+	cfg.SetImagesPath(imagesPath)
 
-	os.Mkdir(suite.cfg.Paths.WWW.Root, 0755)
+	os.Mkdir(cfg.GetWWWRoot(), 0755)
+}
+
+func (suite *TLPSuite) AfterTest(suiteName, testName string) {
+	dc := state.GetConfig()
+	dc.Close()
+	// ensure a clean run.
+	os.Remove(tlpDBPath)
 }
 
 func generateFakeMac() string {
@@ -88,7 +93,7 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-func RunFakeWireshark(ka *Keepalive, cfg *state.CFG, kb *KillBroker, in <-chan bool, out chan []string) {
+func RunFakeWireshark(ka *Keepalive, kb *KillBroker, in <-chan bool, out chan []string) {
 	NUMMACS := 200
 	NUMRANDOM := 10
 	lw := logwrapper.NewLogger(nil)
@@ -137,6 +142,7 @@ func PingAtBogoMidnight(ka *Keepalive,
 		}
 	}
 }
+
 func (suite *TLPSuite) TestManyTLPCycles() {
 
 	// Create channels for process network
@@ -156,10 +162,6 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 		chDdbPar[i] = make(chan interfaces.Database)
 	}
 
-	// See if we can wait and shut down the test...
-	var wg sync.WaitGroup
-	wg.Add(1)
-
 	resetbroker := NewResetBroker()
 	go resetbroker.Start()
 	killbroker := NewKillBroker()
@@ -170,7 +172,7 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 
 	// Need a fake RunWireshark
 	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
-	go RunFakeWireshark(nil, suite.cfg, killbroker, chNsec, chMacs)
+	go RunFakeWireshark(nil, killbroker, chNsec, chMacs)
 
 	go AlgorithmTwo(nil, resetbroker, killbroker, chMacs, chMacsCounted)
 	go PrepEphemeralWifi(nil, killbroker, chMacsCounted, chDataForReport)
@@ -184,6 +186,10 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 	go ParDeltaTempDB(killbroker, chDurationsDB, chDdbPar...)
 	go BatchSend(nil, killbroker, chDdbPar[0])
 	go WriteImages(nil, killbroker, chDdbPar[1])
+
+	// See if we can wait and shut down the test...
+	var wg sync.WaitGroup
+	wg.Add(1)
 
 	NUMCYCLESTORUN := 400
 
@@ -207,6 +213,7 @@ func (suite *TLPSuite) TestManyTLPCycles() {
 		killbroker.Publish(Ping{})
 		wg.Done()
 	}()
+
 	wg.Wait()
 }
 
@@ -350,14 +357,14 @@ func assertEqual(a interface{}, b interface{}, message string) {
 	log.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
 }
 
-func (suite *TLPSuite) TestRawToUid() {
+func (suite *TLPSuite) RawToUid() {
 	log.Println("TestRawToUid")
 	cfg := state.GetConfig()
 	ka := NewKeepalive()
 
 	for testNdx, e := range tests {
 		log.Printf("Test #%v: %v\n", testNdx, e.description)
-		cfg.Monitoring.UniquenessWindow = e.uniquenessWindow
+		cfg.SetUniquenessWindow(e.uniquenessWindow)
 
 		var wg sync.WaitGroup
 		resetbroker := NewResetBroker()

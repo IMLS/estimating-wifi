@@ -21,6 +21,11 @@ func NewAPILogger(cfg interfaces.Config) (api *APILogger) {
 
 func (a *APILogger) Write(p []byte) (n int, err error) {
 
+	if a.cfg.IsStoringLocally() {
+		// do nothing.
+		return len(p), nil
+	}
+
 	data := map[string]interface{}{
 		"pi_serial":   a.cfg.GetSerial(),
 		"fcfs_seq_id": a.cfg.GetFCFSSeqID(),

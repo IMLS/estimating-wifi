@@ -19,6 +19,11 @@ var slashWarned bool = false
 
 func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) error {
 
+	if cfg.IsStoringLocally() {
+		// do nothing.
+		return nil
+	}
+
 	tok := cfg.GetAPIKey()
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slashWarned && !matched {

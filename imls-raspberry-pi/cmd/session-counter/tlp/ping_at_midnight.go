@@ -21,7 +21,7 @@ func PingAtMidnight(ka *Keepalive, rb *ResetBroker, kb *KillBroker) {
 	// Use the cron library to send out the pings.
 	// Publish a message on the reset broker.
 	c := cron.New()
-	_, err := c.AddFunc(cfg.Monitoring.ResetCron, func() {
+	_, err := c.AddFunc(cfg.GetResetCron(), func() {
 		rb.Publish(Ping{})
 	})
 	if err != nil {

@@ -124,8 +124,12 @@ func initLogger(cfg interfaces.Config) {
 			}
 			writers = append(writers, iow)
 		case "api:directus":
-			api := NewAPILogger(cfg)
-			writers = append(writers, api)
+			if cfg.IsStoringToAPI() {
+				api := NewAPILogger(cfg)
+				writers = append(writers, api)
+			} else {
+				fmt.Printf("warning: api configured as a logger in local mode")
+			}
 		}
 	}
 	mw := io.MultiWriter(writers...)

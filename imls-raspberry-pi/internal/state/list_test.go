@@ -1,24 +1,31 @@
 package state
 
 import (
-	"log"
-	"testing"
+	"os"
+
+	"github.com/stretchr/testify/suite"
 )
 
-var listcfg *CFG
-
-func TestListSetup(t *testing.T) {
-	listcfg = NewConfig()
-	listcfg.Paths.WWW.Root = "/tmp"
-	listcfg.Logging.LogLevel = "DEBUG"
-	listcfg.Logging.Loggers = []string{"local:stderr"}
-	listcfg.Databases.QueuesPath = "/tmp/queues.sqlite"
-	listcfg.Databases.DurationsPath = "/tmp/durations.sqlite"
-	InitConfig()
+type ListSuite struct {
+	suite.Suite
 }
 
-func TestList(t *testing.T) {
-	log.Println(t.Name())
+var listDBPath = "/tmp/config-list.sql"
+
+func (suite *ListSuite) SetupTest() {
+	os.Create(listDBPath)
+	os.Chmod(listDBPath, 0777)
+	SetConfigAtPath(listDBPath)
+}
+
+func (suite *ListSuite) AfterTest(suiteName, testName string) {
+	dc := GetConfig()
+	dc.Close()
+	// ensure a clean run.
+	os.Remove(listDBPath)
+}
+
+func (suite *ListSuite) TestList() {
 	ls := NewList("ls1")
 	ls.Push("hello")
 	ls.Push("goodbye")
@@ -35,13 +42,11 @@ func TestList(t *testing.T) {
 		allthere = allthere || found
 	}
 	if !allthere {
-		t.Log("missing value in list")
-		t.Fail()
+		suite.Fail("missing value in list")
 	}
 }
 
-func TestListRemove(t *testing.T) {
-	log.Println(t.Name())
+func (suite *ListSuite) TestListRemove() {
 	ls := NewList("ls1")
 	ls.Push("hello")
 	ls.Push("redshirt")
@@ -66,14 +71,10 @@ func TestListRemove(t *testing.T) {
 		allthere = allthere || found
 	}
 
-	// listcfg.Log().Debug("list after remove ", ls.AsList())
-
 	if !allthere {
-		t.Log("missing value in list")
-		t.Fail()
+		suite.Fail("missing value in list")
 	}
 	if redshirt {
-		t.Log("failed to remove the redshirt")
-		t.Fail()
+		suite.Fail("failed to remove the redshirt")
 	}
 }

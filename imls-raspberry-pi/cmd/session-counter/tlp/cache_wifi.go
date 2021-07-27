@@ -54,9 +54,9 @@ func newTempDB() interfaces.Database {
 		return db
 	} else {
 		cfg.Log().Debug("using in-filesystem DB for wifi (dev)")
-		t := cfg.Clock.Now()
+		t := state.GetClock().Now()
 		todaysDB := fmt.Sprintf("%04d%02d%02d-temp-wifi.sqlite", t.Year(), int(t.Month()), int(t.Day()))
-		path := filepath.Join(cfg.Paths.WWW.Root, todaysDB)
+		path := filepath.Join(cfg.GetWWWRoot(), todaysDB)
 		db = state.NewSqliteDB(path)
 		cfg.Log().Debug(db)
 		db.GetTableFromStruct(structs.WifiEvent{}).Drop()

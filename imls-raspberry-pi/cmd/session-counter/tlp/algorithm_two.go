@@ -59,7 +59,7 @@ func AlgorithmTwo(ka *Keepalive, rb *ResetBroker, kb *KillBroker, in <-chan []st
 				umdb.UpdateMapping(mac)
 			}
 			// Now, filter old things out
-			umdb.RemoveOldMappings(cfg.Monitoring.UniquenessWindow)
+			umdb.RemoveOldMappings(cfg.GetUniquenessWindow())
 			// Get the mappings as UserMappings, and send them out
 			um := umdb.AsUserMappings()
 			lw.Debug("# user mappings [", len(um), "]")
