@@ -7,13 +7,16 @@ import (
 	"os"
 	"sync"
 
+	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
+	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
+//lint:ignore U1000 for now
 func run() {
 	// CHANNELS
 	chNsec := make(chan bool)
@@ -76,6 +79,35 @@ func initConfigFromFlags() {
 
 }
 
+func runSimpleShark(db interfaces.Database, kb *tlp.KillBroker) {
+	cfg := state.GetConfig()
+	c := cron.New()
+	_, err := c.AddFunc("*/1 * * * *", func() {
+		tlp.SimpleShark(db, search.SetMonitorMode, search.SearchForMatchingDevice, tlp.TShark2)
+	})
+	if err != nil {
+		cfg.Log().Error("cron: could not set up crontab entry")
+		cfg.Log().Fatal(err.Error())
+	}
+	c.Start()
+
+	go kb.Start()
+	ch := kb.Subscribe()
+	for {
+		<-ch
+		c.Stop()
+		return
+	}
+}
+
+func run2() {
+	// The MAC database MUST be ephemeral. Put it in RAM.
+	mac_db := state.NewSqliteDB(":memory:")
+	kb := tlp.NewKillBroker()
+	go runSimpleShark(mac_db, kb)
+
+}
+
 func main() {
 	// DO NOT USE LOGGING YET
 	initConfigFromFlags()
@@ -86,7 +118,7 @@ func main() {
 	// Run the network
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go run()
+	go run2()
 	// Wait forever.
 	wg.Wait()
 }
