@@ -15,7 +15,7 @@ import (
 
 func isInDurationRange(diff int) bool {
 	cfg := state.GetConfig()
-	return (diff >= cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes)
+	return (diff >= cfg.GetMinimumMinutes()) && (diff < cfg.GetMaximumMinutes())
 }
 
 func DrawPatronSessions(durations []structs.Duration, outputPath string) {

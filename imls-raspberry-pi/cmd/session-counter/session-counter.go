@@ -112,7 +112,6 @@ func main() {
 	// DO NOT USE LOGGING YET
 	initConfigFromFlags()
 	cfg := state.GetConfig()
-	state.InitConfig()
 	// NOW YOU MAY USE LOGGING.
 
 	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())

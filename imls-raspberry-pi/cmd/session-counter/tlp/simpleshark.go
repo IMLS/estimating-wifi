@@ -18,8 +18,9 @@ import (
 func TSharkRunner(adapter string) []string {
 	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
-	tsharkCmd := exec.Command(cfg.Executables.Wireshark.Path,
-		"-a", fmt.Sprintf("duration:%d", cfg.Executables.Wireshark.Duration),
+	tsharkCmd := exec.Command(
+		cfg.GetWiresharkPath(),
+		"-a", fmt.Sprintf("duration:%d", cfg.GetWiresharkDuration()),
 		"-I", "-i", adapter,
 		"-Tfields", "-e", "wlan.sa")
 
@@ -119,8 +120,8 @@ func insertFirstSeen(db interfaces.Database, mac string) {
 
 	_, err := db.GetPtr().Exec("INSERT INTO ephemeraldurations (mac, start, end) VALUES (?, ?, ?)",
 		mac,
-		cfg.Clock.Now().Unix(),
-		cfg.Clock.Now().Unix())
+		state.GetClock().Now().Unix(),
+		state.GetClock().Now().Unix())
 	if err != nil {
 		cfg.Log().Error("Could not do initial insert for ", mac)
 		cfg.Log().Fatal(err.Error())
@@ -130,7 +131,7 @@ func insertFirstSeen(db interfaces.Database, mac string) {
 func updateLastSeen(db interfaces.Database, mac string) {
 	cfg := state.GetConfig()
 	_, err := db.GetPtr().Exec(`UPDATE ephemeraldurations SET end=? WHERE mac=?`,
-		cfg.Clock.Now().Unix(),
+		state.GetClock().Now().Unix(),
 		mac)
 	if err != nil {
 		cfg.Log().Fatal("Could not update MAC end for ", mac)
