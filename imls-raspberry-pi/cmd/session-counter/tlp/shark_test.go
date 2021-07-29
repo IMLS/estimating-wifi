@@ -44,7 +44,6 @@ func setup() {
 	cfg := state.GetConfig()
 	cfg.RunMode = "test"
 	cfg.StorageMode = "sqlite"
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
 	cfg.Databases.QueuesPath = filepath.Join(path, "..", "test", "www", "queues.sqlite")
 	cfg.Databases.DurationsPath = filepath.Join(path, "..", "test", "www", "durations.sqlite")
 	cfg.Paths.WWW.Root = filepath.Join(path, "..", "test", "www")

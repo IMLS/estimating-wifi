@@ -57,8 +57,6 @@ func (suite *TLPSuite) SetupTest() {
 
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	manuPath := filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	cfg.SetManufacturersPath(manuPath)
 	queuePath := filepath.Join(path, "..", "test", "queue.sqlite")
 	cfg.SetQueuesPath(queuePath)
 
