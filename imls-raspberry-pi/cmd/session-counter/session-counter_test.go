@@ -48,7 +48,7 @@ func runFakeWireshark(device string) []string {
 	return send
 }
 
-func itIsMidnight(now time.Time) bool {
+func isItMidnight(now time.Time) bool {
 	return (now.Hour() == 0 &&
 		now.Minute() == 0 &&
 		now.Second() == 0)
@@ -85,13 +85,7 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 			// Add one minute to the fake clock
 			state.GetClock().(*clock.Mock).Add(1 * time.Minute)
 
-			now := state.GetClock().Now()
-
-			// if now.Minute() == 0 {
-			// 	cfg.Log().Info("THE TIME IS NOW ", now)
-			// }
-
-			if itIsMidnight(now) {
+			if isItMidnight(state.GetClock().Now()) {
 				// Then we run the processing at midnight (once per 24 hours)
 				cfg.Log().Info("RUNNING PROCESSDATA at " + fmt.Sprint(state.GetClock().Now()))
 				// Copy ephemeral durations over to the durations table
@@ -135,10 +129,15 @@ func TestAllUp(t *testing.T) {
 	cfg.Log().Info("next session id: ", cfg.GetCurrentSessionID())
 
 	// Fake the clock
-	mock = clock.NewMock()
 	mt, _ = time.Parse("2006-01-02T15:04", "1976-11-12T00:00")
 	mock.Set(mt)
 	state.SetClock(mock)
 
 	MockRun(5, 200000, 10)
+
+	mt, _ = time.Parse("2006-01-02T15:04", "1978-01-01T00:00")
+	mock.Set(mt)
+	state.SetClock(mock)
+
+	MockRun(90, 2000000, 10)
 }

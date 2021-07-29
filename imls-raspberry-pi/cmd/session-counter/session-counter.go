@@ -12,7 +12,7 @@ import (
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
-	"gsa.gov/18f/internal/wifi-hardware-search/models"
+	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
 func initConfigFromFlags() {
@@ -41,31 +41,15 @@ func initConfigFromFlags() {
 
 }
 
-func runEvery(crontab string, kb *tlp.KillBroker, fun func() bool) {
+func runEvery(crontab string, fun func()) {
 	cfg := state.GetConfig()
 	c := cron.New()
-	_, err := c.AddFunc(crontab, func() {
-		if !fun() {
-			cfg.Log().Error(fun, " returned false...")
-		}
-	})
+	_, err := c.AddFunc(crontab, fun)
 	if err != nil {
 		cfg.Log().Error("cron: could not set up crontab entry")
 		cfg.Log().Fatal(err.Error())
 	}
-	c.Start()
 
-	ch := kb.Subscribe()
-	go kb.Start()
-	for {
-		<-ch
-		c.Stop()
-		return
-	}
-}
-
-func fakeShark2(dev string) []string {
-	return []string{"DE:AD:BE:EF:00:00", "BE:EF:00:00:00:00"}
 }
 
 func run2() {
@@ -73,25 +57,23 @@ func run2() {
 	// The MAC database MUST be ephemeral. Put it in RAM.
 	mac_db := state.NewSqliteDB(":memory:")
 	mac_db.CreateTableFromStruct(structs.EphemeralDuration{})
-	kb := tlp.NewKillBroker()
-	go runEvery("*/1 * * * *", kb,
-		func() bool {
-			cfg.Log().Debug("RUNNING SIMPLESHARK")
-			return tlp.SimpleShark(
-				// search.SetMonitorMode,
-				func(d *models.Device) {},
-				// search.SearchForMatchingDevice,
-				func() *models.Device { return &models.Device{Exists: true, Logicalname: "fakewan0"} },
-				// tlp.TSharkRunner
-				fakeShark2)
-		})
 
 	sq := state.NewQueue("sent")
 	iq := state.NewQueue("images")
 	durationsdb := cfg.GetDurationsDatabase()
-	go runEvery("*/2 * * * *", kb,
-		func() bool {
-			cfg.Log().Debug("RUNNING PROCESSDATA")
+
+	go runEvery("*/1 * * * *",
+		func() {
+			cfg.Log().Debug("RUNNING SIMPLESHARK")
+			tlp.SimpleShark(
+				search.SetMonitorMode,
+				search.SearchForMatchingDevice,
+				tlp.TSharkRunner)
+		})
+
+	go runEvery(cfg.GetResetCron(),
+		func() {
+			cfg.Log().Info("RUNNING PROCESSDATA at ", state.GetClock().Now())
 			// Copy ephemeral durations over to the durations table
 			tlp.ProcessData(durationsdb, sq, iq)
 			// Draw images of the data
@@ -101,9 +83,7 @@ func run2() {
 			// Increment the session counter
 			cfg.IncrementSessionID()
 			// Clear out the ephemeral data for the next day of monitoring
-			mac_db.GetPtr().Exec("DELETE FROM ephemeraldurations")
-
-			return true
+			state.ClearEphemeralDB()
 		})
 }
 
@@ -113,7 +93,7 @@ func main() {
 	cfg := state.GetConfig()
 	// NOW YOU MAY USE LOGGING.
 
-	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())
+	cfg.Log().Info("Startup session id ", cfg.GetCurrentSessionID())
 
 	// Run the network
 	var wg sync.WaitGroup
