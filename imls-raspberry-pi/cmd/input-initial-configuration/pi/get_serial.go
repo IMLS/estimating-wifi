@@ -25,7 +25,7 @@ func cpuinfoLines() (lines []string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Println("error reading /proc/cpuino")
+		log.Println("error reading /proc/cpuinfo")
 		log.Println(err)
 	}
 
