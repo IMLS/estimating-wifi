@@ -44,11 +44,12 @@ func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) 
 		if end > len(data) {
 			end = len(data)
 		}
-
 		divided = append(divided, data[i:end])
 	}
 
-	// FIXME: If there is no data, throw an event that logs there was no data.
+	if len(data) == 0 {
+		return errors.New("PostJSON: no events found")
+	}
 
 	// Now that the incoming array has been chopped up into subarrays of length chunkSize,
 	// lets send those out into the world.
@@ -60,43 +61,39 @@ func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) 
 		// We have to give up if this doesn't work.
 		reqBody, err = json.Marshal(arr)
 		if err != nil {
-			return errors.New("postjson: unable to marshal post of data to JSON")
+			return errors.New("PostJSON: unable to marshal post of data to JSON")
 		}
 
 		// Next, it's time to create a request object. Again, fail if it doesn't work.
 		req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
 		if err != nil {
-			return errors.New("postjson: unable to construct request for data POST")
+			return errors.New("PostJSON: unable to construct request for data POST")
 		}
 
-		// Lets set some headers. Perhaps we should quit here... but, we'll try and keep going
-		// if anything fails.
 		req.Header.Set("Content-type", "application/json")
 		req.Header.Set("X-Api-Key", tok)
-
-		// MAKE THE REQUEST
 		resp, err := client.Do(req)
-		// If there was an error in the post, log it, and exit the function.
+
 		if err != nil {
-			message := fmt.Sprintf("postjson: failure in client attempt to POST to %v", uri)
+			message := fmt.Sprintf("PostJSON: failure in client attempt to POST to %v", uri)
+			log.Print(message)
+			return fmt.Errorf(message)
+		}
+
+		// If we get things back, the errors will be encoded within the JSON.
+		if resp.StatusCode < 200 || resp.StatusCode > 299 {
+			message := fmt.Sprintf("PostJSON: bad status from POST to %v [%v]\n", uri, resp.Status)
 			log.Print(message)
 			return fmt.Errorf(message)
 		} else {
-			// If we get things back, the errors will be encoded within the JSON.
-			if resp.StatusCode < 200 || resp.StatusCode > 299 {
-				message := fmt.Sprintf("PostJSON: bad status from POST to %v [%v]\n", uri, resp.Status)
+			// Parse the response. Everything comes from ReVal in our current formulation.
+			var dat RevalResponse
+			body, _ := ioutil.ReadAll(resp.Body)
+			err := json.Unmarshal(body, &dat)
+			if err != nil {
+				message := fmt.Sprintf("PostJSON: could not unmarshal response body: %v", err)
 				log.Print(message)
 				return fmt.Errorf(message)
-			} else {
-				// Parse the response. Everything comes from ReVal in our current formulation.
-				var dat RevalResponse
-				body, _ := ioutil.ReadAll(resp.Body)
-				err := json.Unmarshal(body, &dat)
-				if err != nil {
-					message := fmt.Sprintf("PostJSON: could not unmarshal response body: %v", err)
-					log.Print(message)
-					return fmt.Errorf(message)
-				}
 			}
 		}
 		// Close the body at function exit.
