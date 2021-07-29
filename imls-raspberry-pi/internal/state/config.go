@@ -37,12 +37,13 @@ func SetConfigAtPath(configDBPath string) *databaseConfig {
 func newConfig(configDBPath string) databaseConfig {
 	db := NewSqliteDB(configDBPath)
 	var table interfaces.Table
-	if !db.CheckTableExists("config") {
+	if !db.CheckTableExists("ConfigDBs") {
 		table = db.CreateTableFromStruct(ConfigDB{})
 		defaults := ConfigDefaults()
 		table.InsertStruct(defaults)
 	} else {
-		table = db.GetTableByName("config")
+		db.InitTable("ConfigDBs")
+		table = db.GetTableByName("ConfigDBs")
 	}
 
 	sessionID := NewSessionID()
