@@ -18,15 +18,6 @@ func isInDurationRange(diff int) bool {
 	return (diff >= cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes)
 }
 
-func DrawPatronSessionsFromWifi(events []structs.WifiEvent, outputPath string) {
-	_, d := Summarize(events)
-	durations := make([]structs.Duration, 0)
-	for _, v := range d {
-		durations = append(durations, v)
-	}
-	DrawPatronSessions(durations, outputPath)
-}
-
 func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
