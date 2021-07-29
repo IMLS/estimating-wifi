@@ -41,7 +41,7 @@ func SimpleSend(db interfaces.Database) {
 			cfg.Log().Debug("PostJSONing ", len(data), " duration datas")
 			err = http.PostJSON(cfg, cfg.GetDurationsURI(), data)
 			if err != nil {
-				log.Println("could not log to API")
+				log.Println("could not log to API; session ", nextSessionIDToSend, " not sent; left on queue")
 				log.Println(err.Error())
 			} else {
 				// If we successfully sent the data remotely, we can now mark it is as sent.
