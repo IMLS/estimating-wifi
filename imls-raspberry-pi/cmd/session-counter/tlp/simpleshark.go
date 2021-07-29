@@ -102,40 +102,10 @@ func SimpleShark(
 	return true
 }
 
-// func macExists(db interfaces.Database, mac string) bool {
-// 	var ed structs.EphemeralDuration
-// 	row := db.GetPtr().QueryRowx("SELECT mac FROM ephemeraldurations WHERE mac = ?", mac)
-// 	err := row.StructScan(&ed)
-// 	// Returns true if MAC found.
-// 	return err == nil && ed.MAC == mac
-// }
-
-// func insertFirstSeen(db interfaces.Database, mac string) {
-// 	cfg := state.GetConfig()
-
-// 	_, err := db.GetPtr().Exec("INSERT INTO ephemeraldurations (mac, start, end) VALUES (?, ?, ?)",
-// 		mac,
-// 		state.GetClock().Now().Unix(),
-// 		state.GetClock().Now().Unix())
-// 	if err != nil {
-// 		cfg.Log().Error("Could not do initial insert for ", mac)
-// 		cfg.Log().Fatal(err.Error())
-// 	}
-// }
-
-// func updateLastSeen(db interfaces.Database, mac string) {
-// 	cfg := state.GetConfig()
-// 	_, err := db.GetPtr().Exec(`UPDATE ephemeraldurations SET end=? WHERE mac=?`,
-// 		state.GetClock().Now().Unix(),
-// 		mac)
-// 	if err != nil {
-// 		cfg.Log().Fatal("Could not update MAC end for ", mac)
-// 	}
-// }
-
 func StoreMacs(keepers []string) {
 	cfg := state.GetConfig()
-	cfg.Log().Debug("keepers", keepers)
+	// Do not log MAC addresses...
+	cfg.Log().Debug("found ", len(keepers), " keepers")
 	for _, mac := range keepers {
 		state.RecordMAC(mac)
 	}
