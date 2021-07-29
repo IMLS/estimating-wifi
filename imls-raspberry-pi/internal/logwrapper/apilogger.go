@@ -3,6 +3,7 @@ package logwrapper
 
 import (
 	"log"
+	"strconv"
 	"time"
 
 	"gsa.gov/18f/internal/http"
@@ -30,7 +31,7 @@ func (a *APILogger) Write(p []byte) (n int, err error) {
 		"pi_serial":   a.cfg.GetSerial(),
 		"fcfs_seq_id": a.cfg.GetFCFSSeqID(),
 		"device_tag":  a.cfg.GetDeviceTag(),
-		"session_id":  a.cfg.GetCurrentSessionID(),
+		"session_id":  strconv.FormatInt(a.cfg.GetCurrentSessionID(), 10),
 		"localtime":   time.Now().Format(time.RFC3339),
 		"tag":         a.l.GetLogLevelName(),
 		"info":        string(p),
