@@ -13,7 +13,7 @@ import (
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
-	"gsa.gov/18f/internal/wifi-hardware-search/search"
+	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
 //lint:ignore U1000 for now
@@ -79,11 +79,13 @@ func initConfigFromFlags() {
 
 }
 
-func runSimpleShark(db interfaces.Database, kb *tlp.KillBroker) {
+func runEvery(crontab string, kb *tlp.KillBroker, fun func() bool) {
 	cfg := state.GetConfig()
 	c := cron.New()
-	_, err := c.AddFunc("*/1 * * * *", func() {
-		tlp.SimpleShark(db, search.SetMonitorMode, search.SearchForMatchingDevice, tlp.TShark2)
+	_, err := c.AddFunc(crontab, func() {
+		if !fun() {
+			cfg.Log().Error(fun, " returned false...")
+		}
 	})
 	if err != nil {
 		cfg.Log().Error("cron: could not set up crontab entry")
@@ -91,8 +93,8 @@ func runSimpleShark(db interfaces.Database, kb *tlp.KillBroker) {
 	}
 	c.Start()
 
-	go kb.Start()
 	ch := kb.Subscribe()
+	go kb.Start()
 	for {
 		<-ch
 		c.Stop()
@@ -100,20 +102,43 @@ func runSimpleShark(db interfaces.Database, kb *tlp.KillBroker) {
 	}
 }
 
+func fakeShark2(dev string) []string {
+	return []string{"DE:AD:BE:EF:00:00", "BE:EF:00:00:00:00"}
+}
+
 func run2() {
+	cfg := state.GetConfig()
 	// The MAC database MUST be ephemeral. Put it in RAM.
 	mac_db := state.NewSqliteDB(":memory:")
-	kb := tlp.NewKillBroker()
-	go runSimpleShark(mac_db, kb)
+	mac_db.CreateTableFromStruct(structs.EphemeralDuration{})
 
+	kb := tlp.NewKillBroker()
+	go runEvery("*/1 * * * *", kb,
+		func() bool {
+			cfg.Log().Debug("RUNNING SIMPLESHARK")
+			return tlp.SimpleShark(mac_db,
+				func(d *models.Device) {}, // search.SetMonitorMode,
+				func() *models.Device { return &models.Device{Exists: true, Logicalname: "fakewan0"} }, // search.SearchForMatchingDevice,
+				fakeShark2) // tlp.TSharkRunner)
+		})
+
+	sq := state.NewQueue("sent")
+	iq := state.NewQueue("images")
+	go runEvery("*/2 * * * *", kb,
+		func() bool {
+			cfg.Log().Debug("RUNNING PROCESSDATA")
+			return tlp.ProcessData(mac_db, sq, iq) //runProcessData(mac_db, sq, iq, kb)
+		})
 }
 
 func main() {
 	// DO NOT USE LOGGING YET
 	initConfigFromFlags()
 	cfg := state.GetConfig()
+	state.InitConfig()
 	// NOW YOU MAY USE LOGGING.
-	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())
+	log.Println(cfg)
+	//cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())
 
 	// Run the network
 	var wg sync.WaitGroup

@@ -77,7 +77,7 @@ func setup() {
 // type MonitorFn func(*models.Device)
 // type SearchFn func() *models.Device
 
-func fakeSetMonitorFn(d *models.Device) {
+func fakeMonitorFn(d *models.Device) {
 
 }
 
@@ -111,11 +111,11 @@ func TestOneHour(t *testing.T) {
 	mock.Set(startTime)
 	cfg.Clock = mock
 	// Run once at the initial time.
-	SimpleShark(db, fakeSetMonitorFn, fakeSearchFn, fakeShark2)
+	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 	mock.Set(endTime)
 	cfg.Clock = mock
 
-	SimpleShark(db, fakeSetMonitorFn, fakeSearchFn, fakeShark2)
+	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 
 	// We should now be able to check the DB.
 	for _, testmac := range []string{"DE:AD:BE:EF:00:00", "BE:EF:00:00:00:00"} {
@@ -156,11 +156,11 @@ func TestOneYear(t *testing.T) {
 	mock.Set(startTime)
 	cfg.Clock = mock
 	// Run once at the initial time.
-	SimpleShark(db, fakeSetMonitorFn, fakeSearchFn, fakeShark2)
+	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 	mock.Set(endTime)
 	cfg.Clock = mock
 
-	SimpleShark(db, fakeSetMonitorFn, fakeSearchFn, fakeShark2)
+	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 
 	// We should now be able to check the DB.
 	for _, testmac := range []string{"DE:AD:BE:EF:00:00", "BE:EF:00:00:00:00"} {
@@ -201,11 +201,11 @@ func TestBumpOne(t *testing.T) {
 	mock.Set(startTime)
 	cfg.Clock = mock
 	// Run once at the initial time.
-	SimpleShark(db, fakeSetMonitorFn, fakeSearchFn, fakeShark2)
+	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 	mock.Set(endTime)
 	cfg.Clock = mock
 
-	SimpleShark(db, fakeSetMonitorFn, fakeSearchFn, fakeShark1)
+	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark1)
 
 	// We should now be able to check the DB.
 	for _, testmac := range []string{"DE:AD:BE:EF:00:00"} {

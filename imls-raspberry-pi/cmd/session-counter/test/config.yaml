@@ -29,11 +29,11 @@ executables:
   lshw_path: /usr/bin/lshw
   ip_path: 
 databases:
-  manufacturers_path: /opt/imls/manufacturers.sqlite
-  durations_path: /opt/imls/www/durations.sqlite
-  queues_path: /opt/imls/www/queues.sqlite
+  manufacturers_path: /tmp/imls/manufacturers.sqlite
+  durations_path: /tmp/imls/www/durations.sqlite
+  queues_path: /tmp/imls/www/queues.sqlite
 paths:
   www:
-    root: /opt/imls/www
-    images: /opt/imls/www/images
+    root: /tmp/imls/www
+    images: /tmp/imls/www/images
 

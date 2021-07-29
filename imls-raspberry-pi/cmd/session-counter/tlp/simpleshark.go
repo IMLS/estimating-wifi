@@ -15,7 +15,7 @@ import (
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
-func TShark2(adapter string) []string {
+func TSharkRunner(adapter string) []string {
 	cfg := state.GetConfig()
 	lw := logwrapper.NewLogger(nil)
 	tsharkCmd := exec.Command(cfg.Executables.Wireshark.Path,
@@ -66,9 +66,12 @@ type MonitorFn func(*models.Device)
 type SearchFn func() *models.Device
 
 func SimpleShark(db interfaces.Database,
+	// setMonitorFn func(d *models.Device),
+	// searchFn func() *models.Device,
+	// sharkFn func(dev string) []string) bool {
 	setMonitorFn MonitorFn,
 	searchFn SearchFn,
-	sharkFn SharkFn) {
+	sharkFn SharkFn) bool {
 
 	cfg := state.GetConfig()
 
@@ -98,7 +101,9 @@ func SimpleShark(db interfaces.Database,
 		StoreMacs(db, keepers)
 	} else {
 		cfg.Log().Info("no wifi devices found. no scanning carried out.")
+		return false
 	}
+	return true
 }
 
 func macExists(db interfaces.Database, mac string) bool {
@@ -117,7 +122,7 @@ func insertFirstSeen(db interfaces.Database, mac string) {
 		cfg.Clock.Now().Unix(),
 		cfg.Clock.Now().Unix())
 	if err != nil {
-		cfg.Log().Error("Could do initial insert for ", mac)
+		cfg.Log().Error("Could not do initial insert for ", mac)
 		cfg.Log().Fatal(err.Error())
 	}
 }
