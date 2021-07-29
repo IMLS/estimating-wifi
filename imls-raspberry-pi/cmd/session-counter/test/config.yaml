@@ -13,7 +13,7 @@ logging:
     # - "api:directus"
 monitoring:
   uniqueness_window: 120
-  minimum_minutes: 5
+  minimum_minutes: 1
   maximum_minutes: 600
   reset_cron: "*/6 * * * *"
 umbrella:

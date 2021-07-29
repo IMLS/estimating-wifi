@@ -9,49 +9,11 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
-
-//lint:ignore U1000 for now
-func run() {
-	// CHANNELS
-	chNsec := make(chan bool)
-	chMacs := make(chan []string)
-	chMacsCounted := make(chan map[string]int)
-	chDataForReport := make(chan []structs.WifiEvent)
-	chWifidb := make(chan interfaces.Database)
-	chDdb := make(chan interfaces.Database)
-	chDdbPar := make([]chan interfaces.Database, 2)
-	chAck := make(chan tlp.Ping)
-	for i := 0; i < 2; i++ {
-		chDdbPar[i] = make(chan interfaces.Database)
-	}
-	// BROKERS
-	resetbroker := tlp.NewResetBroker()
-	go resetbroker.Start()
-	var killbroker *tlp.KillBroker = nil
-	ka := tlp.NewKeepalive()
-
-	// PROCESSES
-	go tlp.StayinAlive(ka)
-	go tlp.TockEveryMinute(ka, killbroker, chNsec)
-	go tlp.RunWireshark(ka, killbroker, chNsec, chMacs)
-	go tlp.AlgorithmTwo(ka, resetbroker, killbroker, chMacs, chMacsCounted)
-	go tlp.PrepEphemeralWifi(ka, killbroker, chMacsCounted, chDataForReport)
-
-	go tlp.CacheWifi(ka, resetbroker, killbroker, chDataForReport, chWifidb, chAck)
-	go tlp.GenerateDurations(ka, killbroker, chWifidb, chDdb, chAck)
-
-	go tlp.ParDeltaTempDB(killbroker, chDdb, chDdbPar...)
-	go tlp.BatchSend(ka, killbroker, chDdbPar[0])
-	go tlp.WriteImages(ka, killbroker, chDdbPar[1])
-
-	go tlp.PingAtMidnight(ka, resetbroker, killbroker)
-}
 
 func initConfigFromFlags() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
@@ -130,7 +92,13 @@ func run2() {
 	go runEvery("*/2 * * * *", kb,
 		func() bool {
 			cfg.Log().Debug("RUNNING PROCESSDATA")
-			return tlp.ProcessData(mac_db, sq, iq) //runProcessData(mac_db, sq, iq, kb)
+			// Copy ephemeral durations over to the durations table
+			tlp.ProcessData(mac_db, sq, iq)
+			// Clear out the ephemeral data for the next day of monitoring
+			mac_db.GetPtr().Exec("DELETE FROM ephemeraldurations")
+			// Draw images of the data
+			tlp.WriteImages(cfg.GetDurationsDatabase())
+			return true
 		})
 }
 

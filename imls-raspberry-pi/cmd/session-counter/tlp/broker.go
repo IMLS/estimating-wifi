@@ -10,20 +10,12 @@ type Broker struct {
 	chSub chan chan interface{}
 }
 
-type ResetBroker struct {
-	*Broker
-}
-
 type KillBroker struct {
 	*Broker
 }
 
 func NewKillBroker() *KillBroker {
 	return &KillBroker{NewBroker()}
-}
-
-func NewResetBroker() *ResetBroker {
-	return &ResetBroker{NewBroker()}
 }
 
 func NewBroker() *Broker {

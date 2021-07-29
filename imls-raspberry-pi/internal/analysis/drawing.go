@@ -3,6 +3,7 @@ package analysis
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
@@ -11,6 +12,11 @@ import (
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
+
+func isInDurationRange(diff int) bool {
+	cfg := state.GetConfig()
+	return (diff >= cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes)
+}
 
 func DrawPatronSessionsFromWifi(events []structs.WifiEvent, outputPath string) {
 	_, d := Summarize(events)
@@ -40,9 +46,9 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
-		// log.Println("st", st, "et", et, "diff", diff)
-		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
-			//log.Println("id", d.PatronId, "diff", diff)
+		log.Println("st", st, "et", et, "diff", diff)
+		if isInDurationRange(diff) {
+			log.Println("KEEP id", d.PatronID, "diff", diff)
 			durationsInRange += 1
 		}
 	}
@@ -79,7 +85,7 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 		totalPatrons += 1
 		totalMinutes += diff
 
-		if (diff > cfg.Monitoring.MinimumMinutes) && (diff < cfg.Monitoring.MaximumMinutes) {
+		if isInDurationRange(diff) {
 			ystep += 1
 
 			// Draw the hour lines
