@@ -53,16 +53,14 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 
 func WriteImages(db interfaces.Database) {
 	cfg := state.GetConfig()
-	cfg.Log().Debug("Starting WriteImages")
 	iq := state.NewQueue("images")
 	imagesToWrite := iq.AsList()
-	cfg.Log().Debug("is there a session waiting to convert to images? [ ", imagesToWrite, "]")
+	cfg.Log().Info("sessions ", imagesToWrite, " are waiting to be written on the image queue")
 	for _, nextImage := range imagesToWrite {
 		durations := []structs.Duration{}
-		cfg.Log().Debug("looking for session ", nextImage, " in durations table to write images")
 		var count int
 		db.GetPtr().QueryRow("SELECT COUNT(*) FROM durations WHERE session_id=?", nextImage).Scan(&count)
-		cfg.Log().Debug("FOUND COUNT ", count)
+		// cfg.Log().Info("Found ", count, " durations to filter down...")
 		err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)
 		cfg.Log().Debug("found ", len(durations), " durations in WriteImages")
 		if err != nil {

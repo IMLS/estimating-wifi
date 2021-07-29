@@ -4,294 +4,21 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
 	"path/filepath"
 	"runtime"
-	"sync"
 	"testing"
 	"time"
 
 	"github.com/benbjohnson/clock"
 
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
-	"gsa.gov/18f/internal/structs"
+	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
-const PASS = true
-const FAIL = false
-
-// Lets mock the clock for testing.
-type Application struct {
-	Clock clock.Clock
-}
-
-func macs(arr ...string) []string {
-	// h := make(map[string]int)
-	// for _, s := range arr {
-	// 	h[s] = rand.Intn(1024)
-	// }
-	// return h
-	return arr
-}
-
-func hashes(arr ...string) [][]string {
-	// Return a list of hashes, one hash for each string
-	harr := make([][]string, 0)
-	for _, s := range arr {
-		harr = append(harr, []string{s})
-	}
-	return harr
-}
-
-// IDs will be assigned in the raw_to_uids proc
-// on a sorted list of MAC addrs. Therefore, we *know*
-// in this test set that "next" will always be UID 0.
-// (If "next" and "apple" are together)
-var m = map[string]string{
-	"next":     "00:00:0f:aa:bb:cc", // ID 0
-	"ericsson": "00:01:ec:aa:bb:cc",
-	"apple":    "00:03:93:aa:bb:cc",
-	"next2":    "00:00:0f:ee:ff:00",
-}
-
-var tests = []struct {
-	description      string
-	passfail         bool
-	uniquenessWindow int
-	initMap          []string
-	loopMaps         [][]string
-	resultMap        map[string]int
-}{
-	// One input hash.
-	{"one input mac, one loop mac",
-		PASS, 5,
-		macs(m["next"]),
-		hashes(m["next"]),
-		map[string]int{
-			"0:0": 0,
-		},
-	},
-	// // Two input hashes
-	{"two input macs, one loop mac",
-		PASS, 5,
-		macs(m["next"], m["apple"]),
-		hashes(m["next"]),
-		// Why zero and one?
-		// Zero for deadbeef, because we send it in the loop.
-		// One for beefcafe, because it was only sent once, and
-		// one tick goes by.
-		map[string]int{
-			"0:0": 0,
-			"1:1": 1,
-		},
-	},
-	// // Two input hashes
-	{"two input macs, one loop mac, both next",
-		PASS, 5,
-		macs(m["next"], m["next2"]),
-		hashes(m["next"]),
-		// Why zero and one?
-		// Zero for deadbeef, because we send it in the loop.
-		// One for beefcafe, because it was only sent once, and
-		// one tick goes by.
-		map[string]int{
-			"0:0": 0,
-			"0:1": 1,
-		},
-	},
-	// Three hashes, three minutes
-	{"three input macs, three comms in the middle",
-		PASS, 5,
-		// Next, Apple, Ericsson
-		macs(m["next"], m["apple"], m["ericsson"]),
-		hashes("de:ad:be:ef", "de:ad:be:ef", "de:ad:be:ef"),
-		// IDs will be assigned by MAC address sort!
-		map[string]int{
-			"0:0": 3,
-			"1:1": 3,
-			"2:2": 3,
-			"3:3": 0,
-		},
-	},
-
-	// Next times out, because it is considered to
-	// have "disconnected" after 5 minutes.
-	{"Next should disappear",
-		PASS, 5,
-		macs(m["next"], m["apple"], m["ericsson"]),
-		hashes(
-			"de:ad:be:ef",
-			"de:ad:be:ef",
-			"de:ad:be:ef",
-			m["apple"],
-			m["ericsson"]),
-		// Why zero and one?
-		// Zero for deadbeef, because we send it in the loop.
-		// One for beefcafe, because it was only sent once, and
-		// one tick goes by.
-		map[string]int{
-			"1:1": 1,
-			"2:2": 0,
-			"3:3": 2,
-		},
-	},
-
-	// Next times out, comes back. Still ID 0.
-	// Apple is considered to have disconnected.
-	{"Drop two",
-		PASS, 5,
-		macs(m["next"], m["apple"], m["ericsson"]),
-		hashes(
-			"de:ad:be:ef",
-			"de:ad:be:ef",
-			"de:ad:be:ef",
-			"de:ad:be:ef",
-			m["next"]),
-		// Why zero and one?
-		// Zero for deadbeef, because we send it in the loop.
-		// One for beefcafe, because it was only sent once, and
-		// one tick goes by.
-		map[string]int{
-			"0:0": 0,
-			"3:3": 1,
-		},
-	},
-}
-
-func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
-	if a == b {
-		return
-	}
-	t.Fatal(message, "\n\texpected: ", a, "\n\treceived: ", b)
-}
-
-func TestRawToUid(t *testing.T) {
-	log.Println("TestRawToUid")
-
-	scPath := "/tmp/sc.sql"
-	os.Create(scPath)
-	os.Chmod(scPath, 0777)
-	state.SetConfigAtPath(scPath)
-
-	cfg := state.GetConfig()
-
-	_, filename, _, _ := runtime.Caller(0)
-	fmt.Println(filename)
-	path := filepath.Dir(filename)
-	manuPath := filepath.Join(path, "test", "manufacturers.sqlite")
-	cfg.SetRunMode("test")
-	cfg.SetStorageMode("sqlite")
-	cfg.SetManufacturersPath(manuPath)
-
-	ka := tlp.NewKeepalive()
-
-	// var buf bytes.Buffer
-	// log.SetOutput(&buf)
-	// defer func() {
-	// 	log.SetOutput(os.Stderr)
-	// }()
-
-	for testNdx, e := range tests {
-		t.Logf("Test #%v: %v\n", testNdx, e.description)
-		cfg.SetUniquenessWindow(e.uniquenessWindow)
-
-		var wg sync.WaitGroup
-		resetbroker := tlp.NewResetBroker()
-		go resetbroker.Start()
-		killbroker := tlp.NewKillBroker()
-		go killbroker.Start()
-
-		chMacs := make(chan []string)
-		chUniq := make(chan map[string]int)
-		var u map[string]int = nil
-
-		wg.Add(1)
-		go func() {
-			chMacs <- e.initMap
-			for _, sarr := range e.loopMaps {
-
-				chMacs <- sarr
-			}
-			defer wg.Done()
-		}()
-
-		// Not using the reset here.
-		go tlp.AlgorithmTwo(ka, resetbroker, killbroker, chMacs, chUniq)
-
-		wg.Add(1)
-		go func() {
-			// The init map
-			<-chUniq
-			count := len(e.loopMaps) - 1
-			for i := 0; i < count; i++ {
-				// This reads in the intervening maps.
-				<-chUniq
-			}
-			u = <-chUniq
-			// ch_poison <- tlp.Ping{}
-			killbroker.Publish(tlp.Ping{})
-			defer wg.Done()
-		}()
-
-		wg.Wait()
-
-		// The last value we receive needs to have its time updated.
-		expected := fmt.Sprint(e.resultMap)
-		received := fmt.Sprint(u)
-		//log.Println("expected", expected, "received", received)
-
-		if e.passfail {
-			assertEqual(t, expected, received, "not equal")
-		}
-	} // end for over tests
-}
-
-func PingAfterNHours(ka *tlp.Keepalive, rb *tlp.ResetBroker, kb *tlp.KillBroker, nHours int, chTick chan bool) {
-	counter := 0
-	chKill := kb.Subscribe()
-	lw := logwrapper.NewLogger(nil)
-	for {
-		select {
-		case <-chTick:
-			counter += 1
-			if (counter != 0) && ((counter % (60 * nHours)) == 0) {
-				// chReset <- tlp.Ping{}
-				lw.Debug("PingAfterNHours is Pinging!")
-				rb.Publish(tlp.Ping{})
-			}
-		case <-chKill:
-			log.Println("Exiting PingAfterNHours")
-			return
-		}
-	}
-}
-
-func PingAtBogoMidnight(ka *tlp.Keepalive,
-	rb *tlp.ResetBroker,
-	kb *tlp.KillBroker) {
-	// counter := 0
-	// chKill := kb.Subscribe()
-	cfg := state.GetConfig()
-	m := state.GetClock()
-	pinged := false
-	for {
-		if m.Now().Hour() == 0 && !pinged {
-			pinged = true
-			cfg.Log().Debug("IT IS BOGOMIDNIGHT.")
-			rb.Publish(tlp.Ping{})
-		}
-		if m.Now().Hour() != 0 {
-			pinged = false
-		}
-	}
-}
-
-func bToMb(b uint64) uint64 {
-	return b / 1024 / 1024
-}
+var NUMMACS int
+var NUMFOUNDPERMINUTE int
+var consistentMACs = make([]string, 0)
 
 func generateFakeMac() string {
 	var letterRunes = []rune("ABCDEF0123456789")
@@ -309,234 +36,109 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-var consistentMacs = []string{
-	"00:03:93:60:BF:CB",
-	"00:03:93:06:5C:0E",
-	"00:03:93:3F:BB:F9",
-	"00:03:93:51:9D:26",
-	"00:00:F0:D0:25:52",
-	"00:00:F0:59:41:80",
-	"00:00:F0:F2:2C:13",
+func runFakeWireshark(device string) []string {
+
+	thisTime := rand.Intn(NUMFOUNDPERMINUTE)
+	send := make([]string, thisTime)
+	// cfg := state.GetConfig()
+	//cfg.Log().Info("sending ", len(send), " this minute")
+	for i := 0; i < thisTime; i++ {
+		send[i] = consistentMACs[rand.Intn(len(consistentMACs))]
+	}
+	return send
 }
 
-func RunFakeWireshark(ka *tlp.Keepalive, kb *tlp.KillBroker, in <-chan bool, out chan []string) {
-	NUMMACS := 200
-	NUMRANDOM := 10
-	lw := logwrapper.NewLogger(nil)
-	lw.Debug("RunFakeWireshark in the house.")
-
-	chKill := kb.Subscribe()
-	// Lets have 30 consistent devices
-	macs := make([]string, NUMMACS)
-	for i := 0; i < NUMMACS; i++ {
-		macs[i] = generateFakeMac()
-	}
-
-	for {
-		select {
-		case <-in:
-			// Pick NUMRANDOM devices every minute
-			send := make([]string, NUMRANDOM)
-			for i := 0; i < NUMRANDOM; i++ {
-				send[i] = macs[rand.Intn(len(macs))]
-			}
-			out <- send
-
-		case <-chKill:
-			log.Println("Exiting RunFakeWireshark")
-			return
-		}
-	}
+func itIsMidnight(now time.Time) bool {
+	return (now.Hour() == 0 &&
+		now.Minute() == 0 &&
+		now.Second() == 0)
 
 }
 
-func runMockNetwork(NUMDAYSTORUN int) {
-	var NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
-	const skip int = 20
-	var NUMCYCLESTORUN = NUMMINUTESTORUN / skip
-	const SECONDSPERMINUTE int = 2
-
-	resetbroker := tlp.NewResetBroker()
-	go resetbroker.Start()
-	killbroker := tlp.NewKillBroker()
-	go killbroker.Start()
-	// Create channels for process network
-	chSec := make(chan bool)
-
-	chNsec := make(chan bool)
-	chNsec1 := make(chan bool)
-	chNsec2 := make(chan bool)
-
-	chMacs := make(chan []string)
-	chMacsCounted := make(chan map[string]int)
-	chDataForReport := make(chan []structs.WifiEvent)
-	chWifiDB := make(chan interfaces.Database)
-	chDurationsDB := make(chan interfaces.Database)
-	chAck := make(chan tlp.Ping)
-	chDdbPar := make([]chan interfaces.Database, 2)
-	for i := 0; i < 2; i++ {
-		chDdbPar[i] = make(chan interfaces.Database)
-	}
-
-	// See if we can wait and shut down the test...
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	// Delta this out to RunWireshark and PingAfterNHours
-	go tlp.TockEveryN(nil, killbroker, SECONDSPERMINUTE, chSec, chNsec)
-	go func(in chan bool, o1 chan bool, o2 chan bool) {
-		for {
-			<-in
-			o1 <- true
-			o2 <- true
-		}
-	}(chNsec, chNsec1, chNsec2)
-
-	go func(in chan bool) {
-		for {
-			<-in
-		}
-	}(chNsec2)
-
-	// Need a fake RunWireshark
-	// go tlp.RunWireshark(nil, cfg, ch_nsec1, ch_macs, KC[1])
-	go RunFakeWireshark(nil, killbroker, chNsec1, chMacs)
-
-	go tlp.AlgorithmTwo(nil, resetbroker, killbroker, chMacs, chMacsCounted)
-	go tlp.PrepEphemeralWifi(nil, killbroker, chMacsCounted, chDataForReport)
-	// At midnight, flush internal structures and restart.
-	//go tlp.PingAtMidnight(nil, cfg, chs_reset[0], KC[4])
-	go PingAtBogoMidnight(nil, resetbroker, killbroker)
-	go tlp.CacheWifi(nil, resetbroker, killbroker, chDataForReport, chWifiDB, chAck)
-	// Make sure we don't hang...
-	go tlp.GenerateDurations(nil, killbroker, chWifiDB, chDurationsDB, chAck)
-
-	go tlp.ParDeltaTempDB(killbroker, chDurationsDB, chDdbPar...)
-	go tlp.BatchSend(nil, killbroker, chDdbPar[0])
-	go tlp.WriteImages(nil, killbroker, chDdbPar[1])
-
+func MockRun(rundays int, nummacs int, numfoundperminute int) {
 	cfg := state.GetConfig()
+	// The MAC database MUST be ephemeral. Put it in RAM.
 
-	go func() {
-		minutes := 0
+	sq := state.NewQueue("sent")
+	iq := state.NewQueue("images")
+	durationsdb := cfg.GetDurationsDatabase()
 
-		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
-		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
-			chSec <- true
-			state.GetClock().(*clock.Mock).Add(m)
-			cfg.Log().Debug("MOCK NOW ", state.GetClock().Now())
+	// Create a pool of NUMMACS devices to draw from.
+	// We will send NUMFOUNDPERMINUTE each minute
+	NUMMACS = nummacs
+	NUMFOUNDPERMINUTE = numfoundperminute
+	consistentMACs = make([]string, NUMMACS)
+	for i := 0; i < NUMMACS; i++ {
+		consistentMACs[i] = generateFakeMac()
+	}
 
-			var m runtime.MemStats
-			runtime.ReadMemStats(&m)
-			minutes += skip
+	for days := 0; days < rundays; days++ {
+		// Pretend we run once per minute for 24 hours
+		for minutes := 0; minutes < 60*24; minutes++ {
+			tlp.SimpleShark(
+				// search.SetMonitorMode,
+				func(d *models.Device) {},
+				// search.SearchForMatchingDevice,
+				func() *models.Device { return &models.Device{Exists: true, Logicalname: "fakewan0"} },
+				// tlp.TSharkRunner
+				runFakeWireshark)
+			// Add one minute to the fake clock
+			state.GetClock().(*clock.Mock).Add(1 * time.Minute)
+
+			now := state.GetClock().Now()
+
+			// if now.Minute() == 0 {
+			// 	cfg.Log().Info("THE TIME IS NOW ", now)
+			// }
+
+			if itIsMidnight(now) {
+				// Then we run the processing at midnight (once per 24 hours)
+				cfg.Log().Info("RUNNING PROCESSDATA at " + fmt.Sprint(state.GetClock().Now()))
+				// Copy ephemeral durations over to the durations table
+				tlp.ProcessData(durationsdb, sq, iq)
+				// Draw images of the data
+				tlp.WriteImages(durationsdb)
+				// Try sending the data
+				tlp.SimpleSend(durationsdb)
+				// Increment the session counter
+				cfg.IncrementSessionID()
+				// Clear out the ephemeral data for the next day of monitoring
+				state.ClearEphemeralDB()
+			}
 		}
-		log.Println("Killing the test network.")
-		killbroker.Publish(tlp.Ping{})
-		wg.Done()
-	}()
-	wg.Wait()
 
+	}
 }
 
-func T0(t *testing.T) {
-	// state.FlushCache()
-
+func TestAllUp(t *testing.T) {
+	// DO NOT USE LOGGING YET
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-
-	t0Path := "/tmp/t0.sql"
-	os.Create(t0Path)
-	os.Chmod(t0Path, 0777)
-	state.SetConfigAtPath(t0Path)
-
+	state.SetConfigAtPath(filepath.Join(path, "test", "config.sqlite"))
 	cfg := state.GetConfig()
-	cfg.SetRunMode("test")
-	cfg.SetStorageMode("sqlite")
-	cfg.SetManufacturersPath(filepath.Join(path, "test", "manufacturers.sqlite"))
-	cfg.SetQueuesPath(filepath.Join(path, "test", "www", "queues.sqlite"))
-	cfg.SetDurationsPath(filepath.Join(path, "test", "www", "durations.sqlite"))
-	cfg.SetRootPath(filepath.Join(path, "test", "www"))
-	cfg.SetImagesPath(filepath.Join(path, "test", "www", "images"))
-	cfg.SetFCFSSeqID("ME0000-001")
-	cfg.SetDeviceTag("testing")
-
-	os.Mkdir(cfg.GetWWWRoot(), 0755)
-	os.Mkdir(cfg.GetWWWImages(), 0755)
-
-	cleanupTempFiles()
 	cfg.Log().SetLogLevel("INFO")
 
+	cfg.Log().Info("initial session id: ", cfg.GetCurrentSessionID())
+
+	// Fake the clock
 	mock := clock.NewMock()
-	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
+	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T00:00")
 	mock.Set(mt)
 	state.SetClock(mock)
 
-	if state.GetClock() == nil {
-		log.Println("clock should not be nil")
-		t.Fail()
-	}
-	cfg.Log().Debug("mock is now ", state.GetClock().Now())
-}
+	MockRun(1, 200000, 10)
+	log.Println("WAITING")
+	time.Sleep(5 * time.Second)
 
-func T1(t *testing.T) {
-	cfg := state.GetConfig()
-	cfg.Log().SetLogLevel("INFO")
-	cfg.SetRunMode("prod")
-}
+	cfg.IncrementSessionID()
+	cfg.Log().Info("next session id: ", cfg.GetCurrentSessionID())
 
-func T2(t *testing.T) {
-	cfg := state.GetConfig()
-	cfg.Log().SetLogLevel("DEBUG")
-	cfg.SetRunMode("prod")
-}
+	// Fake the clock
+	mock = clock.NewMock()
+	mt, _ = time.Parse("2006-01-02T15:04", "1976-11-12T00:00")
+	mock.Set(mt)
+	state.SetClock(mock)
 
-func cleanupTempFiles() {
-	cfg := state.GetConfig()
-
-	f1, err := filepath.Glob(filepath.Join(cfg.GetWWWRoot(), "*.sqlite"))
-	if err != nil {
-		panic(err)
-	}
-	f2, err := filepath.Glob(filepath.Join(cfg.GetWWWImages(), "*.png"))
-	if err != nil {
-		panic(err)
-	}
-
-	for _, f := range append(f1, f2...) {
-		if err := os.Remove(f); err != nil {
-			panic(err)
-		}
-	}
-}
-
-func TestTLPCycles2(t *testing.T) {
-	T0(t)
-	const NUMDAYSTORUN int = 2
-
-	cleanupTempFiles()
-	time.Sleep(1 * time.Second)
-
-	runMockNetwork(NUMDAYSTORUN)
-	time.Sleep(2 * time.Second)
-}
-
-func TLPNCycles(t *testing.T, N int) {
-	log.Println("Running " + fmt.Sprint(N) + " cycles")
-
-	T0(t)
-	T2(t)
-
-	time.Sleep(1 * time.Second)
-
-	runMockNetwork(N)
-	time.Sleep(20 * time.Second)
-}
-
-func TestTLPCyclesMany(t *testing.T) {
-	TLPNCycles(t, 15)
-	TLPNCycles(t, 30)
-	TLPNCycles(t, 45)
-	TLPNCycles(t, 60)
-	TLPNCycles(t, 90)
+	MockRun(5, 200000, 10)
 }

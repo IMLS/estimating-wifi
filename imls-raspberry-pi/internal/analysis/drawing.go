@@ -3,12 +3,10 @@ package analysis
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
 	"github.com/fogleman/gg"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
@@ -20,38 +18,37 @@ func isInDurationRange(diff int) bool {
 
 func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	cfg := state.GetConfig()
-	lw := logwrapper.NewLogger(nil)
 
 	if len(durations) == 0 {
-		lw.Error("DrawPatronSessions was passed zero durations to draw.")
-		lw.Error("Wanted to draw to the output path ", outputPath)
+		cfg.Log().Error("DrawPatronSessions was passed zero durations to draw.")
+		cfg.Log().Error("Wanted to draw to the output path ", outputPath)
 		return
 	}
 
 	// Capture the data about the session while running in a `counter` structure.
 	durationsInRange := 0
 	sort.Sort(structs.ByStart(durations))
-	lw.Debug("about to iterate over [", len(durations), "] durations")
+	cfg.Log().Debug("about to iterate over [", len(durations), "] durations")
 
 	for _, d := range durations {
 		st, _ := time.Parse(time.RFC3339, d.Start)
 		et, _ := time.Parse(time.RFC3339, d.End)
 		diff := int(et.Sub(st).Minutes())
-		log.Println("st", st, "et", et, "diff", diff)
+		// log.Println("st", st, "et", et, "diff", diff)
 		if isInDurationRange(diff) {
-			log.Println("KEEP id", d.PatronID, "diff", diff)
+			// log.Println("KEEP id", d.PatronID, "diff", diff)
 			durationsInRange += 1
 		}
 	}
 
-	lw.Debug("durationsInRange [", durationsInRange, "]")
+	cfg.Log().Info("durations to write to the image [", durationsInRange, "]")
 
 	WIDTH := 1440
 	hourWidth := WIDTH / 24
 
 	HEIGHT := 24 * (durationsInRange + 2)
 
-	lw.Debug("image dimensions (WxH) ", WIDTH, " x ", HEIGHT)
+	cfg.Log().Info("image dimensions (WxH) ", WIDTH, " x ", HEIGHT)
 
 	dc := gg.NewContext(WIDTH, HEIGHT)
 	dc.SetRGBA(0.5, 0.5, 0, 0.5)
@@ -194,12 +191,12 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	}
 
 	//baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
-	lw.Debug("writing summary image to ", outputPath)
+	cfg.Log().Debug("writing summary image to ", outputPath)
 
 	err := dc.SavePNG(outputPath)
 	if err != nil {
-		lw.Info("drawing: failed to save png")
-		lw.Fatal(err.Error())
+		cfg.Log().Info("drawing: failed to save png")
+		cfg.Log().Fatal(err.Error())
 	}
 }
 

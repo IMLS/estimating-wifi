@@ -77,7 +77,7 @@ func run2() {
 	go runEvery("*/1 * * * *", kb,
 		func() bool {
 			cfg.Log().Debug("RUNNING SIMPLESHARK")
-			return tlp.SimpleShark(mac_db,
+			return tlp.SimpleShark(
 				// search.SetMonitorMode,
 				func(d *models.Device) {},
 				// search.SearchForMatchingDevice,
@@ -93,7 +93,7 @@ func run2() {
 		func() bool {
 			cfg.Log().Debug("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
-			tlp.ProcessData(mac_db, durationsdb, sq, iq)
+			tlp.ProcessData(durationsdb, sq, iq)
 			// Draw images of the data
 			tlp.WriteImages(durationsdb)
 			// Try sending the data

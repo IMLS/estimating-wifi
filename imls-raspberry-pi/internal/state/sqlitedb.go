@@ -138,7 +138,7 @@ func (db *SqliteDB) CreateTableFromStruct(s interface{}) interfaces.Table {
 	// log.Println(stmnt)
 	_, err := t.DB.GetPtr().Exec(stmnt)
 	if err != nil {
-		log.Fatalf("Failed to create table from struct: " + t.Name)
+		log.Fatalf("Failed to create table from struct: " + t.Name + " in " + db.Path)
 	}
 
 	return t

@@ -8,10 +8,8 @@ import (
 	"syscall"
 
 	"gsa.gov/18f/cmd/session-counter/constants"
-	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
-	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
@@ -66,10 +64,7 @@ type SharkFn func(string) []string
 type MonitorFn func(*models.Device)
 type SearchFn func() *models.Device
 
-func SimpleShark(db interfaces.Database,
-	// setMonitorFn func(d *models.Device),
-	// searchFn func() *models.Device,
-	// sharkFn func(dev string) []string) bool {
+func SimpleShark(
 	setMonitorFn MonitorFn,
 	searchFn SearchFn,
 	sharkFn SharkFn) bool {
@@ -99,7 +94,7 @@ func SimpleShark(db interfaces.Database,
 				keepers = append(keepers, mac)
 			}
 		}
-		StoreMacs(db, keepers)
+		StoreMacs(keepers)
 	} else {
 		cfg.Log().Info("no wifi devices found. no scanning carried out.")
 		return false
@@ -107,47 +102,41 @@ func SimpleShark(db interfaces.Database,
 	return true
 }
 
-func macExists(db interfaces.Database, mac string) bool {
-	var ed structs.EphemeralDuration
-	row := db.GetPtr().QueryRowx("SELECT mac FROM ephemeraldurations WHERE mac = ?", mac)
-	err := row.StructScan(&ed)
-	// Returns true if MAC found.
-	return err == nil && ed.MAC == mac
-}
+// func macExists(db interfaces.Database, mac string) bool {
+// 	var ed structs.EphemeralDuration
+// 	row := db.GetPtr().QueryRowx("SELECT mac FROM ephemeraldurations WHERE mac = ?", mac)
+// 	err := row.StructScan(&ed)
+// 	// Returns true if MAC found.
+// 	return err == nil && ed.MAC == mac
+// }
 
-func insertFirstSeen(db interfaces.Database, mac string) {
-	cfg := state.GetConfig()
+// func insertFirstSeen(db interfaces.Database, mac string) {
+// 	cfg := state.GetConfig()
 
-	_, err := db.GetPtr().Exec("INSERT INTO ephemeraldurations (mac, start, end) VALUES (?, ?, ?)",
-		mac,
-		state.GetClock().Now().Unix(),
-		state.GetClock().Now().Unix())
-	if err != nil {
-		cfg.Log().Error("Could not do initial insert for ", mac)
-		cfg.Log().Fatal(err.Error())
-	}
-}
+// 	_, err := db.GetPtr().Exec("INSERT INTO ephemeraldurations (mac, start, end) VALUES (?, ?, ?)",
+// 		mac,
+// 		state.GetClock().Now().Unix(),
+// 		state.GetClock().Now().Unix())
+// 	if err != nil {
+// 		cfg.Log().Error("Could not do initial insert for ", mac)
+// 		cfg.Log().Fatal(err.Error())
+// 	}
+// }
 
-func updateLastSeen(db interfaces.Database, mac string) {
-	cfg := state.GetConfig()
-	_, err := db.GetPtr().Exec(`UPDATE ephemeraldurations SET end=? WHERE mac=?`,
-		state.GetClock().Now().Unix(),
-		mac)
-	if err != nil {
-		cfg.Log().Fatal("Could not update MAC end for ", mac)
-	}
-}
+// func updateLastSeen(db interfaces.Database, mac string) {
+// 	cfg := state.GetConfig()
+// 	_, err := db.GetPtr().Exec(`UPDATE ephemeraldurations SET end=? WHERE mac=?`,
+// 		state.GetClock().Now().Unix(),
+// 		mac)
+// 	if err != nil {
+// 		cfg.Log().Fatal("Could not update MAC end for ", mac)
+// 	}
+// }
 
-func StoreMacs(db interfaces.Database, keepers []string) {
+func StoreMacs(keepers []string) {
 	cfg := state.GetConfig()
 	cfg.Log().Debug("keepers", keepers)
 	for _, mac := range keepers {
-		if macExists(db, mac) {
-			cfg.Log().Debug(mac, " exists")
-			updateLastSeen(db, mac)
-		} else {
-			cfg.Log().Debug(mac, " being inserted")
-			insertFirstSeen(db, mac)
-		}
+		state.RecordMAC(mac)
 	}
 }
