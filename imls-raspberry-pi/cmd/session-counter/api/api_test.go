@@ -26,11 +26,6 @@ func TestGetManufacturer(t *testing.T) {
 	cfg := state.GetConfig()
 	cfg.SetStorageMode("local")
 
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
-	manuPath := filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	cfg.SetManufacturersPath(manuPath)
-
 	var tests = []struct {
 		mac  string
 		mfgs string

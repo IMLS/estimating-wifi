@@ -15,7 +15,6 @@ type Config interface {
 	SetRunMode(string)
 	SetUniquenessWindow(int)
 
-	SetManufacturersPath(string)
 	SetDurationsPath(string)
 	SetQueuesPath(string)
 
@@ -39,7 +38,6 @@ type Config interface {
 	IsDeveloperMode() bool
 	IsTestMode() bool
 
-	GetManufacturersDatabase() Database
 	GetDurationsDatabase() Database
 	GetQueuesDatabase() Database
 

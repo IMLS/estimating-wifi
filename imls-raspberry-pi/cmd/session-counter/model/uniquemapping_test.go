@@ -57,11 +57,6 @@ func TestAsUserMappings(t *testing.T) {
 	cfg := state.GetConfig()
 	cfg.SetStorageMode("local")
 
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
-	manuPath := filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	cfg.SetManufacturersPath(manuPath)
-
 	umdb := NewUMDB(cfg)
 	m1 := umdb.AsUserMappings()
 

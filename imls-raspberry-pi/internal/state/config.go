@@ -107,10 +107,6 @@ func (dc *databaseConfig) SetRunMode(mode string) {
 	dc.config.SetTextField("run_mode", mode)
 }
 
-func (dc *databaseConfig) SetManufacturersPath(mode string) {
-	dc.config.SetTextField("manufacturers_path", mode)
-}
-
 func (dc *databaseConfig) SetQueuesPath(mode string) {
 	dc.config.SetTextField("queues_path", mode)
 }
@@ -211,11 +207,6 @@ func (dc *databaseConfig) IsTestMode() bool {
 	return strings.Contains(strings.ToLower(mode), "test")
 }
 
-func (dc *databaseConfig) GetManufacturersDatabase() interfaces.Database {
-	path := dc.config.GetTextField("manufacturers_path")
-	return NewSqliteDB(path)
-}
-
 func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
 	path := dc.config.GetTextField("durations_path")
 	// always make sure we have a durations db created
@@ -276,7 +267,6 @@ type ConfigDB struct {
 	serial            string `db:"serial" sqlite:"TEXT"`
 	storageMode       string `db:"storage_mode" sqlite:"TEXT"`
 	runMode           string `db:"run_mode" sqlite:"TEXT"`
-	manufacturersPath string `db:"manufacturers_path" sqlite:"TEXT"`
 	durationsPath     string `db:"durations_path" sqlite:"TEXT"`
 	queuesPath        string `db:"queues_path" sqlite:"TEXT"`
 	umbrellaScheme    string `db:"umbrella_scheme" sqlite:"TEXT"`
@@ -303,7 +293,6 @@ func ConfigDefaults() ConfigDB {
 	// Serial filled in by device or user
 	defaults.storageMode = "api"
 	defaults.runMode = "prod"
-	defaults.manufacturersPath = "/tmp/manufacturers.sqlite"
 	defaults.durationsPath = "/tmp/durations.sqlite"
 	defaults.queuesPath = "/tmp/queues.sqlite"
 	defaults.umbrellaScheme = "https"
