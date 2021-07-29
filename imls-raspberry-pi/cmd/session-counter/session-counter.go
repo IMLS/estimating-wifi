@@ -55,7 +55,6 @@ func run2() {
 	sq := state.NewQueue("sent")
 	iq := state.NewQueue("images")
 	durationsdb := cfg.GetDurationsDatabase()
-	cfg.Log().Debug("launching gofunkys...")
 	c := cron.New()
 
 	go runEvery("*/1 * * * *", c,
