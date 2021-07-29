@@ -1,3 +1,0 @@
-loggers:
-  - "local:stderr"
-  - "local:tmp"
