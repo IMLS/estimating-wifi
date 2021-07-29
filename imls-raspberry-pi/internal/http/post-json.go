@@ -89,10 +89,12 @@ func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) 
 			// Parse the response. Everything comes from ReVal in our current formulation.
 			var dat RevalResponse
 			body, _ := ioutil.ReadAll(resp.Body)
+
 			err := json.Unmarshal(body, &dat)
 			if err != nil {
 				message := fmt.Sprintf("PostJSON: could not unmarshal response body: %v", err)
 				log.Print(message)
+				log.Printf("%s", string(body))
 				return fmt.Errorf(message)
 			}
 		}

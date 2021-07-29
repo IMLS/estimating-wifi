@@ -16,7 +16,6 @@ import (
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
 	"gsa.gov/18f/cmd/input-initial-configuration/cryptopasta"
-	"gsa.gov/18f/cmd/input-initial-configuration/pi"
 	"gsa.gov/18f/cmd/input-initial-configuration/wordlist"
 	config "gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
@@ -179,7 +178,8 @@ func readWordPairs(input io.Reader) string {
 	}
 
 	// 20210427 Encrypt the key before handing it back.
-	serial := []byte(pi.GetSerial())
+	cfg := config.GetConfig()
+	serial := []byte(cfg.GetSerial())
 	var enckey [32]byte
 	copy(enckey[:], serial)
 	enc, err := cryptopasta.Encrypt([]byte(key), &enckey)
@@ -197,7 +197,8 @@ func readToken(input io.Reader) string {
 	reader := bufio.NewReader(input)
 	tok, _ := reader.ReadString('\n')
 	tok = strings.TrimSpace(tok)
-	serial := []byte(pi.GetSerial())
+	cfg := config.GetConfig()
+	serial := []byte(cfg.GetSerial())
 	var key [32]byte
 	copy(key[:], serial)
 	enc, err := cryptopasta.Encrypt([]byte(tok), &key)
