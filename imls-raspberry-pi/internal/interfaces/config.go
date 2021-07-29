@@ -30,9 +30,8 @@ type Config interface {
 	GetEventsURI() string
 	GetDurationsURI() string
 
-	IncrementSessionID() int
-	GetCurrentSessionID() int
-	GetPreviousSessionID() int
+	IncrementSessionID() int64
+	GetCurrentSessionID() int64
 
 	IsStoringToAPI() bool
 	IsStoringLocally() bool

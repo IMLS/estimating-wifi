@@ -8,12 +8,13 @@ import (
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/structs"
 )
 
 type databaseConfig struct {
 	configDB  interfaces.Database
 	config    interfaces.Table
-	sessionID int
+	sessionID int64
 	logger    interfaces.Logger
 }
 
@@ -49,7 +50,8 @@ func newConfig(configDBPath string) databaseConfig {
 	// sessionid fairly soon so I won't worry too much about it.
 	path := table.GetTextField("durations_path")
 	durationsDB := NewSqliteDB(path)
-	sessionID := InitializeSessionID(durationsDB)
+	durationsDB.CreateTableFromStruct(structs.Duration{})
+	sessionID := InitializeSessionID()
 
 	dc := databaseConfig{db, table, sessionID, nil}
 	dc.logger = logwrapper.NewLogger(&dc)
