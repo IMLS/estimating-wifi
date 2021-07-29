@@ -44,15 +44,8 @@ func newConfig(configDBPath string) databaseConfig {
 	} else {
 		table = db.GetTableByName("config")
 	}
-	// TODO: incorporate manu db as well?
 
-	// TODO: this is awkward: bootstrapping issue. we're getting rid of
-	// sessionid fairly soon so I won't worry too much about it.
-	path := table.GetTextField("durations_path")
-	durationsDB := NewSqliteDB(path)
-	durationsDB.CreateTableFromStruct(structs.Duration{})
-	sessionID := InitializeSessionID()
-
+	sessionID := NewSessionID()
 	dc := databaseConfig{db, table, sessionID, nil}
 	dc.logger = logwrapper.NewLogger(&dc)
 	return dc
@@ -168,11 +161,18 @@ func (dc *databaseConfig) GetDurationsURI() string {
 		startsWithSlash(removeLeadingSlashes(path)))
 }
 
-// See sessionid.go for related interface implementation
-// InitializeSessionID()
-// IncrementSessionID() int
-// GetCurrentSessionID() int
-// GetPreviousSessionID() int
+func NewSessionID() int64 {
+	return GetClock().Now().Unix()
+}
+
+func (dc *databaseConfig) GetCurrentSessionID() int64 {
+	return dc.sessionID
+}
+
+func (dc *databaseConfig) IncrementSessionID() int64 {
+	dc.sessionID = NewSessionID()
+	return dc.sessionID
+}
 
 func (dc *databaseConfig) IsStoringToAPI() bool {
 	mode := dc.config.GetTextField("storage_mode")
@@ -217,7 +217,12 @@ func (dc *databaseConfig) GetManufacturersDatabase() interfaces.Database {
 
 func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
 	path := dc.config.GetTextField("durations_path")
-	return NewSqliteDB(path)
+	// always make sure we have a durations db created
+	db := NewSqliteDB(path)
+	if !db.CheckTableExists("durations") {
+		db.CreateTableFromStruct(structs.Duration{})
+	}
+	return db
 }
 
 func (dc *databaseConfig) GetQueuesDatabase() interfaces.Database {
@@ -297,9 +302,9 @@ func ConfigDefaults() ConfigDB {
 	// Serial filled in by device or user
 	defaults.storageMode = "api"
 	defaults.runMode = "prod"
-	defaults.manufacturersPath = "/opt/imls/manufacturers.sqlite"
-	defaults.durationsPath = "/www/imls/durations.sqlite"
-	defaults.queuesPath = "/www/imls/queues.sqlite"
+	defaults.manufacturersPath = "/tmp/manufacturers.sqlite"
+	defaults.durationsPath = "/tmp/durations.sqlite"
+	defaults.queuesPath = "/tmp/queues.sqlite"
 	defaults.umbrellaScheme = "https"
 	defaults.umbrellaHost = "api.data.gov"
 	defaults.eventsURI = "/TEST/10x-imls/v2/events/"
