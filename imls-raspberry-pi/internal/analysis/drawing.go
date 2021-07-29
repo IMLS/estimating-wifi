@@ -140,7 +140,23 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 				// log.Println(duration)
 			}
 
-			dc.DrawStringAnchored(duration, float64(x+diff), float64(y), 1.25, 1)
+			// For short diffs, position the duration to the right...
+			// A lot of conditions for such a seemingly simple thing...
+			if diff < 60 {
+				// cfg.Log().Debug("drawing a short box")
+				if x < 100 {
+					// If we are too far to the left, put it to the right of the box.
+					dc.DrawStringAnchored(duration, float64(x+diff), float64(y), -2.25, 1)
+				} else if x > (WIDTH - 100) {
+					// If we are too far to the right, go left.
+					dc.DrawStringAnchored(duration, float64(x+diff), float64(y), 3.25, 1)
+				} else {
+					// Otherwise, just *mostly* to the right...
+					dc.DrawStringAnchored(duration, float64(x+diff), float64(y), -1.25, 1)
+				}
+			} else {
+				dc.DrawStringAnchored(duration, float64(x+diff), float64(y), 1.25, 1)
+			}
 
 			dc.Stroke()
 		}
@@ -152,13 +168,13 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	summaryA := fmt.Sprintf("%v devices seen", totalPatrons)
 	summaryP := fmt.Sprintf("%v patron devices", durationsInRange)
 	summaryM := fmt.Sprintf("%v minutes served", totalMinutes)
-
+	// Top string
 	dc.DrawStringAnchored(summaryD, float64(20), float64(20), 0, 0)
-
-	firstLineY := float64(HEIGHT) - ((20 * 5) + 10)
-	dc.DrawStringAnchored(summaryA, float64(20), float64(firstLineY+20), 0, 0)
-	dc.DrawStringAnchored(summaryP, float64(20), float64(firstLineY+40), 0, 0)
-	dc.DrawStringAnchored(summaryM, float64(20), float64(firstLineY+60), 0, 0)
+	// Bottom block
+	firstLineY := float64(HEIGHT) - 50
+	dc.DrawStringAnchored(summaryA, float64(20), float64(firstLineY), 0, 0)
+	dc.DrawStringAnchored(summaryP, float64(20), float64(firstLineY+15), 0, 0)
+	dc.DrawStringAnchored(summaryM, float64(20), float64(firstLineY+30), 0, 0)
 
 	// LEGEND
 	xpos := float64(WIDTH - 300)

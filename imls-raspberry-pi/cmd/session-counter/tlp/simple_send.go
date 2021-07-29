@@ -50,6 +50,7 @@ func SimpleSend(db interfaces.Database) {
 		} else {
 			// Always dequeue. We're storing locally "for free" into the
 			// durations table before trying to do the send.
+			cfg.Log().Info("not in API mode, not sending data...")
 			sq.Remove(nextSessionIDToSend)
 		}
 	}

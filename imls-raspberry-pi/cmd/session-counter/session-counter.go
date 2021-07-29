@@ -94,7 +94,7 @@ func run2() {
 		func() bool {
 			cfg.Log().Debug("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
-			tlp.ProcessData(mac_db, sq, iq)
+			tlp.ProcessData(mac_db, durationsdb, sq, iq)
 			// Draw images of the data
 			tlp.WriteImages(durationsdb)
 			// Try sending the data
