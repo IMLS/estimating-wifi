@@ -89,15 +89,21 @@ func run2() {
 
 	sq := state.NewQueue("sent")
 	iq := state.NewQueue("images")
+	durationsdb := cfg.GetDurationsDatabase()
 	go runEvery("*/2 * * * *", kb,
 		func() bool {
 			cfg.Log().Debug("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
 			tlp.ProcessData(mac_db, sq, iq)
+			// Draw images of the data
+			tlp.WriteImages(durationsdb)
+			// Try sending the data
+			tlp.SimpleSend(durationsdb)
+			// Increment the session counter
+			cfg.IncrementSessionID()
 			// Clear out the ephemeral data for the next day of monitoring
 			mac_db.GetPtr().Exec("DELETE FROM ephemeraldurations")
-			// Draw images of the data
-			tlp.WriteImages(cfg.GetDurationsDatabase())
+
 			return true
 		})
 }
