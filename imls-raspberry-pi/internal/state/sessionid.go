@@ -9,6 +9,6 @@ func (dc *databaseConfig) GetCurrentSessionID() int64 {
 }
 
 func (dc *databaseConfig) IncrementSessionID() int64 {
-	InitializeSessionID()
+	dc.sessionID = InitializeSessionID()
 	return dc.sessionID
 }

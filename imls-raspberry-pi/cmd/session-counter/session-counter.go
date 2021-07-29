@@ -73,7 +73,6 @@ func run2() {
 	// The MAC database MUST be ephemeral. Put it in RAM.
 	mac_db := state.NewSqliteDB(":memory:")
 	mac_db.CreateTableFromStruct(structs.EphemeralDuration{})
-
 	kb := tlp.NewKillBroker()
 	go runEvery("*/1 * * * *", kb,
 		func() bool {
