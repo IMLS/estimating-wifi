@@ -19,15 +19,15 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 	lw := logwrapper.NewLogger(nil)
 	var reterr error
 
-	if _, err := os.Stat(cfg.Paths.WWW.Root); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.Paths.WWW.Root, 0777)
+	if _, err := os.Stat(cfg.GetWWWRoot()); os.IsNotExist(err) {
+		err := os.Mkdir(cfg.GetWWWRoot(), 0777)
 		if err != nil {
-			lw.Error("could not create web directory: ", cfg.Paths.WWW.Root)
+			lw.Error("could not create web directory: ", cfg.GetWWWRoot())
 			reterr = err
 		}
 	}
-	if _, err := os.Stat(cfg.Paths.WWW.Images); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.Paths.WWW.Images, 0777)
+	if _, err := os.Stat(cfg.GetWWWImages()); os.IsNotExist(err) {
+		err := os.Mkdir(cfg.GetWWWImages(), 0777)
 		if err != nil {
 			lw.Error("could not create image directory")
 			reterr = err
@@ -45,7 +45,7 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 		cfg.GetFCFSSeqID(),
 		cfg.GetDeviceTag())
 
-	path := filepath.Join(cfg.Paths.WWW.Images, imageFilename)
+	path := filepath.Join(cfg.GetWWWImages(), imageFilename)
 	// func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
 	analysis.DrawPatronSessions(durations, path)
 	return reterr

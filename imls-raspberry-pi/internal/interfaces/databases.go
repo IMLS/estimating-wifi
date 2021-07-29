@@ -31,4 +31,8 @@ type Table interface {
 	GetDB() Database
 	//FieldToDate(field string) time.Time
 	//DateToField(t time.Time) string
+	GetIntegerField(string) int
+	GetTextField(string) string
+	SetIntegerField(name string, value int)
+	SetTextField(name string, value string)
 }

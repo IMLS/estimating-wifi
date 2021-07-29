@@ -170,14 +170,21 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 
 func TestRawToUid(t *testing.T) {
 	log.Println("TestRawToUid")
-	cfg := state.UnsafeNewConfig()
+
+	scPath := "/tmp/sc.sql"
+	os.Create(scPath)
+	os.Chmod(scPath, 0777)
+	state.SetConfigAtPath(scPath)
+
+	cfg := state.GetConfig()
 
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "test", "manufacturers.sqlite")
-	cfg.Logging.Loggers = []string{"local:stderr"}
-	state.InitConfig()
+	manuPath := filepath.Join(path, "test", "manufacturers.sqlite")
+	cfg.SetRunMode("test")
+	cfg.SetStorageMode("sqlite")
+	cfg.SetManufacturersPath(manuPath)
 
 	ka := tlp.NewKeepalive()
 
@@ -189,7 +196,7 @@ func TestRawToUid(t *testing.T) {
 
 	for testNdx, e := range tests {
 		t.Logf("Test #%v: %v\n", testNdx, e.description)
-		cfg.Monitoring.UniquenessWindow = e.uniquenessWindow
+		cfg.SetUniquenessWindow(e.uniquenessWindow)
 
 		var wg sync.WaitGroup
 		resetbroker := tlp.NewResetBroker()
@@ -268,7 +275,7 @@ func PingAtBogoMidnight(ka *tlp.Keepalive,
 	// counter := 0
 	// chKill := kb.Subscribe()
 	cfg := state.GetConfig()
-	m := cfg.Clock
+	m := state.GetClock()
 	pinged := false
 	for {
 		if m.Now().Hour() == 0 && !pinged {
@@ -343,7 +350,7 @@ func RunFakeWireshark(ka *tlp.Keepalive, kb *tlp.KillBroker, in <-chan bool, out
 
 }
 
-func runMockNetwork(NUMDAYSTORUN int, cfg *state.CFG) {
+func runMockNetwork(NUMDAYSTORUN int) {
 	var NUMMINUTESTORUN int = NUMDAYSTORUN * 24 * 60
 	const skip int = 20
 	var NUMCYCLESTORUN = NUMMINUTESTORUN / skip
@@ -408,14 +415,16 @@ func runMockNetwork(NUMDAYSTORUN int, cfg *state.CFG) {
 	go tlp.BatchSend(nil, killbroker, chDdbPar[0])
 	go tlp.WriteImages(nil, killbroker, chDdbPar[1])
 
+	cfg := state.GetConfig()
+
 	go func() {
 		minutes := 0
 
 		m, _ := time.ParseDuration(fmt.Sprintf("%vm", skip))
 		for secs := 0; secs < NUMCYCLESTORUN; secs++ {
 			chSec <- true
-			cfg.Clock.(*clock.Mock).Add(m)
-			cfg.Log().Debug("MOCK NOW ", cfg.Clock.Now())
+			state.GetClock().(*clock.Mock).Add(m)
+			cfg.Log().Debug("MOCK NOW ", state.GetClock().Now())
 
 			var m runtime.MemStats
 			runtime.ReadMemStats(&m)
@@ -430,64 +439,66 @@ func runMockNetwork(NUMDAYSTORUN int, cfg *state.CFG) {
 }
 
 func T0(t *testing.T) {
+	// state.FlushCache()
+
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-	configPath := filepath.Join(path, "test", "config.yaml")
-	state.UnsafeNewConfigFromPath(configPath)
+
+	t0Path := "/tmp/t0.sql"
+	os.Create(t0Path)
+	os.Chmod(t0Path, 0777)
+	state.SetConfigAtPath(t0Path)
+
 	cfg := state.GetConfig()
-	cfg.RunMode = "test"
-	cfg.StorageMode = "sqlite"
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "test", "manufacturers.sqlite")
-	cfg.Databases.QueuesPath = filepath.Join(path, "test", "www", "queues.sqlite")
-	cfg.Databases.DurationsPath = filepath.Join(path, "test", "www", "durations.sqlite")
-	cfg.Paths.WWW.Root = filepath.Join(path, "test", "www")
-	cfg.Paths.WWW.Images = filepath.Join(path, "test", "www", "images")
-	cfg.Device.FCFSId = "ME0000-001"
-	cfg.Device.DeviceTag = "testing"
+	cfg.SetRunMode("test")
+	cfg.SetStorageMode("sqlite")
+	cfg.SetManufacturersPath(filepath.Join(path, "test", "manufacturers.sqlite"))
+	cfg.SetQueuesPath(filepath.Join(path, "test", "www", "queues.sqlite"))
+	cfg.SetDurationsPath(filepath.Join(path, "test", "www", "durations.sqlite"))
+	cfg.SetRootPath(filepath.Join(path, "test", "www"))
+	cfg.SetImagesPath(filepath.Join(path, "test", "www", "images"))
+	cfg.SetFCFSSeqID("ME0000-001")
+	cfg.SetDeviceTag("testing")
 
-	state.FlushCache()
+	os.Mkdir(cfg.GetWWWRoot(), 0755)
+	os.Mkdir(cfg.GetWWWImages(), 0755)
+
 	cleanupTempFiles()
-	state.InitConfig()
-	cfg.Logging.LogLevel = "INFO"
-	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
+	cfg.Log().SetLogLevel("INFO")
 
-	os.Mkdir(cfg.Paths.WWW.Root, 0755)
-	os.Mkdir(cfg.Paths.WWW.Images, 0755)
 	mock := clock.NewMock()
 	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
 	mock.Set(mt)
-	cfg.Clock = mock
+	state.SetClock(mock)
 
-	if cfg.Clock == nil {
+	if state.GetClock() == nil {
 		log.Println("clock should not be nil")
 		t.Fail()
 	}
-	cfg.Log().Debug("mock is now ", cfg.Clock.Now())
+	cfg.Log().Debug("mock is now ", state.GetClock().Now())
 }
 
 func T1(t *testing.T) {
 	cfg := state.GetConfig()
-	cfg.Logging.LogLevel = "INFO"
-	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
-	cfg.RunMode = "prod"
+	cfg.Log().SetLogLevel("INFO")
+	cfg.SetRunMode("prod")
 }
 
 func T2(t *testing.T) {
 	cfg := state.GetConfig()
-	cfg.Logging.LogLevel = "DEBUG"
-	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
-	cfg.RunMode = "prod"
+	cfg.Log().SetLogLevel("DEBUG")
+	cfg.SetRunMode("prod")
 }
 
 func cleanupTempFiles() {
 	cfg := state.GetConfig()
 
-	f1, err := filepath.Glob(filepath.Join(cfg.Paths.WWW.Root, "*.sqlite"))
+	f1, err := filepath.Glob(filepath.Join(cfg.GetWWWRoot(), "*.sqlite"))
 	if err != nil {
 		panic(err)
 	}
-	f2, err := filepath.Glob(filepath.Join(cfg.Paths.WWW.Images, "*.png"))
+	f2, err := filepath.Glob(filepath.Join(cfg.GetWWWImages(), "*.png"))
 	if err != nil {
 		panic(err)
 	}
@@ -501,13 +512,12 @@ func cleanupTempFiles() {
 
 func TestTLPCycles2(t *testing.T) {
 	T0(t)
-	cfg := state.GetConfig()
 	const NUMDAYSTORUN int = 2
 
 	cleanupTempFiles()
 	time.Sleep(1 * time.Second)
 
-	runMockNetwork(NUMDAYSTORUN, cfg)
+	runMockNetwork(NUMDAYSTORUN)
 	time.Sleep(2 * time.Second)
 }
 
@@ -517,12 +527,12 @@ func TLPNCycles(t *testing.T, N int) {
 	T0(t)
 	T2(t)
 
-	cfg := state.GetConfig()
 	time.Sleep(1 * time.Second)
 
-	runMockNetwork(N, cfg)
+	runMockNetwork(N)
 	time.Sleep(20 * time.Second)
 }
+
 func TestTLPCyclesMany(t *testing.T) {
 	TLPNCycles(t, 15)
 	TLPNCycles(t, 30)

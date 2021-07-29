@@ -37,7 +37,7 @@ func initConfigFromFlags() {
 		log.Fatal("Cannot find config file. Exiting.")
 	}
 
-	state.NewConfigFromPath(*configPathPtr)
+	state.SetConfigAtPath(*configPathPtr)
 
 }
 

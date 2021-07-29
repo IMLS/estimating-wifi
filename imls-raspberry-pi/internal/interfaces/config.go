@@ -1,21 +1,35 @@
 package interfaces
 
-import "github.com/benbjohnson/clock"
-
 type Config interface {
 	GetSerial() string
+
 	GetFCFSSeqID() string
 	GetDeviceTag() string
 	GetAPIKey() string
 
+	// TODO: change to generic set method?
+	SetFCFSSeqID(string)
+	SetDeviceTag(string)
+	SetAPIKey(string)
+	SetStorageMode(string)
+	SetRunMode(string)
+	SetUniquenessWindow(int)
+
+	SetManufacturersPath(string)
+	SetDurationsPath(string)
+	SetQueuesPath(string)
+
+	SetRootPath(string)
+	SetImagesPath(string)
+
 	GetLogLevel() string
 	GetLoggers() []string
+	// TODO: pull this out
 	Log() Logger
 
 	GetEventsURI() string
 	GetDurationsURI() string
 
-	InitializeSessionID()
 	IncrementSessionID() int
 	GetCurrentSessionID() int
 	GetPreviousSessionID() int
@@ -26,11 +40,20 @@ type Config interface {
 	IsDeveloperMode() bool
 	IsTestMode() bool
 
-	GetManufacturerDatabase() Database
+	GetManufacturersDatabase() Database
+	GetDurationsDatabase() Database
+	GetQueuesDatabase() Database
 
-	GetClock() clock.Clock
+	GetWiresharkPath() string
+	GetWiresharkDuration() int
+
+	GetWWWRoot() string
+	GetWWWImages() string
+
 	GetMinimumMinutes() int
 	GetMaximumMinutes() int
+	GetUniquenessWindow() int
+	GetResetCron() string
 }
 
 type Logger interface {

@@ -2,6 +2,7 @@ package model
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -49,12 +50,17 @@ var tests = []struct {
 
 func TestAsUserMappings(t *testing.T) {
 	//cfg := config.ReadConfig()
-	state.NewConfig()
+	configPath := "/tmp/config-mapping.sql"
+	os.Create(configPath)
+	os.Chmod(configPath, 0777)
+	state.SetConfigAtPath(configPath)
 	cfg := state.GetConfig()
+	cfg.SetStorageMode("local")
+
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	state.InitConfig()
+	manuPath := filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.SetManufacturersPath(manuPath)
 
 	umdb := NewUMDB(cfg)
 	m1 := umdb.AsUserMappings()

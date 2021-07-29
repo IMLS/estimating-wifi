@@ -82,7 +82,7 @@ func main() {
 		log.Fatal("Must provide valid config file.")
 	}
 
-	state.NewConfigFromPath(*cfgPath)
+	state.SetConfigAtPath(*cfgPath)
 	cfg := state.GetConfig()
 
 	var durations []structs.Duration
@@ -112,8 +112,8 @@ func main() {
 		// This is necessary... in case we're testing with a
 		// bogus config.yaml file. Better to pull the identifiers from
 		// the actual event stream than trust the file passed.
-		cfg.Device.FCFSId = fcfs
-		cfg.Device.DeviceTag = dt
+		cfg.SetFCFSSeqID(fcfs)
+		cfg.SetDeviceTag(dt)
 		pngName := fmt.Sprintf("%v-%.2v-%.2v-%v-%v-patron-sessions", dtime.Year(), int(dtime.Month()), int(dtime.Day()), fcfs, dt)
 		log.Println("writing to", pngName)
 		analysis.DrawPatronSessions(subset, buildImagePath(fcfs, dt, pngName))

@@ -1,7 +1,6 @@
 package state
 
 import (
-	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -37,7 +36,6 @@ func AsApples(is []interface{}) []Apple {
 }
 
 func TestSqliteDB(test *testing.T) {
-	NewConfig()
 	d := NewSqliteDB("/tmp/test.sqlite")
 	t := d.InitTable("oranges")
 	t.AddColumn("count", t.GetIntegerType())
@@ -50,6 +48,7 @@ func TestSqliteDB2(test *testing.T) {
 	t.InsertStruct(Apple{Color: "red", Weight: 3})
 	t.InsertStruct(Apple{Color: "green", Weight: 5})
 }
+
 func TestSelectAll(test *testing.T) {
 	d := NewSqliteDB("/tmp/test.sqlite")
 	t := d.CreateTableFromStruct(Apple{})
@@ -79,13 +78,11 @@ func TestSelectAll(test *testing.T) {
 func TestManyOpens(test *testing.T) {
 	go http.ListenAndServe("localhost:8080", nil)
 	for i := 0; i < 8000; i++ {
-		log.Print(fmt.Sprint(i) + " ")
 		d := NewSqliteDB("/tmp/test.sqlite")
 		d.CreateTableFromStruct(Apple{})
 	}
 	time.Sleep(10 * time.Second)
 	for i := 0; i < 16000; i++ {
-		log.Print(fmt.Sprint(i) + " ")
 		d := NewSqliteDB("/tmp/test.sqlite")
 		d.CreateTableFromStruct(Apple{})
 	}

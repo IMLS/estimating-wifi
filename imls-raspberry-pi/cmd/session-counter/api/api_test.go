@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -16,14 +17,19 @@ import (
 // But, it slows down practical testing... :/
 const dbIterations = 2000
 
-func Test_get_manufactuerer(t *testing.T) {
+func TestGetManufacturer(t *testing.T) {
 
-	state.NewConfig()
+	configPath := "/tmp/config-manu.sql"
+	os.Create(configPath)
+	os.Chmod(configPath, 0777)
+	state.SetConfigAtPath(configPath)
 	cfg := state.GetConfig()
+	cfg.SetStorageMode("local")
+
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
-	cfg.Databases.ManufacturersPath = filepath.Join(path, "..", "test", "manufacturers.sqlite")
-	state.InitConfig()
+	manuPath := filepath.Join(path, "..", "test", "manufacturers.sqlite")
+	cfg.SetManufacturersPath(manuPath)
 
 	var tests = []struct {
 		mac  string
@@ -38,14 +44,13 @@ func Test_get_manufactuerer(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		t.Run(fmt.Sprintf("Get Manufactuerer = %v", tc.mfgs), func(t *testing.T) {
+		t.Run(fmt.Sprintf("Get Manufacturer = %v", tc.mfgs), func(t *testing.T) {
 			got := MacToMfg(cfg, tc.mac)
 			if got != tc.mfgs {
 				t.Fatalf("got [ %v ] want [ %v ]", got, tc.mfgs)
 			} else {
 				t.Logf("Success !")
 			}
-
 		})
 	}
 }
@@ -53,12 +58,14 @@ func Test_get_manufactuerer(t *testing.T) {
 // I'm hoping that if we're leaking DB connections that
 // this loop will find it. When the DB isn't closed properly,
 // this will fail around 1078ish connections.
-func Test_thrash_db(t *testing.T) {
-	_, filename, _, _ := runtime.Caller(0)
-	path := filepath.Dir(filename)
+func TestThrashDB(t *testing.T) {
+	configPath := "/tmp/config-manu.sql"
+	os.Create(configPath)
+	os.Chmod(configPath, 0777)
 
-	state.NewConfigFromPath(filepath.Join(path, "..", "test", "config.yaml"))
+	state.SetConfigAtPath(configPath)
 	cfg := state.GetConfig()
+	cfg.SetStorageMode("local")
 
 	for ndx := 0; ndx < dbIterations; ndx++ {
 		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
@@ -68,12 +75,11 @@ func Test_thrash_db(t *testing.T) {
 			} else {
 				t.Logf("Success !")
 			}
-
 		})
 	}
 }
 
-func Test_RevalResponseUnmarshall(t *testing.T) {
+func TestRevalResponseUnmarshall(t *testing.T) {
 	testString := `{
 		"tables": [
 		  {

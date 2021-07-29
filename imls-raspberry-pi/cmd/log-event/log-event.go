@@ -29,8 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	config.NewConfigFromPath(*configPathPtr)
-	config.InitConfig()
+	config.SetConfigAtPath(*configPathPtr)
 
 	lw := logwrapper.NewLogger(nil)
 	lw.Info(strings.Join(rest, " "))

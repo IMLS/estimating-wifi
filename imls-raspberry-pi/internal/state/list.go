@@ -33,7 +33,6 @@ func (queue *Queue) AsList() []string {
 	}
 
 	return sessions
-
 }
 
 func (queue *Queue) Remove(sessionid string) {

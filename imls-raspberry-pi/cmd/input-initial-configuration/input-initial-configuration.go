@@ -261,18 +261,20 @@ func main() {
 
 	flag.Parse()
 
-	if *configPathPtr == "" {
-		log.Println("The flag --config MUST be provided.")
-		os.Exit(1)
-	}
-
-	config.NewConfigFromPath(*configPathPtr)
-
 	// Dump version and exit
 	if *versionPtr {
 		fmt.Println(version.GetVersion())
 		os.Exit(0)
 	}
+
+	if *configPathPtr == "" {
+		log.Println("The flag --config MUST be provided.")
+		os.Exit(1)
+	}
+
+	config.SetConfigAtPath(*configPathPtr)
+	cfg := config.GetConfig()
+	defer cfg.Close()
 
 	// DEV ONLY
 	// This is for testing. It will take the key given, encrypt it, and
@@ -282,7 +284,7 @@ func main() {
 	if *readTokenPtr {
 		fmt.Println()
 		token := readToken(os.Stdin)
-		config.SetToken(token)
+		cfg.SetAPIKey(token)
 		os.Exit(0)
 	}
 
@@ -297,29 +299,27 @@ func main() {
 	if *readFCFSPtr {
 		fmt.Println()
 		id := readFCFS(os.Stdin)
-		config.SetFCFSId(id)
+		cfg.SetFCFSSeqID(id)
 	}
 
 	// Read in the hardware tag
 	if *tagPtr {
 		fmt.Println()
 		tag := readTag(os.Stdin)
-		config.SetTag(tag)
+		cfg.SetDeviceTag(tag)
 	}
 
 	// Read in the word pairs
 	if *readWordPairPtr {
 		if readYesOrNo(os.Stdin) {
 			fmt.Println()
-			config.SetStorageMode("api")
+			cfg.SetStorageMode("api")
 			token := readWordPairs(os.Stdin)
-			config.SetToken(token)
+			cfg.SetAPIKey(token)
 		} else {
-			config.SetStorageMode("sqlite")
+			cfg.SetStorageMode("sqlite")
 		}
 	}
-
-	config.DumpConfig(*configPathPtr)
 
 	fmt.Println()
 	fmt.Println(box(color.New(color.FgHiBlue), color.New(color.FgYellow).Sprint("All done!")))
