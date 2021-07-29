@@ -12,6 +12,7 @@ import (
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
+	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/wifi-hardware-search/config"
 )
 
@@ -36,6 +37,7 @@ func UnsafeNewConfig() *CFG {
 func InitConfig() {
 	theConfig.Logging.Log = logwrapper.NewLogger(theConfig)
 	theConfig.Databases.DurationsDB = NewSqliteDB(theConfig.Databases.DurationsPath)
+	theConfig.Databases.DurationsDB.CreateTableFromStruct(structs.Duration{})
 	theConfig.Databases.QueuesDB = NewSqliteDB(theConfig.Databases.QueuesPath)
 	theConfig.Databases.ManufacturersDB = NewSqliteDB(theConfig.Databases.ManufacturersPath)
 	theConfig.InitializeSessionID()

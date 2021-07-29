@@ -29,8 +29,8 @@ func TSharkRunner(adapter string) []string {
 		lw.Error(err.Error())
 	}
 	// The closer is called on exe exit. Idomatic use does not
-	// explicitly call the closer.
-	// defer tsharkOut.Close()
+	// explicitly call the closer. BUT DO WE HAVE LEAKS?
+	defer tsharkOut.Close()
 
 	err = tsharkCmd.Start()
 	if err != nil {

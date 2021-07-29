@@ -117,9 +117,12 @@ func run2() {
 		func() bool {
 			cfg.Log().Debug("RUNNING SIMPLESHARK")
 			return tlp.SimpleShark(mac_db,
-				func(d *models.Device) {}, // search.SetMonitorMode,
-				func() *models.Device { return &models.Device{Exists: true, Logicalname: "fakewan0"} }, // search.SearchForMatchingDevice,
-				fakeShark2) // tlp.TSharkRunner)
+				// search.SetMonitorMode,
+				func(d *models.Device) {},
+				// search.SearchForMatchingDevice,
+				func() *models.Device { return &models.Device{Exists: true, Logicalname: "fakewan0"} },
+				// tlp.TSharkRunner
+				fakeShark2)
 		})
 
 	sq := state.NewQueue("sent")
@@ -137,8 +140,8 @@ func main() {
 	cfg := state.GetConfig()
 	state.InitConfig()
 	// NOW YOU MAY USE LOGGING.
-	log.Println(cfg)
-	//cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())
+
+	cfg.Log().Debug("session id at startup is ", cfg.GetCurrentSessionID())
 
 	// Run the network
 	var wg sync.WaitGroup

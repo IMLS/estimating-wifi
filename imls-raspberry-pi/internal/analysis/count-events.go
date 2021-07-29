@@ -146,9 +146,9 @@ func durationSummary(events []structs.WifiEvent) map[int]structs.Duration {
 				FCFSSeqID: e.FCFSSeqID,
 				DeviceTag: e.DeviceTag,
 				PatronID:  e.PatronIndex,
-				MfgID:     e.ManufacturerIndex,
-				Start:     firstTime.Format(time.RFC3339),
-				End:       lastTime.Format(time.RFC3339)}
+				// MfgID:     e.ManufacturerIndex,
+				Start: firstTime.Format(time.RFC3339),
+				End:   lastTime.Format(time.RFC3339)}
 		}
 	}
 
@@ -235,9 +235,9 @@ func MultiDayDurations(swap bool, newPid int, events []structs.WifiEvent) (map[i
 							FCFSSeqID: e.FCFSSeqID,
 							DeviceTag: e.DeviceTag,
 							PatronID:  maxPatronID,
-							MfgID:     e.ManufacturerIndex,
-							Start:     firstTime.Format(time.RFC3339),
-							End:       endOfToday.Format(time.RFC3339)}
+							// MfgID:     e.ManufacturerIndex,
+							Start: firstTime.Format(time.RFC3339),
+							End:   endOfToday.Format(time.RFC3339)}
 						maxPatronID += 1
 						firstTime = bod(tomorrow(firstTime))
 						firstDay = firstTime.Day()
@@ -255,9 +255,9 @@ func MultiDayDurations(swap bool, newPid int, events []structs.WifiEvent) (map[i
 						FCFSSeqID: e.FCFSSeqID,
 						DeviceTag: e.DeviceTag,
 						PatronID:  maxPatronID,
-						MfgID:     e.ManufacturerIndex,
-						Start:     firstTime.Format(time.RFC3339),
-						End:       endOfToday.Format(time.RFC3339)}
+						// MfgID:     e.ManufacturerIndex,
+						Start: firstTime.Format(time.RFC3339),
+						End:   endOfToday.Format(time.RFC3339)}
 					maxPatronID += 1
 
 				} else {
@@ -267,9 +267,9 @@ func MultiDayDurations(swap bool, newPid int, events []structs.WifiEvent) (map[i
 						FCFSSeqID: e.FCFSSeqID,
 						DeviceTag: e.DeviceTag,
 						PatronID:  e.PatronIndex,
-						MfgID:     e.ManufacturerIndex,
-						Start:     firstTime.Format(time.RFC3339),
-						End:       lastTime.Format(time.RFC3339)}
+						// MfgID:     e.ManufacturerIndex,
+						Start: firstTime.Format(time.RFC3339),
+						End:   lastTime.Format(time.RFC3339)}
 				}
 			}
 
@@ -308,7 +308,7 @@ func MultiDayDurations(swap bool, newPid int, events []structs.WifiEvent) (map[i
 		newv.DeviceTag = v.DeviceTag
 		newv.End = v.End
 		newv.FCFSSeqID = v.FCFSSeqID
-		newv.MfgID = v.MfgID
+		// newv.MfgID = v.MfgID
 		//log.Println(v.PatronId, "becomes", pid)
 		newv.PatronID = pid
 		newv.PiSerial = v.PiSerial
