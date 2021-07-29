@@ -10,7 +10,6 @@ import (
 	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	"gsa.gov/18f/internal/state"
-	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
@@ -41,28 +40,25 @@ func initConfigFromFlags() {
 
 }
 
-func runEvery(crontab string, fun func()) {
+func runEvery(crontab string, c *cron.Cron, fun func()) {
 	cfg := state.GetConfig()
-	c := cron.New()
-	_, err := c.AddFunc(crontab, fun)
+	id, err := c.AddFunc(crontab, fun)
+	cfg.Log().Debug("launched crontab ", crontab, " with id ", id)
 	if err != nil {
 		cfg.Log().Error("cron: could not set up crontab entry")
 		cfg.Log().Fatal(err.Error())
 	}
-
 }
 
 func run2() {
 	cfg := state.GetConfig()
-	// The MAC database MUST be ephemeral. Put it in RAM.
-	mac_db := state.NewSqliteDB(":memory:")
-	mac_db.CreateTableFromStruct(structs.EphemeralDuration{})
-
 	sq := state.NewQueue("sent")
 	iq := state.NewQueue("images")
 	durationsdb := cfg.GetDurationsDatabase()
+	cfg.Log().Debug("launching gofunkys...")
+	c := cron.New()
 
-	go runEvery("*/1 * * * *",
+	go runEvery("*/1 * * * *", c,
 		func() {
 			cfg.Log().Debug("RUNNING SIMPLESHARK")
 			tlp.SimpleShark(
@@ -71,7 +67,7 @@ func run2() {
 				tlp.TSharkRunner)
 		})
 
-	go runEvery(cfg.GetResetCron(),
+	go runEvery(cfg.GetResetCron(), c,
 		func() {
 			cfg.Log().Info("RUNNING PROCESSDATA at ", state.GetClock().Now())
 			// Copy ephemeral durations over to the durations table
@@ -85,6 +81,9 @@ func run2() {
 			// Clear out the ephemeral data for the next day of monitoring
 			state.ClearEphemeralDB()
 		})
+
+	// Start the cron jobs...
+	c.Start()
 }
 
 func main() {
