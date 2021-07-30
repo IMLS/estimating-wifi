@@ -5,10 +5,13 @@ systemctl daemon-reload
 systemctl enable --now imls-update.timer
 
 # set hostname
-DEVICE_TAG=$(grep device_tag /opt/imls/config.yaml | cut -d':' -f 2 | tr -d ' ')
-FCFS_SEQ_ID=$(grep fcfs_seq_id /opt/imls/config.yaml | cut -d':' -f 2 | tr -d ' ')
-hostnamectl set-hostname "${FCFS_SEQ_ID}-${DEVICE_TAG}.local"
-systemctl restart avahi-daemon
+DEVICE_TAG=$(sqlite3 /opt/imls/config.sqlite 'select device_tag from ConfigDBs')
+FCFS_SEQ_ID=$(sqlite3 /opt/imls/config.sqlite 'select fcfs_seq_id from ConfigDBs')
+if [[ ! -z "${DEVICE_TAG}" && ! -z "${FCFS_SEQ_ID}" ]]
+then
+    hostnamectl set-hostname "${FCFS_SEQ_ID}-${DEVICE_TAG}.local"
+    systemctl restart avahi-daemon
+fi
 
 # nginx
 systemctl enable nginx.service
