@@ -153,11 +153,11 @@ func TestOneYear(t *testing.T) {
 	mock := clock.NewMock()
 	// Bump the clock forward
 	mock.Set(startTime)
-	cfg.Clock = mock
+	state.SetClock(mock)
 	// Run once at the initial time.
 	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 	mock.Set(endTime)
-	cfg.Clock = mock
+	state.SetClock(mock)
 
 	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 
@@ -198,11 +198,11 @@ func TestBumpOne(t *testing.T) {
 	mock := clock.NewMock()
 	// Bump the clock forward
 	mock.Set(startTime)
-	cfg.Clock = mock
+	state.SetClock(mock)
 	// Run once at the initial time.
 	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 	mock.Set(endTime)
-	cfg.Clock = mock
+	state.SetClock(mock)
 
 	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark1)
 

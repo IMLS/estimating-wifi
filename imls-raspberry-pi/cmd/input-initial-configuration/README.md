@@ -8,7 +8,7 @@ For use in the bootstrap, running
 sudo input-initial-configuration --all --write
 ```
 
-is appropriate. This will prompt for all inputs, and write them to `/opt/imls/auth.yaml`. Using `--path` will allow for a new location to be chosen for the config.
+is appropriate. This will prompt for all inputs, and write them to `/opt/imls/config.sqlite`. Using `--path` will allow for a new location to be chosen for the config.
 
 * `--fcfs-seq` prompts for the FCFS Seq Id (checked via regex)
 * `--tag` asks for their hardware id/tag (user chosen, freeform)

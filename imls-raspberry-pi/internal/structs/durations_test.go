@@ -13,7 +13,6 @@ func TestAsMapDuration(t *testing.T) {
 		Start:     time.Now().Format(time.RFC3339),
 		End:       time.Now().Format(time.RFC3339),
 		SessionID: "hello",
-		MfgID:     0,
 		PatronID:  0,
 	}
 

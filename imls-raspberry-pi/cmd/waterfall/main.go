@@ -110,7 +110,7 @@ func main() {
 		d := subset[0].Start
 		dtime, _ := time.Parse(time.RFC3339, d)
 		// This is necessary... in case we're testing with a
-		// bogus config.yaml file. Better to pull the identifiers from
+		// bogus config.sqlite file. Better to pull the identifiers from
 		// the actual event stream than trust the file passed.
 		cfg.SetFCFSSeqID(fcfs)
 		cfg.SetDeviceTag(dt)
