@@ -7,6 +7,7 @@ This project provides:
 - imls-ppa: A Debian PPA for installing custom software for the Raspberry Pi 3 or 4
 - imls-raspberry-pi: Command line programs to gather and analyze wifi sessions
 - imls-validator: A standalone service to validate incoming data
+- imls-documentation-v1: __Deprecated__ v1 documentation. For more up-to-date documentation, please consult the [wiki](https://github.com/18F/imls-pi-stack/wiki).
 
 ## Privacy
 
