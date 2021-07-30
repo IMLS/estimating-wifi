@@ -3,6 +3,7 @@ Version: 1.0-1
 Section: base
 Priority: optional
 Architecture: armhf 
-Depends: libc6 (>= 1)
+Depends: libc6 (>= 1),
+         sqlite3 (>= 1)
 Maintainer: Matt Jadud (matthew.jadud@gsa.gov)
 Description: Tool to read in IMLS settings
