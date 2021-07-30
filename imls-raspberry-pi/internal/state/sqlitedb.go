@@ -202,44 +202,68 @@ func (t *SqliteTable) Create() {
 	}
 }
 
-func (t *SqliteTable) InsertStruct(s interface{}) {
-	if reflect.ValueOf(s).Kind() == reflect.Struct {
-		name := reflect.TypeOf(s).Name()
-		columns := make([]string, 0)
-		values := make([]string, 0)
+func insertQueryBuilder(s interface{}) string {
+	name := reflect.TypeOf(s).Name()
+	columns := make([]string, 0)
+	values := make([]string, 0)
 
-		v := reflect.ValueOf(s)
-		for i := 0; i < v.NumField(); i++ {
-			f := reflect.TypeOf(s).Field(i)
-			if f.Tag != "" {
-				col := f.Tag.Get("db")
-				if !strings.Contains(f.Tag.Get("type"), "AUTOINCREMENT") {
-					columns = append(columns, col)
-					switch v.Field(i).Kind() {
-					case reflect.Int:
-						values = append(values, fmt.Sprint(v.Field(i).Int()))
-					case reflect.String:
-						values = append(values, fmt.Sprintf("\"%v\"", v.Field(i).String()))
-					default:
-						fmt.Println("Unsupported field type in " + name)
-						return
-					}
+	v := reflect.ValueOf(s)
+	for i := 0; i < v.NumField(); i++ {
+		f := reflect.TypeOf(s).Field(i)
+		if f.Tag != "" {
+			col := f.Tag.Get("db")
+			if !strings.Contains(f.Tag.Get("type"), "AUTOINCREMENT") {
+				columns = append(columns, col)
+				switch v.Field(i).Kind() {
+				case reflect.Int:
+					values = append(values, fmt.Sprint(v.Field(i).Int()))
+				case reflect.String:
+					values = append(values, fmt.Sprintf("\"%v\"", v.Field(i).String()))
+				default:
+					log.Fatal("insertquerybuilder: unsupported field type in " + name)
+
 				}
 			}
 		}
-		query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
-			name+"s",
-			strings.Join(columns, ", "),
-			strings.Join(values, ", "))
-		// fmt.Println(query)
+	}
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
+		name+"s",
+		strings.Join(columns, ", "),
+		strings.Join(values, ", "))
+	return query
+}
+
+func (t *SqliteTable) InsertStruct(s interface{}) {
+	if reflect.ValueOf(s).Kind() == reflect.Struct {
+		name := reflect.TypeOf(s).Name()
+		query := insertQueryBuilder(s)
 		_, err := t.DB.GetPtr().Exec(query)
 		if err != nil {
 			log.Println("INSERT FAILED ON " + name)
 			log.Println(err.Error())
-			log.Println(query)
+			// If we cannot insert into the DB, nothing works. We should quit.
+			log.Fatal(query)
 		}
 	}
 
+}
+
+func (t *SqliteTable) InsertMany(ses []interface{}) {
+	tx, err := t.GetDB().GetPtr().Begin()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	for _, s := range ses {
+		q := insertQueryBuilder(s)
+		_, err := tx.Exec(q)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
 func (t *SqliteTable) Drop() {

@@ -24,6 +24,7 @@ type Table interface {
 	AddColumn(name string, sqltype string)
 	Create()
 	InsertStruct(s interface{})
+	InsertMany(s []interface{})
 	Drop()
 	GetIntegerType() string
 	GetTextType() string

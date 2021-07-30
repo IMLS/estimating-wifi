@@ -19,6 +19,7 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 	}
 
 	pidCounter := 0
+	durations := make([]interface{}, 0)
 
 	for _, se := range state.GetMACs() {
 
@@ -32,8 +33,11 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 			Start: fmt.Sprint(se.Start),
 			End:   fmt.Sprint(se.End)}
 
-		dDB.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
+		//dDB.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
+		durations = append(durations, d)
 		pidCounter += 1
 	}
+
+	dDB.GetTableFromStruct(structs.Duration{}).InsertMany(durations)
 	return true
 }
