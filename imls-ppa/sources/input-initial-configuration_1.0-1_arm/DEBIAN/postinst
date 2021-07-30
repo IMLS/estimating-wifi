@@ -2,6 +2,8 @@
 
 set -e
 mkdir -p /opt/imls
+mkdir -p /var/log/session-counter
+rm /tmp/log.json # erase older s-c run logs
 
 # account for v1 to v2 upgrades
 if [ -f /opt/imls/config.yaml ]
