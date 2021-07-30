@@ -113,7 +113,7 @@ func TestAllUp(t *testing.T) {
 	cfg := state.GetConfig()
 	cfg.SetStorageMode("local")
 
-	cfg.Log().SetLogLevel("INFO")
+	cfg.Log().SetLogLevel("DEBUG")
 	cfg.Log().Info("initial session id: ", cfg.GetCurrentSessionID())
 
 	// Fake the clock

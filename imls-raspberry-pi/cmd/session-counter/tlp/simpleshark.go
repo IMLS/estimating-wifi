@@ -82,7 +82,7 @@ func SimpleShark(
 	if dev != nil && dev.Exists {
 		// Load the config for use.
 		// cfg.Wireshark.Adapter = dev.Logicalname
-		cfg.Log().Debug("found adapter: ", dev.Logicalname)
+		//cfg.Log().Debug("found adapter: ", dev.Logicalname)
 		setMonitorFn(dev)
 		// This blocks for monitoring...
 		macmap := sharkFn(dev.Logicalname)
@@ -103,9 +103,9 @@ func SimpleShark(
 }
 
 func StoreMacs(keepers []string) {
-	cfg := state.GetConfig()
+	//cfg := state.GetConfig()
 	// Do not log MAC addresses...
-	cfg.Log().Debug("found ", len(keepers), " keepers")
+	//cfg.Log().Debug("found ", len(keepers), " keepers")
 	for _, mac := range keepers {
 		state.RecordMAC(mac)
 	}
