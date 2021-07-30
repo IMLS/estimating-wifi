@@ -18,7 +18,7 @@ This section is mainly of interest to developers only.
 
 ### Release
 
-__NB: these steps must be done on the raspberry pi__
+__NB: these steps must be done on the Raspberry Pi__
 
 - In `imls-raspberry-pi`, "make clean && make all"
 - In `imls-ppa`, "make update-binaries"
