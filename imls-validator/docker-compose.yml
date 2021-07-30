@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  web:
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DIRECTUS_HOST=${DIRECTUS_HOST}
+      - DIRECTUS_USERNAME=${DIRECTUS_USERNAME}
+      - DIRECTUS_PASSWORD=${DIRECTUS_PASSWORD}
+    build: .
+    command: /code/run.sh
+    ports:
+      - 8000:8000

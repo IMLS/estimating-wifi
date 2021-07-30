@@ -1,0 +1,23 @@
+[Unit]
+Description=Session Counter Service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+
+User=root
+Group=root
+LimitNOFILE=1024
+
+ExecStart=/bin/sh -c "/usr/local/bin/session-counter -config /opt/imls/config.sqlite"
+
+# make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=session-counter
+
+[Install]
+WantedBy=multi-user.target

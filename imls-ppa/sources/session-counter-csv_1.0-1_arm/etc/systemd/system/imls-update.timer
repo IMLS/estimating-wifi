@@ -1,0 +1,13 @@
+[Unit]
+Description=Update the IMLS PPA
+After=network-online.target
+Wants=network-online.target
+
+[Timer]
+Unit=imls-update.service
+OnCalendar=*-*-* 2:00:00
+OnBootSec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target

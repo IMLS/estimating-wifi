@@ -1,0 +1,11 @@
+applications:
+- name: ((app-name))
+  routes:
+    - route: ((route))
+  docker:
+    image: directus/directus:v9.0.0-rc.51
+  services:
+    - ((database))
+  instances: ((instances))
+  disk_quota: ((disk_quota))
+  memory: ((memory))

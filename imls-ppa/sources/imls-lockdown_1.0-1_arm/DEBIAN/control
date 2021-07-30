@@ -1,0 +1,9 @@
+Package: imls-lockdown
+Version: 3.1-1
+Section: base
+Priority: optional
+Architecture: armhf
+Depends: libc6 (>= 1),
+         ufw
+Maintainer: James Tranovich (james.tranovich@gsa.gov)
+Description: Lock down the system for IMLS Pilot

@@ -1,0 +1,10 @@
+[
+    {
+        "field": "vendor",
+        "query": "ralink"
+    },
+    {
+        "field": "configuration",
+        "query": "rt2800usb"
+    }
+]

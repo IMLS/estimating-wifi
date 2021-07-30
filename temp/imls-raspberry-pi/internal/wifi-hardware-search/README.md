@@ -1,1 +1,0 @@
-# imls-wifi-adapter-search

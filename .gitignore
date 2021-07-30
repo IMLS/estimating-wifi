@@ -1,8 +1,8 @@
-_site
-.sass-cache
-.jekyll-metadata
-node_modules
-.bundle
-.jekyll-cache/
-.DS_Store
-*~
+imls-playbook/Makefile
+config.yaml
+*.sqlite3
+*.sqlite
+*.out
+/.env
+!release/.gitkeep
+release/

@@ -1,0 +1,4 @@
+build/*
+output*/*
+cache-to-sqlite
+2021*/**

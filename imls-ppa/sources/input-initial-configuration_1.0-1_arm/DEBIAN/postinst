@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+mkdir -p /opt/imls
+mkdir -p /var/log/session-counter
+rm -f /tmp/log.json # erase older s-c run logs
+
+# account for v1 to v2 upgrades
+if [ -f /opt/imls/config.yaml ]
+then
+    # generate a default config.
+    /usr/local/bin/input-initial-configuration -config /opt/imls/config.sqlite
+    CONFIG=/opt/imls/config.yaml
+    DB=/opt/imls/config.sqlite
+    API_TOKEN=$(grep api_token $CONFIG | cut -d':' -f 2 | tr -d '""' | tr -d ' ')
+    DEVICE_TAG=$(grep device_tag $CONFIG | cut -d':' -f 2 | tr -d '""' | tr -d ' ')
+    FCFS_SEQ_ID=$(grep fcfs_seq_id $CONFIG | cut -d':' -f 2 | tr -d '""' | tr -d ' ')
+    sqlite3 $DB "UPDATE ConfigDBs SET api_key='$API_TOKEN', device_tag='$DEVICE_TAG', fcfs_seq_id='$FCFS_SEQ_ID'"
+else
+    /usr/local/bin/input-initial-configuration -all -config /opt/imls/config.sqlite
+fi

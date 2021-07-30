@@ -1,0 +1,4 @@
+*.png
+output/*
+*.csv
+waterfall

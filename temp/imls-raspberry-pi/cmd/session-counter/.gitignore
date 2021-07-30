@@ -1,7 +1,0 @@
-session-counter
-testlogfile
-.vscode
-*.sqlite
-config.yaml
-*.html
-test/www/*
