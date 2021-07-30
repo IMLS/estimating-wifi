@@ -20,11 +20,11 @@ import (
 func cleanupTempFiles() {
 	cfg := state.GetConfig()
 
-	f1, err := filepath.Glob(filepath.Join(cfg.Paths.WWW.Root, "*.sqlite*"))
+	f1, err := filepath.Glob(filepath.Join(cfg.GetWWWRoot(), "*.sqlite*"))
 	if err != nil {
 		panic(err)
 	}
-	f2, err := filepath.Glob(filepath.Join(cfg.Paths.WWW.Images, "*.png"))
+	f2, err := filepath.Glob(filepath.Join(cfg.GetWWWImages(), "*.png"))
 	if err != nil {
 		panic(err)
 	}
@@ -36,40 +36,40 @@ func cleanupTempFiles() {
 	}
 }
 func setup() {
+	configPath := "/tmp/test-shark.sqlite"
+	state.SetConfigAtPath(configPath)
+	cfg := state.GetConfig()
+	cfg.SetRunMode("test")
+	cfg.SetStorageMode("sqlite")
+
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
-	configPath := filepath.Join(path, "..", "test", "config.yaml")
-	state.UnsafeNewConfigFromPath(configPath)
-	cfg := state.GetConfig()
-	cfg.RunMode = "test"
-	cfg.StorageMode = "sqlite"
-	cfg.Databases.QueuesPath = filepath.Join(path, "..", "test", "www", "queues.sqlite")
-	cfg.Databases.DurationsPath = filepath.Join(path, "..", "test", "www", "durations.sqlite")
-	cfg.Paths.WWW.Root = filepath.Join(path, "..", "test", "www")
-	cfg.Paths.WWW.Images = filepath.Join(path, "..", "test", "www", "images")
-	cfg.Device.FCFSId = "ME0000-001"
-	cfg.Device.DeviceTag = "testing"
+	cfg.SetQueuesPath(filepath.Join(path, "..", "test", "www", "queues.sqlite"))
+	cfg.SetDurationsPath(filepath.Join(path, "..", "test", "www", "durations.sqlite"))
+	cfg.SetRootPath(filepath.Join(path, "..", "test", "www"))
+	cfg.SetImagesPath(filepath.Join(path, "..", "test", "www", "images"))
+	cfg.SetFCFSSeqID("ME0000-001")
+	cfg.SetDeviceTag("testing")
+	cfg.Log().SetLogLevel("DEBUG")
 
 	state.FlushCache()
 	log.Println("Calling init config in setup")
-	state.InitConfig()
 	log.Println("Trying to get session id")
 	log.Println("session id is ", cfg.GetCurrentSessionID())
-	cfg.Logging.LogLevel = "DEBUG"
-	cfg.Log().SetLogLevel(cfg.Logging.LogLevel)
+	cfg.Log().SetLogLevel("DEBUG")
 
-	os.Mkdir(cfg.Paths.WWW.Root, 0755)
-	os.Mkdir(cfg.Paths.WWW.Images, 0755)
+	os.Mkdir(cfg.GetWWWRoot(), 0755)
+	os.Mkdir(cfg.GetWWWImages(), 0755)
 	mock := clock.NewMock()
 	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T02:00")
 	mock.Set(mt)
-	cfg.Clock = mock
+	state.SetClock(mock)
 
-	if cfg.Clock == nil {
+	if state.GetClock() == nil {
 		cfg.Log().Fatal("clock should not be nil")
 	}
-	cfg.Log().Debug("mock is now ", cfg.Clock.Now())
+	cfg.Log().Debug("mock is now ", state.GetClock().Now())
 }
 
 // type SharkFn func(string) []string
@@ -108,11 +108,11 @@ func TestOneHour(t *testing.T) {
 	mock := clock.NewMock()
 	// Bump the clock forward
 	mock.Set(startTime)
-	cfg.Clock = mock
+	state.SetClock(mock)
 	// Run once at the initial time.
 	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 	mock.Set(endTime)
-	cfg.Clock = mock
+	state.SetClock(mock)
 
 	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
 

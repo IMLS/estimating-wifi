@@ -111,8 +111,9 @@ func TestAllUp(t *testing.T) {
 	path := filepath.Dir(filename)
 	state.SetConfigAtPath(filepath.Join(path, "test", "config.sqlite"))
 	cfg := state.GetConfig()
-	cfg.Log().SetLogLevel("INFO")
+	cfg.SetStorageMode("local")
 
+	cfg.Log().SetLogLevel("INFO")
 	cfg.Log().Info("initial session id: ", cfg.GetCurrentSessionID())
 
 	// Fake the clock

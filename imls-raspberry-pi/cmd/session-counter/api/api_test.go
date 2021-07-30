@@ -2,77 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	"gsa.gov/18f/internal/http"
-	"gsa.gov/18f/internal/state"
 )
-
-// This should be much higher, like 2000
-// But, it slows down practical testing... :/
-const dbIterations = 2000
-
-func TestGetManufacturer(t *testing.T) {
-
-	configPath := "/tmp/config-manu.sql"
-	os.Create(configPath)
-	os.Chmod(configPath, 0777)
-	state.SetConfigAtPath(configPath)
-	cfg := state.GetConfig()
-	cfg.SetStorageMode("local")
-
-	var tests = []struct {
-		mac  string
-		mfgs string
-	}{
-		{"f4:39:09", "HewlettP"},
-		{"48:00:33", "Technico"},
-		{"3c:37:86", "unknown"},
-		{"dc:a6:32", "Raspberr"},
-		{"b0:34:95", "Apple"},
-		{"60:38:e0:bd:15", "BelkinIn"},
-	}
-
-	for _, tc := range tests {
-		t.Run(fmt.Sprintf("Get Manufacturer = %v", tc.mfgs), func(t *testing.T) {
-			got := MacToMfg(cfg, tc.mac)
-			if got != tc.mfgs {
-				t.Fatalf("got [ %v ] want [ %v ]", got, tc.mfgs)
-			} else {
-				t.Logf("Success !")
-			}
-		})
-	}
-}
-
-// I'm hoping that if we're leaking DB connections that
-// this loop will find it. When the DB isn't closed properly,
-// this will fail around 1078ish connections.
-func TestThrashDB(t *testing.T) {
-	configPath := "/tmp/config-manu.sql"
-	os.Create(configPath)
-	os.Chmod(configPath, 0777)
-
-	state.SetConfigAtPath(configPath)
-	cfg := state.GetConfig()
-	cfg.SetStorageMode("local")
-
-	for ndx := 0; ndx < dbIterations; ndx++ {
-		t.Run(fmt.Sprintf("Thrash DB = %d", ndx), func(t *testing.T) {
-			got := MacToMfg(cfg, "aa:bb:cc")
-			if got != "unknown" {
-				t.Fatalf("got %v; want %v", got, "unknown")
-			} else {
-				t.Logf("Success !")
-			}
-		})
-	}
-}
 
 func TestRevalResponseUnmarshall(t *testing.T) {
 	testString := `{
