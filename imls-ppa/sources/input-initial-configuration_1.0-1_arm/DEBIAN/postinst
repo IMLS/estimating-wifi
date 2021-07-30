@@ -8,7 +8,7 @@ if [ -f /opt/imls/config.yaml ]
 then
     # generate a default config.
     /usr/local/bin/input-initial-configuration -config /opt/imls/config.sqlite
-    CONFIG=/opt/imls/yaml
+    CONFIG=/opt/imls/config.yaml
     DB=/opt/imls/config.sqlite
     API_TOKEN=$(grep api_token $CONFIG | cut -d':' -f 2 | tr -d '""' | tr -d ' ')
     DEVICE_TAG=$(grep device_tag $CONFIG | cut -d':' -f 2 | tr -d '""' | tr -d ' ')
