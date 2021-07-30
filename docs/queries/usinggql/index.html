@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Using GraphQL - IMLS WIFISESS</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Using GraphQL";
+    var mkdocs_page_input_path = "queries/usinggql.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> IMLS WIFISESS</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../repositories/">Repositories</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Hardware</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../hardware/pi/">Pi</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../hardware/wifi/">Wifi Adapters</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Setup</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../setup/bootstrap/">Bootstrap</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../setup/playbook/">Playbook</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Software</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../software/input-initial-configuration/">Initial Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../software/find-ralink/">Find Wifi Hardware</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../software/session-counter/">Session Counter</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Server Stack</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../stack/apidatagov/">api.data.gov</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../stack/reval/">ReVal (Rabbit)</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../stack/directus/">Directus</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Querying Data</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../obtainkey/">Obtain a key</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../testkey/">Test your key</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../schemas/">The Schemas</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Using GraphQL</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../viarest/">Using REST</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../summary/">Summary</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">IMLS WIFISESS</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Querying Data &raquo;</li>
+        
+      
+    
+    <li>Using GraphQL</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="using-graphql-gql">Using graphql (GQL)</h2>
+<p>On your own service backend, querying the data via graphql is straight-forward (if you understand GQL). We do not have expertise with GQL, but it is essentially an endpoint that lets you submit queries as JSON documents. On our team, we have used <a href="https://www.electronjs.org/apps/graphiql">GraphiQL</a> as an open source application for testing queries before embedding them into applications.</p>
+<p>Here is an example query:</p>
+<pre><code>{
+  items {
+    wifi_v1(filter: {fcfs_seq_id:{_eq:&quot;&lt;THESEQID&gt;&quot;}, device_tag: {_eq: &quot;&lt;THETAG&gt;&quot;}}) {
+        device_tag
+        session_id
+        event_id
+        manufacturer_index
+        patron_index
+    }
+  }
+}
+</code></pre>
+
+<p>This query will, when executed, return an array of objects (or an empty array). Each object will have five fields as specified in the query (<code>device_tag</code>, <code>session_id</code>, etc.). It will only return objects that meet the constraints; in this case, where the <code>fcfs_seq_id</code> is equal to the ID passed in, and the <code>device_tag</code> is similarly a match. (This is the <code>WHERE</code> clause of the query). There are additional constraints/filters that can be placed on a query, and we would refer you to the Directus documentation for more info. </p>
+<p>Once you have tested the query (<a href="https://www.electronjs.org/apps/graphiql">GraphiQL</a>), you can embed it in your application as an HTTPS POST. Your target endpoint is (during the pilot) <code>https://api.data.gov/TEST/10x-imls/v1/graphql/</code>.</p>
+<p>Here is an example from the client side in Javascript. (Do not embed your key in a Javascript application. You know this.)</p>
+<pre><code>    // Because of CORs, we need to pass the API key as a URL
+    // parameter. The COR constraints can be lifted, but
+    // for now we have chosen to leave them in place.
+    function gqlUrl (key) {
+        return `https://api.data.gov/TEST/10x-imls/v1/graphql/?api_key=${key}`;
+    }
+
+    // The query options need to wrap the query in an object.
+    // That is, the JSON submitted to the server must have 
+    // the form:
+    //   { query: ... }
+    // where the `...` is a valid query as assembled in 
+    // GraphiQL or similar.
+    function gqlOptions(query) {
+        const options = {
+            method: &quot;POST&quot;,
+            headers: {
+                &quot;Content-Type&quot;: &quot;application/json&quot;,
+            },
+            body: JSON.stringify({
+                query: query
+            })
+        };
+        return options;
+    }
+
+    // Here, we have parameterized the wifiQuery string
+    // using several variables that were set earlier in the 
+    // code. That code is not shown in this example; it
+    // pulls the values from some text fields on a webpage.
+    // It would be safe to embed query parameters in a page,
+    // but not the key itself!
+    var wifiQuery = `
+    {
+        items {
+            wifi_v1(limit: ${SEARCH_LIMIT}, 
+                    filter: { fcfs_seq_id: {_eq: &quot;${fcfs_seq_id}&quot;}, 
+                              device_tag:  {_eq: &quot;${device_tag}&quot;}
+                    ) {
+                device_tag
+                session_id
+                event_id
+                manufacturer_index
+                patron_index
+            }
+        }
+    }`;
+
+    // Now we do the fetch, handling success and failure
+    // as appropriate for the application at hand.
+    await fetch(gqlUrl(api_key), gqlOptions(eventQuery))
+        .then(res =&gt; res.json())
+        .then(eventsResult)
+        .catch(eventFailHandler);
+</code></pre>
+
+<p>In Python, Go, or any other language, the steps are the same:</p>
+<ol>
+<li>Formulate and test a valid GQL query.</li>
+<li>Wrap the query in a JSON object of the form <code>{query: ...}</code></li>
+<li>POST that query to <code>https://api.data.gov/TEST/10x-imls/v1/graphql/</code></li>
+</ol>
+<p><strong>The trailing slash on that URL matters</strong>.</p>
+<p>If the query is successful, you will get back something that looks like:</p>
+<pre><code>{ &quot;data&quot;: 
+    { &quot;items&quot;: 
+        &quot;events_v1&quot;: [
+            ... objects ...
+        ]
+    }
+}
+</code></pre>
+
+<p>where <code>events_v1</code> will be whichever table you have queried; for the pilot, <code>events_v1</code> and <code>wifi_v1</code> are the only tables available. </p>
+<p>The objects returned will be JSON objects containing the fields you specified. If you only indicated you wanted <code>device_tag</code>, then each object will contain one field only: <code>device_tag</code>. </p>
+<p><strong>NOTE</strong>: We have left the <code>pi_serial</code> field out of the results that come back from all queries; why? An over-abundance of caution. It is not PII (because we own the RPis in question, and it does not indicate anything about an <em>individual</em>), but we left it out of queries just the same. This applies to GQL and RESTful queries alike.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../viarest/" class="btn btn-neutral float-right" title="Using REST">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../schemas/" class="btn btn-neutral" title="The Schemas"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../schemas/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../viarest/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
