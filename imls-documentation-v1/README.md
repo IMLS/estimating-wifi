@@ -1,3 +1,9 @@
+# IMLS documentation v1
+
+Please note that these documents apply to v1 only of the IMLS software and as such are deprecated (as of the time of writing, the imls-pi-stack is at v3.1). The [wiki](https://github.com/18F/imls-pi-stack/wiki) contains more up-to-date documentation.
+
+v1 documentation is still provided for two reasons: 1. as a way to serve up Javascript on Federalist for e.g., [generating word pairs from API keys](https://federalist-126760f7-e6ff-4146-9b00-e8966a80d7f0.app.cloud.gov/site/cantsin/10x-shared-components-phase-3/install/#step-7-enter-your-apidatagov-key) and 2. historical interest.
+
 # For the Busy Devteam
 
 After you check out the site:
