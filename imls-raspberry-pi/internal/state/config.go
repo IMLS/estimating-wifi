@@ -293,8 +293,8 @@ func ConfigDefaults() ConfigDB {
 	// Serial filled in by device or user
 	defaults.storageMode = "api"
 	defaults.runMode = "prod"
-	defaults.durationsPath = "/tmp/durations.sqlite"
-	defaults.queuesPath = "/tmp/queues.sqlite"
+	defaults.durationsPath = "/www/imls/durations.sqlite"
+	defaults.queuesPath = "/www/imls/queues.sqlite"
 	defaults.umbrellaScheme = "https"
 	defaults.umbrellaHost = "api.data.gov"
 	defaults.eventsURI = "/TEST/10x-imls/v2/events/"
