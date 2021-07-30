@@ -53,7 +53,7 @@ func (suite *TLPSuite) SetupTest() {
 	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T18:00")
 	mock.Set(mt)
 	state.SetClock(mock)
-	suite.lw.Debug("mock is now ", state.GetClock().Now())
+	suite.lw.Debug("mock is now ", state.GetClock().Now().In(time.Local))
 
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)

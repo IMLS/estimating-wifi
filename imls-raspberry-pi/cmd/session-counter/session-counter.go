@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/robfig/cron/v3"
 	"gsa.gov/18f/cmd/session-counter/tlp"
@@ -68,7 +69,7 @@ func run2() {
 
 	go runEvery(cfg.GetResetCron(), c,
 		func() {
-			cfg.Log().Info("RUNNING PROCESSDATA at ", state.GetClock().Now())
+			cfg.Log().Info("RUNNING PROCESSDATA at ", state.GetClock().Now().In(time.Local))
 			// Copy ephemeral durations over to the durations table
 			tlp.ProcessData(durationsdb, sq, iq)
 			// Draw images of the data

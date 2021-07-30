@@ -9,6 +9,6 @@ import (
 
 func GetYesterday(cfg interfaces.Config) time.Time {
 	offset := -24
-	yesterday := state.GetClock().Now().Add(time.Duration(offset) * time.Hour)
+	yesterday := state.GetClock().Now().In(time.Local).Add(time.Duration(offset) * time.Hour)
 	return yesterday
 }

@@ -30,8 +30,8 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 			DeviceTag: cfg.GetDeviceTag(),
 			PatronID:  pidCounter,
 			// FIXME: All times should become UNIX epoch seconds...
-			Start: fmt.Sprint(se.Start),
-			End:   fmt.Sprint(se.End)}
+			Start: se.Start,
+			End:   se.End}
 
 		//dDB.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
 		durations = append(durations, d)

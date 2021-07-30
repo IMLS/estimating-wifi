@@ -85,9 +85,9 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 			// Add one minute to the fake clock
 			state.GetClock().(*clock.Mock).Add(1 * time.Minute)
 
-			if isItMidnight(state.GetClock().Now()) {
+			if isItMidnight(state.GetClock().Now().In(time.Local)) {
 				// Then we run the processing at midnight (once per 24 hours)
-				cfg.Log().Info("RUNNING PROCESSDATA at " + fmt.Sprint(state.GetClock().Now()))
+				cfg.Log().Info("RUNNING PROCESSDATA at " + fmt.Sprint(state.GetClock().Now().In(time.Local)))
 				// Copy ephemeral durations over to the durations table
 				tlp.ProcessData(durationsdb, sq, iq)
 				// Draw images of the data
@@ -118,7 +118,7 @@ func TestAllUp(t *testing.T) {
 
 	// Fake the clock
 	mock := clock.NewMock()
-	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T00:00")
+	mt, _ := time.Parse("2006-01-02T15:04", "1975-10-11T00:01")
 	mock.Set(mt)
 	state.SetClock(mock)
 
@@ -130,13 +130,13 @@ func TestAllUp(t *testing.T) {
 	cfg.Log().Info("next session id: ", cfg.GetCurrentSessionID())
 
 	// Fake the clock
-	mt, _ = time.Parse("2006-01-02T15:04", "1976-11-12T00:00")
+	mt, _ = time.Parse("2006-01-02T15:04", "1976-11-12T00:01")
 	mock.Set(mt)
 	state.SetClock(mock)
 
 	MockRun(5, 200000, 10)
 
-	mt, _ = time.Parse("2006-01-02T15:04", "1978-01-01T00:00")
+	mt, _ = time.Parse("2006-01-02T15:04", "1978-01-01T00:01")
 	mock.Set(mt)
 	state.SetClock(mock)
 

@@ -3,6 +3,7 @@ package state
 import (
 	"crypto/sha1"
 	"fmt"
+	"time"
 )
 
 type StartEnd struct {
@@ -24,7 +25,10 @@ func ClearEphemeralDB() {
 
 // NOTE: Do not log MAC addresses.
 func RecordMAC(mac string) {
-	now := GetClock().Now().Unix()
+	now := GetClock().Now().In(time.Local).Unix()
+	// cfg := GetConfig()
+	// cfg.Log().Debug("THE TIME IS NOW ", GetClock().Now().In(time.Local), " or ", now)
+
 	// Check if we already have the MAC address in the ephemeral table.
 	if p, ok := ed[mac]; ok {
 		//cfg.Log().Debug(mac, " exists, updating")

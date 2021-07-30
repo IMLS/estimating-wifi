@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 )
 
 type ByStart []Duration
 
 func (a ByStart) Len() int { return len(a) }
 func (a ByStart) Less(i, j int) bool {
-	it, _ := time.Parse(time.RFC3339, a[i].Start)
-	jt, _ := time.Parse(time.RFC3339, a[j].Start)
-	return it.Before(jt)
+	// it, _ := time.Parse(time.RFC3339, a[i].Start)
+	// jt, _ := time.Parse(time.RFC3339, a[j].Start)
+	return a[i].Start < a[j].Start
+	//return it.Before(jt)
 }
 func (a ByStart) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -28,9 +28,8 @@ type Duration struct {
 	FCFSSeqID string `json:"fcfs_seq_id" db:"fcfs_seq_id" type:"TEXT"`
 	DeviceTag string `json:"device_tag" db:"device_tag" type:"TEXT"`
 	PatronID  int    `json:"patron_index" db:"patron_index" type:"INTEGER"`
-	// MfgID     int    `json:"manufacturer_index" db:"manufacturer_index" type:"INTEGER"`
-	Start string `json:"start" db:"start" type:"DATE"`
-	End   string `json:"end" db:"end" type:"DATE"`
+	Start     int64  `json:"start" db:"start" type:"INTEGER"`
+	End       int64  `json:"end" db:"end" type:"INTEGER"`
 }
 
 func (d Duration) AsMap() map[string]interface{} {

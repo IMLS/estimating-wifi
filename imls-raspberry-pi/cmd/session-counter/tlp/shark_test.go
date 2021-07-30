@@ -69,7 +69,7 @@ func setup() {
 	if state.GetClock() == nil {
 		cfg.Log().Fatal("clock should not be nil")
 	}
-	cfg.Log().Debug("mock is now ", state.GetClock().Now())
+	cfg.Log().Debug("mock is now ", state.GetClock().Now().In(time.Local))
 }
 
 // type SharkFn func(string) []string

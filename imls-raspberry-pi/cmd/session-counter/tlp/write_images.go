@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
-	"gsa.gov/18f/cmd/session-counter/model"
 	"gsa.gov/18f/internal/analysis"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
@@ -36,7 +36,8 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 
 	// FIXME: This filename kinda makes no sense if we're not running
 	// a reset on a daily basis at midnight.
-	yesterday := model.GetYesterday(cfg)
+	// yesterday := model.GetYesterday(cfg)
+	yesterday := state.GetClock().Now().In(time.Local)
 	imageFilename := fmt.Sprintf("%04d%02d%02d-%v-%v_%v.png",
 		yesterday.Year(),
 		int(yesterday.Month()),

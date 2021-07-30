@@ -217,6 +217,8 @@ func insertQueryBuilder(s interface{}) string {
 				switch v.Field(i).Kind() {
 				case reflect.Int:
 					values = append(values, fmt.Sprint(v.Field(i).Int()))
+				case reflect.Int64:
+					values = append(values, fmt.Sprint(v.Field(i).Int()))
 				case reflect.String:
 					values = append(values, fmt.Sprintf("\"%v\"", v.Field(i).String()))
 				default:

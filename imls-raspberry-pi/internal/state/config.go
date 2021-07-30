@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"log"
 	"strings"
+	"time"
 
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
@@ -159,7 +160,7 @@ func (dc *databaseConfig) GetDurationsURI() string {
 }
 
 func NewSessionID() int64 {
-	return GetClock().Now().Unix()
+	return GetClock().Now().In(time.Local).Unix()
 }
 
 func (dc *databaseConfig) GetCurrentSessionID() int64 {
