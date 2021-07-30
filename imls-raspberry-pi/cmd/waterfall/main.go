@@ -61,7 +61,7 @@ func readDurationsFromSqlite(path string) []structs.Duration {
 		d := structs.Duration{}
 		var id int
 		var minutes int
-		err = rows.Scan(&id, &d.PiSerial, &d.SessionID, &d.FCFSSeqID, &d.DeviceTag, &d.PatronID, &d.MfgID, &d.Start, &d.End, &minutes)
+		err = rows.Scan(&id, &d.PiSerial, &d.SessionID, &d.FCFSSeqID, &d.DeviceTag, &d.PatronID, &d.Start, &d.End, &minutes)
 		if err != nil {
 			log.Println("could not scan")
 			log.Fatal(err)
@@ -108,7 +108,7 @@ func main() {
 		fcfs := subset[0].FCFSSeqID
 		dt := subset[0].DeviceTag
 		d := subset[0].Start
-		dtime, _ := time.Parse(time.RFC3339, d)
+		dtime := time.Unix(d, 0)
 		// This is necessary... in case we're testing with a
 		// bogus config.sqlite file. Better to pull the identifiers from
 		// the actual event stream than trust the file passed.

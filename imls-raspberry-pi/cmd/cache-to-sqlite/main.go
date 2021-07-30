@@ -30,7 +30,6 @@ type config struct {
 	FcfsSeqID string
 	DeviceTag string
 	GraphQL   string
-	Events    string
 	Durations string
 	Stepsize  int
 	TzOffset  int
@@ -124,7 +123,7 @@ func generateSqlite(cfg *config, ch <-chan []structs.Duration, wg *sync.WaitGrou
 		tx, _ := db.Begin()
 		stat, _ := tx.Prepare(`INSERT INTO durations
             (id, pi_serial, session_id, fcfs_seq_id, device_tag, patron_index, manufacturer_index, start, end)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
 
 		if events == nil {
 			stat.Close()
@@ -134,7 +133,7 @@ func generateSqlite(cfg *config, ch <-chan []structs.Duration, wg *sync.WaitGrou
 			return
 		} else {
 			for _, e := range events {
-				_, err := stat.Exec(e.ID, e.PiSerial, e.SessionID, e.FCFSSeqID, e.DeviceTag, e.PatronID, e.MfgID, e.Start, e.End)
+				_, err := stat.Exec(e.ID, e.PiSerial, e.SessionID, e.FCFSSeqID, e.DeviceTag, e.PatronID, e.Start, e.End)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -155,7 +154,7 @@ func getLibraries(cfg *config) map[string][]string {
 	// Fetch the last 50K events;
 	for count := 0; count < 10; count++ {
 		client := &http.Client{}
-		req, err := http.NewRequest("GET", cfg.Events, nil)
+		req, err := http.NewRequest("GET", cfg.Durations, nil)
 		if err != nil {
 			log.Println(err)
 			log.Fatal("Could not create HTTP request.")
@@ -177,7 +176,7 @@ func getLibraries(cfg *config) map[string][]string {
 		defer resp.Body.Close()
 
 		body, _ := ioutil.ReadAll(resp.Body)
-		evts := new(structs.WifiEvents)
+		evts := new(structs.Durations)
 		json.Unmarshal(body, &evts)
 
 		for _, e := range evts.Data {
@@ -196,7 +195,7 @@ func main() {
 	deviceTagPtr := flag.String("device_tag", "", "Set the device tag to process.")
 	sqlitePtr := flag.Bool("sqlite", false, "Generate an SQLite table of the data.")
 	graphQLPtr := flag.String("graphql", "https://api.data.gov/TEST/10x-imls/v1/graphql/", "GraphQL endpoint.")
-	eventsPtr := flag.String("events", "https://api.data.gov/TEST/10x-imls/v2/search/events/", "Events REST endpoint.")
+	// logsPtr := flag.String("events", "https://api.data.gov/TEST/10x-imls/v2/search/events/", "Events REST endpoint.")
 	durationsPtr := flag.String("durations", "https://api.data.gov/TEST/10x-imls/v2/search/durations/", "Durations REST endpoint.")
 	stepSizePtr := flag.Int("stepsize", 10000, "How many elements to retrieve per HTTPS GET. Default is 10K.")
 	// The server is recording time in Z, or Zulu time, which is GMT.
@@ -229,7 +228,6 @@ func main() {
 		FcfsSeqID: *fcfsSeqIDPtr,
 		DeviceTag: *deviceTagPtr,
 		GraphQL:   *graphQLPtr,
-		Events:    *eventsPtr,
 		Durations: *durationsPtr,
 		Stepsize:  *stepSizePtr,
 		TzOffset:  *tzOffsetPtr,
