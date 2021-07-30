@@ -258,7 +258,7 @@ func main() {
 	readWordPairPtr := flag.Bool("word-pairs", false, "Read in their API token as word pairs.")
 	tagPtr := flag.Bool("tag", false, "A local inventory tag or identifier.")
 	// Controlling output
-	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
+	configPathPtr := flag.String("config", "", "Path to config.sqlite. REQUIRED.")
 
 	flag.Parse()
 

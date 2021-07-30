@@ -14,7 +14,7 @@ import (
 
 func main() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
-	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
+	configPathPtr := flag.String("config", "", "Path to config.sqlite. REQUIRED.")
 	flag.Parse()
 	rest := flag.Args()
 

@@ -16,7 +16,7 @@ import (
 
 func initConfigFromFlags() {
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
-	configPathPtr := flag.String("config", "", "Path to config.yaml. REQUIRED.")
+	configPathPtr := flag.String("config", "", "Path to config.sqlite. REQUIRED.")
 	flag.Parse()
 
 	// If they just want the version, print and exit.
