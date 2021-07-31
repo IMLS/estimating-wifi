@@ -7,9 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/jszwec/csvutil"
 	_ "github.com/mattn/go-sqlite3"
 	"gsa.gov/18f/internal/analysis"
@@ -46,30 +44,19 @@ func buildImagePath(fcfs string, deviceTag string, pngName string) string {
 }
 
 func readDurationsFromSqlite(path string) []structs.Duration {
-	db, err := sqlx.Open("sqlite3", path)
+	// db, err := sqlx.Open("sqlite3", path)
+	// if err != nil {
+	// 	log.Fatal("could not open sqlite file.")
+	// }
+	db := state.NewSqliteDB(path)
+	durations := []structs.Duration{}
+	err := db.GetPtr().Select(&durations, "SELECT * FROM durations")
 	if err != nil {
-		log.Fatal("could not open sqlite file.")
+		log.Fatal(err.Error())
 	}
+	// rows, err := db.Query("SELECT *, cast((JulianDay(end) - JulianDay(start)) * 24 * 60 as integer) as minutes FROM durations")
 
-	events := []structs.Duration{}
-	rows, err := db.Query("SELECT *, cast((JulianDay(end) - JulianDay(start)) * 24 * 60 as integer) as minutes FROM durations")
-	if err != nil {
-		log.Println("error in read query")
-		log.Fatal(err)
-	}
-	for rows.Next() {
-		d := structs.Duration{}
-		var id int
-		var minutes int
-		err = rows.Scan(&id, &d.PiSerial, &d.SessionID, &d.FCFSSeqID, &d.DeviceTag, &d.PatronID, &d.Start, &d.End, &minutes)
-		if err != nil {
-			log.Println("could not scan")
-			log.Fatal(err)
-		}
-		events = append(events, d)
-	}
-
-	return events
+	return durations
 }
 
 func main() {
@@ -107,14 +94,12 @@ func main() {
 
 		fcfs := subset[0].FCFSSeqID
 		dt := subset[0].DeviceTag
-		d := subset[0].Start
-		dtime := time.Unix(d, 0)
 		// This is necessary... in case we're testing with a
 		// bogus config.sqlite file. Better to pull the identifiers from
 		// the actual event stream than trust the file passed.
 		cfg.SetFCFSSeqID(fcfs)
 		cfg.SetDeviceTag(dt)
-		pngName := fmt.Sprintf("%v-%.2v-%.2v-%v-%v-patron-sessions", dtime.Year(), int(dtime.Month()), int(dtime.Day()), fcfs, dt)
+		pngName := fmt.Sprintf("%v-%v-%v-patron-sessions", subset[0].SessionID, fcfs, dt)
 		log.Println("writing to", pngName)
 		analysis.DrawPatronSessions(subset, buildImagePath(fcfs, dt, pngName))
 	}
