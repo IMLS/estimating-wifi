@@ -28,8 +28,8 @@ type Duration struct {
 	FCFSSeqID string `json:"fcfs_seq_id" db:"fcfs_seq_id" type:"TEXT"`
 	DeviceTag string `json:"device_tag" db:"device_tag" type:"TEXT"`
 	PatronID  int    `json:"patron_index" db:"patron_index" type:"INTEGER"`
-	Start     int64  `json:"start" db:"start" type:"INTEGER"`
-	End       int64  `json:"end" db:"end" type:"INTEGER"`
+	Start     int64  `json:"start,string" db:"start" type:"INTEGER"`
+	End       int64  `json:"end,string" db:"end" type:"INTEGER"`
 }
 
 func (d Duration) AsMap() map[string]interface{} {
