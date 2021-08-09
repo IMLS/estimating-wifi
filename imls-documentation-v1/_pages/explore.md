@@ -268,9 +268,9 @@ sidenav: false
         converted = []
         for (o of arr) {
             console.log(o)
-            startdt = DateTime.fromISO(o.start)
+            startdt = DateTime.fromMillis(parseInt(o.start) * 1000)
             start = startdt.toSeconds();
-            enddt = DateTime.fromISO(o.end)
+            enddt = DateTime.fromMillis(parseInt(o.end) * 1000)
             end = enddt.toSeconds();
             console.log(o.start, "becomes", start)
             console.log(o.end, "becomes", end)
@@ -317,7 +317,7 @@ sidenav: false
         console.log("labels", sqllabels)
         chart.update();
         var elem = document.getElementById("chartsummary");
-        elem.innerHTML = total_minutes + " minutes across " + patron_devices + " devices." 
+        elem.innerHTML = Math.floor(total_minutes) + " minutes across " + patron_devices + " devices." 
 
     }
     async function drawChart() {
