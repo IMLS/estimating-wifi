@@ -21,4 +21,6 @@ Please see the [wiki](https://github.com/18F/imls-pi-stack/wiki).
 
 This software was developed by James Tranovich and Matt Jadud, federal software engineers with [18F](https://18f.gsa.gov/), with funding support from [10x](https://10x.gsa.gov/) and in collaboration with the [Institute of Museum and Library Services](https://imls.gov/).
 
+Questions can be directed to matthew dot jadud at gsa dot gov.
+
 This software is in the **public domain**. No promises are made regarding its functionality or fitness. See the [LICENSE](./LICENSE.md) for more information.
