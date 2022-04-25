@@ -12,7 +12,7 @@
 			{{totalDevices}} devices seen
 		</p>
 		<p class="text">
-			{{totalPatrons}} patron devices
+			{{totalPatrons}} patrons
 		</p>
 		<p class="text">
 			{{totalMinutes}} minutes served
@@ -87,33 +87,57 @@
 
 		 async function retrieveMetrics() {
 			 isLoading.value = true;
+			 const filter = {
+				 _and: [
+					 {
+						 "start": {
+						 	 _gte: unixEpoch(props.day),
+						 }
+					 },
+					 {
+						 "end": {
+						 	 _lt: unixEpoch(nextDay(props.day)),
+						 }
+					 },
+					 {
+						 "fcfs_seq_id": {
+							 _eq: props.fcfsId,
+						 }
+					 }
+				 ]
+			 };
+			 // NB. these calculations are NOT ACCURATE and are only for
+			 // prototyping purposes.
 			 const devices = await api.get(`/items/${props.tableName}`, {
 				 params: {
 					 aggregate: {
 						 "count": "*",
 					 },
-					 filter: {
-						 _and: [
-						 	 {
-						 	 	 "start": {
-						 	 		 _gte: unixEpoch(props.day),
-						 	 	 }
-						 	 },
-							 {
-						 	     "end": {
-						 	         _lt: unixEpoch(nextDay(props.day)),
-							     }
-						 	 },
-							 {
-								 "fcfs_seq_id": {
-									 _eq: props.fcfsId,
-								 }
-							 }
-						 ]
-					 },
+					 filter,
 				 },
 			 });
 			 totalDevices.value = devices.data.data[0].count;
+			 const patrons = await api.get(`/items/${props.tableName}`, {
+				 params: {
+					 aggregate: {
+						 "countDistinct": "patron_index",
+					 },
+					 filter,
+				 },
+			 });
+			 totalPatrons.value = patrons.data.data[0].countDistinct.patron_index;
+			 const times = await api.get(`/items/${props.tableName}`, {
+				 params: {
+					 aggregate: {
+						 "sum": ["end", "start"],
+					 },
+					 filter,
+				 },
+			 });
+			 // this is a hack. we want a proper "duration" column since there
+			 // does not seem to be a way to do custom selects using the API.
+			 const seconds = (times.data.data[0].sum.start - times.data.data[0].sum.end) / 1000;
+			 totalMinutes.value = Math.trunc(seconds / 60);
 			 isLoading.value = false;
 		 }
 
