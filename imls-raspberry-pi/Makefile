@@ -44,4 +44,12 @@ clean:
 	rm -rf ../release/{bin,pkg}
 
 test:
+	make -C cmd/cache-to-sqlite/ test
+	make -C cmd/input-initial-configuration/ test
+	make -C cmd/wifi-hardware-search-cli test
+	make -C internal/wifi-hardware-search test
+	make -C internal/state test
+	make -C cmd/session-counter/ test
+
+old_test:
 	go test -coverprofile all.out -timeout 45m ./...

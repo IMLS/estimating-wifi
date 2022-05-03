@@ -2,6 +2,8 @@ package state
 
 import (
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -28,16 +30,21 @@ func (suite *ConfigSuite) AfterTest(suiteName, testName string) {
 
 func (suite *ConfigSuite) TestConfigDefaults() {
 	dc := GetConfig()
-	var expected []string = []string{"local:stderr", "local:tmp", "api:directus"}
+	_, filename, _, _ := runtime.Caller(0)
+	path := filepath.Dir(filename)
+	durationsPath := filepath.Join(path, "test", "durations.sqlite")
+	dc.SetDurationsPath(durationsPath)
+	var expected = []string{"local:stderr", "local:tmp", "api:directus"}
 	result := dc.GetLoggers()
 	for i := 0; i < 3; i += 1 {
 		if result[i] != expected[i] {
 			suite.Fail("loggers were not equal")
 		}
 	}
-	if dc.GetDurationsDatabase().GetPath() != "/www/imls/durations.sqlite" {
+	if dc.GetDurationsDatabase().GetPath() != durationsPath {
 		suite.Fail("duration path was not equal")
 	}
+	os.Remove(durationsPath)
 }
 
 func (suite *ConfigSuite) TestConfigWrite() {

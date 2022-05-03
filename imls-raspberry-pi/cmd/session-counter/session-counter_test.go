@@ -114,6 +114,8 @@ func TestAllUp(t *testing.T) {
 	cfg.SetStorageMode("local")
 	cfg.SetRootPath(filepath.Join(path, "test", "www"))
 	cfg.SetImagesPath(filepath.Join(path, "test", "www", "images"))
+	cfg.SetQueuesPath(filepath.Join(path, "test", "queues.sqlite"))
+	cfg.SetDurationsPath(filepath.Join(path, "test", "durations.sqlite"))
 
 	cfg.Log().SetLogLevel("DEBUG")
 	cfg.Log().Info("initial session id: ", cfg.GetCurrentSessionID())
