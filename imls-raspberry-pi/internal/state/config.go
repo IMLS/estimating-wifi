@@ -218,6 +218,10 @@ func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
 	return db
 }
 
+func (dc *databaseConfig) GetDatabasePath() string {
+	return dc.configDB.GetPath()
+}
+
 func (dc *databaseConfig) GetQueuesDatabase() interfaces.Database {
 	path := dc.config.GetTextField("queues_path")
 	return NewSqliteDB(path)

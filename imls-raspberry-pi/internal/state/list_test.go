@@ -10,19 +10,19 @@ type ListSuite struct {
 	suite.Suite
 }
 
-var listDBPath = "/tmp/config-list.sql"
-
 func (suite *ListSuite) SetupTest() {
-	os.Create(listDBPath)
-	os.Chmod(listDBPath, 0777)
-	SetConfigAtPath(listDBPath)
+	tempDB, err := os.CreateTemp("", "list-test.sqlite")
+	if err != nil {
+		suite.Fail(err.Error())
+	}
+	SetConfigAtPath(tempDB.Name())
 }
 
 func (suite *ListSuite) AfterTest(suiteName, testName string) {
 	dc := GetConfig()
-	dc.Close()
 	// ensure a clean run.
-	os.Remove(listDBPath)
+	os.Remove(dc.GetDatabasePath())
+	dc.Close()
 }
 
 func (suite *ListSuite) TestList() {

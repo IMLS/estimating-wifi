@@ -28,15 +28,14 @@ type TLPSuite struct {
 	lw   *logwrapper.StandardLogger
 }
 
-var tlpDBPath = "/tmp/config-test.sql"
-
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
 func (suite *TLPSuite) SetupTest() {
-
-	os.Create(tlpDBPath)
-	os.Chmod(tlpDBPath, 0777)
-	state.SetConfigAtPath(tlpDBPath)
+	tempDB, err := os.CreateTemp("", "tlp-test.sqlite")
+	if err != nil {
+		suite.Fail(err.Error())
+	}
+	state.SetConfigAtPath(tempDB.Name())
 
 	cfg := state.GetConfig()
 	cfg.SetRunMode("test")
@@ -70,9 +69,9 @@ func (suite *TLPSuite) SetupTest() {
 
 func (suite *TLPSuite) AfterTest(suiteName, testName string) {
 	dc := state.GetConfig()
-	dc.Close()
 	// ensure a clean run.
-	os.Remove(tlpDBPath)
+	os.Remove(dc.GetDatabasePath())
+	dc.Close()
 }
 
 func generateFakeMac() string {

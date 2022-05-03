@@ -10,19 +10,19 @@ type QueueSuite struct {
 	suite.Suite
 }
 
-var suiteDBPath = "/tmp/config-suite.sql"
-
 func (suite *QueueSuite) SetupTest() {
-	os.Create(suiteDBPath)
-	os.Chmod(suiteDBPath, 0777)
-	SetConfigAtPath(suiteDBPath)
+	tempDB, err := os.CreateTemp("", "queue-test.sqlite")
+	if err != nil {
+		suite.Fail(err.Error())
+	}
+	SetConfigAtPath(tempDB.Name())
 }
 
 func (suite *QueueSuite) AfterTest(suiteName, testName string) {
 	dc := GetConfig()
-	dc.Close()
 	// ensure a clean run.
-	os.Remove(suiteDBPath)
+	os.Remove(dc.GetDatabasePath())
+	dc.Close()
 }
 
 func (suite *QueueSuite) TestQueueCreate() {
