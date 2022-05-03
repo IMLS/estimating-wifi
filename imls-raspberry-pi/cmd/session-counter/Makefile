@@ -13,7 +13,7 @@ install: all
 test:
 	go test api/*.go
 	go test model/*.go
-	go test -timeout 1m *.go
+	go test -timeout 10m *.go
 
 crossbuild: clean
 	GOOS=linux GOARCH=arm GOARM=7 go build
