@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -24,8 +25,6 @@ type StandardLogger struct {
 var standardLogger *StandardLogger = nil
 
 var once sync.Once
-
-const LOGDIR = "/var/log/session-counter"
 
 var logLevel = logrus.InfoLevel
 
@@ -107,22 +106,27 @@ func initLogger(cfg interfaces.Config) {
 		case "local:stdout":
 			writers = append(writers, os.Stdout)
 		case "local:file":
-			os.Mkdir(LOGDIR, 0755)
-			filename := filepath.Join(LOGDIR, "log.json")
-			iow, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+			_, filename, _, _ := runtime.Caller(0)
+			path := filepath.Dir(filename)
+			logsPath := filepath.Join(path, "logs")
+			os.Mkdir(logsPath, 0755)
+			logFile := filepath.Join(logsPath, "log.json")
+			iow, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 			if err != nil {
-				fmt.Printf("could not open logfile %v for writing\n", filename)
+				fmt.Printf("could not open logfile %v for writing\n", logFile)
 				os.Exit(-1)
 			}
 			writers = append(writers, iow)
 		case "local:tmp":
-			filename := filepath.Join("/tmp", "log.json")
-			iow, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+			logFile, err := os.CreateTemp("", "log.json")
 			if err != nil {
-				fmt.Printf("could not open logfile %v for writing\n", filename)
+				log.Fatal(err)
+			}
+			if err != nil {
+				fmt.Printf("could not open logfile %v for writing\n", logFile.Name())
 				os.Exit(-1)
 			}
-			writers = append(writers, iow)
+			writers = append(writers, logFile)
 		case "api:directus":
 			if cfg.IsStoringToAPI() {
 				api := NewAPILogger(cfg)

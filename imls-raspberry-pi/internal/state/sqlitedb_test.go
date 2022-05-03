@@ -2,6 +2,7 @@ package state
 
 import (
 	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -36,21 +37,36 @@ func AsApples(is []interface{}) []Apple {
 }
 
 func TestSqliteDB(test *testing.T) {
-	d := NewSqliteDB("/tmp/test.sqlite")
+	tempDB, err := os.CreateTemp("", "sqlitedb-test-db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.Remove(tempDB.Name())
+	d := NewSqliteDB(tempDB.Name())
 	t := d.InitTable("oranges")
 	t.AddColumn("count", t.GetIntegerType())
 	t.Create()
 }
 
 func TestSqliteDB2(test *testing.T) {
-	d := NewSqliteDB("/tmp/test.sqlite")
+	tempDB, err := os.CreateTemp("", "sqlitedb-test-db2")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.Remove(tempDB.Name())
+	d := NewSqliteDB(tempDB.Name())
 	t := d.CreateTableFromStruct(Apple{})
 	t.InsertStruct(Apple{Color: "red", Weight: 3})
 	t.InsertStruct(Apple{Color: "green", Weight: 5})
 }
 
 func TestSelectAll(test *testing.T) {
-	d := NewSqliteDB("/tmp/test.sqlite")
+	tempDB, err := os.CreateTemp("", "sqlitedb-test-select-all")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.Remove(tempDB.Name())
+	d := NewSqliteDB(tempDB.Name())
 	t := d.CreateTableFromStruct(Apple{})
 	t.InsertStruct(Apple{Color: "red", Weight: 3})
 	apples := Apple{}.SelectAll(t.GetDB())
@@ -76,14 +92,19 @@ func TestSelectAll(test *testing.T) {
 }
 
 func TestManyOpens(test *testing.T) {
+	tempDB, err := os.CreateTemp("", "sqlitedb-test-many-opens")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.Remove(tempDB.Name())
 	go http.ListenAndServe("localhost:8080", nil)
 	for i := 0; i < 8000; i++ {
-		d := NewSqliteDB("/tmp/test.sqlite")
+		d := NewSqliteDB(tempDB.Name())
 		d.CreateTableFromStruct(Apple{})
 	}
 	time.Sleep(10 * time.Second)
 	for i := 0; i < 16000; i++ {
-		d := NewSqliteDB("/tmp/test.sqlite")
+		d := NewSqliteDB(tempDB.Name())
 		d.CreateTableFromStruct(Apple{})
 	}
 }
