@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2609c1b3b9649d7ab0eff683c7e71948d98e4ac1978ad64e4744cc73b7587333"
+            "sha256": "0dd0b4399c275ec3341f8064e31d45728373d1d89d13000e5fe0352f47c5e5d7"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,19 +26,19 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:cb872b71e23d139300bc825564c3f24c4b8a3f8c5a4a51458df7ee35cc8c1a87",
-                "sha256:d9428ac1c0d75ad50289cae8cc9a77f56ac04d0f7eee6e7d31167d577df3f6cb"
+                "sha256:3b13d727854aba9dea900b6c7fa134c52396869d842460d14fab8b85b69645f7",
+                "sha256:9ac902076eac82112f4536cc2606a1f597a387dbc56b250575ac2d2c64c75e20"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.21.43"
+            "version": "==1.21.46"
         },
         "botocore": {
             "hashes": [
-                "sha256:501d0b0ae378f06d6d23114e4e5f0c166975c34f9a0e34bfbc5bf388fc5f04e1",
-                "sha256:76173ec95dce29217ffbd367e689a8bfe056ed2db14b622fb5bfc3903f05b6db"
+                "sha256:663d8f02b98641846eb959c54c840cc33264d5f2dee5b8fc09ee8adbef0f8dcf",
+                "sha256:89a203bba3c8f2299287e48a9e112e2dbe478cf67eaac26716f0e7f176446146"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.24.43"
+            "version": "==1.24.46"
         },
         "cached-property": {
             "hashes": [
@@ -92,11 +92,11 @@
         },
         "django": {
             "hashes": [
-                "sha256:1ee37046b0bf2b61e83b3a01d067323516ec3b6f2b17cd49b1326dd4ba9dc913",
-                "sha256:90763c764738586b11d7e1f44828032c153366e43ad7f782908193a1bb2d6d92"
+                "sha256:0200b657afbf1bc08003845ddda053c7641b9b24951e52acd51f6abda33a7413",
+                "sha256:365429d07c1336eb42ba15aa79f45e1c13a0b04d5c21569e7d596696418a6a45"
             ],
             "index": "pypi",
-            "version": "==2.2.27"
+            "version": "==2.2.28"
         },
         "djangorestframework": {
             "hashes": [
