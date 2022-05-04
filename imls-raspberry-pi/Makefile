@@ -1,12 +1,16 @@
 VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
+RELEASEPATH = ../release/bin/*
 
 ifeq ($(shell uname -m),armv7l)
-RELEASEPATH = ../release/bin/*
 ENVVARS = CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
 else
-RELEASEPATH = ../release/bin/linux_arm/*
+ifeq ($(OS),Windows_NT)
+# choco install mingw (for now, since we need CGO)
+ENVVARS = CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-gcc
+else
 ENVVARS = CGO_ENABLED=1 GOOS=linux
+endif
 endif
 
 check-install:
