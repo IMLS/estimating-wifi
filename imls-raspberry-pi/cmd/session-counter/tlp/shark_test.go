@@ -36,8 +36,11 @@ func cleanupTempFiles() {
 	}
 }
 func setup() {
-	configPath := "/tmp/test-shark.sqlite"
-	state.SetConfigAtPath(configPath)
+	tempDB, err := os.CreateTemp("", "shark-test.sqlite")
+	if err != nil {
+		log.Fatal(err)
+	}
+	state.SetConfigAtPath(tempDB.Name())
 	cfg := state.GetConfig()
 	cfg.SetRunMode("test")
 	cfg.SetStorageMode("sqlite")

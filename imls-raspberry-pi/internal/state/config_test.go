@@ -13,19 +13,19 @@ type ConfigSuite struct {
 	suite.Suite
 }
 
-var configDBPath = "/tmp/config-test.sql"
-
 func (suite *ConfigSuite) SetupTest() {
-	os.Create(configDBPath)
-	os.Chmod(configDBPath, 0777)
-	SetConfigAtPath(configDBPath)
+	tempDB, err := os.CreateTemp("", "config-test.sqlite")
+	if err != nil {
+		suite.Fail(err.Error())
+	}
+	SetConfigAtPath(tempDB.Name())
 }
 
 func (suite *ConfigSuite) AfterTest(suiteName, testName string) {
 	dc := GetConfig()
-	dc.Close()
 	// ensure a clean run.
-	os.Remove(configDBPath)
+	os.Remove(dc.GetDatabasePath())
+	dc.Close()
 }
 
 func (suite *ConfigSuite) TestConfigDefaults() {

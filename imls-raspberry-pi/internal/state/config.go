@@ -3,6 +3,7 @@ package state
 import (
 	"encoding/base64"
 	"log"
+	"runtime"
 	"strings"
 	"time"
 
@@ -218,6 +219,10 @@ func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
 	return db
 }
 
+func (dc *databaseConfig) GetDatabasePath() string {
+	return dc.configDB.GetPath()
+}
+
 func (dc *databaseConfig) GetQueuesDatabase() interfaces.Database {
 	path := dc.config.GetTextField("queues_path")
 	return NewSqliteDB(path)
@@ -294,8 +299,6 @@ func ConfigDefaults() ConfigDB {
 	// Serial filled in by device or user
 	defaults.storageMode = "api"
 	defaults.runMode = "prod"
-	defaults.durationsPath = "/www/imls/durations.sqlite"
-	defaults.queuesPath = "/www/imls/queues.sqlite"
 	defaults.umbrellaScheme = "https"
 	defaults.umbrellaHost = "api.data.gov"
 	defaults.eventsURI = "/TEST/10x-imls/v2/events/"
@@ -303,9 +306,19 @@ func ConfigDefaults() ConfigDB {
 	defaults.minimumMinutes = 5
 	defaults.maximumMinutes = 600
 	defaults.wiresharkDuration = 45
-	defaults.wiresharkPath = "/usr/bin/tshark"
 	defaults.resetCron = "0 0 * * *"
-	defaults.wwwRoot = "/www/imls"
-	defaults.wwwImages = "/www/imls/images"
+	if runtime.GOOS == "windows" {
+		defaults.wiresharkPath = "c:/Program Files/Wireshark/bin/tshark.exe"
+		defaults.wwwRoot = "c:/imls"
+		defaults.wwwImages = "c:/imls/images"
+		defaults.durationsPath = "c:/imls/durations.sqlite"
+		defaults.queuesPath = "c:/imls/queues.sqlite"
+	} else {
+		defaults.wiresharkPath = "/usr/bin/tshark"
+		defaults.wwwRoot = "/www/imls"
+		defaults.wwwImages = "/www/imls/images"
+		defaults.durationsPath = "/www/imls/durations.sqlite"
+		defaults.queuesPath = "/www/imls/queues.sqlite"
+	}
 	return defaults
 }
