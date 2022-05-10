@@ -1,8 +1,8 @@
-// Package lshw is a thin wrapper around `lshw`
 package lshw
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
@@ -11,8 +11,9 @@ import (
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
-// GetDeviceHash calls out to `lshw` and then passes it off for parsing into a
-// hashmap.
+// PURPOSE
+// This function calls out to `lshw` and
+// then passes it off for parsing into a hashmap.
 func GetDeviceHash(wlan *models.Device) []map[string]string {
 	wlan.Exists = false
 
@@ -52,10 +53,11 @@ func deepCopy(h map[string]string) map[string]string {
 	return nh
 }
 
-// ParseLSHW takes an array of strings (representing the output of `lshw`) and
-// parses them into a list of hashes. Each map represents a piece of hardware
-// attached to the machine. The keys are the descriptors provided by `lshw`, and
-// the values are... the values reported by `lshw`.
+// PURPOSE
+// This function takes an array of strings (representing the output of `lshw`)
+// and parses them into a list of hashes. Each map represents a piece of hardware
+// attached to the machine. The keys are the descriptors provided by
+// `lshw`, and the values are... the values reported by `lshw`.
 func ParseLSHW(stringArray []string) []map[string]string {
 	sectionHeading := regexp.MustCompile(`^\s*\*-(usb|network)((?:\:\d))?\s*`)
 	entryPattern := regexp.MustCompile(`\s*([a-z ]+):\s+(.*)\s*`)
@@ -71,6 +73,9 @@ func ParseLSHW(stringArray []string) []map[string]string {
 	for _, line := range stringArray {
 		newSecMatch := sectionHeading.MatchString(line)
 		hashMatch := entryPattern.MatchString(line)
+		if *config.Verbose {
+			fmt.Printf("RE   line [%v] nsm [%v] hm [%v]\n", line, newSecMatch, hashMatch)
+		}
 
 		if newSecMatch {
 			// If we find a new section, and we have something in the hash,
@@ -92,6 +97,10 @@ func ParseLSHW(stringArray []string) []map[string]string {
 
 	// Don't lose the last hash!
 	devices = append(devices, hash)
+	if *config.Verbose {
+		fmt.Println("found", len(devices), "devices")
+		fmt.Println("devices\n", devices)
+	}
 
 	return devices
 }

@@ -11,11 +11,15 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/text"
 	"gsa.gov/18f/internal/version"
-	"gsa.gov/18f/cmd/wifi-hardware-search-cli/config"
-	"gsa.gov/18f/cmd/wifi-hardware-search-cli/constants"
-	"gsa.gov/18f/cmd/wifi-hardware-search-cli/lshw"
-	"gsa.gov/18f/cmd/wifi-hardware-search-cli/models"
+	"gsa.gov/18f/internal/wifi-hardware-search/config"
+	"gsa.gov/18f/internal/wifi-hardware-search/lshw"
+	"gsa.gov/18f/internal/wifi-hardware-search/models"
+	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
+
+// This is used for truncating longer MAC addresses
+// into a standard/32-bit form.
+const MACLENGTH = 17
 
 func findMatchingDevice(wlan *models.Device) {
 	// GetDeviceHash calls out to `lshw`.
@@ -76,8 +80,8 @@ func findMatchingDevice(wlan *models.Device) {
 			wlan.Logicalname = strings.ToLower(hash["logical name"])
 			wlan.Serial = strings.ToLower(hash["serial"])
 
-			if len(hash["serial"]) >= constants.MACLENGTH {
-				wlan.Mac = strings.ToLower(hash["serial"][0:constants.MACLENGTH])
+			if len(hash["serial"]) >= MACLENGTH {
+				wlan.Mac = strings.ToLower(hash["serial"][0:MACLENGTH])
 			} else {
 				wlan.Mac = strings.ToLower(hash["serial"])
 			}
@@ -126,8 +130,7 @@ func main() {
 	// ansible integration.
 	existsPtr := flag.Bool("exists", false, "Ask if a device exists. Returns `true` or `false`.")
 	// It is possible, but unlikely, that the location of lshw will change.
-	lshwPtr := flag.String("lshw-path", config.LSHW_EXE, "Path to the `lshw` binary.")
-	searchesPtr := flag.String("searchjson-path", config.SEARCHES_PATH, "Path to a JSON file containing default searches.")
+	lshwPtr := flag.String("lshw-path", config.GetLSHWLocation(), "Path to the `lshw` binary.")
 	// In case we care about versioning.
 	versionPtr := flag.Bool("version", false, "Get the software version and exit.")
 	flag.Parse()
@@ -137,8 +140,7 @@ func main() {
 	config.Verbose = verbosePtr
 
 	// Override configuration if needed, in case things move/change names.
-	config.LSHW_EXE = *lshwPtr
-	config.SEARCHES_PATH = *searchesPtr
+	config.SetLSHWLocation(*lshwPtr)
 
 	// ROOT
 	// We can't do this without root. Some things... might work.
@@ -177,7 +179,7 @@ func main() {
 		// that are compiled in via `embed`. GetSearches pulls the "live"
 		// searches if it can, and falls back to the embedded if needed.
 		// It goes through each one-by-one.
-		for _, s := range config.GetSearches() {
+		for _, s := range search.GetSearches() {
 			if *config.Verbose {
 				fmt.Println("search", s)
 			}
@@ -192,7 +194,7 @@ func main() {
 	} else {
 		// The alternative is we're not doing an exhaustive/discovery search.
 		// Therefore, we should use the field/search ptrs.
-		s := &config.Search{Field: *fieldPtr, Query: *searchPtr}
+		s := &models.Search{Field: *fieldPtr, Query: *searchPtr}
 		device.Search = s
 		findMatchingDevice(device)
 	}
