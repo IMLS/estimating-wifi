@@ -3,6 +3,7 @@ package search
 import (
 	"embed"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
@@ -13,6 +14,10 @@ import (
 	"gsa.gov/18f/internal/wifi-hardware-search/lshw"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
+
+// This is used for truncating longer MAC addresses
+// into a standard/32-bit form.
+const MACLENGTH = 17
 
 // The text file is embedded at compile time.
 // https://pkg.go.dev/embed#FS.ReadFile
@@ -80,13 +85,22 @@ func FindMatchingDevice(wlan *models.Device) {
 	// Now, go through the devices and find the one that matches our criteria.
 	for _, hash := range devices {
 
+		if *config.Verbose {
+			fmt.Println("---------")
+			for k, v := range hash {
+				fmt.Println(k, "<-", v)
+			}
+		}
+
 		// The default is to search all the fields
 		if wlan.Search.Field == "ALL" {
 
 			for k := range hash {
 				// Lowercase everything for purposes of pattern matching.
 				v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[k]))
-
+				if *config.Verbose {
+					fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
+				}
 				if v {
 					// If we find it, set the fact that it exists. This will be picked up
 					// back out in main() for the final act of printing a message to the user.
@@ -100,6 +114,9 @@ func FindMatchingDevice(wlan *models.Device) {
 		} else {
 			// If we aren't doing a full search, then this is the alternative: check just
 			// one field. It will still be a lowercase search, but it will be against one field only.
+			if *config.Verbose {
+				fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
+			}
 			v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[wlan.Search.Field]))
 			if v {
 				wlan.Exists = true
@@ -117,8 +134,8 @@ func FindMatchingDevice(wlan *models.Device) {
 			wlan.Logicalname = strings.ToLower(hash["logical name"])
 			wlan.Serial = strings.ToLower(hash["serial"])
 
-			if len(hash["serial"]) >= config.MACLENGTH {
-				wlan.Mac = strings.ToLower(hash["serial"][0:config.MACLENGTH])
+			if len(hash["serial"]) >= MACLENGTH {
+				wlan.Mac = strings.ToLower(hash["serial"][0:MACLENGTH])
 			} else {
 				wlan.Mac = strings.ToLower(hash["serial"])
 			}
