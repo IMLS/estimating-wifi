@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"runtime"
 	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -16,12 +15,7 @@ import (
 )
 
 func findMatchingDevice(wlan *models.Device) {
-	if runtime.GOOS == "windows" {
-		fmt.Println("not supported yet")
-		os.Exit(-1)
-	} else {
-		search.FindMatchingDevice(wlan)
-	}
+	search.FindMatchingDevice(wlan)
 }
 
 // https://stackoverflow.com/questions/18930910/access-struct-property-by-name

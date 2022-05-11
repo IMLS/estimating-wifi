@@ -7,10 +7,12 @@ import (
 	"log"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 
 	"gsa.gov/18f/internal/wifi-hardware-search/config"
+	"gsa.gov/18f/internal/wifi-hardware-search/devpkey"
 	"gsa.gov/18f/internal/wifi-hardware-search/lshw"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
@@ -44,15 +46,19 @@ func GetSearches() []models.Search {
 }
 
 func SetMonitorMode(dev *models.Device) {
-	cmds := make([]*exec.Cmd, 0)
-	cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "down"))
-	cmds = append(cmds, exec.Command("/usr/sbin/iw", dev.Logicalname, "set", "monitor", "none"))
-	cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "up"))
+	if runtime.GOOS == "windows" {
+		fmt.Println("warning: monitor mode on windows is not supported yet:", dev.Logicalname)
+	} else {
+		cmds := make([]*exec.Cmd, 0)
+		cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "down"))
+		cmds = append(cmds, exec.Command("/usr/sbin/iw", dev.Logicalname, "set", "monitor", "none"))
+		cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "up"))
 
-	// Run the commands to set the adapter into monitor mode.
-	for _, c := range cmds {
-		c.Start()
-		c.Wait()
+		// Run the commands to set the adapter into monitor mode.
+		for _, c := range cmds {
+			c.Start()
+			c.Wait()
+		}
 	}
 }
 
@@ -72,12 +78,20 @@ func SearchForMatchingDevice() *models.Device {
 	return dev
 }
 
+func osFindMatchingDevice(wlan *models.Device) []map[string]string {
+	if runtime.GOOS == "windows" {
+		return devpkey.GetDeviceHash(wlan)
+	} else {
+		// GetDeviceHash calls out to `lshw`.
+		return lshw.GetDeviceHash(wlan)
+	}
+}
+
 // PURPOSE
 // Takes a Device structure and, using the Search fields of that structure,
 // attempts to find a matching WLAN device.
 func FindMatchingDevice(wlan *models.Device) {
-	// GetDeviceHash calls out to `lshw`.
-	devices := lshw.GetDeviceHash(wlan)
+	devices := osFindMatchingDevice(wlan)
 
 	// We start by assuming that we have not found the device.
 	found := false
