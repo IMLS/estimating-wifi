@@ -1,9 +1,0 @@
-* fix api filtering
-* add patron devices
-* add minutes served
-- select sum(round((julianday(d.end) - julianday(d.start)) * 1440)) as diff from durations d where start >= '2022-04-14' and end < '2022-04-15';
-* test against:
- // for 2022-04-15-1-CA5678-9999:
- // - 19461 devices seen
- // - 5392 patron devices
- // - 66601 minutes served
