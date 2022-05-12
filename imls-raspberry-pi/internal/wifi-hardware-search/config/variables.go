@@ -10,3 +10,5 @@ func SetLSHWLocation(path string) {
 func GetLSHWLocation() string {
 	return lshw_exe
 }
+
+var Verbose *bool = new(bool)
