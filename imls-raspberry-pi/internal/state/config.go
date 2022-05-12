@@ -308,7 +308,7 @@ func ConfigDefaults() ConfigDB {
 	defaults.wiresharkDuration = 45
 	defaults.resetCron = "0 0 * * *"
 	if runtime.GOOS == "windows" {
-		defaults.wiresharkPath = "c:/Program Files/Wireshark/bin/tshark.exe"
+		defaults.wiresharkPath = "c:/Program Files/Wireshark/tshark.exe"
 		defaults.wwwRoot = "c:/imls"
 		defaults.wwwImages = "c:/imls/images"
 		defaults.durationsPath = "c:/imls/durations.sqlite"
