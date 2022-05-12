@@ -6,9 +6,7 @@ package netadapter
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"log"
-	"os"
 	"os/exec"
 
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
@@ -50,8 +48,8 @@ func (p *PowerShell) execute(args ...string) []byte {
 	args = append([]string{"-NoProfile", "-NonInteractive"}, args...)
 	cmd := exec.Command(p.powerShell, args...)
 	var out bytes.Buffer
-	multi := io.MultiWriter(os.Stdout, &out)
-	cmd.Stdout = multi
+	cmd.Stdout = &out
+	cmd.Stderr = nil
 	if err := cmd.Run(); err != nil {
 		log.Println("Powershell: cannot start command")
 		log.Fatal(err)
