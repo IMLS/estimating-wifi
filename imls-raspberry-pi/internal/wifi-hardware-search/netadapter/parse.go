@@ -1,6 +1,7 @@
-package devpkey
+package netadapter
 
-// devpkey: property keys for the Plug and Play Device Property API on Windows.
+// netadapter: pull in basic network adapter properties and property keys from
+// the Plug and Play Device Property API on Windows.
 
 import (
 	"bytes"

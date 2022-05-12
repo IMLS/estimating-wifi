@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"gsa.gov/18f/internal/wifi-hardware-search/config"
-	"gsa.gov/18f/internal/wifi-hardware-search/devpkey"
 	"gsa.gov/18f/internal/wifi-hardware-search/lshw"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
+	"gsa.gov/18f/internal/wifi-hardware-search/netadapter"
 )
 
 // This is used for truncating longer MAC addresses
@@ -79,7 +79,7 @@ func SearchForMatchingDevice() *models.Device {
 
 func osFindMatchingDevice(wlan *models.Device) []map[string]string {
 	if runtime.GOOS == "windows" {
-		return devpkey.GetDeviceHash(wlan)
+		return netadapter.GetDeviceHash(wlan)
 	} else {
 		// GetDeviceHash calls out to `lshw`.
 		return lshw.GetDeviceHash(wlan)
