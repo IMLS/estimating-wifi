@@ -45,6 +45,10 @@ func (d Duration) AsMap() map[string]interface{} {
 		if !strings.Contains(f.Tag.Get("type"), "AUTOINCREMENT") {
 			col := strings.ReplaceAll(strings.Split(f.Tag.Get("db"), ",")[0], "\"", "")
 			nom := strings.ReplaceAll(fmt.Sprintf("%v", reflect.Indirect(r).FieldByName(f.Name)), "\"", "")
+			// truncate fake serial if needed.
+			if string(col) == "pi_serial" {
+				nom = nom[0:15]
+			}
 			m[string(col)] = nom
 		}
 	}
