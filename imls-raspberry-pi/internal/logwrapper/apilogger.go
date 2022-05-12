@@ -28,7 +28,7 @@ func (a *APILogger) Write(p []byte) (n int, err error) {
 	}
 
 	data := map[string]interface{}{
-		"pi_serial":   a.cfg.GetSerial(),
+		"pi_serial":   a.cfg.GetSerial()[0:15], // truncate our fake serial number if needed
 		"fcfs_seq_id": a.cfg.GetFCFSSeqID(),
 		"device_tag":  a.cfg.GetDeviceTag(),
 		"session_id":  strconv.FormatInt(a.cfg.GetCurrentSessionID(), 10),
