@@ -14,10 +14,6 @@ import (
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
-func findMatchingDevice(wlan *models.Device) {
-	search.FindMatchingDevice(wlan)
-}
-
 // https://stackoverflow.com/questions/18930910/access-struct-property-by-name
 // PURPOSE
 // This reflects on the Device structure and attempts to pull values out by
@@ -109,7 +105,7 @@ func main() {
 			}
 			device.Search = &s
 			// findMatchingDevice populates device.Exists if something is found.
-			findMatchingDevice(device)
+			search.FindMatchingDevice(device)
 			// We can stop searching if we find something.
 			if device.Exists {
 				break
@@ -120,7 +116,7 @@ func main() {
 		// Therefore, we should use the field/search ptrs.
 		s := &models.Search{Field: *fieldPtr, Query: *searchPtr}
 		device.Search = s
-		findMatchingDevice(device)
+		search.FindMatchingDevice(device)
 	}
 
 	// If we asked for a true/false value, print that.
