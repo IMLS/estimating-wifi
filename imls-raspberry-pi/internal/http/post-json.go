@@ -71,7 +71,7 @@ func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) 
 		}
 
 		req.Header.Set("Content-type", "application/json")
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer: %s", tok))
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok))
 		resp, err := client.Do(req)
 
 		if err != nil {
