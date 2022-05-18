@@ -44,6 +44,8 @@ services:
           npm run build
           cd ../../..
           done
+          npx directus bootstrap
+          npx directus schema apply --yes /directus/extensions/migrations/snapshot.yaml
           npx directus database migrate:latest
           npx directus start
     environment:
