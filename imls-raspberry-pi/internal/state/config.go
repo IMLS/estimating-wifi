@@ -300,9 +300,9 @@ func ConfigDefaults() ConfigDB {
 	defaults.storageMode = "api"
 	defaults.runMode = "prod"
 	defaults.umbrellaScheme = "https"
-	defaults.umbrellaHost = "api.data.gov"
-	defaults.eventsURI = "/TEST/10x-imls/v2/events/"
-	defaults.durationsURI = "/TEST/10x-imls/v2/durations/"
+	defaults.umbrellaHost = "rabbit-phase-4.app.cloud.gov"
+	defaults.eventsURI = "/items/events_v2/"
+	defaults.durationsURI = "/items/durations_v2/"
 	defaults.minimumMinutes = 5
 	defaults.maximumMinutes = 600
 	defaults.wiresharkDuration = 45
