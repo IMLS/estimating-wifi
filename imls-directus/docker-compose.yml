@@ -68,5 +68,7 @@ services:
       ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@example.com}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD:-d1r3ctu5}"
 
+      EXTENSIONS_AUTO_RELOAD: 'true'
+
 networks:
   directus:
