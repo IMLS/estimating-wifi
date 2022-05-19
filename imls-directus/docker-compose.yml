@@ -9,6 +9,8 @@ services:
   database:
     container_name: database
     image: postgis/postgis:13-master
+    ports:
+      - 8432:5432
     volumes:
       - ./data/database:/var/lib/postgresql/data
     networks:
