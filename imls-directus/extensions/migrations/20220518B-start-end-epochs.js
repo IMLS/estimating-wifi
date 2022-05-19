@@ -5,8 +5,8 @@ module.exports = {
       table.bigInteger('new_end', { useTz: true });
       // equivalent to `UPDATE durations SET new_start = extract(epoch from "start"::timestamp);` etc
       knex('durations').update({
-        new_start: 'extract(epoch from "start"::timestamp)',
-        new_end: 'extract(epoch from "end"::timestamp)',
+        new_start: 'extract(epoch from "start"::timestamptz)',
+        new_end: 'extract(epoch from "end"::timestamptz)',
       })
       table.dropColumns('start', 'end');
       table.renameColumn('new_start', 'start');
@@ -16,7 +16,6 @@ module.exports = {
 
   async down(knex) {
     await knex.schema.alterTable('durations', (table) => {
-      // this is a destructive migration: timezone information will be lost
       table.text('old_start');
       table.text('old_end');
       knex('durations').update({
