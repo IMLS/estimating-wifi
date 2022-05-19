@@ -28,7 +28,7 @@ func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) 
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slashWarned && !matched {
 		slashWarned = true
-		log.Println("WARNING: api.data.gov wants a trailing slash on URIs")
+		log.Println("WARNING: missing a trailing slash on URIs")
 	}
 
 	timeout := time.Duration(15 * time.Second)
@@ -71,7 +71,7 @@ func PostJSON(cfg interfaces.Config, uri string, data []map[string]interface{}) 
 		}
 
 		req.Header.Set("Content-type", "application/json")
-		req.Header.Set("X-Api-Key", tok)
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok))
 		resp, err := client.Do(req)
 
 		if err != nil {

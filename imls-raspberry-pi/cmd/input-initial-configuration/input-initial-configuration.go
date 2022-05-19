@@ -40,7 +40,7 @@ func decode(ndx int) string {
 }
 
 func readYesOrNo(input io.Reader) bool {
-	msg := "Do you have an api.data.gov API key?"
+	msg := "Do you have an API key?"
 	reader := bufio.NewReader(input)
 	yes := regexp.MustCompile("(?i)^(yes|y)$")
 	no := regexp.MustCompile("(?i)^(no|n)$")
