@@ -2,11 +2,11 @@ package state
 
 import (
 	"encoding/base64"
-	"log"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/logwrapper"
@@ -80,11 +80,15 @@ func (dc *databaseConfig) GetAPIKey() string {
 	copy(key[:], serial)
 	b64, err := base64.StdEncoding.DecodeString(apiKey)
 	if err != nil {
-		log.Print("config: cannot b64 decode auth token: ", err)
+		log.Error().
+			Err(err).
+			Msg("cannot b64 decode")
 	}
 	dec, err := cryptopasta.Decrypt(b64, &key)
 	if err != nil {
-		log.Print("config: failed to decrypt auth token after decoding: ", err)
+		log.Error().
+			Err(err).
+			Msg("failed to decrypt after decoding")
 	}
 	return string(dec)
 }
@@ -136,10 +140,6 @@ func (dc *databaseConfig) GetLogLevel() string {
 func (dc *databaseConfig) GetLoggers() []string {
 	loggers := dc.config.GetTextField("loggers")
 	return strings.Split(loggers, ",")
-}
-
-func (dc *databaseConfig) Log() interfaces.Logger {
-	return dc.logger
 }
 
 func (dc *databaseConfig) GetEventsURI() string {
@@ -199,7 +199,7 @@ func (dc *databaseConfig) IsDeveloperMode() bool {
 		either = either || strings.Contains(strings.ToLower(mode), s)
 	}
 	if either {
-		log.Println("running in developer mode")
+		log.Info().Msg("running in developer mode")
 	}
 	return either
 }

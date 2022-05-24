@@ -3,6 +3,7 @@ package tlp
 import (
 	"fmt"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
@@ -12,7 +13,11 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 	cfg := state.GetConfig()
 	// Queue up what needs to be sent still.
 	thissession := cfg.GetCurrentSessionID()
-	cfg.Log().Debug("queueing current session [ ", thissession, " ] to images and send queue... ")
+
+	log.Debug().
+		Int64("session", thissession).
+		Msg("queueing to images and send")
+
 	if thissession >= 0 {
 		sq.Enqueue(fmt.Sprint(thissession))
 		iq.Enqueue(fmt.Sprint(thissession))

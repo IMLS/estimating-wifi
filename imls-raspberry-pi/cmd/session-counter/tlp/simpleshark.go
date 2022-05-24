@@ -7,6 +7,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/constants"
 	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
@@ -69,8 +70,6 @@ func SimpleShark(
 	searchFn SearchFn,
 	sharkFn SharkFn) bool {
 
-	cfg := state.GetConfig()
-
 	// Look up the adapter. Use the find-ralink library.
 	// The % will trigger first time through, which we want.
 	var dev *models.Device = nil
@@ -82,7 +81,6 @@ func SimpleShark(
 	if dev != nil && dev.Exists {
 		// Load the config for use.
 		// cfg.Wireshark.Adapter = dev.Logicalname
-		//cfg.Log().Debug("found adapter: ", dev.Logicalname)
 		setMonitorFn(dev)
 		// This blocks for monitoring...
 		macmap := sharkFn(dev.Logicalname)
@@ -96,7 +94,8 @@ func SimpleShark(
 		}
 		StoreMacs(keepers)
 	} else {
-		cfg.Log().Info("no wifi devices found. no scanning carried out.")
+		log.Info().
+			Msg("no wifi devices found; no scanning carried out")
 		return false
 	}
 	return true

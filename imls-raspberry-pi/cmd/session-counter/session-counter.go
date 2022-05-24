@@ -28,7 +28,7 @@ func runEvery(crontab string, c *cron.Cron, fun func()) {
 		Msg("runEvery")
 	if err != nil {
 		log.Fatal().
-			Str("error", err.Error()).
+			Err(err).
 			Msg("cron: could not set up crontab entry")
 	}
 }

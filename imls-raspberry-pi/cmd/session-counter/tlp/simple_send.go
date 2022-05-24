@@ -1,8 +1,7 @@
 package tlp
 
 import (
-	"log"
-
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/http"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/state"
@@ -11,7 +10,9 @@ import (
 
 func SimpleSend(db interfaces.Database) {
 	cfg := state.GetConfig()
-	cfg.Log().Debug("Starting BatchSend")
+	log.Debug().
+		Msg("starting batch send")
+
 	// This only comes in on reset...
 	sq := state.NewQueue("sent")
 	sessionsToSend := sq.AsList()
@@ -22,27 +23,41 @@ func SimpleSend(db interfaces.Database) {
 		err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIDToSend)
 
 		if err != nil {
-			cfg.Log().Info("error in extracting durations for session", nextSessionIDToSend)
-			cfg.Log().Error(err.Error())
+			log.Error().
+				Err(err).
+				Str("session", nextSessionIDToSend).
+				Msg("could not extract durations")
 		}
-		cfg.Log().Debug("found ", len(durations), " durations to send in session ", nextSessionIDToSend)
 
 		if len(durations) == 0 {
-			cfg.Log().Info("found zero durations to send/draw. dequeing session [", nextSessionIDToSend, "]")
+			log.Debug().
+				Str("session", nextSessionIDToSend).
+				Msg("found zero durations")
 			sq.Remove(nextSessionIDToSend)
 		} else if cfg.IsStoringToAPI() {
-			cfg.Log().Info("attempting to send batch [", nextSessionIDToSend, "][", len(durations), "] to the API server")
+			log.Debug().
+				Int("durations", len(durations)).
+				Str("session", nextSessionIDToSend).
+				Msg("preparing to send durations to API")
+
 			// convert []Duration to an array of map[string]interface{}
 			data := make([]map[string]interface{}, 0)
 			for _, duration := range durations {
 				data = append(data, duration.AsMap())
 			}
+
 			// After writing images, we come back and try and send the data remotely.
-			cfg.Log().Debug("PostJSONing ", len(data), " duration datas")
+			log.Debug().
+				Int("duration", len(data)).
+				Str("session", nextSessionIDToSend).
+				Msg("sending durations to API")
+
 			err = http.PostJSON(cfg, cfg.GetDurationsURI(), data)
 			if err != nil {
-				log.Println("could not log to API; session ", nextSessionIDToSend, " not sent; left on queue")
-				log.Println(err.Error())
+				log.Error().
+					Str("session", nextSessionIDToSend).
+					Err(err).
+					Msg("could not send; data left on queue")
 			} else {
 				// If we successfully sent the data remotely, we can now mark it is as sent.
 				sq.Remove(nextSessionIDToSend)
@@ -50,7 +65,8 @@ func SimpleSend(db interfaces.Database) {
 		} else {
 			// Always dequeue. We're storing locally "for free" into the
 			// durations table before trying to do the send.
-			cfg.Log().Info("not in API mode, not sending data...")
+			log.Info().
+				Msg("not in API mode, not sending data")
 			sq.Remove(nextSessionIDToSend)
 		}
 	}

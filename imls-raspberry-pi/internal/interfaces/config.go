@@ -23,8 +23,6 @@ type Config interface {
 
 	GetLogLevel() string
 	GetLoggers() []string
-	// TODO: pull this out
-	Log() Logger
 
 	GetEventsURI() string
 	GetDurationsURI() string

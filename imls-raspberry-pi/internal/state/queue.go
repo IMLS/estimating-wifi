@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/interfaces"
 )
 
@@ -27,13 +28,11 @@ func NewQueue(name string) (q *Queue) {
 }
 
 func (queue *Queue) Enqueue(item string) {
-	cfg := GetConfig()
 	stmt := fmt.Sprintf("INSERT OR IGNORE INTO %v (item) VALUES (?)", queue.name)
 	queue.db.Open()
 	_, err := queue.db.GetPtr().Exec(stmt, item)
 	if err != nil {
-		cfg.Log().Error("error in enqueue insert")
-		cfg.Log().Error(err.Error())
+		log.Error().Err(err).Msg("could not insert")
 	}
 }
 
@@ -55,7 +54,6 @@ func (queue *Queue) Peek() (string, error) {
 }
 
 func (queue *Queue) Dequeue() (string, error) {
-	cfg := GetConfig()
 	qr := QueueRow{}
 
 	err := queue.db.GetPtr().Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
@@ -64,12 +62,11 @@ func (queue *Queue) Dequeue() (string, error) {
 	} else {
 		_, err := queue.db.GetPtr().Exec(fmt.Sprintf("DELETE FROM %v WHERE ROWID = ?", queue.name), qr.Rowid)
 		if err != nil {
-			cfg.Log().Error("failed to delete ", qr.Rowid, " in queue.Dequeue()")
-			cfg.Log().Error(err.Error())
+			log.Error().
+				Int("rowid", qr.Rowid).
+				Err(err).Msg("could not delete")
 			return "", errors.New("failed to dequeue")
 		}
-		// cfg.Log().Debug("DEQUEUE result ", res)
-		// cfg.Log().Debug("DEQUEUE removed [ ", qr.Item, " ] on the queue [ ", queue.name, " ]")
 		return qr.Item, nil
 	}
 }
