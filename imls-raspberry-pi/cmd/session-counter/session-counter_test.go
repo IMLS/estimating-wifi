@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"path/filepath"
 	"runtime"
@@ -10,7 +9,7 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
@@ -40,8 +39,6 @@ func runFakeWireshark(device string) []string {
 
 	thisTime := rand.Intn(NUMFOUNDPERMINUTE)
 	send := make([]string, thisTime)
-	// cfg := state.GetConfig()
-	//cfg.Log().Info("sending ", len(send), " this minute")
 	for i := 0; i < thisTime; i++ {
 		send[i] = consistentMACs[rand.Intn(len(consistentMACs))]
 	}
@@ -87,7 +84,9 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 
 			if isItMidnight(state.GetClock().Now().In(time.Local)) {
 				// Then we run the processing at midnight (once per 24 hours)
-				cfg.Log().Info("RUNNING PROCESSDATA at " + fmt.Sprint(state.GetClock().Now().In(time.Local)))
+				log.Info().
+					Str("time", fmt.Sprint(state.GetClock().Now().In(time.Local))).
+					Msg("RUNNING PROCESSDATA")
 				// Copy ephemeral durations over to the durations table
 				tlp.ProcessData(durationsdb, sq, iq)
 				// Draw images of the data
@@ -117,8 +116,9 @@ func TestAllUp(t *testing.T) {
 	cfg.SetQueuesPath(filepath.Join(path, "test", "queues.sqlite"))
 	cfg.SetDurationsPath(filepath.Join(path, "test", "durations.sqlite"))
 
-	cfg.Log().SetLogLevel("DEBUG")
-	cfg.Log().Info("initial session id: ", cfg.GetCurrentSessionID())
+	log.Info().
+		Int64("session id", cfg.GetCurrentSessionID()).
+		Msg("initial session")
 
 	// Fake the clock
 	mock := clock.NewMock()
@@ -127,11 +127,15 @@ func TestAllUp(t *testing.T) {
 	state.SetClock(mock)
 
 	MockRun(1, 200000, 10)
-	log.Println("WAITING")
+
+	log.Info().Msg("WAITING")
 	time.Sleep(5 * time.Second)
 
 	cfg.IncrementSessionID()
-	cfg.Log().Info("next session id: ", cfg.GetCurrentSessionID())
+
+	log.Info().
+		Int64("session id", cfg.GetCurrentSessionID()).
+		Msg("next session")
 
 	// Fake the clock
 	mt, _ = time.Parse("2006-01-02T15:04", "1976-11-12T00:01")
