@@ -9,7 +9,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/structs"
 )
 
@@ -17,7 +16,6 @@ type databaseConfig struct {
 	configDB  interfaces.Database
 	config    interfaces.Table
 	sessionID int64
-	logger    interfaces.Logger
 }
 
 var singletonConfig databaseConfig
@@ -49,8 +47,7 @@ func newConfig(configDBPath string) databaseConfig {
 	}
 
 	sessionID := NewSessionID()
-	dc := databaseConfig{db, table, sessionID, nil}
-	dc.logger = logwrapper.NewLogger(&dc)
+	dc := databaseConfig{db, table, sessionID}
 	return dc
 }
 

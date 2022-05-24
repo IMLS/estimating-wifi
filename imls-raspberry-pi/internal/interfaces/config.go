@@ -50,11 +50,3 @@ type Config interface {
 	GetUniquenessWindow() int
 	GetResetCron() string
 }
-
-type Logger interface {
-	Debug(args ...interface{})
-	Info(args ...interface{})
-	Error(args ...interface{})
-	Fatal(args ...interface{})
-	SetLogLevel(level string)
-}
