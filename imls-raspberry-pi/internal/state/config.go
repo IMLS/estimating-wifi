@@ -139,15 +139,6 @@ func (dc *databaseConfig) GetLoggers() []string {
 	return strings.Split(loggers, ",")
 }
 
-func (dc *databaseConfig) GetEventsURI() string {
-	scheme := dc.config.GetTextField("umbrella_scheme")
-	host := dc.config.GetTextField("umbrella_host")
-	path := dc.config.GetTextField("events_uri")
-	return (scheme + "://" +
-		removeLeadingAndTrailingSlashes(host) +
-		startsWithSlash(removeLeadingSlashes(path)))
-}
-
 func (dc *databaseConfig) GetDurationsURI() string {
 	scheme := dc.config.GetTextField("umbrella_scheme")
 	host := dc.config.GetTextField("umbrella_host")
@@ -298,7 +289,6 @@ func ConfigDefaults() ConfigDB {
 	defaults.runMode = "prod"
 	defaults.umbrellaScheme = "https"
 	defaults.umbrellaHost = "rabbit-phase-4.app.cloud.gov"
-	defaults.eventsURI = "/items/events_v2/"
 	defaults.durationsURI = "/items/durations_v2/"
 	defaults.minimumMinutes = 5
 	defaults.maximumMinutes = 600

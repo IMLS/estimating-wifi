@@ -24,7 +24,6 @@ type Config interface {
 	GetLogLevel() string
 	GetLoggers() []string
 
-	GetEventsURI() string
 	GetDurationsURI() string
 
 	IncrementSessionID() int64
