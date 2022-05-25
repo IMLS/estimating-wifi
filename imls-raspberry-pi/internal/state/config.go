@@ -4,75 +4,59 @@ import (
 	"encoding/base64"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/structs"
 )
 
-type databaseConfig struct {
-	configDB  interfaces.Database
-	config    interfaces.Table
-	sessionID int64
-}
-
-var singletonConfig databaseConfig
-
-func GetConfig() *databaseConfig {
-	if singletonConfig.configDB == nil {
-		panic("config database was not initialized")
+func SetConfigAtPath(configPath string) {
+	SetConfigDefaults()
+	viper.AddConfigPath(".")
+	if runtime.GOOS == "linux" {
+		viper.AddConfigPath("/etc/imls/")
 	}
-	return &singletonConfig
-}
+	if runtime.GOOS == "windows" {
+		viper.AddConfigPath("%PROGRAMDATA%\\imls")
+	}
+	viper.SetConfigType("ini")
+	viper.SetConfigFile(configPath)
+	viper.AutomaticEnv()
 
-func SetConfigAtPath(configDBPath string) *databaseConfig {
-	singletonConfig = newConfig(configDBPath)
-	return &singletonConfig
-}
-
-// NewConfig creates a sqlite file and corresponding config table if not already
-// extant
-func newConfig(configDBPath string) databaseConfig {
-	db := NewSqliteDB(configDBPath)
-	var table interfaces.Table
-	if !db.CheckTableExists("ConfigDBs") {
-		table = db.CreateTableFromStruct(ConfigDB{})
-		defaults := ConfigDefaults()
-		table.InsertStruct(defaults)
+	err := viper.ReadInConfig()
+	if err == nil {
+		log.Info().Msg(viper.ConfigFileUsed())
 	} else {
-		db.InitTable("ConfigDBs")
-		table = db.GetTableByName("ConfigDBs")
+		log.Fatal().
+			Err(err).
+			Msg("could not find configuration file")
 	}
-
-	sessionID := NewSessionID()
-	dc := databaseConfig{db, table, sessionID}
-	return dc
 }
 
-func (dc *databaseConfig) GetSerial() string {
+func GetSerial() string {
 	// allow the serial to be stored so we can test out different serial and api
 	// key settings. if not, default to reading from /proc (as a cached read)
-	serial := dc.config.GetTextField("serial")
+	serial := viper.GetString("config.device_serial")
 	if serial == "" {
 		return getCachedSerial()
 	}
 	return serial
 }
 
-func (dc *databaseConfig) GetFCFSSeqID() string {
-	return dc.config.GetTextField("fcfs_seq_id")
+func GetFCFSSeqID() string {
+	return viper.GetString("config.fcfs_id")
 }
 
-func (dc *databaseConfig) GetDeviceTag() string {
-	return dc.config.GetTextField("device_tag")
+func GetDeviceTag() string {
+	return viper.GetString("config.device_tag")
 }
 
-// GetAPIKey decodes the api key stored in the database.
-func (dc *databaseConfig) GetAPIKey() string {
-	apiKey := dc.config.GetTextField("api_key")
-	serial := dc.GetSerial()
+// GetAPIKey decodes the api key stored in the ini file.
+func GetAPIKey() string {
+	apiKey := viper.GetString("config.api_key")
+	serial := GetSerial()
 	var key [32]byte
 	copy(key[:], serial)
 	b64, err := base64.StdEncoding.DecodeString(apiKey)
@@ -90,84 +74,70 @@ func (dc *databaseConfig) GetAPIKey() string {
 	return string(dec)
 }
 
-func (dc *databaseConfig) SetFCFSSeqID(id string) {
-	dc.config.SetTextField("fcfs_seq_id", id)
+func SetFCFSSeqID(id string) {
+	viper.Set("config.fcfs_id", id)
 }
 
-func (dc *databaseConfig) SetDeviceTag(tag string) {
-	dc.config.SetTextField("device_tag", tag)
+func SetDeviceTag(tag string) {
+	viper.Set("config.device_tag", tag)
 }
 
-func (dc *databaseConfig) SetAPIKey(key string) {
-	dc.config.SetTextField("api_key", key)
+func SetAPIKey(key string) {
+	viper.Set("config.api_key", key)
 }
 
-func (dc *databaseConfig) SetStorageMode(mode string) {
-	dc.config.SetTextField("storage_mode", mode)
+func SetStorageMode(mode string) {
+	viper.Set("mode.storage", mode)
 }
 
-func (dc *databaseConfig) SetRunMode(mode string) {
-	dc.config.SetTextField("run_mode", mode)
+func SetRunMode(mode string) {
+	viper.Set("mode.run", mode)
 }
 
-func (dc *databaseConfig) SetQueuesPath(mode string) {
-	dc.config.SetTextField("queues_path", mode)
+func SetQueuesPath(where string) {
+	viper.Set("db.queues", where)
 }
 
-func (dc *databaseConfig) SetDurationsPath(mode string) {
-	dc.config.SetTextField("durations_path", mode)
+func SetDurationsPath(where string) {
+	viper.Set("db.durations", where)
 }
 
-func (dc *databaseConfig) SetRootPath(mode string) {
-	dc.config.SetTextField("www_root", mode)
+func SetRootPath(mode string) {
+	viper.Set("www.root", mode)
 }
 
-func (dc *databaseConfig) SetImagesPath(mode string) {
-	dc.config.SetTextField("www_images", mode)
+func SetImagesPath(mode string) {
+	viper.Set("www.images", mode)
 }
 
-func (dc *databaseConfig) SetUniquenessWindow(window int) {
-	dc.config.SetIntegerField("uniqueness_window", window)
+func SetUniquenessWindow(window int) {
+	viper.Set("config.uniqueness_window", window)
 }
 
-func (dc *databaseConfig) GetLogLevel() string {
-	return dc.config.GetTextField("log_level")
+func GetLogLevel() string {
+	return viper.GetString("log.level")
 }
 
-func (dc *databaseConfig) GetLoggers() []string {
-	loggers := dc.config.GetTextField("loggers")
-	return strings.Split(loggers, ",")
+func GetLoggers() []string {
+	return viper.GetStringSlice("log.loggers")
 }
 
-func (dc *databaseConfig) GetDurationsURI() string {
-	scheme := dc.config.GetTextField("umbrella_scheme")
-	host := dc.config.GetTextField("umbrella_host")
-	path := dc.config.GetTextField("durations_uri")
+func GetDurationsURI() string {
+	scheme := viper.GetString("api.scheme")
+	host := viper.GetString("api.host")
+	path := viper.GetString("api.uri")
 	return (scheme + "://" +
 		removeLeadingAndTrailingSlashes(host) +
 		startsWithSlash(removeLeadingSlashes(path)))
 }
 
-func NewSessionID() int64 {
-	return GetClock().Now().In(time.Local).Unix()
-}
-
-func (dc *databaseConfig) GetCurrentSessionID() int64 {
-	return dc.sessionID
-}
-
-func (dc *databaseConfig) IncrementSessionID() int64 {
-	dc.sessionID = NewSessionID()
-	return dc.sessionID
-}
-
-func (dc *databaseConfig) IsStoringToAPI() bool {
-	mode := dc.config.GetTextField("storage_mode")
+func IsStoringToAPI() bool {
+	mode := viper.GetString("mode.storage")
 	return strings.Contains(strings.ToLower(mode), "api")
 }
 
-func (dc *databaseConfig) IsStoringLocally() bool {
-	mode := dc.config.GetTextField("storage_mode")
+func IsStoringLocally() bool {
+	mode := viper.GetString("mode.storage")
 	either := false
 	for _, s := range []string{"local", "sqlite"} {
 		either = either || strings.Contains(strings.ToLower(mode), s)
@@ -175,13 +145,13 @@ func (dc *databaseConfig) IsStoringLocally() bool {
 	return either
 }
 
-func (dc *databaseConfig) IsProductionMode() bool {
-	mode := dc.config.GetTextField("run_mode")
+func IsProductionMode() bool {
+	mode := viper.GetString("mode.run")
 	return strings.Contains(strings.ToLower(mode), "prod")
 }
 
-func (dc *databaseConfig) IsDeveloperMode() bool {
-	mode := dc.config.GetTextField("run_mode")
+func IsDeveloperMode() bool {
+	mode := viper.GetString("mode.run")
 	either := false
 	for _, s := range []string{"dev", "test"} {
 		either = either || strings.Contains(strings.ToLower(mode), s)
@@ -192,13 +162,13 @@ func (dc *databaseConfig) IsDeveloperMode() bool {
 	return either
 }
 
-func (dc *databaseConfig) IsTestMode() bool {
-	mode := dc.config.GetTextField("run_mode")
+func IsTestMode() bool {
+	mode := viper.GetString("mode.run")
 	return strings.Contains(strings.ToLower(mode), "test")
 }
 
-func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
-	path := dc.config.GetTextField("durations_path")
+func GetDurationsDatabase() interfaces.Database {
+	path := viper.GetString("db.durations")
 	// always make sure we have a durations db created
 	db := NewSqliteDB(path)
 	if !db.CheckTableExists("durations") {
@@ -207,105 +177,70 @@ func (dc *databaseConfig) GetDurationsDatabase() interfaces.Database {
 	return db
 }
 
-func (dc *databaseConfig) GetDatabasePath() string {
-	return dc.configDB.GetPath()
-}
-
-func (dc *databaseConfig) GetQueuesDatabase() interfaces.Database {
-	path := dc.config.GetTextField("queues_path")
+func GetQueuesDatabase() interfaces.Database {
+	path := viper.GetString("db.queues")
 	return NewSqliteDB(path)
 }
 
-func (dc *databaseConfig) GetWiresharkPath() string {
-	return dc.config.GetTextField("wireshark_path")
+func GetWiresharkPath() string {
+	return viper.GetString("wireshark.path")
 }
 
-func (dc *databaseConfig) GetWiresharkDuration() int {
-	return dc.config.GetIntegerField("wireshark_duration")
+func GetWiresharkDuration() int {
+	return viper.GetInt("wireshark.duration")
 }
 
-func (dc *databaseConfig) GetMinimumMinutes() int {
-	return dc.config.GetIntegerField("minimum_minutes")
+func GetMinimumMinutes() int {
+	return viper.GetInt("config.minimum_minutes")
 }
 
-func (dc *databaseConfig) GetMaximumMinutes() int {
-	return dc.config.GetIntegerField("maximum_minutes")
+func GetMaximumMinutes() int {
+	return viper.GetInt("config.maximum_minutes")
 }
 
-func (dc *databaseConfig) GetUniquenessWindow() int {
-	return dc.config.GetIntegerField("uniqueness_window")
+func GetUniquenessWindow() int {
+	return viper.GetInt("config.uniqueness_window")
 }
 
-func (dc *databaseConfig) GetResetCron() string {
-	return dc.config.GetTextField("reset_cron")
+func GetResetCron() string {
+	return viper.GetString("cron.reset")
 }
 
-func (dc *databaseConfig) GetWWWRoot() string {
-	return dc.config.GetTextField("www_root")
+func GetWWWRoot() string {
+	return viper.GetString("www.root")
 }
 
-func (dc *databaseConfig) GetWWWImages() string {
-	return dc.config.GetTextField("www_images")
+func GetWWWImages() string {
+	return viper.GetString("www.images")
 }
 
-func (dc *databaseConfig) Close() {
-	dc.configDB.Close()
-}
-
-type ConfigDB struct {
-	logLevel          string `db:"log_level" sqlite:"TEXT"`
-	loggers           string `db:"loggers" sqlite:"TEXT"` // comma separated
-	apiKey            string `db:"api_key" sqlite:"TEXT"`
-	deviceTag         string `db:"device_tag" sqlite:"TEXT"`
-	fcfsSeqID         string `db:"fcfs_seq_id" sqlite:"TEXT"`
-	serial            string `db:"serial" sqlite:"TEXT"`
-	storageMode       string `db:"storage_mode" sqlite:"TEXT"`
-	runMode           string `db:"run_mode" sqlite:"TEXT"`
-	durationsPath     string `db:"durations_path" sqlite:"TEXT"`
-	queuesPath        string `db:"queues_path" sqlite:"TEXT"`
-	umbrellaScheme    string `db:"umbrella_scheme" sqlite:"TEXT"`
-	umbrellaHost      string `db:"umbrella_host" sqlite:"TEXT"`
-	eventsURI         string `db:"events_uri" sqlite:"TEXT"`
-	durationsURI      string `db:"durations_uri" sqlite:"TEXT"`
-	minimumMinutes    int    `db:"minimum_minutes" sqlite:"INTEGER"`
-	maximumMinutes    int    `db:"maximum_minutes" sqlite:"INTEGER"`
-	uniquenessWindow  int    `db:"uniqueness_window" sqlite:"INTEGER"`
-	wiresharkPath     string `db:"wireshark_path" sqlite:"TEXT"`
-	wiresharkDuration int    `db:"wireshark_duration" sqlite:"INTEGER"`
-	resetCron         string `db:"reset_cron" sqlite:"TEXT"`
-	wwwRoot           string `db:"www_root" sqlite:"TEXT"`
-	wwwImages         string `db:"www_images" sqlite:"TEXT"`
-}
-
-func ConfigDefaults() ConfigDB {
-	var defaults ConfigDB
-	defaults.logLevel = "DEBUG"
-	defaults.loggers = "local:stderr,local:tmp,api:directus"
-	// APIKey filled in by user
-	// DeviceTag filled in by user
-	// FCFSSeqID filled in by user
-	// Serial filled in by device or user
-	defaults.storageMode = "api"
-	defaults.runMode = "prod"
-	defaults.umbrellaScheme = "https"
-	defaults.umbrellaHost = "rabbit-phase-4.app.cloud.gov"
-	defaults.durationsURI = "/items/durations_v2/"
-	defaults.minimumMinutes = 5
-	defaults.maximumMinutes = 600
-	defaults.wiresharkDuration = 45
-	defaults.resetCron = "0 0 * * *"
+func SetConfigDefaults() {
+	// config.api_key filled in by user
+	// config.fcfs_id filled in by user
+	// config.device_tag filled in by user
+	// config.device_serial filled in by device or user
+	viper.SetDefault("config.minimum_minutes", 5)
+	viper.SetDefault("config.maximum_minutes", 600)
+	viper.SetDefault("log.level", "DEBUG")
+	viper.SetDefault("log.loggers", []string{"local:stderr", "local:tmp", "api:directus"})
+	viper.SetDefault("mode.storage", "api")
+	viper.SetDefault("mode.run", "prod")
+	viper.SetDefault("api.scheme", "https")
+	viper.SetDefault("api.host", "rabbit-phase-4.app.cloud.gov")
+	viper.SetDefault("api.uri", "/items/durations_v2/")
+	viper.SetDefault("cron.reset", "0 0 * * *")
+	viper.SetDefault("wireshark.duration", 45)
 	if runtime.GOOS == "windows" {
-		defaults.wiresharkPath = "c:/Program Files/Wireshark/tshark.exe"
-		defaults.wwwRoot = "c:/imls"
-		defaults.wwwImages = "c:/imls/images"
-		defaults.durationsPath = "c:/imls/durations.sqlite"
-		defaults.queuesPath = "c:/imls/queues.sqlite"
+		viper.SetDefault("wireshark.path", "c:/Program Files/Wireshark/tshark.exe")
+		viper.SetDefault("www.root", "c:/imls")
+		viper.SetDefault("www.images", "c:/imls/images")
+		viper.SetDefault("db.durations", "c:/imls/durations.sqlite")
+		viper.SetDefault("db.queues", "c:/imls/queues.sqlite")
 	} else {
-		defaults.wiresharkPath = "/usr/bin/tshark"
-		defaults.wwwRoot = "/www/imls"
-		defaults.wwwImages = "/www/imls/images"
-		defaults.durationsPath = "/www/imls/durations.sqlite"
-		defaults.queuesPath = "/www/imls/queues.sqlite"
+		viper.SetDefault("wireshark.path", "/usr/bin/tshark")
+		viper.SetDefault("www.root", "/www/imls")
+		viper.SetDefault("www.images", "/www/imls/images")
+		viper.SetDefault("db.durations", "/www/imls/durations.sqlite")
+		viper.SetDefault("db.queues", "/www/imls/queues.sqlite")
 	}
-	return defaults
 }

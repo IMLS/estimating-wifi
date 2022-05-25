@@ -70,7 +70,6 @@ func main() {
 	}
 
 	state.SetConfigAtPath(*cfgPath)
-	cfg := state.GetConfig()
 
 	var durations []structs.Duration
 	if *typeFlag == "sqlite" {
@@ -97,8 +96,8 @@ func main() {
 		// This is necessary... in case we're testing with a
 		// bogus config.sqlite file. Better to pull the identifiers from
 		// the actual event stream than trust the file passed.
-		cfg.SetFCFSSeqID(fcfs)
-		cfg.SetDeviceTag(dt)
+		state.SetFCFSSeqID(fcfs)
+		state.SetDeviceTag(dt)
 		pngName := fmt.Sprintf("%v-%v-%v-patron-sessions", subset[0].SessionID, fcfs, dt)
 		log.Println("writing to", pngName)
 		analysis.DrawPatronSessions(subset, buildImagePath(fcfs, dt, pngName))

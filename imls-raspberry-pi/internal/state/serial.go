@@ -2,10 +2,11 @@ package state
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"regexp"
 	"runtime"
+
+	"github.com/rs/zerolog/log"
 )
 
 const FakeSerial = "CESTNEPASUNESERIE"
@@ -51,7 +52,7 @@ func getCachedSerial() string {
 			}
 		} else {
 			if !serialWarnGiven {
-				log.Println("Not running on an RPi. Cannot grab serial number.")
+				log.Warn().Msg("Not running on a Raspberry Pi. Cannot grab serial number.")
 				serialWarnGiven = true
 			}
 

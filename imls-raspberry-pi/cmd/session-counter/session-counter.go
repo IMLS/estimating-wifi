@@ -34,10 +34,9 @@ func runEvery(crontab string, c *cron.Cron, fun func()) {
 }
 
 func run2() {
-	cfg := state.GetConfig()
 	sq := state.NewQueue("sent")
 	iq := state.NewQueue("images")
-	durationsdb := cfg.GetDurationsDatabase()
+	durationsdb := state.GetDurationsDatabase()
 	c := cron.New()
 
 	go runEvery("*/1 * * * *", c,
@@ -49,7 +48,7 @@ func run2() {
 				tlp.TSharkRunner)
 		})
 
-	go runEvery(cfg.GetResetCron(), c,
+	go runEvery(state.GetResetCron(), c,
 		func() {
 			log.Info().
 				Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
@@ -61,7 +60,7 @@ func run2() {
 			// Try sending the data
 			tlp.SimpleSend(durationsdb)
 			// Increment the session counter
-			cfg.IncrementSessionID()
+			state.IncrementSessionID()
 			// Clear out the ephemeral data for the next day of monitoring
 			state.ClearEphemeralDB()
 		})
@@ -72,10 +71,9 @@ func run2() {
 
 func launchTLP() {
 	state.SetConfigAtPath(cfgFile)
-	cfg := state.GetConfig()
 
 	log.Info().
-		Int64("session_id", cfg.GetCurrentSessionID()).
+		Int64("session_id", state.GetCurrentSessionID()).
 		Msg("session id at launch")
 
 	// Run the network
@@ -126,8 +124,8 @@ func initLogs() {
 func main() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile,
 		"config",
-		"config.sqlite3",
-		"config file (default is config.sqlite3 in current directory")
+		"session-counter.ini",
+		"config file (default is session-counter.ini in /etc/imls, %PROGRAMDATA%\\IMLS, or current directory")
 	rootCmd.PersistentFlags().StringVar(&logLevel,
 		"logging",
 		"info",
