@@ -21,24 +21,22 @@ func SetConfigAtPath(configPath string) {
 	if runtime.GOOS == "windows" {
 		viper.AddConfigPath("%PROGRAMDATA%\\imls")
 	}
+	viper.SetConfigName("session-counter")
 	viper.SetConfigType("ini")
 	viper.SetConfigFile(configPath)
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
-	if err == nil {
-		log.Info().Msg(viper.ConfigFileUsed())
-	} else {
-		log.Fatal().
-			Err(err).
-			Msg("could not find configuration file")
+	if err != nil {
+		viper.SafeWriteConfig()
 	}
+	log.Info().Msg(viper.ConfigFileUsed())
 }
 
 func GetSerial() string {
 	// allow the serial to be stored so we can test out different serial and api
 	// key settings. if not, default to reading from /proc (as a cached read)
-	serial := viper.GetString("config.device_serial")
+	serial := viper.GetString("user.device_serial")
 	if serial == "" {
 		return getCachedSerial()
 	}
@@ -46,7 +44,7 @@ func GetSerial() string {
 }
 
 func GetFCFSSeqID() string {
-	return viper.GetString("config.fcfs_id")
+	return viper.GetString("user.fcfs_id")
 }
 
 func GetDeviceTag() string {
@@ -55,7 +53,7 @@ func GetDeviceTag() string {
 
 // GetAPIKey decodes the api key stored in the ini file.
 func GetAPIKey() string {
-	apiKey := viper.GetString("config.api_key")
+	apiKey := viper.GetString("user.api_key")
 	serial := GetSerial()
 	var key [32]byte
 	copy(key[:], serial)
@@ -75,15 +73,15 @@ func GetAPIKey() string {
 }
 
 func SetFCFSSeqID(id string) {
-	viper.Set("config.fcfs_id", id)
+	viper.Set("user.fcfs_id", id)
 }
 
 func SetDeviceTag(tag string) {
-	viper.Set("config.device_tag", tag)
+	viper.Set("user.device_tag", tag)
 }
 
 func SetAPIKey(key string) {
-	viper.Set("config.api_key", key)
+	viper.Set("user.api_key", key)
 }
 
 func SetStorageMode(mode string) {
@@ -219,10 +217,13 @@ func GetWWWImages() string {
 }
 
 func SetConfigDefaults() {
-	// config.api_key filled in by user
-	// config.fcfs_id filled in by user
-	// config.device_tag filled in by user
-	// config.device_serial filled in by device or user
+	// these must be filled in by the user. NB: these settings will _not_ be
+	// present in the config and are set here for explicitness.
+	viper.SetDefault("user.api_key", "")
+	viper.SetDefault("user.fcfs_id", "")
+	viper.SetDefault("user.device_tag", "")
+	viper.SetDefault("user.device_serial", "")
+	// defaults for running in production
 	viper.SetDefault("config.minimum_minutes", 5)
 	viper.SetDefault("config.maximum_minutes", 600)
 	viper.SetDefault("log.level", "DEBUG")
