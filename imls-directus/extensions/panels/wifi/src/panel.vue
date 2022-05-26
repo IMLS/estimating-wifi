@@ -142,7 +142,6 @@
 		 }
 
 		 function unixEpoch(date) {
-			 console.log(date, dayjs(date).unix());
 			 return dayjs(date).unix();
 		 }
 
