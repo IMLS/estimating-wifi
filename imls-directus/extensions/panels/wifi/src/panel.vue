@@ -46,7 +46,7 @@
 	 props: {
 		 day: {
 			 type: Date,
-			 default: '2022-04-15', // just happens to be tax day!
+			 default: '2021-08-31', // just happens to be tax day!
 		 },
 		 fcfsId: {
 			 type: String,
@@ -142,7 +142,8 @@
 		 }
 
 		 function unixEpoch(date) {
-			 return dayjs(date).unix() * 1000;
+			 console.log(date, dayjs(date).unix());
+			 return dayjs(date).unix();
 		 }
 
 		 function previousDay(date) {
