@@ -48,7 +48,7 @@ func GetFCFSSeqID() string {
 }
 
 func GetDeviceTag() string {
-	return viper.GetString("config.device_tag")
+	return viper.GetString("user.device_tag")
 }
 
 // GetAPIKey decodes the api key stored in the ini file.
@@ -117,7 +117,9 @@ func GetLogLevel() string {
 }
 
 func GetLoggers() []string {
-	return viper.GetStringSlice("log.loggers")
+	// viper.GetStringSlice does not work with ini file defaults
+	loggers := viper.GetString("log.loggers")
+	return strings.Split(loggers, ",")
 }
 
 func GetDurationsURI() string {
@@ -227,7 +229,7 @@ func SetConfigDefaults() {
 	viper.SetDefault("config.minimum_minutes", 5)
 	viper.SetDefault("config.maximum_minutes", 600)
 	viper.SetDefault("log.level", "DEBUG")
-	viper.SetDefault("log.loggers", []string{"local:stderr", "local:tmp", "api:directus"})
+	viper.SetDefault("log.loggers", "local:stderr,local:tmp,api:directus")
 	viper.SetDefault("mode.storage", "api")
 	viper.SetDefault("mode.run", "prod")
 	viper.SetDefault("api.scheme", "https")
