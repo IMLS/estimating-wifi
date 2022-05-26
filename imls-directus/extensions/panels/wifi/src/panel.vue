@@ -136,8 +136,8 @@
 			 });
 			 // this is a hack. we want a proper "duration" column since there
 			 // does not seem to be a way to do custom selects using the API.
-			 const seconds = (times.data.data[0].sum.start - times.data.data[0].sum.end) / 1000;
-			 totalMinutes.value = Math.trunc(seconds / 60);
+			 const seconds = (times.data.data[0].sum.end - times.data.data[0].sum.start);
+			 totalMinutes.value = Math.trunc(seconds / 60).toLocaleString();
 			 isLoading.value = false;
 		 }
 
