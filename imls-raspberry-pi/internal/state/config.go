@@ -167,6 +167,10 @@ func IsTestMode() bool {
 	return strings.Contains(strings.ToLower(mode), "test")
 }
 
+func GetDurationsPath() string {
+	return viper.GetString("db.durations")
+}
+
 func GetDurationsDatabase() interfaces.Database {
 	path := viper.GetString("db.durations")
 	// always make sure we have a durations db created

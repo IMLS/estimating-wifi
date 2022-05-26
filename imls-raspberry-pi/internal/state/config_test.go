@@ -14,7 +14,7 @@ type ConfigSuite struct {
 }
 
 func (suite *ConfigSuite) SetupTest() {
-	tempDB, err := os.CreateTemp("", "config-test.sqlite")
+	tempDB, err := os.CreateTemp("", "config-test.ini")
 	if err != nil {
 		suite.Fail(err.Error())
 	}
@@ -22,35 +22,31 @@ func (suite *ConfigSuite) SetupTest() {
 }
 
 func (suite *ConfigSuite) AfterTest(suiteName, testName string) {
-	dc := GetConfig()
 	// ensure a clean run.
-	os.Remove(dc.GetDatabasePath())
-	dc.Close()
+	os.Remove(GetDurationsPath())
 }
 
 func (suite *ConfigSuite) TestConfigDefaults() {
-	dc := GetConfig()
 	_, filename, _, _ := runtime.Caller(0)
 	path := filepath.Dir(filename)
 	durationsPath := filepath.Join(path, "test", "durations.sqlite")
-	dc.SetDurationsPath(durationsPath)
+	SetDurationsPath(durationsPath)
 	var expected = []string{"local:stderr", "local:tmp", "api:directus"}
-	result := dc.GetLoggers()
+	result := GetLoggers()
 	for i := 0; i < 3; i += 1 {
 		if result[i] != expected[i] {
 			suite.Fail("loggers were not equal")
 		}
 	}
-	if dc.GetDurationsDatabase().GetPath() != durationsPath {
+	if GetDurationsDatabase().GetPath() != durationsPath {
 		suite.Fail("duration path was not equal")
 	}
 	os.Remove(durationsPath)
 }
 
 func (suite *ConfigSuite) TestConfigWrite() {
-	dc := GetConfig()
-	dc.SetDeviceTag("a random string")
-	result := dc.GetDeviceTag()
+	SetDeviceTag("a random string")
+	result := GetDeviceTag()
 	if result != "a random string" {
 		suite.Fail("write was not reflected")
 	}
