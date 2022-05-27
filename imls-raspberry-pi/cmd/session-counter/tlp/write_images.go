@@ -15,23 +15,22 @@ import (
 
 //This must happen after the data is updated for the day.
 func writeImages(durations []structs.Duration, sessionid string) error {
-	cfg := state.GetConfig()
 	var reterr error
 
-	if _, err := os.Stat(cfg.GetWWWRoot()); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.GetWWWRoot(), 0777)
+	if _, err := os.Stat(state.GetWWWRoot()); os.IsNotExist(err) {
+		err := os.Mkdir(state.GetWWWRoot(), 0777)
 		if err != nil {
 			log.Error().
-				Str("web directory", cfg.GetWWWRoot()).
+				Str("web directory", state.GetWWWRoot()).
 				Msg("could not create root directory")
 			reterr = err
 		}
 	}
-	if _, err := os.Stat(cfg.GetWWWImages()); os.IsNotExist(err) {
-		err := os.Mkdir(cfg.GetWWWImages(), 0777)
+	if _, err := os.Stat(state.GetWWWImages()); os.IsNotExist(err) {
+		err := os.Mkdir(state.GetWWWImages(), 0777)
 		if err != nil {
 			log.Error().
-				Str("web directory", cfg.GetWWWImages()).
+				Str("web directory", state.GetWWWImages()).
 				Msg("could not create image directory")
 			reterr = err
 		}
@@ -46,10 +45,10 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 		int(yesterday.Month()),
 		int(yesterday.Day()),
 		sessionid,
-		cfg.GetFCFSSeqID(),
-		cfg.GetDeviceTag())
+		state.GetFCFSSeqID(),
+		state.GetDeviceTag())
 
-	path := filepath.Join(cfg.GetWWWImages(), imageFilename)
+	path := filepath.Join(state.GetWWWImages(), imageFilename)
 	// func DrawPatronSessions(cfg *config.Config, durations []Duration, outputPath string) {
 	analysis.DrawPatronSessions(durations, path)
 	return reterr

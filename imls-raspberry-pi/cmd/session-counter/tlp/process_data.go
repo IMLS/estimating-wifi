@@ -10,9 +10,8 @@ import (
 )
 
 func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool {
-	cfg := state.GetConfig()
 	// Queue up what needs to be sent still.
-	thissession := cfg.GetCurrentSessionID()
+	thissession := state.GetCurrentSessionID()
 
 	log.Debug().
 		Int64("session", thissession).
@@ -29,10 +28,10 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 	for _, se := range state.GetMACs() {
 
 		d := structs.Duration{
-			PiSerial:  cfg.GetSerial(),
-			SessionID: fmt.Sprint(cfg.GetCurrentSessionID()),
-			FCFSSeqID: cfg.GetFCFSSeqID(),
-			DeviceTag: cfg.GetDeviceTag(),
+			PiSerial:  state.GetSerial(),
+			SessionID: fmt.Sprint(state.GetCurrentSessionID()),
+			FCFSSeqID: state.GetFCFSSeqID(),
+			DeviceTag: state.GetDeviceTag(),
 			PatronID:  pidCounter,
 			// FIXME: All times should become UNIX epoch seconds...
 			Start: se.Start,

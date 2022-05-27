@@ -11,18 +11,16 @@ type ListSuite struct {
 }
 
 func (suite *ListSuite) SetupTest() {
-	tempDB, err := os.CreateTemp("", "list-test.sqlite")
+	temp, err := os.CreateTemp("", "list-test.ini")
 	if err != nil {
 		suite.Fail(err.Error())
 	}
-	SetConfigAtPath(tempDB.Name())
+	SetConfigAtPath(temp.Name())
 }
 
 func (suite *ListSuite) AfterTest(suiteName, testName string) {
-	dc := GetConfig()
 	// ensure a clean run.
-	os.Remove(dc.GetDatabasePath())
-	dc.Close()
+	os.Remove(GetDurationsPath())
 }
 
 func (suite *ListSuite) TestList() {

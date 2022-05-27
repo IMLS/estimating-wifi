@@ -178,8 +178,7 @@ func readWordPairs(input io.Reader) string {
 	}
 
 	// 20210427 Encrypt the key before handing it back.
-	cfg := config.GetConfig()
-	serial := []byte(cfg.GetSerial())
+	serial := []byte(config.GetSerial())
 	var enckey [32]byte
 	copy(enckey[:], serial)
 	enc, err := cryptopasta.Encrypt([]byte(key), &enckey)
@@ -197,8 +196,7 @@ func readToken(input io.Reader) string {
 	reader := bufio.NewReader(input)
 	tok, _ := reader.ReadString('\n')
 	tok = strings.TrimSpace(tok)
-	cfg := config.GetConfig()
-	serial := []byte(cfg.GetSerial())
+	serial := []byte(config.GetSerial())
 	var key [32]byte
 	copy(key[:], serial)
 	enc, err := cryptopasta.Encrypt([]byte(tok), &key)
@@ -258,7 +256,7 @@ func main() {
 	readWordPairPtr := flag.Bool("word-pairs", false, "Read in their API token as word pairs.")
 	tagPtr := flag.Bool("tag", false, "A local inventory tag or identifier.")
 	// Controlling output
-	configPathPtr := flag.String("config", "", "Path to config.sqlite. REQUIRED.")
+	configPathPtr := flag.String("config", "", "Path to config.ini. REQUIRED.")
 
 	flag.Parse()
 
@@ -274,8 +272,6 @@ func main() {
 	}
 
 	config.SetConfigAtPath(*configPathPtr)
-	cfg := config.GetConfig()
-	defer cfg.Close()
 
 	// DEV ONLY
 	// This is for testing. It will take the key given, encrypt it, and
@@ -285,7 +281,7 @@ func main() {
 	if *readTokenPtr {
 		fmt.Println()
 		token := readToken(os.Stdin)
-		cfg.SetAPIKey(token)
+		config.SetAPIKey(token)
 		os.Exit(0)
 	}
 
@@ -300,25 +296,25 @@ func main() {
 	if *readFCFSPtr {
 		fmt.Println()
 		id := readFCFS(os.Stdin)
-		cfg.SetFCFSSeqID(id)
+		config.SetFCFSSeqID(id)
 	}
 
 	// Read in the hardware tag
 	if *tagPtr {
 		fmt.Println()
 		tag := readTag(os.Stdin)
-		cfg.SetDeviceTag(tag)
+		config.SetDeviceTag(tag)
 	}
 
 	// Read in the word pairs
 	if *readWordPairPtr {
 		if readYesOrNo(os.Stdin) {
 			fmt.Println()
-			cfg.SetStorageMode("api")
+			config.SetStorageMode("api")
 			token := readWordPairs(os.Stdin)
-			cfg.SetAPIKey(token)
+			config.SetAPIKey(token)
 		} else {
-			cfg.SetStorageMode("sqlite")
+			config.SetStorageMode("sqlite")
 		}
 	}
 

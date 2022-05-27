@@ -9,7 +9,6 @@ import (
 )
 
 func SimpleSend(db interfaces.Database) {
-	cfg := state.GetConfig()
 	log.Debug().
 		Msg("starting batch send")
 
@@ -34,7 +33,7 @@ func SimpleSend(db interfaces.Database) {
 				Str("session", nextSessionIDToSend).
 				Msg("found zero durations")
 			sq.Remove(nextSessionIDToSend)
-		} else if cfg.IsStoringToAPI() {
+		} else if state.IsStoringToAPI() {
 			log.Debug().
 				Int("durations", len(durations)).
 				Str("session", nextSessionIDToSend).
@@ -52,7 +51,7 @@ func SimpleSend(db interfaces.Database) {
 				Str("session", nextSessionIDToSend).
 				Msg("sending durations to API")
 
-			err = http.PostJSON(cfg, cfg.GetDurationsURI(), data)
+			err = http.PostJSON(state.GetDurationsURI(), data)
 			if err != nil {
 				log.Error().
 					Str("session", nextSessionIDToSend).

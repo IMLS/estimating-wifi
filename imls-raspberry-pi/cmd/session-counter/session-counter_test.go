@@ -53,12 +53,11 @@ func isItMidnight(now time.Time) bool {
 }
 
 func MockRun(rundays int, nummacs int, numfoundperminute int) {
-	cfg := state.GetConfig()
 	// The MAC database MUST be ephemeral. Put it in RAM.
 
 	sq := state.NewQueue("sent")
 	iq := state.NewQueue("images")
-	durationsdb := cfg.GetDurationsDatabase()
+	durationsdb := state.GetDurationsDatabase()
 
 	// Create a pool of NUMMACS devices to draw from.
 	// We will send NUMFOUNDPERMINUTE each minute
@@ -94,7 +93,7 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 				// Try sending the data
 				tlp.SimpleSend(durationsdb)
 				// Increment the session counter
-				cfg.IncrementSessionID()
+				state.IncrementSessionID()
 				// Clear out the ephemeral data for the next day of monitoring
 				state.ClearEphemeralDB()
 			}
@@ -109,15 +108,14 @@ func TestAllUp(t *testing.T) {
 	fmt.Println(filename)
 	path := filepath.Dir(filename)
 	state.SetConfigAtPath(filepath.Join(path, "test", "config.sqlite"))
-	cfg := state.GetConfig()
-	cfg.SetStorageMode("local")
-	cfg.SetRootPath(filepath.Join(path, "test", "www"))
-	cfg.SetImagesPath(filepath.Join(path, "test", "www", "images"))
-	cfg.SetQueuesPath(filepath.Join(path, "test", "queues.sqlite"))
-	cfg.SetDurationsPath(filepath.Join(path, "test", "durations.sqlite"))
+	state.SetStorageMode("local")
+	state.SetRootPath(filepath.Join(path, "test", "www"))
+	state.SetImagesPath(filepath.Join(path, "test", "www", "images"))
+	state.SetQueuesPath(filepath.Join(path, "test", "queues.sqlite"))
+	state.SetDurationsPath(filepath.Join(path, "test", "durations.sqlite"))
 
 	log.Info().
-		Int64("session id", cfg.GetCurrentSessionID()).
+		Int64("session id", state.GetCurrentSessionID()).
 		Msg("initial session")
 
 	// Fake the clock
@@ -131,10 +129,10 @@ func TestAllUp(t *testing.T) {
 	log.Info().Msg("WAITING")
 	time.Sleep(5 * time.Second)
 
-	cfg.IncrementSessionID()
+	state.IncrementSessionID()
 
 	log.Info().
-		Int64("session id", cfg.GetCurrentSessionID()).
+		Int64("session id", state.GetCurrentSessionID()).
 		Msg("next session")
 
 	// Fake the clock

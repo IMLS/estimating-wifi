@@ -8,18 +8,15 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/state"
+	config "gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
 func isInDurationRange(diff int) bool {
-	cfg := state.GetConfig()
-	return (diff >= cfg.GetMinimumMinutes()) && (diff < cfg.GetMaximumMinutes())
+	return (diff >= config.GetMinimumMinutes()) && (diff < config.GetMaximumMinutes())
 }
 
 func DrawPatronSessions(durations []structs.Duration, outputPath string) {
-	cfg := state.GetConfig()
-
 	if len(durations) == 0 {
 		log.Error().
 			Str("output path", outputPath).
@@ -140,7 +137,6 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 			// For short diffs, position the duration to the right...
 			// A lot of conditions for such a seemingly simple thing...
 			if diff < 60 {
-				// cfg.Log().Debug("drawing a short box")
 				if x < 100 {
 					// If we are too far to the left, put it to the right of the box.
 					dc.DrawStringAnchored(duration, float64(x+diff), float64(y), -2.25, 1)
@@ -161,7 +157,7 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	}
 
 	day := time.Unix(durations[0].Start, 0).In(time.Local)
-	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), cfg.GetFCFSSeqID(), cfg.GetDeviceTag())
+	summaryD := fmt.Sprintf("Patron sessions from %v %v, %v - %v %v", day.Month(), day.Day(), day.Year(), config.GetFCFSSeqID(), config.GetDeviceTag())
 	summaryA := fmt.Sprintf("%v devices seen", totalPatrons)
 	summaryP := fmt.Sprintf("%v patron devices", durationsInRange)
 	summaryM := fmt.Sprintf("%v minutes served", totalMinutes)
