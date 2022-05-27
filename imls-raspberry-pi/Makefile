@@ -19,7 +19,7 @@ check-install:
 check:
 	golangci-lint run ./...
 
-all: input-configuration session-counter wifi-hardware-search-cli log-event cache-to-sqlite waterfall
+all: input-configuration session-counter wifi-hardware-search-cli cache-to-sqlite waterfall
 
 deps:
 	go mod download
@@ -32,9 +32,6 @@ session-counter: deps
 
 wifi-hardware-search-cli: deps
 	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
-
-log-event: deps
-	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/log-event
 
 cache-to-sqlite: deps
 	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/cache-to-sqlite

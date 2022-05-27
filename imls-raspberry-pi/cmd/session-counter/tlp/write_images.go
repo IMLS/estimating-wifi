@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/analysis"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
@@ -16,20 +16,23 @@ import (
 //This must happen after the data is updated for the day.
 func writeImages(durations []structs.Duration, sessionid string) error {
 	cfg := state.GetConfig()
-	lw := logwrapper.NewLogger(nil)
 	var reterr error
 
 	if _, err := os.Stat(cfg.GetWWWRoot()); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.GetWWWRoot(), 0777)
 		if err != nil {
-			lw.Error("could not create web directory: ", cfg.GetWWWRoot())
+			log.Error().
+				Str("web directory", cfg.GetWWWRoot()).
+				Msg("could not create root directory")
 			reterr = err
 		}
 	}
 	if _, err := os.Stat(cfg.GetWWWImages()); os.IsNotExist(err) {
 		err := os.Mkdir(cfg.GetWWWImages(), 0777)
 		if err != nil {
-			lw.Error("could not create image directory")
+			log.Error().
+				Str("web directory", cfg.GetWWWImages()).
+				Msg("could not create image directory")
 			reterr = err
 		}
 	}
@@ -53,25 +56,33 @@ func writeImages(durations []structs.Duration, sessionid string) error {
 }
 
 func WriteImages(db interfaces.Database) {
-	cfg := state.GetConfig()
 	iq := state.NewQueue("images")
 	imagesToWrite := iq.AsList()
-	cfg.Log().Info("sessions ", imagesToWrite, " are waiting to be written on the image queue")
+
+	log.Info().
+		Int("sessions", len(imagesToWrite)).
+		Msg("about to write to image queue")
+
 	for _, nextImage := range imagesToWrite {
 		durations := []structs.Duration{}
 		var count int
 		db.GetPtr().QueryRow("SELECT COUNT(*) FROM durations WHERE session_id=?", nextImage).Scan(&count)
-		// cfg.Log().Info("Found ", count, " durations to filter down...")
 		err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextImage)
-		cfg.Log().Debug("found ", len(durations), " durations in WriteImages")
+
+		log.Debug().
+			Int("durations", len(durations)).
+			Msg("found durations")
 		if err != nil {
-			cfg.Log().Info("error in extracting durations for session", nextImage)
-			cfg.Log().Error(err.Error())
+			log.Error().
+				Err(err).
+				Str("session", nextImage).
+				Msg("could not extract durations")
 		} else {
 			err = writeImages(durations, nextImage)
 			if err != nil {
-				cfg.Log().Error("error in writing images")
-				cfg.Log().Error(err.Error())
+				log.Error().
+					Err(err).
+					Msg("could not write images")
 			} else {
 				iq.Remove(nextImage)
 			}

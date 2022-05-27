@@ -1,6 +1,10 @@
 package state
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+)
 
 type List struct {
 	*Queue
@@ -18,11 +22,12 @@ func (queue *Queue) Push(sessionid string) {
 }
 
 func (queue *Queue) AsList() []string {
-	cfg := GetConfig()
 	stmt := fmt.Sprintf("SELECT item FROM %v ORDER BY rowid", queue.name)
 	rows, err := queue.db.GetPtr().Query(stmt)
 	if err != nil {
-		cfg.Log().Error("could not extract any items from queue/list ", queue.name)
+		log.Error().
+			Str("queue", queue.name).
+			Msg("could not extract any items")
 	}
 
 	sessions := make([]string, 0)
@@ -36,17 +41,20 @@ func (queue *Queue) AsList() []string {
 }
 
 func (queue *Queue) Remove(sessionid string) {
-	cfg := GetConfig()
 	stmt, err := queue.db.GetPtr().Prepare(fmt.Sprintf("DELETE FROM %v WHERE item = ?", queue.name))
 	if err != nil {
-		cfg.Log().Error("could not prepare delete statement for ", queue.name)
-		cfg.Log().Fatal(err.Error())
+		log.Fatal().
+			Str("queue", queue.name).
+			Err(err).
+			Msg("could not prepare delete statement")
 	}
-	// lw.Debug("removing ", sessionid)
 	res, err := stmt.Exec(sessionid)
 	if err != nil {
-		cfg.Log().Error("could not delete session from queue/list ", sessionid, " ", queue.name)
-		cfg.Log().Error(res)
-		cfg.Log().Error(err.Error())
+		log.Error().
+			Str("result", fmt.Sprintf("%v", res)).
+			Str("sessionid", sessionid).
+			Str("queue", queue.name).
+			Err(err).
+			Msg("could not delete session")
 	}
 }

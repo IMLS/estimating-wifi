@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
@@ -20,15 +21,18 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	cfg := state.GetConfig()
 
 	if len(durations) == 0 {
-		cfg.Log().Error("DrawPatronSessions was passed zero durations to draw.")
-		cfg.Log().Error("Wanted to draw to the output path ", outputPath)
+		log.Error().
+			Str("output path", outputPath).
+			Msg("zero durations to draw")
 		return
 	}
 
 	// Capture the data about the session while running in a `counter` structure.
 	durationsInRange := 0
 	sort.Sort(structs.ByStart(durations))
-	cfg.Log().Debug("about to iterate over [", len(durations), "] durations")
+	log.Debug().
+		Int("total durations", len(durations)).
+		Msg("iterating")
 
 	for _, d := range durations {
 		st := time.Unix(d.Start, 0).In(time.Local)
@@ -41,14 +45,19 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 		}
 	}
 
-	cfg.Log().Info("durations to write to the image [", durationsInRange, "]")
+	log.Debug().
+		Int("durations in range", durationsInRange).
+		Msg("writing durations")
 
 	WIDTH := 1440
 	hourWidth := WIDTH / 24
 
 	HEIGHT := 24 * (durationsInRange + 2)
 
-	cfg.Log().Info("image dimensions (WxH) ", WIDTH, " x ", HEIGHT)
+	log.Debug().
+		Int("width", WIDTH).
+		Int("height", HEIGHT).
+		Msg("image dimensions")
 
 	dc := gg.NewContext(WIDTH, HEIGHT)
 	dc.SetRGBA(0.5, 0.5, 0, 0.5)
@@ -191,12 +200,15 @@ func DrawPatronSessions(durations []structs.Duration, outputPath string) {
 	}
 
 	//baseFilename := fmt.Sprint(filepath.Join(outdir, fmt.Sprintf("%v-%v-%v", sid, seqId, dt)))
-	cfg.Log().Debug("writing summary image to ", outputPath)
+	log.Debug().
+		Str("output path", outputPath).
+		Msg("writing summary image")
 
 	err := dc.SavePNG(outputPath)
 	if err != nil {
-		cfg.Log().Info("drawing: failed to save png")
-		cfg.Log().Fatal(err.Error())
+		log.Fatal().
+			Err(err).
+			Msg("could not save png")
 	}
 }
 

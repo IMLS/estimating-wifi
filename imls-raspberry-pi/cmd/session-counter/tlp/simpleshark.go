@@ -7,15 +7,14 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/constants"
-	"gsa.gov/18f/internal/logwrapper"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
 func TSharkRunner(adapter string) []string {
 	cfg := state.GetConfig()
-	lw := logwrapper.NewLogger(nil)
 	tsharkCmd := exec.Command(
 		cfg.GetWiresharkPath(),
 		"-a", fmt.Sprintf("duration:%d", cfg.GetWiresharkDuration()),
@@ -24,8 +23,9 @@ func TSharkRunner(adapter string) []string {
 
 	tsharkOut, err := tsharkCmd.StdoutPipe()
 	if err != nil {
-		lw.Error("could not open wireshark pipe")
-		lw.Error(err.Error())
+		log.Error().
+			Err(err).
+			Msg("could not open wireshark pipe")
 	}
 	// The closer is called on exe exit. Idomatic use does not
 	// explicitly call the closer. BUT DO WE HAVE LEAKS?
@@ -33,13 +33,15 @@ func TSharkRunner(adapter string) []string {
 
 	err = tsharkCmd.Start()
 	if err != nil {
-		lw.Error("could not exe wireshark")
-		lw.Error(err.Error())
+		log.Error().
+			Err(err).
+			Msg("could not execute wireshark")
 	}
 	tsharkBytes, err := ioutil.ReadAll(tsharkOut)
 	if err != nil {
-		lw.Info("did not read wireshark bytes")
-		lw.Error(err.Error())
+		log.Error().
+			Err(err).
+			Msg("could not read from wireshark output")
 	}
 
 	//tsharkCmd.Wait()
@@ -48,10 +50,15 @@ func TSharkRunner(adapter string) []string {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			// The program has exited with an exit code != 0
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				lw.Fatal("tshark exit status ", status.ExitStatus(), " ", string(tsharkBytes))
+				log.Fatal().
+					Int("exit status", status.ExitStatus()).
+					Str("output", string(tsharkBytes)).
+					Msg("tshark exited unexpectedly")
 			}
 		} else {
-			lw.Fatal("tsharkCmd.Wait()", err.Error())
+			log.Fatal().
+				Err(err).
+				Msg("tshark did not wait")
 		}
 	}
 
@@ -69,8 +76,6 @@ func SimpleShark(
 	searchFn SearchFn,
 	sharkFn SharkFn) bool {
 
-	cfg := state.GetConfig()
-
 	// Look up the adapter. Use the find-ralink library.
 	// The % will trigger first time through, which we want.
 	var dev *models.Device = nil
@@ -82,7 +87,6 @@ func SimpleShark(
 	if dev != nil && dev.Exists {
 		// Load the config for use.
 		// cfg.Wireshark.Adapter = dev.Logicalname
-		//cfg.Log().Debug("found adapter: ", dev.Logicalname)
 		setMonitorFn(dev)
 		// This blocks for monitoring...
 		macmap := sharkFn(dev.Logicalname)
@@ -96,7 +100,8 @@ func SimpleShark(
 		}
 		StoreMacs(keepers)
 	} else {
-		cfg.Log().Info("no wifi devices found. no scanning carried out.")
+		log.Info().
+			Msg("no wifi devices found; no scanning carried out")
 		return false
 	}
 	return true

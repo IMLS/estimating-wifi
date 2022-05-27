@@ -23,10 +23,7 @@ type Config interface {
 
 	GetLogLevel() string
 	GetLoggers() []string
-	// TODO: pull this out
-	Log() Logger
 
-	GetEventsURI() string
 	GetDurationsURI() string
 
 	IncrementSessionID() int64
@@ -51,12 +48,4 @@ type Config interface {
 	GetMaximumMinutes() int
 	GetUniquenessWindow() int
 	GetResetCron() string
-}
-
-type Logger interface {
-	Debug(args ...interface{})
-	Info(args ...interface{})
-	Error(args ...interface{})
-	Fatal(args ...interface{})
-	SetLogLevel(level string)
 }
