@@ -35,7 +35,7 @@ Name: "{app}\Wireshark"
 ; Our IMLS installer
 Source: "..\release\bin\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source:"session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
 ; TODO: bundle up wireshark with license and source code (probably need libraries as well)
 ; Wireshark
 ; Source: "c:\Program Files\Wireshark\tshark.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
@@ -161,4 +161,11 @@ begin
   end;
 end else
     Result := True;
+end;
+
+procedure WriteOutIni();
+begin
+  SetIniString('user', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
+  SetIniString('user', 'fcfs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
+  SetIniString('user', 'device_tag', DevicePage.Values[0], ExpandConstant(CurrentFileName));
 end;
