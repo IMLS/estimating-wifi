@@ -2,12 +2,11 @@ package lshw
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
 
-	"gsa.gov/18f/internal/wifi-hardware-search/config"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
@@ -17,7 +16,7 @@ import (
 func GetDeviceHash(wlan *models.Device) []map[string]string {
 	wlan.Exists = false
 
-	cmd := exec.Command(config.GetLSHWLocation(), "-class", "network")
+	cmd := exec.Command(state.GetLshwPath(), "-class", "network")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Println("cpw: cannot get stdout from lshw")
@@ -73,9 +72,6 @@ func ParseLSHW(stringArray []string) []map[string]string {
 	for _, line := range stringArray {
 		newSecMatch := sectionHeading.MatchString(line)
 		hashMatch := entryPattern.MatchString(line)
-		if *config.Verbose {
-			fmt.Printf("RE   line [%v] nsm [%v] hm [%v]\n", line, newSecMatch, hashMatch)
-		}
 
 		if newSecMatch {
 			// If we find a new section, and we have something in the hash,
@@ -97,10 +93,6 @@ func ParseLSHW(stringArray []string) []map[string]string {
 
 	// Don't lose the last hash!
 	devices = append(devices, hash)
-	if *config.Verbose {
-		fmt.Println("found", len(devices), "devices")
-		fmt.Println("devices\n", devices)
-	}
 
 	return devices
 }

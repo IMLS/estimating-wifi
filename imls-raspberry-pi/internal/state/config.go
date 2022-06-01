@@ -194,6 +194,22 @@ func GetWiresharkDuration() int {
 	return viper.GetInt("wireshark.duration")
 }
 
+func GetIpPath() string {
+	return viper.GetString("ip.path")
+}
+
+func GetIwPath() string {
+	return viper.GetString("iw.path")
+}
+
+func GetLshwPath() string {
+	return viper.GetString("lshw.path")
+}
+
+func GetWlanHelperPath() string {
+	return viper.GetString("wlanhelper.path")
+}
+
 func GetMinimumMinutes() int {
 	return viper.GetInt("config.minimum_minutes")
 }
@@ -239,12 +255,16 @@ func SetConfigDefaults() {
 	viper.SetDefault("wireshark.duration", 45)
 	if runtime.GOOS == "windows" {
 		viper.SetDefault("wireshark.path", "c:/Program Files/Wireshark/tshark.exe")
+		viper.SetDefault("wlanhelper.path", "c:/Windows/System32/Npcap/WlanHelper.exe")
 		viper.SetDefault("www.root", "c:/imls")
 		viper.SetDefault("www.images", "c:/imls/images")
 		viper.SetDefault("db.durations", "c:/imls/durations.sqlite")
 		viper.SetDefault("db.queues", "c:/imls/queues.sqlite")
 	} else {
+		viper.SetDefault("iw.path", "/usr/sbin/iw")
+		viper.SetDefault("ip.path", "/usr/sbin/ip")
 		viper.SetDefault("wireshark.path", "/usr/bin/tshark")
+		viper.SetDefault("lshw.path", "/usr/bin/lshw")
 		viper.SetDefault("www.root", "/www/imls")
 		viper.SetDefault("www.images", "/www/imls/images")
 		viper.SetDefault("db.durations", "/www/imls/durations.sqlite")
