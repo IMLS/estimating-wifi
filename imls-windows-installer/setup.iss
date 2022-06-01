@@ -35,9 +35,11 @@ Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
 ; Wireshark 3.6.5 portable app
 Source:"WiresharkPortable64_3.6.5.paf.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
+Source:"npcap-1.60.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
 
 [Run]
 Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; Description: "Wireshark 3.6.5"; Flags: runascurrentuser
+Filename: "{app}\Wireshark\npcap-1.60.exe"; Description: "npcap 1.60"; Flags: runascurrentuser
 
 [Code]
 var
