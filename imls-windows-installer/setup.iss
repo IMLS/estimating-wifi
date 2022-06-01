@@ -24,9 +24,6 @@ WizardStyle=modern
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-
 [Dirs]
 Name: "{app}\Wireshark"
 
@@ -35,20 +32,12 @@ Name: "{app}\Wireshark"
 ; Our IMLS installer
 Source: "..\release\bin\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source:"session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
-; TODO: bundle up wireshark with license and source code (probably need libraries as well)
-; Wireshark
-; Source: "c:\Program Files\Wireshark\tshark.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
-; Source: "c:\Windows\System32\Npcap\WlanHelper.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
-; Source: "LICENSE.txt"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
-; Source: "wireshark-3.6.5.zip"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
-
-[Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Source: "session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
+; Wireshark 3.6.5 portable app
+Source:"WiresharkPortable64_3.6.5.paf.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; Description: "Wireshark 3.6.5"; Flags: runascurrentuser
 
 [Code]
 var
