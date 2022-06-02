@@ -6,9 +6,9 @@ package netadapter
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"os/exec"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
@@ -44,22 +44,21 @@ func New() *PowerShell {
 	}
 }
 
-func (p *PowerShell) execute(args ...string) []byte {
+func (p *PowerShell) Execute(args ...string) []byte {
 	args = append([]string{"-NoProfile", "-NonInteractive"}, args...)
 	cmd := exec.Command(p.powerShell, args...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = nil
 	if err := cmd.Run(); err != nil {
-		log.Println("Powershell: cannot start command")
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("Powershell: cannot start command")
 	}
 	return out.Bytes()
 }
 
 func GetDeviceHash(wlan *models.Device) []map[string]string {
 	ps := New()
-	lines := ps.execute(findNetPSCommand)
+	lines := ps.Execute(findNetPSCommand)
 	var netinfo []NetInfo
 	json.Unmarshal([]byte(lines), &netinfo)
 	result := make([]map[string]string, len(netinfo))

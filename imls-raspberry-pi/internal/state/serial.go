@@ -7,12 +7,16 @@ import (
 	"runtime"
 
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/internal/wifi-hardware-search/netadapter"
 )
 
 const FakeSerial = "CESTNEPASUNESERIE"
 const FakeSerialCheck = "PAS"
 
-var serialWarnGiven = false
+var (
+	serialWarnGiven    = false
+	GetSerialPSCommand = "(Get-CimInstance -Class Win32_ComputerSystemProduct).UUID"
+)
 
 // Create a cache, so repeated calls to get the serial don't
 // open up endless file sockets...
@@ -50,9 +54,13 @@ func getCachedSerial() string {
 					cache["serial"] = serial
 				}
 			}
+		} else if runtime.GOOS == "windows" {
+			ps := netadapter.New()
+			lines := ps.Execute(GetSerialPSCommand)
+			cache["serial"] = string(lines)
 		} else {
 			if !serialWarnGiven {
-				log.Warn().Msg("Not running on a Raspberry Pi. Cannot grab serial number.")
+				log.Warn().Msg("Cannot grab serial number.")
 				serialWarnGiven = true
 			}
 
