@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+    "strings"
 
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/wifi-hardware-search/netadapter"
@@ -57,7 +58,7 @@ func getCachedSerial() string {
 		} else if runtime.GOOS == "windows" {
 			ps := netadapter.New()
 			lines := ps.Execute(GetSerialPSCommand)
-			cache["serial"] = string(lines)
+			cache["serial"] = strings.TrimSpace(string(lines)) // remove \r\n
 		} else {
 			if !serialWarnGiven {
 				log.Warn().Msg("Cannot grab serial number.")

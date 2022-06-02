@@ -53,15 +53,15 @@ func GetAPIKey() string {
 	copy(key[:], serial)
 	b64, err := base64.StdEncoding.DecodeString(apiKey)
 	if err != nil {
-		log.Error().
+		log.Fatal().
 			Err(err).
-			Msg("cannot b64 decode")
+			Msg("get api key: cannot b64 decode")
 	}
 	dec, err := cryptopasta.Decrypt(b64, &key)
 	if err != nil {
-		log.Error().
+		log.Fatal().
 			Err(err).
-			Msg("failed to decrypt after decoding")
+			Msg("get api key: failed to decrypt after decoding")
 	}
 	return string(dec)
 }
