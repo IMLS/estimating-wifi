@@ -2,10 +2,12 @@ package state
 
 import (
 	"bufio"
+	"crypto/sha1"
+	"fmt"
 	"os"
 	"regexp"
 	"runtime"
-    "strings"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/wifi-hardware-search/netadapter"
@@ -58,7 +60,9 @@ func getCachedSerial() string {
 		} else if runtime.GOOS == "windows" {
 			ps := netadapter.New()
 			lines := ps.Execute(GetSerialPSCommand)
-			cache["serial"] = strings.TrimSpace(string(lines)) // remove \r\n
+			serial := strings.TrimSpace(string(lines)) // remove \r\n
+			hash := sha1.Sum([]byte(serial))
+			cache["serial"] = fmt.Sprintf("%x", hash)
 		} else {
 			if !serialWarnGiven {
 				log.Warn().Msg("Cannot grab serial number.")
