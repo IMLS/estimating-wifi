@@ -26,9 +26,17 @@ func TSharkRunner(adapter string) []string {
 			Err(err).
 			Msg("could not open wireshark pipe")
 	}
+	tsharkErr, err2 := tsharkCmd.StderrPipe()
+	if err2 != nil {
+		log.Error().
+			Err(err2).
+			Msg("could not open wireshark stderr pipe")
+	}
+
 	// The closer is called on exe exit. Idomatic use does not
 	// explicitly call the closer. BUT DO WE HAVE LEAKS?
 	defer tsharkOut.Close()
+	defer tsharkErr.Close()
 
 	err = tsharkCmd.Start()
 	if err != nil {
@@ -42,6 +50,12 @@ func TSharkRunner(adapter string) []string {
 			Err(err).
 			Msg("could not read from wireshark output")
 	}
+	tsharkErrBytes, err2 := ioutil.ReadAll(tsharkErr)
+	if err2 != nil {
+		log.Error().
+			Err(err2).
+			Msg("could not read from wireshark stderr")
+	}
 
 	//tsharkCmd.Wait()
 	// From https://stackoverflow.com/questions/10385551/get-exit-code-go
@@ -51,7 +65,9 @@ func TSharkRunner(adapter string) []string {
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 				log.Fatal().
 					Int("exit status", status.ExitStatus()).
-					Str("output", string(tsharkBytes)).
+					Str("tshark command", tsharkCmd.String()).
+					Str("stderr", string(tsharkErrBytes)).
+					Str("stdout", string(tsharkBytes)).
 					Msg("tshark exited unexpectedly")
 			}
 		} else {

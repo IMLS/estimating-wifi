@@ -4,14 +4,14 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os/exec"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
 
-	"gsa.gov/18f/internal/wifi-hardware-search/config"
+	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/lshw"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/netadapter"
@@ -39,7 +39,9 @@ func GetSearches() []models.Search {
 	err := json.Unmarshal(data, &searches)
 
 	if err != nil {
-		log.Fatal("could not unmarshal search strings from embedded data.")
+		log.Fatal().
+			Err(err).
+			Msg("could not unmarshal search strings from embedded data")
 	}
 
 	return searches
@@ -48,16 +50,28 @@ func GetSearches() []models.Search {
 func SetMonitorMode(dev *models.Device) {
 	cmds := make([]*exec.Cmd, 0)
 	if runtime.GOOS == "windows" {
-		cmds = append(cmds, exec.Command("c:/Windows/System32/Npcap/WlanHelper.exe", dev.Logicalname, "mode", "monitor"))
+		cmds = append(cmds, exec.Command(state.GetWlanHelperPath(), dev.Logicalname, "mode", "monitor"))
 	} else {
-		cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "down"))
-		cmds = append(cmds, exec.Command("/usr/sbin/iw", dev.Logicalname, "set", "monitor", "none"))
-		cmds = append(cmds, exec.Command("/usr/sbin/ip", "link", "set", dev.Logicalname, "up"))
+		cmds = append(cmds, exec.Command(state.GetIpPath(), "link", "set", dev.Logicalname, "down"))
+		cmds = append(cmds, exec.Command(state.GetIwPath(), dev.Logicalname, "set", "monitor", "none"))
+		cmds = append(cmds, exec.Command(state.GetIpPath(), "link", "set", dev.Logicalname, "up"))
 	}
 	// Run the commands to set the adapter into monitor mode.
 	for _, c := range cmds {
-		c.Start()
-		c.Wait()
+		err := c.Start()
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("command", c.String()).
+				Msg("command did not execute")
+		}
+		err = c.Wait()
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Str("command", c.String()).
+				Msg("command failed")
+		}
 	}
 }
 
@@ -69,7 +83,7 @@ func SearchForMatchingDevice() *models.Device {
 	for _, s := range GetSearches() {
 		dev.Search = &s
 		// findMatchingDevice populates device. Exits if something is found.
-		FindMatchingDevice(dev)
+		FindMatchingDevice(dev, false)
 		if dev.Exists {
 			break
 		}
@@ -89,7 +103,7 @@ func osFindMatchingDevice(wlan *models.Device) []map[string]string {
 // PURPOSE
 // Takes a Device structure and, using the Search fields of that structure,
 // attempts to find a matching WLAN device.
-func FindMatchingDevice(wlan *models.Device) {
+func FindMatchingDevice(wlan *models.Device, verbose bool) {
 	devices := osFindMatchingDevice(wlan)
 
 	// We start by assuming that we have not found the device.
@@ -98,7 +112,7 @@ func FindMatchingDevice(wlan *models.Device) {
 	// Now, go through the devices and find the one that matches our criteria.
 	for _, hash := range devices {
 
-		if *config.Verbose {
+		if verbose {
 			fmt.Println("---------")
 			for k, v := range hash {
 				fmt.Println(k, "<-", v)
@@ -111,7 +125,7 @@ func FindMatchingDevice(wlan *models.Device) {
 			for k := range hash {
 				// Lowercase everything for purposes of pattern matching.
 				v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[k]))
-				if *config.Verbose {
+				if verbose {
 					fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
 				}
 				if v {
@@ -127,7 +141,7 @@ func FindMatchingDevice(wlan *models.Device) {
 		} else {
 			// If we aren't doing a full search, then this is the alternative: check just
 			// one field. It will still be a lowercase search, but it will be against one field only.
-			if *config.Verbose {
+			if verbose {
 				fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
 			}
 			v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[wlan.Search.Field]))
