@@ -34,13 +34,7 @@ func SetConfigAtPath(configPath string) {
 }
 
 func GetSerial() string {
-	// allow the serial to be stored so we can test out different serial and api
-	// key settings. if not, default to reading from /proc (as a cached read)
-	serial := viper.GetString("user.device_serial")
-	if serial == "" {
-		return getCachedSerial()
-	}
-	return serial
+	return getCachedSerial()
 }
 
 func GetFCFSSeqID() string {
@@ -59,15 +53,15 @@ func GetAPIKey() string {
 	copy(key[:], serial)
 	b64, err := base64.StdEncoding.DecodeString(apiKey)
 	if err != nil {
-		log.Error().
+		log.Fatal().
 			Err(err).
-			Msg("cannot b64 decode")
+			Msg("get api key: cannot b64 decode")
 	}
 	dec, err := cryptopasta.Decrypt(b64, &key)
 	if err != nil {
-		log.Error().
+		log.Fatal().
 			Err(err).
-			Msg("failed to decrypt after decoding")
+			Msg("get api key: failed to decrypt after decoding")
 	}
 	return string(dec)
 }
@@ -240,7 +234,6 @@ func SetConfigDefaults() {
 	viper.SetDefault("user.api_key", "")
 	viper.SetDefault("user.fcfs_id", "")
 	viper.SetDefault("user.device_tag", "")
-	viper.SetDefault("user.device_serial", "")
 	// defaults for running in production
 	viper.SetDefault("config.minimum_minutes", 5)
 	viper.SetDefault("config.maximum_minutes", 600)
