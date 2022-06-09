@@ -1,13 +1,12 @@
 package state
 
 import (
-	"encoding/base64"
+	"fmt"
 	"runtime"
 	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"gsa.gov/18f/internal/cryptopasta"
 	"gsa.gov/18f/internal/interfaces"
 	"gsa.gov/18f/internal/structs"
 )
@@ -28,9 +27,10 @@ func SetConfigAtPath(configPath string) {
 
 	err := viper.ReadInConfig()
 	if err != nil {
+		log.Info().Msg("no configuration found: writing")
 		viper.SafeWriteConfig()
 	}
-	log.Info().Msg(viper.ConfigFileUsed())
+	log.Info().Msg(fmt.Sprintf("using configuration: %s", viper.ConfigFileUsed()))
 }
 
 func GetSerial() string {
@@ -38,44 +38,28 @@ func GetSerial() string {
 }
 
 func GetFCFSSeqID() string {
-	return viper.GetString("user.fcfs_id")
+	return viper.GetString("device.fcfs_id")
 }
 
 func GetDeviceTag() string {
-	return viper.GetString("user.device_tag")
+	return viper.GetString("device.tag")
 }
 
 // GetAPIKey decodes the api key stored in the ini file.
 func GetAPIKey() string {
-	apiKey := viper.GetString("user.api_key")
-	serial := GetSerial()
-	var key [32]byte
-	copy(key[:], serial)
-	b64, err := base64.StdEncoding.DecodeString(apiKey)
-	if err != nil {
-		log.Fatal().
-			Err(err).
-			Msg("get api key: cannot b64 decode")
-	}
-	dec, err := cryptopasta.Decrypt(b64, &key)
-	if err != nil {
-		log.Fatal().
-			Err(err).
-			Msg("get api key: failed to decrypt after decoding")
-	}
-	return string(dec)
+	return viper.GetString("device.api_key")
 }
 
 func SetFCFSSeqID(id string) {
-	viper.Set("user.fcfs_id", id)
+	viper.Set("device.fcfs_id", id)
 }
 
 func SetDeviceTag(tag string) {
-	viper.Set("user.device_tag", tag)
+	viper.Set("device.tag", tag)
 }
 
 func SetAPIKey(key string) {
-	viper.Set("user.api_key", key)
+	viper.Set("device.api_key", key)
 }
 
 func SetStorageMode(mode string) {
@@ -231,9 +215,9 @@ func GetWWWImages() string {
 func SetConfigDefaults() {
 	// these must be filled in by the user. NB: these settings will _not_ be
 	// present in the config and are set here for explicitness.
-	viper.SetDefault("user.api_key", "")
-	viper.SetDefault("user.fcfs_id", "")
-	viper.SetDefault("user.device_tag", "")
+	viper.SetDefault("device.api_key", "")
+	viper.SetDefault("device.fcfs_id", "")
+	viper.SetDefault("device.tag", "")
 	// defaults for running in production
 	viper.SetDefault("config.minimum_minutes", 5)
 	viper.SetDefault("config.maximum_minutes", 600)
