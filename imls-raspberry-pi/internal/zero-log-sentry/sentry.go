@@ -84,7 +84,9 @@ func SetupZeroLogSentry(name string, dsn string) {
 		SampleRate: 1.0, // no sampling; send all events
 	}
 	client, err := sentry.NewClient(options)
-	if err == nil {
+	if err != nil {
+		log.Error().Err(err).Msg("could not initialize sentry")
+	} else {
 		customWriter := ZeroLogSentry{
 			client: client,
 			name:   name,

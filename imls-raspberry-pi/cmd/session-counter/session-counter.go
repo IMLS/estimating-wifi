@@ -72,7 +72,7 @@ func launchTLP() {
 	state.SetConfigAtPath(cfgFile)
 	dsn := state.GetSentryDSN()
 	if dsn != "" {
-		zls.SetupZeroLogSentry(dsn, "session-counter")
+		zls.SetupZeroLogSentry("session-counter", dsn)
 	}
 
 	log.Info().

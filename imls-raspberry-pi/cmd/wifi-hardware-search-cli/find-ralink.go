@@ -134,7 +134,7 @@ func initialize() {
 	state.SetConfigAtPath(cfgFile)
 	dsn := state.GetSentryDSN()
 	if dsn != "" {
-		zls.SetupZeroLogSentry(dsn, "wifi-hardware-search-cli")
+		zls.SetupZeroLogSentry("wifi-hardware-search-cli", dsn)
 	}
 }
 
