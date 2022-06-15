@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gsa.gov/18f/internal/state"
@@ -136,20 +135,6 @@ func initialize() {
 	dsn := state.GetSentryDSN()
 	if dsn != "" {
 		zls.SetupZeroLogSentry(dsn, "wifi-hardware-search-cli")
-	}
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	logLevel := state.GetLogLevel()
-	switch lvl := logLevel; lvl {
-	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 }
 
