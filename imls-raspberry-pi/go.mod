@@ -6,20 +6,18 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/benbjohnson/clock v1.1.0
 	github.com/briandowns/spinner v1.16.0
-	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
+	github.com/buger/jsonparser v1.1.1
 	github.com/fatih/color v1.13.0
 	github.com/fogleman/gg v1.3.0
+	github.com/getsentry/sentry-go v0.13.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jszwec/csvutil v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/rs/zerolog v1.26.1 // indirect
-	github.com/sirupsen/logrus v1.8.1
-	github.com/spf13/cobra v1.4.0 // indirect
-	github.com/spf13/viper v1.11.0 // indirect
+	github.com/rs/zerolog v1.26.1
+	github.com/spf13/cobra v1.4.0
+	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
-	gopkg.in/yaml.v2 v2.4.0
 )
