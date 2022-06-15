@@ -45,6 +45,10 @@ func GetDeviceTag() string {
 	return viper.GetString("device.tag")
 }
 
+func GetSentryDSN() string {
+	return viper.GetString("sentry.dsn")
+}
+
 // GetAPIKey decodes the api key stored in the ini file.
 func GetAPIKey() string {
 	return viper.GetString("device.api_key")

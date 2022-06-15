@@ -13,6 +13,7 @@ import (
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
+	"gsa.gov/18f/internal/zero-log-sentry"
 )
 
 var (
@@ -71,6 +72,11 @@ func run2() {
 
 func launchTLP() {
 	state.SetConfigAtPath(cfgFile)
+
+	dsn := state.GetSentryDSN()
+	if dsn != "" {
+		zls.SetupZeroLogSentry(dsn, "session-counter")
+	}
 
 	log.Info().
 		Int64("session_id", state.GetCurrentSessionID()).
