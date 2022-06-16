@@ -1,24 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"strings"
 
-	"github.com/jedib0t/go-pretty/v6/text"
-	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
+	"gsa.gov/18f/internal/zero-log-sentry"
 )
 
 var (
 	cfgFile    string
-	logLevel   string
-	verbose    bool
 	discover   bool
 	lshwSearch string
 	lshwField  string
@@ -44,7 +41,7 @@ func getField(v *models.Device, field string) reflect.Value {
 
 func launch() {
 	if os.Getuid() != 0 {
-		fmt.Println(text.FgRed.Sprint("wifi-hardware-search-cli *really* needs to be run as root."))
+		log.Warn().Msg("wifi-hardware-search-cli needs to be run as root.")
 	}
 
 	device := new(models.Device)
@@ -70,12 +67,13 @@ func launch() {
 		// searches if it can, and falls back to the embedded if needed.
 		// It goes through each one-by-one.
 		for _, s := range search.GetSearches() {
-			if verbose {
-				fmt.Println("search", s)
-			}
+			log.Debug().
+				Str("field", s.Field).
+				Str("query", s.Query).
+				Msg("searching")
 			device.Search = &s
 			// FindMatchingDevice populates device.Exists if something is found.
-			search.FindMatchingDevice(device, verbose)
+			search.FindMatchingDevice(device)
 			// We can stop searching if we find something.
 			if device.Exists {
 				break
@@ -86,7 +84,7 @@ func launch() {
 		// Therefore, we should use the field/search params
 		s := &models.Search{Field: lshwField, Query: lshwSearch}
 		device.Search = s
-		search.FindMatchingDevice(device, verbose)
+		search.FindMatchingDevice(device)
 	}
 
 	// If we asked for a true/false value, print that.
@@ -94,9 +92,9 @@ func launch() {
 		// If we're explicitly asking to see if it exists, say no, and
 		// return a zero error code.
 		if device.Exists {
-			fmt.Println("true")
+			log.Info().Msg("device exists")
 		} else {
-			fmt.Println("false")
+			log.Info().Msg("device does not exist")
 		}
 		os.Exit(0)
 	} else if device.Exists {
@@ -104,18 +102,13 @@ func launch() {
 		// and try and extract the field they asked for. If they named the field incorrectly,
 		// this will fail in a pretty gruesome way.
 		res := getField(device, extract)
-		if reflect.TypeOf(res).Kind() == reflect.Bool {
-			fmt.Println(res.Interface())
-		} else {
-			fmt.Println(res)
-		}
+		log.Info().Str("result", res.String()).Msg("obtained field")
 		os.Exit(0)
 	} else {
 		// Otherwise... this is bad. Exit with error.
-		fmt.Println("Device not found")
+		log.Fatal().Msg("Device not found")
 		os.Exit(-1)
 	}
-
 }
 
 var rootCmd = &cobra.Command{
@@ -132,24 +125,19 @@ var versionCmd = &cobra.Command{
 	Short: "wifi-hardware-search version",
 	Long:  `Print the version number of wifi-hardware-search`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(version.GetVersion())
+		log.Info().Str("version", version.GetVersion()).Msg("fin.")
 	},
 }
 
 func initialize() {
 	state.SetConfigAtPath(cfgFile)
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	switch lvl := logLevel; lvl {
-	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	dsn := state.GetSentryDSN()
+	if dsn != "" {
+		zls.SetupZeroLogSentry("wifi-hardware-search-cli", dsn)
+		zls.SetTags(map[string]string{
+			"tag":     state.GetDeviceTag(),
+			"fcfs_id": state.GetFCFSSeqID(),
+		})
 	}
 }
 
@@ -158,14 +146,6 @@ func main() {
 		"config",
 		"session-counter.ini",
 		"config file (default is session-counter.ini in /etc/imls, %PROGRAMDATA%\\IMLS, or current directory")
-	rootCmd.PersistentFlags().StringVar(&logLevel,
-		"logging",
-		"info",
-		"logging level (debug, info, warn, error)")
-	rootCmd.PersistentFlags().BoolVar(&verbose,
-		"verbose",
-		false,
-		"verbose output")
 	rootCmd.PersistentFlags().BoolVar(&discover,
 		"discover",
 		true,

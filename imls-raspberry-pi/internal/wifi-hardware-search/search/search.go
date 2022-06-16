@@ -3,7 +3,6 @@ package search
 import (
 	"embed"
 	"encoding/json"
-	"fmt"
 	"os/exec"
 	"regexp"
 	"runtime"
@@ -83,7 +82,7 @@ func SearchForMatchingDevice() *models.Device {
 	for _, s := range GetSearches() {
 		dev.Search = &s
 		// findMatchingDevice populates device. Exits if something is found.
-		FindMatchingDevice(dev, false)
+		FindMatchingDevice(dev)
 		if dev.Exists {
 			break
 		}
@@ -103,7 +102,7 @@ func osFindMatchingDevice(wlan *models.Device) []map[string]string {
 // PURPOSE
 // Takes a Device structure and, using the Search fields of that structure,
 // attempts to find a matching WLAN device.
-func FindMatchingDevice(wlan *models.Device, verbose bool) {
+func FindMatchingDevice(wlan *models.Device) {
 	devices := osFindMatchingDevice(wlan)
 
 	// We start by assuming that we have not found the device.
@@ -111,12 +110,9 @@ func FindMatchingDevice(wlan *models.Device, verbose bool) {
 
 	// Now, go through the devices and find the one that matches our criteria.
 	for _, hash := range devices {
-
-		if verbose {
-			fmt.Println("---------")
-			for k, v := range hash {
-				fmt.Println(k, "<-", v)
-			}
+		log.Debug().Msg("--------")
+		for k, v := range hash {
+			log.Debug().Str("key", k).Str("value", v).Msg("looking at field")
 		}
 
 		// The default is to search all the fields
@@ -125,9 +121,10 @@ func FindMatchingDevice(wlan *models.Device, verbose bool) {
 			for k := range hash {
 				// Lowercase everything for purposes of pattern matching.
 				v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[k]))
-				if verbose {
-					fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
-				}
+				log.Debug().
+					Str("query", wlan.Search.Query).
+					Str("field", wlan.Search.Field).
+					Msg("searching all fields")
 				if v {
 					// If we find it, set the fact that it exists. This will be picked up
 					// back out in main() for the final act of printing a message to the user.
@@ -141,9 +138,10 @@ func FindMatchingDevice(wlan *models.Device, verbose bool) {
 		} else {
 			// If we aren't doing a full search, then this is the alternative: check just
 			// one field. It will still be a lowercase search, but it will be against one field only.
-			if verbose {
-				fmt.Println("query", wlan.Search.Query, "field", wlan.Search.Field)
-			}
+			log.Debug().
+				Str("query", wlan.Search.Query).
+				Str("field", wlan.Search.Field).
+				Msg("searching one field")
 			v, _ := regexp.MatchString(strings.ToLower(wlan.Search.Query), strings.ToLower(hash[wlan.Search.Field]))
 			if v {
 				wlan.Exists = true

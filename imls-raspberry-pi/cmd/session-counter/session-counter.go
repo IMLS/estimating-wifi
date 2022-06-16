@@ -6,18 +6,17 @@ import (
 	"time"
 
 	"github.com/robfig/cron/v3"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
+	"gsa.gov/18f/internal/zero-log-sentry"
 )
 
 var (
-	cfgFile  string
-	logLevel string
+	cfgFile string
 )
 
 func runEvery(crontab string, c *cron.Cron, fun func()) {
@@ -71,6 +70,14 @@ func run2() {
 
 func launchTLP() {
 	state.SetConfigAtPath(cfgFile)
+	dsn := state.GetSentryDSN()
+	if dsn != "" {
+		zls.SetupZeroLogSentry("session-counter", dsn)
+		zls.SetTags(map[string]string{
+			"tag":     state.GetDeviceTag(),
+			"fcfs_id": state.GetFCFSSeqID(),
+		})
+	}
 
 	log.Info().
 		Int64("session_id", state.GetCurrentSessionID()).
@@ -105,32 +112,11 @@ var versionCmd = &cobra.Command{
 	},
 }
 
-func initLogs() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	switch lvl := logLevel; lvl {
-	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	}
-}
-
 func main() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile,
 		"config",
 		"session-counter.ini",
 		"config file (default is session-counter.ini in /etc/imls, %PROGRAMDATA%\\IMLS, or current directory")
-	rootCmd.PersistentFlags().StringVar(&logLevel,
-		"logging",
-		"info",
-		"logging level (debug, info, warn, error)")
-	cobra.OnInitialize(initLogs)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.Execute()
 }

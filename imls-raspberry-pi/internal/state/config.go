@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"gsa.gov/18f/internal/interfaces"
@@ -31,6 +32,21 @@ func SetConfigAtPath(configPath string) {
 		viper.SafeWriteConfig()
 	}
 	log.Info().Msg(fmt.Sprintf("using configuration: %s", viper.ConfigFileUsed()))
+	// configure logging.
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	logLevel := GetLogLevel()
+	switch lvl := logLevel; lvl {
+	case "debug":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "info":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "warn":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "error":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
 }
 
 func GetSerial() string {
@@ -43,6 +59,10 @@ func GetFCFSSeqID() string {
 
 func GetDeviceTag() string {
 	return viper.GetString("device.tag")
+}
+
+func GetSentryDSN() string {
+	return viper.GetString("sentry.dsn")
 }
 
 // GetAPIKey decodes the api key stored in the ini file.
