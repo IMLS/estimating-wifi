@@ -1,8 +1,0 @@
-[Unit]
-Description=Update the IMLS PPA
-
-[Service]
-ExecStartPre=sh -c "mkdir -p /opt/imls"
-ExecStart=sh -c "curl -s https://raw.githubusercontent.com/18F/imls-pi-stack/main/imls-ppa/imls-ppa.shim -o /opt/imls/update.shim"
-ExecStart=bash /opt/imls/update.shim
-Type=oneshot
