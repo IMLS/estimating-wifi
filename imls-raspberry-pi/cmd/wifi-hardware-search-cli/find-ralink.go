@@ -135,6 +135,10 @@ func initialize() {
 	dsn := state.GetSentryDSN()
 	if dsn != "" {
 		zls.SetupZeroLogSentry("wifi-hardware-search-cli", dsn)
+		zls.SetTags(map[string]string{
+			"tag":     state.GetDeviceTag(),
+			"fcfs_id": state.GetFCFSSeqID(),
+		})
 	}
 }
 

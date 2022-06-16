@@ -71,14 +71,20 @@ func (zls *ZeroLogSentry) Write(data []byte) (int, error) {
 		return nil
 	})
 	if err == nil {
-		zls.client.CaptureEvent(&event, nil, nil)
+		scope := sentry.CurrentHub().Scope()
+		zls.client.CaptureEvent(&event, nil, scope)
 		defer zls.client.Flush(2 * time.Second)
 	}
 	return len(data), nil
 }
 
+func SetTags(m map[string]string) {
+	sentry.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetTags(m)
+	})
+}
+
 func SetupZeroLogSentry(name string, dsn string) {
-	// TODO user/tag etc
 	options := sentry.ClientOptions{
 		Dsn:        dsn,
 		SampleRate: 1.0, // no sampling; send all events
