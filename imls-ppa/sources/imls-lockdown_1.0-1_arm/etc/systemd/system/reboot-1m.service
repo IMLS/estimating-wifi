@@ -1,9 +1,0 @@
-[Unit]
-Description=Reboot after activation
-
-[Service]
-Type=simple
-ExecStart=/usr/sbin/reboot
-
-[Install]
-WantedBy=multi-user.target

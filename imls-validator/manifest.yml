@@ -1,6 +1,0 @@
----
-applications:
-  - name: 10x-rabbit-demo
-    env:
-      SECRET_KEY: ((secret_key))
-      RABBIT_MAGIC_HEADER: ((rabbit_magic_header))
