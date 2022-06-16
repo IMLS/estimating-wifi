@@ -93,11 +93,10 @@ func launch() {
 		// return a zero error code.
 		if device.Exists {
 			log.Info().Msg("device exists")
-			os.Exit(0)
 		} else {
 			log.Info().Msg("device does not exist")
-			os.Exit(1)
 		}
+		os.Exit(0)
 	} else if device.Exists {
 		// Otherwise, we're going to use reflection to look into the device structure
 		// and try and extract the field they asked for. If they named the field incorrectly,
