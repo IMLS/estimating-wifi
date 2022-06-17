@@ -83,7 +83,8 @@ func PostJSON(uri string, data []map[string]interface{}) error {
 		// If we get things back, the errors will be encoded within the JSON.
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
 			message := fmt.Sprintf("PostJSON: bad status from POST to %v [%v]\n", uri, resp.Status)
-			log.Warn().Str("uri", uri).Str("response", resp.Status).Msg(message)
+			body, _ := ioutil.ReadAll(resp.Body)
+			log.Warn().Str("message", string(body)).Str("response", resp.Status).Msg(message)
 			return fmt.Errorf(message)
 		} else {
 			// Parse the response. Everything comes from ReVal in our current formulation.
