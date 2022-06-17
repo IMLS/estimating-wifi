@@ -7,11 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"regexp"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/state"
 )
 
@@ -28,7 +28,7 @@ func PostJSON(uri string, data []map[string]interface{}) error {
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slashWarned && !matched {
 		slashWarned = true
-		log.Println("WARNING: missing a trailing slash on URIs")
+		log.Warn().Msg("missing a trailing slash on URIs")
 	}
 
 	timeout := time.Duration(15 * time.Second)
@@ -76,14 +76,14 @@ func PostJSON(uri string, data []map[string]interface{}) error {
 
 		if err != nil {
 			message := fmt.Sprintf("PostJSON: failure in client attempt to POST to %v", uri)
-			log.Print(message)
+			log.Warn().Str("uri", uri).Msg(message)
 			return fmt.Errorf(message)
 		}
 
 		// If we get things back, the errors will be encoded within the JSON.
 		if resp.StatusCode < 200 || resp.StatusCode > 299 {
 			message := fmt.Sprintf("PostJSON: bad status from POST to %v [%v]\n", uri, resp.Status)
-			log.Print(message)
+			log.Warn().Str("uri", uri).Str("response", resp.Status).Msg(message)
 			return fmt.Errorf(message)
 		} else {
 			// Parse the response. Everything comes from ReVal in our current formulation.
@@ -93,8 +93,7 @@ func PostJSON(uri string, data []map[string]interface{}) error {
 			err := json.Unmarshal(body, &dat)
 			if err != nil {
 				message := fmt.Sprintf("PostJSON: could not unmarshal response body: %v", err)
-				log.Print(message)
-				log.Printf("%s", string(body))
+				log.Warn().Err(err).Str("body", string(body)).Msg(message)
 				return fmt.Errorf(message)
 			}
 		}

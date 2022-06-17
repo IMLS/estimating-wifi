@@ -2,10 +2,10 @@ package lshw
 
 import (
 	"bufio"
-	"log"
 	"os/exec"
 	"regexp"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
@@ -19,13 +19,11 @@ func GetDeviceHash(wlan *models.Device) []map[string]string {
 	cmd := exec.Command(state.GetLshwPath(), "-class", "network")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Println("cpw: cannot get stdout from lshw")
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("cpw: cannot get stdout from lshw")
 	}
 
 	if err := cmd.Start(); err != nil {
-		log.Println("cpw: cannot start `lshw` command")
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("cpw: cannot start lshw")
 	}
 
 	arr := make([]string, 0)
