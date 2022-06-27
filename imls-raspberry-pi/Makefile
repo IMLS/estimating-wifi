@@ -19,13 +19,10 @@ check-install:
 check:
 	golangci-lint run ./...
 
-all: input-configuration session-counter wifi-hardware-search-cli cache-to-sqlite waterfall
+all: session-counter wifi-hardware-search-cli
 
 deps:
 	go mod download
-
-input-configuration: deps
-	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/input-initial-configuration
 
 session-counter: deps
 	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
@@ -33,20 +30,12 @@ session-counter: deps
 wifi-hardware-search-cli: deps
 	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
 
-cache-to-sqlite: deps
-	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/cache-to-sqlite
-
-waterfall: deps
-	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/waterfall
-
 clean:
 	mkdir -p ../release/{bin,pkg}
 	chmod -R +w ../release/{bin,pkg}*
 	rm -rf ../release/{bin,pkg}
 
 test:
-	make -C cmd/cache-to-sqlite/ test
-	make -C cmd/input-initial-configuration/ test
 	make -C internal/wifi-hardware-search test
 	make -C internal/state test
 	make -C cmd/session-counter/ test
