@@ -1,29 +1,34 @@
 <template>
-	<h1 class="header">
-		{{fcfsId}} Wi-Fi statistics on {{day}}
-	</h1>
-	<div class="body" v-if="isLoading">
-		<p class="text">
-			Loading...
-		</p>
-	</div>
-	<div class="body" v-else>
-		<p class="text">
-			{{totalDevices}} devices seen
-		</p>
-		<p class="text">
-			{{totalPatrons}} patrons
-		</p>
-		<p class="text">
-			{{totalMinutes}} minutes served
-		</p>
-	</div>
-	<div class="footer">
-		<div class="button" @click="day = previousDay(day)">
-			&larr; Previous day
+	<div>
+		<h1 class="header">
+			Weekly sessions for sensor {{fcfsId}}
+		</h1>
+		<h2 class="header">
+			{{day}} through {{ previousDay(nextWeek(day)) }}
+		</h2>
+		<div class="body" v-if="isLoading">
+			<p class="text">
+				Loading...
+			</p>
 		</div>
-		<div class="button" @click="day = nextDay(day)">
-			Next day &rarr;
+		<div class="body" v-else>
+			<p class="text">
+				{{totalDevices}} devices seen
+			</p>
+			<p class="text">
+				{{totalPatrons}} patrons
+			</p>
+			<p class="text">
+				{{totalMinutes}} minutes served
+			</p>
+		</div>
+		<div class="footer">
+			<div class="button" @click="day = previousWeek(day)">
+				&larr; Previous week
+			</div>
+			<div class="button" @click="day = nextWeek(day)">
+				Next week &rarr;
+			</div>
 		</div>
 	</div>
 </template>
@@ -50,7 +55,7 @@
 		 },
 		 fcfsId: {
 			 type: String,
-			 default: 'CA5678-999',
+			 default: '',
 			 required: true,
 		 },
 		 tableName: {
@@ -80,9 +85,10 @@
 			 totalPatrons,
 			 totalMinutes,
 			 isLoading,
-			 fcfsId: props.fcfsId,
+			 sensorID: props.fcfsId,
 			 previousDay,
-			 nextDay,
+			 previousWeek,
+			 nextWeek,
 		 };
 
 		 async function retrieveMetrics() {
@@ -96,7 +102,7 @@
 					 },
 					 {
 						 "end": {
-						 	 _lt: unixEpoch(nextDay(props.day)),
+						 	 _lt: unixEpoch(nextWeek(props.day)),
 						 }
 					 },
 					 {
@@ -149,8 +155,12 @@
 			 return dayjs(date).subtract(1, 'day').format('YYYY-MM-DD');
 		 }
 
-		 function nextDay(date) {
-			 return dayjs(date).add(1, 'day').format('YYYY-MM-DD');
+		 function previousWeek(date) {
+			 return dayjs(date).subtract(1, 'week').format('YYYY-MM-DD');
+		 }
+
+		 function nextWeek(date) {
+			 return dayjs(date).add(1, 'week').format('YYYY-MM-DD');
 		 }
 	 },
  };

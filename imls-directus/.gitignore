@@ -3,3 +3,4 @@
 /node_modules
 /extensions/displays/unix-timestamp/index.js
 /extensions/panels/wifi/index.js
+.DS_store

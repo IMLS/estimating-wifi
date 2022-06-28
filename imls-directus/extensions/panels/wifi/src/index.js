@@ -3,7 +3,7 @@ import PanelComponent from './panel.vue';
 export default {
 	id: 'wifi-minutes',
 	name: 'Wifi',
-	icon: 'Wifi',
+	icon: 'wifi',
 	description: 'Wi-Fi minutes served',
 	component: PanelComponent,
 	options: ({ options }) => {
