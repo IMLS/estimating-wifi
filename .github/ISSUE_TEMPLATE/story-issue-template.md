@@ -1,8 +1,8 @@
 ---
 name: Story Issue Template
 about: For top-level/story-level tickets.
-title: "[STORY] "
-labels: ''
+title: ''
+labels: story
 assignees: ''
 
 ---
