@@ -11,7 +11,9 @@ assignees: ''
 
 User stories follow this format:
 
-As  __persona__, so that __reason__, I would like __request__.
+As  __(role/persona)__,
+so that __(goal to accomplish)__,
+I would like __request__.
 
 The user story should have a reason to exist: what do I need as the user
 described in the summary?  This part details any detail that could not be
