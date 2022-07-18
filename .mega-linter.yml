@@ -23,6 +23,8 @@ DISABLE_ERRORS: true
 # use prettier for JavaScript code formatting
 JAVASCRIPT_DEFAULT_STYLE: prettier
 
-DISABLE_LINTERS: [ GO_GOLANGCI_LINT ]
+# disable golangci-lint (it was problematic for a while)
+# DISABLE_LINTERS: [ GO_GOLANGCI_LINT ]
 
+# v6 supports SARIF reporters
 SARIF_REPORTER: true
