@@ -6,7 +6,7 @@ ADDITIONAL_EXCLUDED_DIRECTORIES: [report, megalinter-reports]
 IGNORE_GITIGNORED_FILES: true
 
 # don't attempt to apply fixes at this time
-APPLY_FIXES: none
+APPLY_FIXES: all
 
 # please don't spell check everything...
 DISABLE: [SPELL, COPYPASTE]
