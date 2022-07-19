@@ -1,6 +1,5 @@
 VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
-RELEASEPATH = ../release/bin/*
 
 ifeq ($(shell uname -m),armv7l)
 ENVVARS = CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
@@ -13,11 +12,8 @@ ENVVARS = CGO_ENABLED=1 GOOS=linux
 endif
 endif
 
-check-install:
-	go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
-
 check:
-	golangci-lint run ./...
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1 run ./...
 
 all: session-counter wifi-hardware-search-cli
 
@@ -25,15 +21,10 @@ deps:
 	go mod download
 
 session-counter: deps
-	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
 
 wifi-hardware-search-cli: deps
-	${ENVVARS} GOPATH=$$PWD/../release go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
-
-clean:
-	mkdir -p ../release/{bin,pkg}
-	chmod -R +w ../release/{bin,pkg}*
-	rm -rf ../release/{bin,pkg}
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
 
 test:
 	make -C internal/wifi-hardware-search test
