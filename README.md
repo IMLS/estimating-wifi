@@ -1,5 +1,8 @@
 # IMLS Estimating Wifi
 
+[![MegaLinter](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml)
+[![woke](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml)
+
 Estimating Wifi is a pilot project to automate the monitoring of wifi usage via low-cost and open source tools.
 
 For the full history of this project, please see the [previous repository](https://github.com/18F/imls-pi-stack/).
@@ -19,7 +22,7 @@ No PII (personally identifiable information) is logged as part of this project. 
 
 Forthcoming.
 
-# About
+## About
 
 This software was developed by James Tranovich and Matt Jadud, federal software engineers with [18F](https://18f.gsa.gov/), with funding support from [10x](https://10x.gsa.gov/) and in collaboration with the [Institute of Museum and Library Services](https://imls.gov/).
 
