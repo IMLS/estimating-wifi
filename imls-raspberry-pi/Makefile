@@ -1,3 +1,5 @@
+.PHONY: all clean test
+
 VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 
