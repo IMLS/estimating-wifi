@@ -88,8 +88,6 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 					Msg("RUNNING PROCESSDATA")
 				// Copy ephemeral durations over to the durations table
 				tlp.ProcessData(durationsdb, sq, iq)
-				// Draw images of the data
-				tlp.WriteImages(durationsdb)
 				// Try sending the data
 				tlp.SimpleSend(durationsdb)
 				// Increment the session counter
