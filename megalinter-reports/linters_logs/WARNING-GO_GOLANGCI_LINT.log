@@ -1,0 +1,394 @@
+Results of golangci-lint linter (version 1.47.1)
+See documentation on https://oxsecurity.github.io/megalinter/latest/descriptors/go_golangci_lint/
+-----------------------------------------------
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/api/api_test.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"gsa.gov/18f/internal/http\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"gsa.gov/18f/internal/http\"\n\n"
+
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/constants/constants.go
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/model/auth.go
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/model/get_yesterday.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"gsa.gov/18f/internal/interfaces\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"gsa.gov/18f/internal/interfaces\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/session-counter.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/cmd/session-counter/session-counter.go:22:34: undeclared name: `cron` (typecheck)
+    func runEvery(crontab string, c *cron.Cron, fun func()) {
+                                     ^
+    imls-raspberry-pi/cmd/session-counter/session-counter.go:39:7: undeclared name: `cron` (typecheck)
+    	c := cron.New()
+    	     ^
+    imls-raspberry-pi/cmd/session-counter/session-counter.go:8:2: "github.com/robfig/cron/v3" imported but not used (typecheck)
+    	"github.com/robfig/cron/v3"
+    	^
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/session-counter_test.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/benbjohnson/clock\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/benbjohnson/clock\"\n\n"
+
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/tlp/broker.go
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/process_data.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/shark_test.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/cmd/session-counter/tlp/shark_test.go:116:2: undeclared name: `SimpleShark` (typecheck)
+    	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
+    	^
+    imls-raspberry-pi/cmd/session-counter/tlp/shark_test.go:120:2: undeclared name: `SimpleShark` (typecheck)
+    	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
+    	^
+    imls-raspberry-pi/cmd/session-counter/tlp/shark_test.go:161:2: undeclared name: `SimpleShark` (typecheck)
+    	SimpleShark(db, fakeMonitorFn, fakeSearchFn, fakeShark2)
+    	^
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/simple_send.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/cmd/wifi-hardware-search-cli/find-ralink.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/cmd/wifi-hardware-search-cli/find-ralink.go:136:3: undeclared name: `zls` (typecheck)
+    		zls.SetupZeroLogSentry("wifi-hardware-search-cli", dsn)
+    		^
+    imls-raspberry-pi/cmd/wifi-hardware-search-cli/find-ralink.go:137:3: undeclared name: `zls` (typecheck)
+    		zls.SetTags(map[string]string{
+    		^
+    imls-raspberry-pi/cmd/wifi-hardware-search-cli/find-ralink.go:14:2: "gsa.gov/18f/internal/zero-log-sentry" imported but not used (typecheck)
+    	"gsa.gov/18f/internal/zero-log-sentry"
+    	^
+
+✅ [SUCCESS] imls-raspberry-pi/internal/cryptopasta/encrypt.go
+❌ [ERROR] imls-raspberry-pi/internal/http/post-json.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/http/post-json.go:91:12: undeclared name: `RevalResponse` (typecheck)
+    			var dat RevalResponse
+    			        ^
+
+✅ [SUCCESS] imls-raspberry-pi/internal/http/structs.go
+❌ [ERROR] imls-raspberry-pi/internal/interfaces/config.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/interfaces/config.go:38:25: undeclared name: `Database` (typecheck)
+    	GetDurationsDatabase() Database
+    	                       ^
+    imls-raspberry-pi/internal/interfaces/config.go:39:22: undeclared name: `Database` (typecheck)
+    	GetQueuesDatabase() Database
+    	                    ^
+
+❌ [ERROR] imls-raspberry-pi/internal/interfaces/databases.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/jmoiron/sqlx\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/jmoiron/sqlx\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/internal/state/clock.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/benbjohnson/clock\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/benbjohnson/clock\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/internal/state/clock_test.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/clock_test.go:12:2: undeclared name: `SetClock` (typecheck)
+    	SetClock(mock)
+    	^
+    imls-raspberry-pi/internal/state/clock_test.go:13:10: undeclared name: `GetClock` (typecheck)
+    	year := GetClock().Now().UTC().Year()
+    	        ^
+    imls-raspberry-pi/internal/state/clock_test.go:21:2: undeclared name: `SetClock` (typecheck)
+    	SetClock(mock)
+    	^
+    imls-raspberry-pi/internal/state/clock_test.go:22:5: undeclared name: `GetClock` (typecheck)
+    	if GetClock().Now().UTC().Year() != 1970 {
+    	   ^
+    imls-raspberry-pi/internal/state/clock_test.go:30:11: undeclared name: `GetClock` (typecheck)
+    	mock.Set(GetClock().Now().UTC().Add(3 * 365 * d))
+    	         ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/config.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/config.go:53:9: undeclared name: `getCachedSerial` (typecheck)
+    	return getCachedSerial()
+    	       ^
+    imls-raspberry-pi/internal/state/config.go:128:3: undeclared name: `removeLeadingAndTrailingSlashes` (typecheck)
+    		removeLeadingAndTrailingSlashes(host) +
+    		^
+    imls-raspberry-pi/internal/state/config.go:129:3: undeclared name: `startsWithSlash` (typecheck)
+    		startsWithSlash(removeLeadingSlashes(path)))
+    		^
+    imls-raspberry-pi/internal/state/config.go:175:8: undeclared name: `NewSqliteDB` (typecheck)
+    	db := NewSqliteDB(path)
+    	      ^
+    imls-raspberry-pi/internal/state/config.go:184:9: undeclared name: `NewSqliteDB` (typecheck)
+    	return NewSqliteDB(path)
+    	       ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/config_test.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/state/config_test.go:19:9: suite.Fail undefined (type *ConfigSuite has no field or method Fail) (typecheck)
+    		suite.Fail(err.Error())
+    		      ^
+    imls-raspberry-pi/internal/state/config_test.go:21:2: undeclared name: `SetConfigAtPath` (typecheck)
+    	SetConfigAtPath(tempDB.Name())
+    	^
+    imls-raspberry-pi/internal/state/config_test.go:26:12: undeclared name: `GetDurationsPath` (typecheck)
+    	os.Remove(GetDurationsPath())
+    	          ^
+    imls-raspberry-pi/internal/state/config_test.go:33:2: undeclared name: `SetDurationsPath` (typecheck)
+    	SetDurationsPath(durationsPath)
+    	^
+    imls-raspberry-pi/internal/state/config_test.go:35:12: undeclared name: `GetLoggers` (typecheck)
+    	result := GetLoggers()
+    	          ^
+    imls-raspberry-pi/internal/state/config_test.go:38:10: suite.Fail undefined (type *ConfigSuite has no field or method Fail) (typecheck)
+    			suite.Fail("loggers were not equal")
+    			      ^
+    imls-raspberry-pi/internal/state/config_test.go:41:5: undeclared name: `GetDurationsDatabase` (typecheck)
+    	if GetDurationsDatabase().GetPath() != durationsPath {
+    	   ^
+    imls-raspberry-pi/internal/state/config_test.go:42:9: suite.Fail undefined (type *ConfigSuite has no field or method Fail) (typecheck)
+    		suite.Fail("duration path was not equal")
+    		      ^
+    imls-raspberry-pi/internal/state/config_test.go:48:2: undeclared name: `SetDeviceTag` (typecheck)
+    	SetDeviceTag("a random string")
+    	^
+    imls-raspberry-pi/internal/state/config_test.go:49:12: undeclared name: `GetDeviceTag` (typecheck)
+    	result := GetDeviceTag()
+    	          ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/constants.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/constants.go:12:7: don't use ALL_CAPS in Go names; use CamelCase (golint)
+    const MAC_MEMORY_DURATION_SEC = 2 * 60 * 60
+          ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/ephemeral.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/ephemeral.go:28:9: undeclared name: `GetClock` (typecheck)
+    	now := GetClock().Now().In(time.Local).Unix()
+    	       ^
+    imls-raspberry-pi/internal/state/ephemeral.go:38:42: undeclared name: `MAC_MEMORY_DURATION_SEC` (typecheck)
+    		if (now > se.End) && ((now - se.End) > MAC_MEMORY_DURATION_SEC) {
+    		                                       ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/geturi.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/state/geturi.go:13:6: `removeLeadingAndTrailingSlashes` is unused (deadcode)
+    func removeLeadingAndTrailingSlashes(uri string) string {
+         ^
+    imls-raspberry-pi/internal/state/geturi.go:17:6: `startsWithSlash` is unused (deadcode)
+    func startsWithSlash(uri string) string {
+         ^
+    imls-raspberry-pi/internal/state/geturi.go:5:6: func `removeTrailingSlashes` is unused (unused)
+    func removeTrailingSlashes(uri string) string {
+         ^
+    imls-raspberry-pi/internal/state/geturi.go:9:6: func `removeLeadingSlashes` is unused (unused)
+    func removeLeadingSlashes(uri string) string {
+         ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/list.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/list.go:10:3: undeclared name: `Queue` (typecheck)
+    	*Queue
+    	 ^
+    imls-raspberry-pi/internal/state/list.go:20:14: undeclared name: `Queue` (typecheck)
+    func (queue *Queue) Push(sessionid string) {
+                 ^
+    imls-raspberry-pi/internal/state/list.go:24:14: undeclared name: `Queue` (typecheck)
+    func (queue *Queue) AsList() []string {
+                 ^
+    imls-raspberry-pi/internal/state/list.go:14:7: undeclared name: `NewQueue` (typecheck)
+    	q := NewQueue(name)
+    	     ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/list_test.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/state/list_test.go:16:9: suite.Fail undefined (type *ListSuite has no field or method Fail) (typecheck)
+    		suite.Fail(err.Error())
+    		      ^
+    imls-raspberry-pi/internal/state/list_test.go:18:2: undeclared name: `SetConfigAtPath` (typecheck)
+    	SetConfigAtPath(temp.Name())
+    	^
+    imls-raspberry-pi/internal/state/list_test.go:23:12: undeclared name: `GetDurationsPath` (typecheck)
+    	os.Remove(GetDurationsPath())
+    	          ^
+    imls-raspberry-pi/internal/state/list_test.go:27:8: undeclared name: `NewList` (typecheck)
+    	ls := NewList("ls1")
+    	      ^
+    imls-raspberry-pi/internal/state/list_test.go:43:9: suite.Fail undefined (type *ListSuite has no field or method Fail) (typecheck)
+    		suite.Fail("missing value in list")
+    		      ^
+    imls-raspberry-pi/internal/state/list_test.go:48:8: undeclared name: `NewList` (typecheck)
+    	ls := NewList("ls1")
+    	      ^
+    imls-raspberry-pi/internal/state/list_test.go:73:9: suite.Fail undefined (type *ListSuite has no field or method Fail) (typecheck)
+    		suite.Fail("missing value in list")
+    		      ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/queue.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/queue.go:21:9: undeclared name: `GetQueuesDatabase` (typecheck)
+    	tdb := GetQueuesDatabase()
+    	       ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/queue_test.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/queue_test.go:16:9: suite.Fail undefined (type *QueueSuite has no field or method Fail) (typecheck)
+    		suite.Fail(err.Error())
+    		      ^
+    imls-raspberry-pi/internal/state/queue_test.go:18:2: undeclared name: `SetConfigAtPath` (typecheck)
+    	SetConfigAtPath(temp.Name())
+    	^
+    imls-raspberry-pi/internal/state/queue_test.go:22:12: undeclared name: `GetDurationsPath` (typecheck)
+    	os.Remove(GetDurationsPath())
+    	          ^
+    imls-raspberry-pi/internal/state/queue_test.go:26:2: undeclared name: `NewQueue` (typecheck)
+    	NewQueue("queue1")
+    	^
+    imls-raspberry-pi/internal/state/queue_test.go:30:7: undeclared name: `NewQueue` (typecheck)
+    	q := NewQueue("queue1")
+    	     ^
+    imls-raspberry-pi/internal/state/queue_test.go:36:7: undeclared name: `NewQueue` (typecheck)
+    	q := NewQueue("queue1")
+    	     ^
+    imls-raspberry-pi/internal/state/queue_test.go:45:9: suite.Fail undefined (type *QueueSuite has no field or method Fail) (typecheck)
+    		suite.Fail("peek on an empty returned nil")
+    		      ^
+    imls-raspberry-pi/internal/state/queue_test.go:54:9: suite.Fail undefined (type *QueueSuite has no field or method Fail) (typecheck)
+    		suite.Fail("nothing on the queue")
+    		      ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/serial.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/internal/state/session.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/state/session.go:23:9: undeclared name: `GetClock` (typecheck)
+    	return GetClock().Now().In(time.Local).Unix()
+    	       ^
+
+❌ [ERROR] imls-raspberry-pi/internal/state/sqlitedb.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/jmoiron/sqlx\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/jmoiron/sqlx\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/internal/state/sqlitedb_test.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/state/sqlitedb_test.go:45:7: undeclared name: `NewSqliteDB` (typecheck)
+    	d := NewSqliteDB(tempDB.Name())
+    	     ^
+    imls-raspberry-pi/internal/state/sqlitedb_test.go:57:7: undeclared name: `NewSqliteDB` (typecheck)
+    	d := NewSqliteDB(tempDB.Name())
+    	     ^
+    imls-raspberry-pi/internal/state/sqlitedb_test.go:69:7: undeclared name: `NewSqliteDB` (typecheck)
+    	d := NewSqliteDB(tempDB.Name())
+    	     ^
+
+❌ [ERROR] imls-raspberry-pi/internal/structs/durations.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/structs/durations.go:16:2: commentFormatting: put a space between `//` and comment text (gocritic)
+    	//return it.Before(jt)
+    	^
+    imls-raspberry-pi/internal/structs/durations.go:48:12: unnecessary conversion (unconvert)
+    			m[string(col)] = nom
+    			        ^
+
+❌ [ERROR] imls-raspberry-pi/internal/structs/durations_test.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/structs/durations_test.go:9:7: undeclared name: `Duration` (typecheck)
+    	e := Duration{
+    	     ^
+
+✅ [SUCCESS] imls-raspberry-pi/internal/structs/ephemeral_duration.go
+❌ [ERROR] imls-raspberry-pi/internal/version/version.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/version/version.go:3:1: comment on exported var `Semver` should be of the form `Semver ...` (golint)
+    // Set this with -ldflags at build time.
+    ^
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go:122:12: undeclared name: `ParseLSHW` (typecheck)
+    	result := ParseLSHW(lines)
+    	          ^
+
+✅ [SUCCESS] imls-raspberry-pi/internal/wifi-hardware-search/models/device.go
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/search/search.go
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] Can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\""
+    level=error msg="Running error: 1 error occurred:\n\t* can't run linter goanalysis_metalinter: buildir: failed to load package : could not load export data: no export data for \"github.com/rs/zerolog/log\"\n\n"
+
+✅ [SUCCESS] imls-raspberry-pi/internal/wifi-hardware-search/search/search_test.go
+❌ [ERROR] imls-raspberry-pi/internal/zero-log-sentry/sentry.go
+    level=warning msg="[runner] The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive."
+    level=warning msg="[runner] The linter 'maligned' is deprecated (since v1.38.0) due to: The repository of the linter has been archived by the owner.  Replaced by govet 'fieldalignment'."
+    imls-raspberry-pi/internal/zero-log-sentry/sentry.go:17:10: undeclared name: `sentry` (typecheck)
+    	client *sentry.Client
+    	        ^
+    imls-raspberry-pi/internal/zero-log-sentry/sentry.go:20:26: undeclared name: `sentry` (typecheck)
+    func getAppStacktrace() *sentry.Stacktrace {
+                             ^
+    imls-raspberry-pi/internal/zero-log-sentry/sentry.go:21:11: undeclared name: `sentry` (typecheck)
+    	trace := sentry.NewStacktrace()
+    	         ^
+    imls-raspberry-pi/internal/zero-log-sentry/sentry.go:10:2: "github.com/getsentry/sentry-go" imported but not used (typecheck)
+    	"github.com/getsentry/sentry-go"
+    	^
+
