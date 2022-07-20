@@ -1,0 +1,5 @@
+Results of syft linter (version 0.51.0)
+See documentation on https://oxsecurity.github.io/megalinter/latest/descriptors/repository_syft/
+-----------------------------------------------
+
+✅ [SUCCESS] for workspace /github/workspace

@@ -1,0 +1,5 @@
+Results of gitleaks linter (version 8.8.12)
+See documentation on https://oxsecurity.github.io/megalinter/latest/descriptors/repository_gitleaks/
+-----------------------------------------------
+
+✅ [SUCCESS] for workspace /github/workspace

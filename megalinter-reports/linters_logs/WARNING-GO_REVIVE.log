@@ -1,0 +1,4050 @@
+Results of revive linter (version 0.0.0)
+See documentation on https://oxsecurity.github.io/megalinter/latest/descriptors/go_revive/
+-----------------------------------------------
+
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/api/api_test.go
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/constants/constants.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/constants/constants.go"
+                    },
+                    "region": {
+                      "startColumn": 6,
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported const MACLENGTH should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#error-strings",
+                  "id": "error-strings",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/model/auth.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/model/auth.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type AuthError should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/model/auth.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 12
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Entry should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#dot-imports",
+                  "id": "dot-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/model/get_yesterday.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/model/get_yesterday.go"
+                    },
+                    "region": {
+                      "startLine": 9
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetYesterday should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#error-naming",
+                  "id": "error-naming",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/session-counter.go
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/session-counter_test.go
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/broker.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 7
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Broker should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 12
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type KillBroker should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startLine": 16
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function NewKillBroker should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startLine": 20
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function NewBroker should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startLine": 27
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Broker.Start should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startLine": 44
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Broker.Subscribe should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/broker.go"
+                    },
+                    "region": {
+                      "startLine": 50
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Broker.Publish should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#increment-decrement",
+                  "id": "increment-decrement",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/process_data.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/process_data.go"
+                    },
+                    "region": {
+                      "startColumn": 2,
+                      "startLine": 41
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should replace pidCounter += 1 with pidCounter++"
+              },
+              "ruleId": "increment-decrement"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/process_data.go"
+                    },
+                    "region": {
+                      "startLine": 11
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function ProcessData should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#range",
+                  "id": "range",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/cmd/session-counter/tlp/shark_test.go
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/simple_send.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simple_send.go"
+                    },
+                    "region": {
+                      "startLine": 10
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SimpleSend should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#errorf",
+                  "id": "errorf",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startLine": 15
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function TSharkRunner should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 84
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type SharkFn should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 85
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type MonitorFn should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 86
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type SearchFn should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startLine": 88
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SimpleShark should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startLine": 124
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function StoreMacs should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/cmd/session-counter/tlp/simpleshark.go"
+                    },
+                    "region": {
+                      "startColumn": 26,
+                      "startLine": 95
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should drop = nil from declaration of var dev; it is the zero value"
+              },
+              "ruleId": "var-declaration"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#error-naming",
+                  "id": "error-naming",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/cmd/wifi-hardware-search-cli/find-ralink.go
+❌ [ERROR] imls-raspberry-pi/internal/cryptopasta/encrypt.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/cryptopasta/encrypt.go"
+                    },
+                    "region": {
+                      "startLine": 11
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "package comment should be of the form \"Package cryptopasta ...\""
+              },
+              "ruleId": "package-comments"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#indent-error-flow",
+                  "id": "indent-error-flow",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/http/post-json.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/http/post-json.go"
+                    },
+                    "region": {
+                      "startColumn": 16,
+                      "startLine": 17
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type bool from declaration of var slashWarned; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/http/post-json.go"
+                    },
+                    "region": {
+                      "startLine": 19
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function PostJSON should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/http/post-json.go"
+                    },
+                    "region": {
+                      "startColumn": 9,
+                      "startLine": 88
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "if block ends with a return statement, so drop this else and outdent its block"
+              },
+              "ruleId": "indent-error-flow"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#dot-imports",
+                  "id": "dot-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/http/structs.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/http/structs.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type RevalResponse should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#exported",
+                  "id": "exported",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/interfaces/config.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/interfaces/config.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Config should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#var-declaration",
+                  "id": "var-declaration",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/interfaces/databases.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/interfaces/databases.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 6
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Database should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/interfaces/databases.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 22
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Table should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#error-strings",
+                  "id": "error-strings",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/state/clock.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/clock.go"
+                    },
+                    "region": {
+                      "startLine": 8
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetClock should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/clock.go"
+                    },
+                    "region": {
+                      "startLine": 16
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetClock should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#context-keys-type",
+                  "id": "context-keys-type",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/state/clock_test.go
+❌ [ERROR] imls-raspberry-pi/internal/state/config.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 14
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetConfigAtPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 51
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetSerial should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 55
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetFCFSSeqID should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 59
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetDeviceTag should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 63
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetSentryDSN should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 72
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetFCFSSeqID should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 76
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetDeviceTag should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 80
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetAPIKey should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 84
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetStorageMode should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 88
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetRunMode should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 92
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetQueuesPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 96
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetDurationsPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 100
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetRootPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 104
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetImagesPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 108
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetUniquenessWindow should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 112
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetLogLevel should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 116
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetLoggers should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 122
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetDurationsURI should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 131
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function IsStoringToAPI should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 136
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function IsStoringLocally should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 145
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function IsProductionMode should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 150
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function IsDeveloperMode should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 162
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function IsTestMode should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 167
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetDurationsPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 171
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetDurationsDatabase should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 181
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetQueuesDatabase should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 186
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetWiresharkPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 190
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetWiresharkDuration should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 194
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetIpPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 198
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetIwPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 202
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetLshwPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 206
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetWlanHelperPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 210
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetMinimumMinutes should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 214
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetMaximumMinutes should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 218
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetUniquenessWindow should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 222
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetResetCron should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 226
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetWWWRoot should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 230
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetWWWImages should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startLine": 234
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetConfigDefaults should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 194
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "func GetIpPath should be GetIPPath"
+              },
+              "ruleId": "var-naming"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#var-declaration",
+                  "id": "var-declaration",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/state/config_test.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/config_test.go"
+                    },
+                    "region": {
+                      "startColumn": 20,
+                      "startLine": 35
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should replace i += 1 with i++"
+              },
+              "ruleId": "increment-decrement"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#var-declaration",
+                  "id": "var-declaration",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/state/constants.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/constants.go"
+                    },
+                    "region": {
+                      "startColumn": 6,
+                      "startLine": 11
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "don't use ALL_CAPS in Go names; use CamelCase"
+              },
+              "ruleId": "var-naming"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/constants.go"
+                    },
+                    "region": {
+                      "startColumn": 4,
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported var WIFIDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/constants.go"
+                    },
+                    "region": {
+                      "startColumn": 4,
+                      "startLine": 3
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported var DURATIONSDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/constants.go"
+                    },
+                    "region": {
+                      "startColumn": 4,
+                      "startLine": 4
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported var TEMPDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/constants.go"
+                    },
+                    "region": {
+                      "startLine": 6
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported const MAC_MEMORY_DURATION_SEC should be of the form \"MAC_MEMORY_DURATION_SEC ...\""
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#package-comments",
+                  "id": "package-comments",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/state/ephemeral.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/ephemeral.go"
+                    },
+                    "region": {
+                      "startColumn": 7,
+                      "startLine": 15
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type EphemeralDB from declaration of var ed; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/ephemeral.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 8
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type StartEnd should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/ephemeral.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 13
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type EphemeralDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/ephemeral.go"
+                    },
+                    "region": {
+                      "startLine": 17
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetMACs should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/ephemeral.go"
+                    },
+                    "region": {
+                      "startLine": 21
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function ClearEphemeralDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/ephemeral.go"
+                    },
+                    "region": {
+                      "startLine": 25
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported function RecordMAC should be of the form \"RecordMAC ...\""
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#errorf",
+                  "id": "errorf",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/state/geturi.go
+❌ [ERROR] imls-raspberry-pi/internal/state/list.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/list.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 8
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type List should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/list.go"
+                    },
+                    "region": {
+                      "startLine": 12
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function NewList should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/list.go"
+                    },
+                    "region": {
+                      "startLine": 23
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Queue.AsList should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/list.go"
+                    },
+                    "region": {
+                      "startLine": 42
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Queue.Remove should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#var-declaration",
+                  "id": "var-declaration",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/state/list_test.go
+❌ [ERROR] imls-raspberry-pi/internal/state/queue.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startColumn": 8,
+                      "startLine": 48
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "if block ends with a return statement, so drop this else and outdent its block"
+              },
+              "ruleId": "indent-error-flow"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startColumn": 8,
+                      "startLine": 60
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "if block ends with a return statement, so drop this else and outdent its block"
+              },
+              "ruleId": "indent-error-flow"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 10
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type QueueRow should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 14
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Queue should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startLine": 19
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function NewQueue should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startLine": 28
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Queue.Enqueue should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startLine": 37
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Queue.Peek should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/queue.go"
+                    },
+                    "region": {
+                      "startLine": 54
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Queue.Dequeue should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#dot-imports",
+                  "id": "dot-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/state/queue_test.go
+❌ [ERROR] imls-raspberry-pi/internal/state/serial.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/serial.go"
+                    },
+                    "region": {
+                      "startColumn": 10,
+                      "startLine": 25
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type map[string]string from declaration of var cache; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/serial.go"
+                    },
+                    "region": {
+                      "startColumn": 6,
+                      "startLine": 15
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported const FakeSerial should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/serial.go"
+                    },
+                    "region": {
+                      "startColumn": 6,
+                      "startLine": 16
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported const FakeSerialCheck should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/serial.go"
+                    },
+                    "region": {
+                      "startColumn": 1,
+                      "startLine": 20
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported var GetSerialPSCommand should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#blank-imports",
+                  "id": "blank-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/state/session.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/session.go"
+                    },
+                    "region": {
+                      "startColumn": 25,
+                      "startLine": 15
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported func InitializeSession returns unexported type state.sessionId, which can be annoying to use"
+              },
+              "ruleId": "unexported-return"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/session.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 6
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "type sessionId should be sessionID"
+              },
+              "ruleId": "var-naming"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/session.go"
+                    },
+                    "region": {
+                      "startLine": 15
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function InitializeSession should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/session.go"
+                    },
+                    "region": {
+                      "startLine": 21
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function NewSessionID should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/session.go"
+                    },
+                    "region": {
+                      "startLine": 25
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetCurrentSessionID should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/session.go"
+                    },
+                    "region": {
+                      "startLine": 29
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function IncrementSessionID should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#blank-imports",
+                  "id": "blank-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/state/sqlitedb.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startColumn": 1,
+                      "startLine": 9
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "a blank import should be only in a main or test package, or have a comment justifying it"
+              },
+              "ruleId": "blank-imports"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 13
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type SqliteDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 21
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function FlushCache should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 28
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function NewSqliteDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 47
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.Open should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 61
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.Close should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 78
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.GetPtr should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 82
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.GetPath should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 99
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.InitTable should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 104
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.RemoveTable should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 108
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.CreateTableFromStruct should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 146
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.CheckTableExists should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 151
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.ListTables should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 159
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.GetTableFromStruct should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 166
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.GetTableByName should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 170
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteDB.Query should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 176
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type SqliteTable should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 182
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.AddColumn should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 187
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.Create should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 237
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.InsertStruct should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 252
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.InsertMany should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 270
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.Drop should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 281
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.GetIntegerType should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 285
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.GetTextType should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 289
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.GetDateType should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 293
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.GetDB should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 297
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.GetIntegerField should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 308
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.GetTextField should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 319
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.SetIntegerField should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startLine": 328
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method SqliteTable.SetTextField should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startColumn": 8,
+                      "startLine": 89
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "if block ends with a return statement, so drop this else and outdent its block (move short variable declaration to its own line if necessary)"
+              },
+              "ruleId": "indent-error-flow"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/state/sqlitedb.go"
+                    },
+                    "region": {
+                      "startColumn": 13,
+                      "startLine": 19
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type map[string]*SqliteDB from declaration of var ptrCache; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#dot-imports",
+                  "id": "dot-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/state/sqlitedb_test.go
+❌ [ERROR] imls-raspberry-pi/internal/structs/durations.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/structs/durations.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 8
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type ByStart should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/structs/durations.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 19
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Durations should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/structs/durations.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 23
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Duration should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/structs/durations.go"
+                    },
+                    "region": {
+                      "startLine": 34
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method Duration.AsMap should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#blank-imports",
+                  "id": "blank-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/structs/durations_test.go
+❌ [ERROR] imls-raspberry-pi/internal/structs/ephemeral_duration.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/structs/ephemeral_duration.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type EphemeralDuration should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#var-declaration",
+                  "id": "var-declaration",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/version/version.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/version/version.go"
+                    },
+                    "region": {
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported var Semver should be of the form \"Semver ...\""
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/version/version.go"
+                    },
+                    "region": {
+                      "startLine": 5
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetVersion should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#context-keys-type",
+                  "id": "context-keys-type",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse.go"
+                    },
+                    "region": {
+                      "startLine": 12
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported function GetDeviceHash should be of the form \"GetDeviceHash ...\""
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse.go"
+                    },
+                    "region": {
+                      "startLine": 52
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported function ParseLSHW should be of the form \"ParseLSHW ...\""
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#package-comments",
+                  "id": "package-comments",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go"
+                    },
+                    "region": {
+                      "startColumn": 7,
+                      "startLine": 10
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type string from declaration of var t1; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go"
+                    },
+                    "region": {
+                      "startColumn": 7,
+                      "startLine": 41
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type string from declaration of var t2; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go"
+                    },
+                    "region": {
+                      "startColumn": 7,
+                      "startLine": 71
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type string from declaration of var t3; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/lshw/parse_test.go"
+                    },
+                    "region": {
+                      "startColumn": 7,
+                      "startLine": 76
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "should omit type string from declaration of var t4; it will be inferred from the right-hand side"
+              },
+              "ruleId": "var-declaration"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#dot-imports",
+                  "id": "dot-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/models/device.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/models/device.go"
+                    },
+                    "region": {
+                      "startLine": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported type Search should be of the form \"Search ...\" (with optional leading article)"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/models/device.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 10
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type Device should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#unexported-return",
+                  "id": "unexported-return",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 26
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type PowerShell should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 30
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type NetInfo should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go"
+                    },
+                    "region": {
+                      "startLine": 39
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function New should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go"
+                    },
+                    "region": {
+                      "startLine": 46
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported method PowerShell.Execute should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/netadapter/parse.go"
+                    },
+                    "region": {
+                      "startLine": 58
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function GetDeviceHash should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#dot-imports",
+                  "id": "dot-imports",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+❌ [ERROR] imls-raspberry-pi/internal/wifi-hardware-search/search/search.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startLine": 18
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported const MACLENGTH should be of the form \"MACLENGTH ...\""
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startLine": 27
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported function GetSearches should be of the form \"GetSearches ...\""
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startLine": 48
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetMonitorMode should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startLine": 76
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported function SearchForMatchingDevice should be of the form \"SearchForMatchingDevice ...\""
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 78
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "func name will be used as search.SearchForMatchingDevice by other packages, and that stutters; consider calling this ForMatchingDevice"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startLine": 101
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "comment on exported function FindMatchingDevice should be of the form \"FindMatchingDevice ...\""
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/wifi-hardware-search/search/search.go"
+                    },
+                    "region": {
+                      "startColumn": 8,
+                      "startLine": 95
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "if block ends with a return statement, so drop this else and outdent its block"
+              },
+              "ruleId": "indent-error-flow"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#var-naming",
+                  "id": "var-naming",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+
+✅ [SUCCESS] imls-raspberry-pi/internal/wifi-hardware-search/search/search_test.go
+❌ [ERROR] imls-raspberry-pi/internal/zero-log-sentry/sentry.go
+    {
+      "runs": [
+        {
+          "results": [
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/zero-log-sentry/sentry.go"
+                    },
+                    "region": {
+                      "startColumn": 5,
+                      "startLine": 14
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported type ZeroLogSentry should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/zero-log-sentry/sentry.go"
+                    },
+                    "region": {
+                      "startLine": 80
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetTags should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            },
+            {
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "imls-raspberry-pi/internal/zero-log-sentry/sentry.go"
+                    },
+                    "region": {
+                      "startLine": 86
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "exported function SetupZeroLogSentry should have comment or be unexported"
+              },
+              "ruleId": "exported"
+            }
+          ],
+          "tool": {
+            "driver": {
+              "informationUri": "https://revive.run",
+              "name": "revive",
+              "rules": [
+                {
+                  "helpUri": "https://revive.run/r#error-naming",
+                  "id": "error-naming",
+                  "properties": {
+                    "severity": "warning"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "version": "2.1.0"
+    }
+

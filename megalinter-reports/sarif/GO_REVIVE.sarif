@@ -1,0 +1,82 @@
+{
+  "runs": [
+    {
+      "results": [
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/github/workspace/imls-raspberry-pi/internal/zero-log-sentry/sentry.go"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 14
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "exported type ZeroLogSentry should have comment or be unexported"
+          },
+          "ruleId": "exported"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/github/workspace/imls-raspberry-pi/internal/zero-log-sentry/sentry.go"
+                },
+                "region": {
+                  "startLine": 80
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "exported function SetTags should have comment or be unexported"
+          },
+          "ruleId": "exported"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/github/workspace/imls-raspberry-pi/internal/zero-log-sentry/sentry.go"
+                },
+                "region": {
+                  "startLine": 86
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "exported function SetupZeroLogSentry should have comment or be unexported"
+          },
+          "ruleId": "exported"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://revive.run",
+          "name": "revive",
+          "rules": [
+            {
+              "helpUri": "https://revive.run/r#error-naming",
+              "id": "error-naming",
+              "properties": {
+                "severity": "warning"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}
