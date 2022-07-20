@@ -1,6 +1,8 @@
 package tlp
 
 import (
+	"strconv"
+
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/internal/http"
@@ -24,19 +26,19 @@ func SimpleSend(db interfaces.Database) {
 		if err != nil {
 			log.Error().
 				Err(err).
-				Str("session", nextSessionIDToSend).
+				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("could not extract durations")
 		}
 
 		if len(durations) == 0 {
 			log.Debug().
-				Str("session", nextSessionIDToSend).
+				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("found zero durations")
 			sq.Remove(nextSessionIDToSend)
 		} else if state.IsStoringToAPI() {
 			log.Debug().
 				Int("durations", len(durations)).
-				Str("session", nextSessionIDToSend).
+				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("preparing to send durations to API")
 
 			// convert []Duration to an array of map[string]interface{}
@@ -48,13 +50,13 @@ func SimpleSend(db interfaces.Database) {
 			// After writing images, we come back and try and send the data remotely.
 			log.Debug().
 				Int("duration", len(data)).
-				Str("session", nextSessionIDToSend).
+				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("sending durations to API")
 
 			err = http.PostJSON(state.GetDurationsURI(), data)
 			if err != nil {
 				log.Error().
-					Str("session", nextSessionIDToSend).
+					Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 					Err(err).
 					Msg("could not send; data left on queue")
 			} else {
