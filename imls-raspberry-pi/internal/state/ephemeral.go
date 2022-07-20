@@ -1,7 +1,7 @@
 package state
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"time"
 )
@@ -41,8 +41,8 @@ func RecordMAC(mac string) {
 			// unchanged, and create a new entry for the current mac address, in case we
 			// see it again (in less than 2h).
 			// cfg.Log().Debug(mac, " is an old mac, refreshing/changing")
-			sha1 := sha1.Sum([]byte(mac + fmt.Sprint(now)))
-			ed[fmt.Sprintf("%x", sha1)] = se
+			hash := sha256.Sum256([]byte(mac + fmt.Sprint(now)))
+			ed[fmt.Sprintf("%x", hash)] = se
 			ed[mac] = StartEnd{Start: now, End: now}
 		} else {
 			// Just update the mac address. It has been less than 2h.
