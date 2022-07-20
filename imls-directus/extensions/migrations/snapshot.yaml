@@ -339,12 +339,12 @@ fields:
       validation_message: null
   - collection: durations
     field: start
-    type: bigint
+    type: datetime
     schema:
       name: start
       table: durations
       schema: public
-      data_type: bigint
+      data_type: timestamptz
       is_nullable: true
       generation_expression: null
       default_value: null
@@ -380,12 +380,12 @@ fields:
       validation_message: null
   - collection: durations
     field: end
-    type: bigint
+    type: datetime
     schema:
       name: end
       table: durations
       schema: public
-      data_type: bigint
+      data_type: timestamptz
       is_nullable: true
       generation_expression: null
       default_value: null
