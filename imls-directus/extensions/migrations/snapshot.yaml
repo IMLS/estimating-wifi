@@ -128,7 +128,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -169,7 +169,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -210,7 +210,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -251,7 +251,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -292,7 +292,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -333,7 +333,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -374,7 +374,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -415,7 +415,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -456,7 +456,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -497,7 +497,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -538,7 +538,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
