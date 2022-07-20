@@ -5,8 +5,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/cmd/session-counter/structs"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/structs"
 )
 
 // https://stackoverflow.com/questions/71274361/go-error-cannot-use-generic-type-without-instantiation

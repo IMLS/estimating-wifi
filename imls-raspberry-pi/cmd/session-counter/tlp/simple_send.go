@@ -5,9 +5,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/cmd/session-counter/structs"
 	"gsa.gov/18f/internal/http"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/structs"
 )
 
 func SimpleSend(db interfaces.Database) {
