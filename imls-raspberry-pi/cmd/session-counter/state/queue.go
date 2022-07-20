@@ -1,71 +1,64 @@
-package state
+package model
 
-import (
-	"errors"
-	"fmt"
+import "errors"
 
-	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/interfaces"
-)
-
-type QueueRow struct {
-	Rowid int
-	Item  string
+type storable interface {
+	int64 | string
 }
-type Queue struct {
+
+type Queue[S storable] struct {
 	name string
-	db   interfaces.Database
+	fifo []S
 }
 
-func NewQueue(name string) (q *Queue) {
-	tdb := GetQueuesDatabase()
-	t := tdb.InitTable(name)
-	t.AddColumn("item", "TEXT UNIQUE")
-	t.Create()
-	q = &Queue{name: name, db: tdb}
+func NewQueue[S storable](name string) (q *Queue[S]) {
+	q = &Queue[S]{name: name, fifo: make([]S, 0)}
 	return q
 }
 
-func (queue *Queue) Enqueue(item string) {
-	stmt := fmt.Sprintf("INSERT OR IGNORE INTO %v (item) VALUES (?)", queue.name)
-	queue.db.Open()
-	_, err := queue.db.GetPtr().Exec(stmt, item)
-	if err != nil {
-		log.Error().Err(err).Msg("could not insert")
-	}
+func (queue *Queue[S]) Enqueue(item S) {
+	queue.fifo = append(queue.fifo, item)
 }
 
-func (queue *Queue) Peek() (string, error) {
-	//lw := logwrapper.NewLogger(nil)
-	qr := QueueRow{}
-
-	queue.db.Open()
-	err := queue.db.GetPtr().Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
-
-	// The rowid value starts at 1. From the SQLite documentation.
-	// if the Rowid is 0, we did not get anything back.
-	if err != nil || qr.Item == "" || qr.Rowid == 0 {
-		return "", errors.New("nothing on the queue")
+func (queue *Queue[S]) Peek() (S, error) {
+	if len(queue.fifo) > 0 {
+		return queue.fifo[0], nil
 	} else {
-		//lw.Debug("PEEK found [ ", qr.Item, " ] on the queue [ ", queue.name, " ]")
-		return qr.Item, nil
+		// https://stackoverflow.com/questions/70585852/return-default-value-for-generic-type
+		// By declaring an empty variable, we get the default "nil" return
+		// type for a generic.
+		var result S
+		return result, errors.New("queue is empty in peek")
 	}
+
 }
 
-func (queue *Queue) Dequeue() (string, error) {
-	qr := QueueRow{}
+func (queue *Queue[S]) Length() int {
+	return len(queue.fifo)
+}
 
-	err := queue.db.GetPtr().Get(&qr, fmt.Sprintf("SELECT rowid, item FROM %v ORDER BY rowid", queue.name))
-	if err != nil {
-		return "", err
+func (queue *Queue[S]) Dequeue() (S, error) {
+	if len(queue.fifo) > 0 {
+		var s S
+		s, queue.fifo = queue.fifo[0], queue.fifo[1:]
+		return s, nil
 	} else {
-		_, err := queue.db.GetPtr().Exec(fmt.Sprintf("DELETE FROM %v WHERE ROWID = ?", queue.name), qr.Rowid)
-		if err != nil {
-			log.Error().
-				Int("rowid", qr.Rowid).
-				Err(err).Msg("could not delete")
-			return "", errors.New("failed to dequeue")
+		var result S
+		return result, errors.New("queue is empty in dequeue")
+	}
+
+}
+
+func (q *Queue[S]) AsList() []S {
+	return q.fifo
+}
+
+func (q *Queue[S]) Remove(s S) {
+	n := make([]S, 0)
+	for _, v := range q.fifo {
+		if v != s {
+			n = append(n, v)
 		}
-		return qr.Item, nil
 	}
+	q.fifo = n
 }
