@@ -5,3 +5,4 @@ testlogfile
 config.yaml
 *.html
 test/www/*
+*ini

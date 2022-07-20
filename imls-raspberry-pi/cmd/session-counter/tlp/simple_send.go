@@ -7,10 +7,9 @@ import (
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
 	"gsa.gov/18f/internal/http"
-	"gsa.gov/18f/internal/interfaces"
 )
 
-func SimpleSend(db interfaces.Database) {
+func SimpleSend(db *state.DurationsDB) {
 	log.Debug().
 		Msg("starting batch send")
 
@@ -19,16 +18,10 @@ func SimpleSend(db interfaces.Database) {
 	sessionsToSend := sq.AsList()
 
 	for _, nextSessionIDToSend := range sessionsToSend {
-		durations := []structs.Duration{}
+		durations := []*structs.Duration{}
 		// FIXME: Leaky Abstraction
-		err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIDToSend)
-
-		if err != nil {
-			log.Error().
-				Err(err).
-				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
-				Msg("could not extract durations")
-		}
+		// err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIDToSend)
+		durations = db.GetSession(nextSessionIDToSend)
 
 		if len(durations) == 0 {
 			log.Debug().
@@ -53,7 +46,7 @@ func SimpleSend(db interfaces.Database) {
 				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("sending durations to API")
 
-			err = http.PostJSON(state.GetDurationsURI(), data)
+			err := http.PostJSON(state.GetDurationsURI(), data)
 			if err != nil {
 				log.Error().
 					Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
