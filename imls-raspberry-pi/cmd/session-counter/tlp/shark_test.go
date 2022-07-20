@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )

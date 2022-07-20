@@ -9,7 +9,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/constants"
-	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 

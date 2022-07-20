@@ -2,9 +2,9 @@ package tlp
 
 import (
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/internal/http"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
@@ -13,7 +13,7 @@ func SimpleSend(db interfaces.Database) {
 		Msg("starting batch send")
 
 	// This only comes in on reset...
-	sq := state.NewQueue("sent")
+	sq := state.NewQueue[int64]("sent")
 	sessionsToSend := sq.AsList()
 
 	for _, nextSessionIDToSend := range sessionsToSend {

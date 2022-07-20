@@ -3,8 +3,8 @@ package model
 import (
 	"time"
 
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/state"
 )
 
 func GetYesterday(cfg interfaces.Config) time.Time {
