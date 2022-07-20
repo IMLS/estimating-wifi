@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/structs"
 )
 
-func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool {
+// https://stackoverflow.com/questions/71274361/go-error-cannot-use-generic-type-without-instantiation
+// Instantiate generics.
+func ProcessData(dDB interfaces.Database, sq *state.Queue[int64]) bool {
 	// Queue up what needs to be sent still.
 	thissession := state.GetCurrentSessionID()
 
@@ -18,8 +20,7 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 		Msg("queueing to images and send")
 
 	if thissession >= 0 {
-		sq.Enqueue(fmt.Sprint(thissession))
-		iq.Enqueue(fmt.Sprint(thissession))
+		sq.Enqueue(thissession)
 	}
 
 	pidCounter := 0

@@ -33,8 +33,7 @@ func runEvery(crontab string, c *cron.Cron, fun func()) {
 }
 
 func run2() {
-	sq := state.NewQueue("sent")
-	iq := state.NewQueue("images")
+	sq := state.NewQueue[int64]("sent")
 	durationsdb := state.GetDurationsDatabase()
 	c := cron.New()
 
@@ -53,7 +52,13 @@ func run2() {
 				Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
 				Msg("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
+<<<<<<< HEAD
 			tlp.ProcessData(durationsdb, sq, iq)
+=======
+			tlp.ProcessData(durationsdb, sq)
+			// Draw images of the data
+			tlp.WriteImages(durationsdb)
+>>>>>>> 994993fa (TLP test runs; generics fixed.)
 			// Try sending the data
 			tlp.SimpleSend(durationsdb)
 			// Increment the session counter
