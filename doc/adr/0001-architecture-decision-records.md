@@ -12,7 +12,7 @@ We need to record the architectural decisions made on this project.
 
 ## Decision
 
-We will use Architecture Decision Records, as described by Michael Nygard in this article: 
+We will use Architecture Decision Records, as described by Michael Nygard in this article:
 [Documenting Architecture Decisions](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions)
 
 ## Consequences

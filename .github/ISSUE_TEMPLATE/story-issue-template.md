@@ -27,11 +27,11 @@ Also, here are a few points that need to be addressed:
 ]
 
 
-### Resources:
+### Resources
 
-* Mockups: 
-* Testing URL: 
-* Staging URL: 
+* Mockups:
+* Testing URL:
+* Staging URL:
 
 
 ### Notes
