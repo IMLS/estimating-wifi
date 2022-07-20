@@ -8,8 +8,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/structs"
 )
 
 func SetConfigAtPath(configPath string) {
@@ -169,19 +167,11 @@ func GetDurationsPath() string {
 	return viper.GetString("db.durations")
 }
 
-func GetDurationsDatabase() interfaces.Database {
-	path := viper.GetString("db.durations")
+func GetDurationsDatabase() *DurationsDB {
+	// path := viper.GetString("db.durations")
 	// always make sure we have a durations db created
-	db := NewSqliteDB(path)
-	if !db.CheckTableExists("durations") {
-		db.CreateTableFromStruct(structs.Duration{})
-	}
+	db := NewDurationsDB()
 	return db
-}
-
-func GetQueuesDatabase() interfaces.Database {
-	path := viper.GetString("db.queues")
-	return NewSqliteDB(path)
 }
 
 func GetWiresharkPath() string {
