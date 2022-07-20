@@ -92,10 +92,10 @@ fields:
       validation: null
       validation_message: null
   - collection: durations
-    field: pi_serial
+    field: serial
     type: string
     schema:
-      name: pi_serial
+      name: serial
       table: durations
       schema: public
       data_type: character varying
@@ -115,7 +115,7 @@ fields:
       foreign_key_column: null
     meta:
       collection: durations
-      field: pi_serial
+      field: serial
       special: null
       interface: null
       options: null
