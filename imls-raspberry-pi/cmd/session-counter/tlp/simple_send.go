@@ -4,9 +4,9 @@ import (
 	"strconv"
 
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/cmd/session-counter/api"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
-	"gsa.gov/18f/internal/http"
 )
 
 func SimpleSend(db *state.DurationsDB) {
@@ -46,7 +46,7 @@ func SimpleSend(db *state.DurationsDB) {
 				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("sending durations to API")
 
-			err := http.PostJSON(state.GetDurationsURI(), data)
+			err := api.PostJSON(state.GetDurationsURI(), data)
 			if err != nil {
 				log.Error().
 					Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
