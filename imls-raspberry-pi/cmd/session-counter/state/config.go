@@ -168,8 +168,6 @@ func GetDurationsPath() string {
 }
 
 func GetDurationsDatabase() *DurationsDB {
-	// path := viper.GetString("db.durations")
-	// always make sure we have a durations db created
 	db := NewDurationsDB()
 	return db
 }
