@@ -16,11 +16,11 @@ The team explored different data models: a relational model with three tables (l
 
 - We decided the tables per library idea simply represented a grouping of devices, and it would better to be more explicit
 - The tables per device idea helped with security: a sensor would write to their own individual table on Directus and have its own API key
-    - If the API key were compromised, only the table for that sensor would be compromised, not the whole table
-    - ![Data taxonomy for tables per device idea](/doc/images/data_heriachy.jpg)
+  - If the API key were compromised, only the table for that sensor would be compromised, not the whole table
+  - ![Data taxonomy for tables per device idea](/doc/images/data_heriachy.jpg)
 - The relational model with three tables (libraries, sensors, and durations/presences) was the simplest option in terms of number of tables and leveraging primary key / foreign key relationships
-    - This model poses a security risk if the API key for a sensor were compromised, since the whole "sensors" table would be at risk
-    - ![ER diagram for sensors table](/doc/images/ER_Diagram_Sensors.png)
+  - This model poses a security risk if the API key for a sensor were compromised, since the whole "sensors" table would be at risk
+  - ![ER diagram for sensors table](/doc/images/ER_Diagram_Sensors.png)
 
 The team decided to lower the importance in decision-making of someone compromising the API key and sending false data to the database because it would be challenging to classify false data. Additionally, they lowered the importance of performance as a decision-making factor because at the scale of deployment (hundreds of sensors), the selected data model would not impact performance greatly.
 
