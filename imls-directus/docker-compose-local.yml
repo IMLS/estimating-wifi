@@ -6,6 +6,20 @@ services:
     networks:
       - directus
 
+  database:
+    container_name: database
+    image: postgis/postgis:13-master
+    ports:
+      - 8432:5432
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    networks:
+      - directus
+    environment:
+      POSTGRES_USER: "directus"
+      POSTGRES_PASSWORD: "directus"
+      POSTGRES_DB: "directus"
+
   directus:
     container_name: directus
     image: directus/directus:9.10
@@ -18,6 +32,7 @@ services:
       - directus
     depends_on:
       - cache
+      - database
     # build extensions manually, since `directus-extension build` must be run in
     # the extension top-level directory. also migrate database changes manually.
     command:
@@ -40,11 +55,11 @@ services:
       SECRET: "${SECRET:-6116487b-cda1-52c2-b5b5-c8022c45e263}"
 
       DB_CLIENT: "pg"
-      DB_HOST: "${POSTGRES_HOST}" # must be specified in .env
+      DB_HOST: "database"
       DB_PORT: "5432"
       DB_DATABASE: "directus"
-      DB_USER: "${POSTGRES_USER}" # must be specified in .env
-      DB_PASSWORD: "${POSTGRES_PASSWORD}" # must be specified in .env
+      DB_USER: "directus"
+      DB_PASSWORD: "directus"
 
       CACHE_ENABLED: "true"
       CACHE_STORE: "redis"
