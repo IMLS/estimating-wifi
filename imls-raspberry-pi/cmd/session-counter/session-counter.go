@@ -13,6 +13,8 @@ import (
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 	zls "gsa.gov/18f/internal/zero-log-sentry"
+
+	_ "net/http/pprof"
 )
 
 var (
@@ -61,6 +63,8 @@ func run2() {
 			state.IncrementSessionID()
 			// Clear out the ephemeral data for the next day of monitoring
 			state.ClearEphemeralDB()
+			durationsdb.ClearDurationsDB()
+
 		})
 
 	// Start the cron jobs...
@@ -68,6 +72,13 @@ func run2() {
 }
 
 func launchTLP() {
+	// if viper.GetBool("WITH_PROFILE") {
+	// 	go http.ListenAndServe("localhost:8080", nil)
+	// 	log.Info().
+	// 		Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
+	// 		Msg("Launching pprof server server")
+	// }
+
 	state.SetConfigAtPath(cfgFile)
 	dsn := state.GetSentryDSN()
 	if dsn != "" {
@@ -112,6 +123,7 @@ var versionCmd = &cobra.Command{
 }
 
 func main() {
+
 	rootCmd.PersistentFlags().StringVar(&cfgFile,
 		"config",
 		"session-counter.ini",

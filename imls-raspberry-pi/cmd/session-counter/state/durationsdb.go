@@ -13,6 +13,14 @@ func NewDurationsDB() *DurationsDB {
 	return &DurationsDB{db: db}
 }
 
+func (mkv *DurationsDB) ClearDurationsDB() {
+	if mkv.db != nil {
+		for k := range mkv.db {
+			delete(mkv.db, k)
+		}
+	}
+}
+
 func (mkv *DurationsDB) Insert(d *structs.Duration) {
 	pk += 1
 	mkv.db[pk] = d
