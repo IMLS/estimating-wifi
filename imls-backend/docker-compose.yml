@@ -1,0 +1,25 @@
+version: "3"
+services:
+  server:
+    image: postgrest/postgrest
+    ports:
+      - "3000:3000"
+    environment:
+      PGRST_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
+      PGRST_DB_SCHEMAS: public
+      #In production this role should not be the same as the one used for the connection
+      PGRST_DB_ANON_ROLE: web_anon
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+    depends_on:
+      - db
+  db:
+    image: postgres:14.4-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-imls}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+    volumes:
+      - "./data/database:/var/lib/postgresql/data"
+      - "./init:/docker-entrypoint-initdb.d"
