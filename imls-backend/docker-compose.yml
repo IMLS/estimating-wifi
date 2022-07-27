@@ -4,6 +4,8 @@ services:
     image: postgrest/postgrest
     ports:
       - "3000:3000"
+    networks:
+      - postgrest
     environment:
       PGRST_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
       PGRST_DB_SCHEMAS: public
@@ -16,6 +18,8 @@ services:
     image: postgres:14.4-alpine
     ports:
       - "5432:5432"
+    networks:
+      - postgrest
     environment:
       POSTGRES_DB: "${POSTGRES_DB:-imls}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
@@ -23,3 +27,5 @@ services:
     volumes:
       - "./data/database:/var/lib/postgresql/data"
       - "./init:/docker-entrypoint-initdb.d"
+networks:
+  postgrest:
