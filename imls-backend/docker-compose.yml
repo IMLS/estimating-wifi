@@ -27,5 +27,21 @@ services:
     volumes:
       - "./data/database:/var/lib/postgresql/data"
       - "./init:/docker-entrypoint-initdb.d"
+  admin:
+    image: dpage/pgadmin4:6.12
+    ports:
+      - "8080:80"
+    networks:
+      - postgrest
+    environment:
+      # connection string in the app is host.docker.internal
+      # user is `postgres` (or as above), password is as below.
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL:-imls@gsa.gov}"
+      PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+      PGADMIN_DISABLE_POSTFIX: 1
+      PGADMIN_LISTEN_ADDRESS: "0.0.0.0"
+
+
+
 networks:
   postgrest:
