@@ -46,7 +46,9 @@ CREATE TABLE imlswifi.presences (
     start_time timestamp with time zone NOT NULL,
     end_time timestamp with time zone NOT NULL,
     fscs_id character varying(16) NOT NULL,
-    sensor_id integer NOT NULL
+    sensor_id integer NOT NULL,
+    manufacturer_index integer,
+    patron_index integer
 );
 
 
@@ -59,7 +61,9 @@ CREATE VIEW api.presences AS
     presences.start_time,
     presences.end_time,
     presences.fscs_id,
-    presences.sensor_id
+    presences.sensor_id,
+    presences.manufacturer_index,
+    presences.patron_index
    FROM imlswifi.presences;
 
 

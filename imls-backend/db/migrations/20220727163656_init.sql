@@ -22,6 +22,8 @@ CREATE TABLE imlswifi.presences (
     end_time TIMESTAMPTZ NOT NULL,
     fscs_id VARCHAR(16) NOT NULL,
     sensor_id SERIAL,
+    manufacturer_index INTEGER,
+    patron_index INTEGER,
     CONSTRAINT fk_presence_library
         FOREIGN KEY (fscs_id)
             REFERENCES imlswifi.libraries(fscs_id),
