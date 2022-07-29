@@ -308,4 +308,5 @@ ALTER TABLE ONLY imlswifi.sensors
 --
 
 INSERT INTO public.schema_migrations (version) VALUES
-    ('20220727163656');
+    ('20220727163656'),
+    ('20220729132839');
