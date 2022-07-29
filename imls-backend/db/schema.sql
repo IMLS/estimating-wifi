@@ -38,15 +38,6 @@ CREATE TABLE api.helo (
 
 
 --
--- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
---
-
-CREATE TABLE imlswifi.libraries (
-    fscs_id character varying(16) NOT NULL
-);
-
-
---
 -- Name: presences; Type: TABLE; Schema: imlswifi; Owner: -
 --
 
@@ -56,6 +47,28 @@ CREATE TABLE imlswifi.presences (
     end_time timestamp with time zone NOT NULL,
     fscs_id character varying(16) NOT NULL,
     sensor_id integer NOT NULL
+);
+
+
+--
+-- Name: presences; Type: VIEW; Schema: api; Owner: -
+--
+
+CREATE VIEW api.presences AS
+ SELECT presences.presence_id,
+    presences.start_time,
+    presences.end_time,
+    presences.fscs_id,
+    presences.sensor_id
+   FROM imlswifi.presences;
+
+
+--
+-- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
+--
+
+CREATE TABLE imlswifi.libraries (
+    fscs_id character varying(16) NOT NULL
 );
 
 
@@ -309,4 +322,5 @@ ALTER TABLE ONLY imlswifi.sensors
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220727163656'),
-    ('20220729132839');
+    ('20220729132839'),
+    ('20220729150547');
