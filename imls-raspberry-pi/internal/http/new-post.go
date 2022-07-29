@@ -34,7 +34,7 @@ func newPost(uri string, data []map[string]interface{}, key string) {
 	client := resty.New()
 	client.AddRetryCondition(
 		func(r *resty.Response, err error) bool {
-			return r.StatusCode() == http.StatusUnauthorized
+			return r.StatusCode() == http.StatusTooManyRequests
 		},
 	)
 	client.SetTimeout(time.Duration(timeOut) * time.Second)
