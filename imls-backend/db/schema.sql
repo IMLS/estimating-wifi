@@ -132,6 +132,43 @@ ALTER SEQUENCE imlswifi.sensors_sensor_id_seq OWNED BY imlswifi.sensors.sensor_i
 
 
 --
+-- Name: durations_v2; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.durations_v2 (
+    id integer NOT NULL,
+    pi_serial character varying(16),
+    fcfs_seq_id character varying(16),
+    device_tag character varying(32),
+    session_id character varying(255),
+    patron_index integer,
+    manufacturer_index integer,
+    start text,
+    "end" text
+);
+
+
+--
+-- Name: durations_v2_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.durations_v2_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: durations_v2_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.durations_v2_id_seq OWNED BY public.durations_v2.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -159,6 +196,13 @@ ALTER TABLE ONLY imlswifi.presences ALTER COLUMN sensor_id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY imlswifi.sensors ALTER COLUMN sensor_id SET DEFAULT nextval('imlswifi.sensors_sensor_id_seq'::regclass);
+
+
+--
+-- Name: durations_v2 id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.durations_v2 ALTER COLUMN id SET DEFAULT nextval('public.durations_v2_id_seq'::regclass);
 
 
 --
@@ -191,6 +235,14 @@ ALTER TABLE ONLY imlswifi.presences
 
 ALTER TABLE ONLY imlswifi.sensors
     ADD CONSTRAINT sensors_pkey PRIMARY KEY (sensor_id);
+
+
+--
+-- Name: durations_v2 durations_v2_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.durations_v2
+    ADD CONSTRAINT durations_v2_pkey PRIMARY KEY (id);
 
 
 --
