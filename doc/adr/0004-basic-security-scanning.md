@@ -10,8 +10,8 @@ Proposed
 
 We need to add basic automated security scanning for the PiSpots code.
 
-For Phase 3 we need security scanning which will have automated tooling that scans our code, containers, DB, etc. for the most common security concerns, dependency updates, etc. Based on the reserch we should have two good SAST (static aplication security testing) and two good DAST (dynamic application security testing) tools. 
-Code scanning should include : 
+For Phase 3 we need security scanning which will have automated tooling that scans our code, containers, DB, etc. for the most common security concerns, dependency updates, etc. Based on the reserch we should have two good SAST (static aplication security testing) and two good DAST (dynamic application security testing) tools.
+Code scanning should include :
     - looking for vulnerabilities in the source code
     - looking for bad/unsafe variabels
     - looking for vulnerable dependancies
