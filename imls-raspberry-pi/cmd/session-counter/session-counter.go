@@ -10,9 +10,8 @@ import (
 	"github.com/spf13/cobra"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/version"
+	zls "gsa.gov/18f/cmd/session-counter/zero-log-sentry"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
-	zls "gsa.gov/18f/internal/zero-log-sentry"
 
 	_ "net/http/pprof"
 )
@@ -118,7 +117,7 @@ var versionCmd = &cobra.Command{
 	Short: "session-counter version",
 	Long:  `Print the version number of session-counter`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(version.GetVersion())
+		fmt.Println(state.GetVersion())
 	},
 }
 
