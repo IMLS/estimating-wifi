@@ -1,0 +1,36 @@
+---
+
+# taken from dependabot documentation:
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+# Basic set up for three package managers
+
+version: 2
+updates:
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "githubactions"
+
+  # Maintain dependencies for Go
+  - package-ecosystem: "gomod"
+    directory: "/imls-raspberry-pi/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "go"
+
+  # Maintain dependencies for Docker
+  - package-ecosystem: "docker"
+    directory: "/imls-backend/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "docker"
