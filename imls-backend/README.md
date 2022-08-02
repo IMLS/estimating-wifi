@@ -28,7 +28,7 @@ This is for local configuration only and should never be run in production.
 
 ## Query the DB
 
-- `curl -s http://127.0.0.1:3000/presences `
+- `curl -s http://127.0.0.1:3000/presences`
 - Fields from the `presences` table
   - presence_id SERIAL PRIMARY KEY,
   - start_time TIMESTAMPTZ NOT NULL,
