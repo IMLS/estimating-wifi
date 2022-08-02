@@ -13,6 +13,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
+<<<<<<< HEAD
 )
 
 require (
@@ -35,4 +36,8 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+=======
+	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
+	gopkg.in/resty.v1 v1.12.0 // indirect
+>>>>>>> main
 )

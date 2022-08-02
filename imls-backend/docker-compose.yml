@@ -1,0 +1,45 @@
+version: "3"
+services:
+  server:
+    image: postgrest/postgrest
+    ports:
+      - "3000:3000"
+    networks:
+      - postgrest
+    environment:
+      PGRST_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
+      PGRST_DB_SCHEMAS: api
+      #In production this role should not be the same as the one used for the connection
+      PGRST_DB_ANON_ROLE: web_anon
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+    depends_on:
+      - db
+  db:
+    image: postgres:14.4-alpine
+    ports:
+      - "5432:5432"
+    networks:
+      - postgrest
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-imls}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+    volumes:
+      - "./data/database:/var/lib/postgresql/data"
+      - "./init:/docker-entrypoint-initdb.d"
+  admin:
+    image: dpage/pgadmin4:6.12
+    ports:
+      - "8080:80"
+    networks:
+      - postgrest
+    environment:
+      # connection string in the app is host.docker.internal
+      # user is `postgres` (or as above), password is as below.
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL:-imls@gsa.gov}"
+      PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+      PGADMIN_DISABLE_POSTFIX: 1
+      PGADMIN_LISTEN_ADDRESS: "0.0.0.0"
+
+networks:
+  postgrest:

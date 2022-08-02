@@ -2,7 +2,7 @@ package state
 
 import (
 	"bufio"
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"os"
 	"regexp"
@@ -61,7 +61,7 @@ func getCachedSerial() string {
 			ps := netadapter.New()
 			lines := ps.Execute(GetSerialPSCommand)
 			serial := strings.TrimSpace(string(lines)) // remove \r\n
-			hash := sha1.Sum([]byte(serial))
+			hash := sha256.Sum256([]byte(serial))
 			cache["serial"] = fmt.Sprintf("%x", hash)
 		} else {
 			if !serialWarnGiven {
