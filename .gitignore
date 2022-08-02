@@ -6,3 +6,5 @@ config.yaml
 /.env
 !release/.gitkeep
 release/
+report/
+megalinter-reports/
