@@ -33,3 +33,5 @@ SARIF_REPORTER: true
 
 # make individual checks available to the status reporter
 GITHUB_STATUS_REPORTER: true
+
+REPOSITORY_GITLEAKS_ARGUMENTS: --no-git
