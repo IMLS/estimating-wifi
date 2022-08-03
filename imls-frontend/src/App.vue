@@ -2,9 +2,9 @@
 import { RouterView } from "vue-router";
 import "uswds";
 
-// import ComponentName from '@/components/ComponentName.vue'
-import USWDSHeader from "@/components/USWDSHeader.vue";
-import USWDSFooter from "@/components/USWDSFooter.vue";
+// import ComponentName from './components/ComponentName.vue'
+import USWDSHeader from "./components/USWDSHeader.vue";
+import USWDSFooter from "./components/USWDSFooter.vue";
 
 export default {
   components: {

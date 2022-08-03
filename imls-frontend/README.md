@@ -41,3 +41,14 @@ npm run lint
 ```
 
 Kindly lint your branches before opening a PR or merging to main.
+
+### Test with Jest and Vue Test Utils
+
+```sh
+npm run test
+```
+
+Jest docs: https://jestjs.io/
+Testing Vue components: https://test-utils.vuejs.org/guide/
+
+Our setup tells Jest to use Babel so you can write your tests using ES6.
