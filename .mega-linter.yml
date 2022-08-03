@@ -1,0 +1,33 @@
+---
+# don't use Mega-Linter to test the reports Mega-Linter created
+ADDITIONAL_EXCLUDED_DIRECTORIES: [report, megalinter-reports]
+
+# don't scan files listed in .gitignore (e.g., node_modules)
+IGNORE_GITIGNORED_FILES: true
+
+# don't attempt to apply fixes at this time
+APPLY_FIXES: all
+
+# please don't spell check everything...
+DISABLE: [SPELL, COPYPASTE]
+
+# only scan new / updated files, not everything
+VALIDATE_ALL_CODEBASE: true
+
+# don't print the alpaca -- it's cute, but we don't need it in the logs
+PRINT_ALPACA: false
+
+# don't fail on finding (yet)
+DISABLE_ERRORS: true
+
+# use prettier for JavaScript code formatting
+JAVASCRIPT_DEFAULT_STYLE: prettier
+
+# disable golangci-lint (it was problematic for a while)
+# DISABLE_LINTERS: [GO_GOLANGCI_LINT]
+
+# v6 supports SARIF reporters
+SARIF_REPORTER: true
+
+# make individual checks available to the status reporter
+GITHUB_STATUS_REPORTER: true

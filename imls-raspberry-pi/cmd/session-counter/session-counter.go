@@ -12,7 +12,7 @@ import (
 	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
-	"gsa.gov/18f/internal/zero-log-sentry"
+	zls "gsa.gov/18f/internal/zero-log-sentry"
 )
 
 var (
@@ -54,8 +54,6 @@ func run2() {
 				Msg("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
 			tlp.ProcessData(durationsdb, sq, iq)
-			// Draw images of the data
-			tlp.WriteImages(durationsdb)
 			// Try sending the data
 			tlp.SimpleSend(durationsdb)
 			// Increment the session counter

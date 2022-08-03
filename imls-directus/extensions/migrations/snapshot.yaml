@@ -25,30 +25,6 @@ collections:
       schema: public
       name: durations
       comment: null
-  - collection: events
-    meta:
-      collection: events
-      icon: assignment
-      note: Wi-Fi events
-      display_template: null
-      hidden: false
-      singleton: false
-      translations: null
-      archive_field: null
-      archive_app_filter: true
-      archive_value: null
-      unarchive_value: null
-      sort_field: null
-      accountability: all
-      color: null
-      item_duplication_fields: null
-      sort: null
-      group: null
-      collapse: open
-    schema:
-      schema: public
-      name: events
-      comment: null
 fields:
   - collection: durations
     field: id
@@ -92,18 +68,18 @@ fields:
       validation: null
       validation_message: null
   - collection: durations
-    field: pi_serial
+    field: serial
     type: string
     schema:
-      name: pi_serial
+      name: serial
       table: durations
       schema: public
       data_type: character varying
-      is_nullable: true
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
-      max_length: 16
+      max_length: 36
       comment: null
       numeric_precision: null
       numeric_scale: null
@@ -115,7 +91,7 @@ fields:
       foreign_key_column: null
     meta:
       collection: durations
-      field: pi_serial
+      field: serial
       special: null
       interface: null
       options: null
@@ -128,7 +104,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -140,7 +116,7 @@ fields:
       table: durations
       schema: public
       data_type: character varying
-      is_nullable: true
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -169,7 +145,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -181,7 +157,7 @@ fields:
       table: durations
       schema: public
       data_type: character varying
-      is_nullable: true
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -210,7 +186,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -222,7 +198,7 @@ fields:
       table: durations
       schema: public
       data_type: character varying
-      is_nullable: true
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -251,7 +227,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -263,7 +239,7 @@ fields:
       table: durations
       schema: public
       data_type: integer
-      is_nullable: true
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -292,7 +268,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
@@ -304,7 +280,7 @@ fields:
       table: durations
       schema: public
       data_type: integer
-      is_nullable: true
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -333,19 +309,19 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
   - collection: durations
     field: start
-    type: bigint
+    type: datetime
     schema:
       name: start
       table: durations
       schema: public
-      data_type: bigint
-      is_nullable: true
+      data_type: timestamptz
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -374,19 +350,19 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null
   - collection: durations
     field: end
-    type: bigint
+    type: datetime
     schema:
       name: end
       table: durations
       schema: public
-      data_type: bigint
-      is_nullable: true
+      data_type: timestamptz
+      is_nullable: false
       generation_expression: null
       default_value: null
       is_generated: false
@@ -415,376 +391,7 @@ fields:
       translations: null
       note: null
       conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: id
-    type: integer
-    schema:
-      name: id
-      table: events
-      schema: public
-      data_type: integer
-      is_nullable: false
-      generation_expression: null
-      default_value: nextval('events_id_seq'::regclass)
-      is_generated: false
-      max_length: null
-      comment: null
-      numeric_precision: 32
-      numeric_scale: 0
-      is_unique: true
-      is_primary_key: true
-      has_auto_increment: true
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: id
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: pi_serial
-    type: string
-    schema:
-      name: pi_serial
-      table: events
-      schema: public
-      data_type: character varying
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: 16
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: pi_serial
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: fcfs_seq_id
-    type: string
-    schema:
-      name: fcfs_seq_id
-      table: events
-      schema: public
-      data_type: character varying
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: 16
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: fcfs_seq_id
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: device_tag
-    type: string
-    schema:
-      name: device_tag
-      table: events
-      schema: public
-      data_type: character varying
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: 32
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: device_tag
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: session_id
-    type: string
-    schema:
-      name: session_id
-      table: events
-      schema: public
-      data_type: character varying
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: 255
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: session_id
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: localtime
-    type: timestamp
-    schema:
-      name: localtime
-      table: events
-      schema: public
-      data_type: timestamp with time zone
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: null
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: localtime
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: servertime
-    type: timestamp
-    schema:
-      name: servertime
-      table: events
-      schema: public
-      data_type: timestamp with time zone
-      is_nullable: true
-      generation_expression: null
-      default_value: CURRENT_TIMESTAMP
-      is_generated: false
-      max_length: null
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: servertime
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: tag
-    type: string
-    schema:
-      name: tag
-      table: events
-      schema: public
-      data_type: character varying
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: 255
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: tag
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
-      group: null
-      validation: null
-      validation_message: null
-  - collection: events
-    field: info
-    type: text
-    schema:
-      name: info
-      table: events
-      schema: public
-      data_type: text
-      is_nullable: true
-      generation_expression: null
-      default_value: null
-      is_generated: false
-      max_length: null
-      comment: null
-      numeric_precision: null
-      numeric_scale: null
-      is_unique: false
-      is_primary_key: false
-      has_auto_increment: false
-      foreign_key_schema: null
-      foreign_key_table: null
-      foreign_key_column: null
-    meta:
-      collection: events
-      field: info
-      special: null
-      interface: null
-      options: null
-      display: null
-      display_options: null
-      readonly: false
-      hidden: true
-      sort: null
-      width: full
-      translations: null
-      note: null
-      conditions: null
-      required: false
+      required: true
       group: null
       validation: null
       validation_message: null

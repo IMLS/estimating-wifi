@@ -1,13 +1,18 @@
-# IMLS Pi Stack
+# IMLS Estimating Wifi
 
-Pi Stack is a pilot project to automate the monitoring of wifi usage via low-cost and open source tools.
+[![MegaLinter](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml)
+[![woke](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml)
+
+Estimating Wifi is a pilot project to automate the monitoring of wifi usage via low-cost and open source tools.
+
+For the full history of this project, please see the [previous repository](https://github.com/18F/imls-pi-stack/).
 
 This project provides:
 
-- imls-ppa: A Debian PPA for installing custom software for the Raspberry Pi 3 or 4
+- imls-directus: Custom [Directus](https://directus.io/) extensions for data visualization
 - imls-raspberry-pi: Command line programs to gather and analyze wifi sessions
-- imls-validator: A standalone service to validate incoming data
-- imls-documentation-v1: __Deprecated__ v1 documentation. For more up-to-date documentation, please consult the [wiki](https://github.com/18F/imls-pi-stack/wiki).
+- imls-windows-installer: Scripts to generate a Windows installer
+- doc: Developer documentation
 
 ## Privacy
 
@@ -15,9 +20,9 @@ No PII (personally identifiable information) is logged as part of this project. 
 
 ## Installation instructions
 
-Please see the [wiki](https://github.com/18F/imls-pi-stack/wiki).
+Forthcoming.
 
-# About
+## About
 
 This software was developed by James Tranovich and Matt Jadud, federal software engineers with [18F](https://18f.gsa.gov/), with funding support from [10x](https://10x.gsa.gov/) and in collaboration with the [Institute of Museum and Library Services](https://imls.gov/).
 
