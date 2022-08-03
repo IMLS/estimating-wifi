@@ -2,6 +2,7 @@
 
 [![MegaLinter](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml)
 [![woke](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml)
+[![CodeQL](https://github.com/IMLS/estimating-wifi/actions/workflows/codeql.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/codeql.yml)
 
 Estimating Wifi is a pilot project to automate the monitoring of wifi usage via low-cost and open source tools.
 
