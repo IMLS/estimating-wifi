@@ -1,0 +1,83 @@
+/*
+* * * * * ==============================
+* * * * * ==============================
+* * * * * ==============================
+* * * * * ==============================
+========================================
+========================================
+========================================
+*/
+
+// -------------------------------------
+// Import individual theme settings...
+
+@import "uswds-theme-general";
+@import "uswds-theme-typography";
+@import "uswds-theme-spacing";
+@import "uswds-theme-color";
+@import "uswds-theme-utilities";
+@import "uswds-theme-components";
+
+$theme-show-notifications: false;
+
+// ...or import custom theme settings.
+
+// @import "my-custom-theme";
+
+// -------------------------------------
+// Import individual USWDS uswds/scss/packages...
+// See https://designsystem.digital.gov/components/
+
+// First import required and global uswds/scss/packages...
+// @import "uswds/scss/packages/required";
+// @import "uswds/scss/packages/global";
+
+// Then import individual component uswds/scss/packages...
+// @import 'uswds/scss/packages/form-controls';
+// @import 'uswds/scss/packages/form-templates';
+// @import 'uswds/scss/packages/layout-grid';
+// @import 'uswds/scss/packages/typography';
+// @import 'uswds/scss/packages/validation';
+// @import 'uswds/scss/packages/usa-accordion';
+// @import 'uswds/scss/packages/usa-alert';
+// @import 'uswds/scss/packages/usa-banner';
+// @import 'uswds/scss/packages/usa-breadcrumb';
+// @import 'uswds/scss/packages/usa-button-group';
+// @import 'uswds/scss/packages/usa-button';
+// @import 'uswds/scss/packages/usa-card';
+// @import 'uswds/scss/packages/usa-checklist';
+// @import 'uswds/scss/packages/usa-collection';
+// @import 'uswds/scss/packages/usa-footer';
+// @import "uswds/scss/packages/usa-header";
+// @import 'uswds/scss/packages/usa-hero';
+// @import 'uswds/scss/packages/usa-icon-list';
+// @import 'uswds/scss/packages/usa-icon';
+// @import 'uswds/scss/packages/usa-identifier';
+// @import 'uswds/scss/packages/usa-layout';
+// @import 'uswds/scss/packages/usa-link';
+// @import 'uswds/scss/packages/usa-media-block';
+// @import 'uswds/scss/packages/usa-megamenu';
+// @import 'uswds/scss/packages/usa-modal';
+// @import 'uswds/scss/packages/usa-nav-container';
+// @import 'uswds/scss/packages/usa-nav';
+// @import 'uswds/scss/packages/usa-navbar';
+// @import 'uswds/scss/packages/usa-pagination';
+// @import 'uswds/scss/packages/usa-process-list';
+// @import 'uswds/scss/packages/usa-search';
+// @import 'uswds/scss/packages/usa-section';
+// @import 'uswds/scss/packages/usa-sidenav';
+// @import 'uswds/scss/packages/usa-site-alert';
+// @import 'uswds/scss/packages/usa-skipnav';
+// @import 'uswds/scss/packages/usa-step-indicator';
+// @import 'uswds/scss/packages/usa-summary-box';
+// @import 'uswds/scss/packages/usa-table';
+// @import 'uswds/scss/packages/usa-tag';
+
+// or package sets...
+// @import 'uswds/scss/packages/uswds-components';
+// @import 'uswds/scss/packages/uswds-utilities';
+
+// -------------------------------------
+// ...or import the complete USWDS kit
+
+@import "uswds/scss/uswds.scss";
