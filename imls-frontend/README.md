@@ -42,16 +42,15 @@ npm run lint
 
 Kindly lint your branches before opening a PR or merging to main.
 
-### Test with Jest and Vue Test Utils
+### Test with Vitest and Vue Test Utils
 
 ```sh
 npm run test
 ```
 
-Jest docs: https://jestjs.io/
+Vitest docs: https://vitest.dev/
 Testing Vue components: https://test-utils.vuejs.org/guide/
 
-Our setup tells Jest to use Babel so you can write your tests using ES6.
 
 You can debug using the [beta version of the Vue Devtools chrome extension](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg).
 Set `__VUE_PROD_DEVTOOLS__=true` in a .env file to enable testing.
