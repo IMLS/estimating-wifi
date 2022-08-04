@@ -10,8 +10,6 @@ function sortByAttributes(attributeKey) {
 
 export const store = readonly({
   // replace with real data
-  sensors: [ { id: "GA0027-008-01" }]
+  sensors: [{ id: "GA0027-008-01" }],
 });
-export const state = reactive({
- 
-});
+export const state = reactive({});

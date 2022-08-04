@@ -48,8 +48,8 @@ Kindly lint your branches before opening a PR or merging to main.
 npm run test
 ```
 
-Vitest docs: https://vitest.dev/
-Testing Vue components: https://test-utils.vuejs.org/guide/
+Vitest docs: <https://vitest.dev/>
+Testing Vue components: <https://test-utils.vuejs.org/guide/>
 
 
 You can debug using the [beta version of the Vue Devtools chrome extension](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg).

@@ -31,7 +31,11 @@ const router = createRouter({
       props: true,
     },
     // will match everything and put it under `$route.params.pathMatch`
-    { path: "/:pathMatch(.*)*", name: "NotFound", component: () => import("../views/PageNotFound.vue") },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "NotFound",
+      component: () => import("../views/PageNotFound.vue"),
+    },
   ],
   scrollBehavior(to, from, savedPosition) {
     // always scroll to top
