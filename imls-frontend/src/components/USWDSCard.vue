@@ -13,6 +13,10 @@ export default {
     ctaLink: {
       type: String,
       default: "#"
+    },
+    noFooter: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -35,7 +39,7 @@ export default {
         <slot />
       </p>
     </div>
-    <div class="usa-card__footer">
+    <div class="usa-card__footer" v-if="!noFooter">
       <router-link
         class="usa-button"
         :to="ctaLink"
