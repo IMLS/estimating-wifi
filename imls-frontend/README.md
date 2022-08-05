@@ -87,10 +87,10 @@ docker build -t pispots . \
  pispots
  ````
 
- The log output will provide the address you may visit to interact
- with the application on your local system.
+The log output will provide the address you may visit to interact
+with the application on your local system.
 
- ### Publishing the Application
+### Publishing the Application
 
  If you want to publish the application to a Docker image registry,
  it will need to be built first:
@@ -108,7 +108,7 @@ docker build -t "${IMAGE_REGISTRY}/${IMAGE_ORG}/${IMAGE_NAME}:${IMAGE_TAG}" .
 docker login "${IMAGE_REGISTRY}"
 
 # push the image
-docker image push "${IMAGE_REGISTRY}/${IMAGE_ORG}/${IMAGE_NAME}:${IMAGE_TAG}" 
+docker image push "${IMAGE_REGISTRY}/${IMAGE_ORG}/${IMAGE_NAME}:${IMAGE_TAG}"
 ```
 
 The image built in this process will have everything needed to run the
