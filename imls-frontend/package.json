@@ -2,12 +2,13 @@
   "name": "imls-estimating-wifi",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --port 4000",
+    "dev": "vite --port 4000 --host",
     "build": "vite build",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "test": "vitest run --coverage",
     "test:watch": "vitest watch",
     "test:coverage": "vitest --coverage && open ./coverage/lcov-report/index.html"
+
   },
   "dependencies": {
     "@rushstack/eslint-patch": "^1.1.0",
