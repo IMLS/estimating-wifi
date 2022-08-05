@@ -64,3 +64,53 @@ You can debug using the
 [beta version of the Vue Devtools chrome extension](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg).
 Set `__VUE_PROD_DEVTOOLS__=true` in a .env file to enable testing.
 
+## Working with Docker
+
+### Developing the Application
+
+If you're working in a development environment and you want hot reloads
+(i.e., when you save a file in your editor, you want the change reflected
+immediately and without having to rebuild the image), use this:
+
+```sh
+docker-compose up --build
+```
+
+or
+
+```sh
+docker build -t pispots . \
+&& docker run \
+ --rm \
+ -p 4000:4000 \
+ -v "$(pwd):/app" \
+ pispots
+ ````
+
+ The log output will provide the address you may visit to interact
+ with the application on your local system.
+
+ ### Publishing the Application
+
+ If you want to publish the application to a Docker image registry,
+ it will need to be built first:
+
+ ```sh
+IMAGE_REGISTRY="hostname.of.registry.tld:5000"
+IMAGE_ORG="organization-for-image"
+IMAGE_NAME="name-of-image"
+IMAGE_TAG="latest"
+
+# build the image
+docker build -t "${IMAGE_REGISTRY}/${IMAGE_ORG}/${IMAGE_NAME}:${IMAGE_TAG}" .
+
+# login to the registry, if applicable
+docker login "${IMAGE_REGISTRY}"
+
+# push the image
+docker image push "${IMAGE_REGISTRY}/${IMAGE_ORG}/${IMAGE_NAME}:${IMAGE_TAG}" 
+```
+
+The image built in this process will have everything needed to run the
+application from the container hosting service of your choice.
+
