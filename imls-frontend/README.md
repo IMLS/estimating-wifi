@@ -4,7 +4,10 @@ This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
+[VSCode](https://code.visualstudio.com/) +
+[Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+(and disable Vetur) +
+[TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
 
 ## Customize configuration
 
@@ -28,13 +31,19 @@ npm run dev
 npm run build
 ```
 
-If you'd like to test the production build locally, install [http-server](https://www.npmjs.com/package/http-server_) and then host the `/imls-frontend/dist` folder:
-```npm install http-server -g```
-```cd dist```
-```http-server```
+If you'd like to test the production build locally, install
+[http-server](https://www.npmjs.com/package/http-server_)
+and then host the `/imls-frontend/dist` folder:
 
+```sh
+npm install http-server -g
+cd dist
+http-server
+```
 
-### Lint with [ESLint](https://eslint.org/)
+### Lint with ESLint
+
+[ESLint](https://eslint.org/) is available from eslint.org
 
 ```sh
 npm run lint
@@ -51,6 +60,7 @@ npm run test
 Vitest docs: <https://vitest.dev/>
 Testing Vue components: <https://test-utils.vuejs.org/guide/>
 
-
-You can debug using the [beta version of the Vue Devtools chrome extension](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg).
+You can debug using the
+[beta version of the Vue Devtools chrome extension](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg).
 Set `__VUE_PROD_DEVTOOLS__=true` in a .env file to enable testing.
+
