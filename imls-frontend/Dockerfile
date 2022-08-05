@@ -4,6 +4,6 @@ COPY package*.json /app/
 
 WORKDIR /app
 ENV NODE_ENV=development
-RUN npm -g install
-#COPY . /app/
-#RUN npm run build
+COPY . /app/
+RUN npm install
+CMD npm run dev

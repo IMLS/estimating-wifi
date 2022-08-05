@@ -1,8 +1,12 @@
+---
+
 version: "3.8"
 services:
   web:
     build:
-      context: ./  
+      context: .
+    # image: node:18-alpine
+    working_dir: /app/
     command: /bin/sh -c "npm install && npm run dev"
     volumes:
       - .:/app/
