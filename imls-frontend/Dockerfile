@@ -1,11 +1,9 @@
-FROM node:18-alpine as base
+FROM node:18-alpine
+RUN mkdir -p /app
+COPY package*.json /app/
 
-COPY package*.json /
-EXPOSE 3000
-
-FROM base as dev
-WORKDIR /
+WORKDIR /app
 ENV NODE_ENV=development
-RUN npm install -g nodemon && npm install
-COPY . /
-RUN npm run build
+RUN npm -g install
+#COPY . /app/
+#RUN npm run build
