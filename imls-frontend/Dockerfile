@@ -6,4 +6,4 @@ WORKDIR /app
 ENV NODE_ENV=development
 COPY . /app/
 RUN npm install
-CMD npm run dev
+CMD ["/bin/sh -c 'npm install && npm run dev'"]
