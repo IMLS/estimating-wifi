@@ -4,7 +4,7 @@ services:
   web:
     build:
       context: .
-    # image: node:18-alpine
+    # image: node:18-buster-slim
     working_dir: /app/
     command: /bin/sh -c "npm install && npm run dev"
     volumes:
