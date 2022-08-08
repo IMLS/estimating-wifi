@@ -37,7 +37,7 @@ body:
     attributes:
       label: Definition of Done (DoD)
       description: The Definition of Done is a list of criteria under which the team would consider this story complete
-      placeholder: '1.'
+      placeholder: "1."
     validations:
       required: false
   - type: textarea
@@ -45,7 +45,7 @@ body:
     attributes:
       label: Acceptance Criteria (AC)
       description: The Acceptance Criteria is a series of tests meant to confirm that things are working as-expected
-      placeholder: '1.'
+      placeholder: "1."
     validations:
       required: false
   - type: textarea
