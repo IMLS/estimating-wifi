@@ -25,7 +25,7 @@ body:
     id: reason
     attributes:
       label: Reason / Justification
-      decription: Finally, a user story involves a reason or a justification as to why the story should be completed -- it's an answer to "why should we do this?"
+      description: Finally, a user story involves a reason or a justification as to why the story should be completed -- it's an answer to "why should we do this?"
     validations:
       required: true
   - type: markdown
@@ -37,8 +37,8 @@ body:
     attributes:
       label: Definition of Done (DoD)
       description: The Definition of Done is a list of criteria under which the team would consider this story complete
-      placeholer: 1.
-    validatiosn:
+      placeholder: 1.
+    validations:
       required: false
   - type: textarea
     id: ac
