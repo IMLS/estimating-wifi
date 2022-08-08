@@ -178,18 +178,48 @@ export default {
               <button
                 class="usa-accordion__button usa-nav__link"
                 aria-expanded="false"
-                aria-controls="extended-nav-section-one"
+                aria-controls="extended-nav-section-sensors"
               >
                 <span>Sensors</span>
               </button>
 
               <ul
-                id="extended-nav-section-one"
+                id="extended-nav-section-sensors"
                 class="usa-nav__submenu"
               >
                 <li class="usa-nav__submenu-item">
                   <RouterLink to="/sensors/GA0027-008-01/">
                     Sensor GA0027-008-01
+                  </RouterLink>
+                </li>
+              </ul>
+            </li>
+            <li class="usa-nav__primary-item">
+              <button
+                class="usa-accordion__button usa-nav__link"
+                aria-expanded="false"
+                aria-controls="extended-nav-section-systems"
+              >
+                <span>Systems</span>
+              </button>
+
+              <ul
+                id="extended-nav-section-systems"
+                class="usa-nav__submenu"
+              >
+                <li class="usa-nav__submenu-item">
+                  <RouterLink to="/system/AA0001-001/">
+                    FSCS AA0001-001
+                  </RouterLink>
+                </li>
+                <li class="usa-nav__submenu-item">
+                  <RouterLink to="/system/AA0002-001/">
+                    FSCS AA0002-001
+                  </RouterLink>
+                </li>
+                <li class="usa-nav__submenu-item">
+                  <RouterLink to="/system/AA0003-001/">
+                    FSCS AA0003-001
                   </RouterLink>
                 </li>
               </ul>

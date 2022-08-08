@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import("../views/PageSingleSensor.vue"),
       props: true,
     },
+        {
+      path: "/system/:id/",
+      component: () => import("../views/PageSystem.vue"),
+      props: true,
+    },
     // will match everything and put it under `$route.params.pathMatch`
     {
       path: "/:pathMatch(.*)*",
