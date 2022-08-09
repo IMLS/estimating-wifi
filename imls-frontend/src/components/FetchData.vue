@@ -68,6 +68,9 @@ export default {
       } catch (error) {
         this.loadedError = error
       }
+    },
+    formatCount(num) {
+      return parseInt(num).toLocaleString('en-US')
     }
   },
 };
@@ -83,17 +86,12 @@ export default {
     <div class="margin-y-2">
       <code>{{ loadUrl }}</code>
     </div>
-    <!-- <ul class="usa-button-group usa-button-group--segmented margin-bottom-3">
-      <li class="usa-button-group__item" v-bind:key="fscs.id" v-for="fscs in store.fscs_ids">
-        <button class="usa-button" :class="{'usa-button--outline': fscsId != fscs.id }" @click="fscsId = fscs.id">{{ fscs.id }}</button>
-      </li>
-    </ul> -->
     <div v-if="loadedError && loadedError.message">
       <p>Oops! Error encountered: {{ loadedError.message }}</p>
       <button @click="retry">Retry</button>
     </div>
     <div v-else-if="loadedData">
-      <h3>Display {{ loadedData.length.toLocaleString('en-US') }} of {{ totalFound.toLocaleString('en-US') }} total entries found:</h3>
+      <h3>Display {{ formatCount(loadedData.length) }} of {{ formatCount(totalFound) }} total entries found:</h3>
       <pre>{{ loadedData }}</pre>
       <div v-if="loadedData.length < 1">Request succeeded but no data was found.</div>
     </div>
