@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 )
 
 //***Define Success and Error structures***
