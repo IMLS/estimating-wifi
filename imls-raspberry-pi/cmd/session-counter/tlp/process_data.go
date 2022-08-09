@@ -1,8 +1,6 @@
 package tlp
 
 import (
-	"time"
-
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
@@ -33,8 +31,8 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 			FCFSSeqID: state.GetFCFSSeqID(),
 			DeviceTag: state.GetDeviceTag(),
 			PatronID:  pidCounter,
-			Start:     time.Unix(se.Start, 0).Format(time.RFC3339),
-			End:       time.Unix(se.End, 0).Format(time.RFC3339),
+			Start:     se.Start,
+			End:       se.End,
 		}
 
 		//dDB.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
