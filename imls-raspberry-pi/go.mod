@@ -11,7 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.27.0
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
 )
