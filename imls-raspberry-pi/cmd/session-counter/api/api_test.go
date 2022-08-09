@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"testing"
-
-	"gsa.gov/18f/internal/http"
 )
 
 func TestRevalResponseUnmarshall(t *testing.T) {
@@ -44,7 +42,7 @@ func TestRevalResponseUnmarshall(t *testing.T) {
 		"valid": true
 	  }`
 
-	var rev http.RevalResponse
+	var rev RevalResponse
 	err := json.Unmarshal([]byte(testString), &rev)
 	if err != nil {
 		log.Println("unmarshalling error:", err)

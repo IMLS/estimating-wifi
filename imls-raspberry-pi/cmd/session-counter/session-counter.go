@@ -8,11 +8,12 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/state"
-	"gsa.gov/18f/internal/version"
+	zls "gsa.gov/18f/cmd/session-counter/zero-log-sentry"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
-	zls "gsa.gov/18f/internal/zero-log-sentry"
+
+	_ "net/http/pprof"
 )
 
 var (
@@ -33,8 +34,7 @@ func runEvery(crontab string, c *cron.Cron, fun func()) {
 }
 
 func run2() {
-	sq := state.NewQueue("sent")
-	iq := state.NewQueue("images")
+	sq := state.NewQueue[int64]("sent")
 	durationsdb := state.GetDurationsDatabase()
 	c := cron.New()
 
@@ -53,13 +53,17 @@ func run2() {
 				Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
 				Msg("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
-			tlp.ProcessData(durationsdb, sq, iq)
+			tlp.ProcessData(durationsdb, sq)
+			// Draw images of the data
+			// tlp.WriteImages(durationsdb)
 			// Try sending the data
 			tlp.SimpleSend(durationsdb)
 			// Increment the session counter
 			state.IncrementSessionID()
 			// Clear out the ephemeral data for the next day of monitoring
 			state.ClearEphemeralDB()
+			durationsdb.ClearDurationsDB()
+
 		})
 
 	// Start the cron jobs...
@@ -67,6 +71,13 @@ func run2() {
 }
 
 func launchTLP() {
+	// if viper.GetBool("WITH_PROFILE") {
+	// 	go http.ListenAndServe("localhost:8080", nil)
+	// 	log.Info().
+	// 		Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
+	// 		Msg("Launching pprof server server")
+	// }
+
 	state.SetConfigAtPath(cfgFile)
 	dsn := state.GetSentryDSN()
 	if dsn != "" {
@@ -106,11 +117,12 @@ var versionCmd = &cobra.Command{
 	Short: "session-counter version",
 	Long:  `Print the version number of session-counter`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(version.GetVersion())
+		fmt.Println(state.GetVersion())
 	},
 }
 
 func main() {
+
 	rootCmd.PersistentFlags().StringVar(&cfgFile,
 		"config",
 		"session-counter.ini",

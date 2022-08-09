@@ -1,16 +1,16 @@
 package tlp
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/interfaces"
-	"gsa.gov/18f/internal/state"
-	"gsa.gov/18f/internal/structs"
+	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/cmd/session-counter/structs"
 )
 
-func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool {
+// https://stackoverflow.com/questions/71274361/go-error-cannot-use-generic-type-without-instantiation
+// Instantiate generics.
+func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 	// Queue up what needs to be sent still.
 	thissession := state.GetCurrentSessionID()
 
@@ -19,18 +19,17 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 		Msg("queueing to images and send")
 
 	if thissession >= 0 {
-		sq.Enqueue(fmt.Sprint(thissession))
-		iq.Enqueue(fmt.Sprint(thissession))
+		sq.Enqueue(thissession)
 	}
 
 	pidCounter := 0
-	durations := make([]interface{}, 0)
+	durations := make([]*structs.Duration, 0)
 
 	for _, se := range state.GetMACs() {
 
-		d := structs.Duration{
+		d := &structs.Duration{
 			PiSerial:  state.GetSerial(),
-			SessionID: fmt.Sprint(state.GetCurrentSessionID()),
+			SessionID: state.GetCurrentSessionID(),
 			FCFSSeqID: state.GetFCFSSeqID(),
 			DeviceTag: state.GetDeviceTag(),
 			PatronID:  pidCounter,
@@ -43,6 +42,7 @@ func ProcessData(dDB interfaces.Database, sq *state.Queue, iq *state.Queue) bool
 		pidCounter += 1
 	}
 
-	dDB.GetTableFromStruct(structs.Duration{}).InsertMany(durations)
+	// dDB.GetTableFromStruct(structs.Duration{}).InsertMany(durations)
+	dDB.InsertMany(durations)
 	return true
 }
