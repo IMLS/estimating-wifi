@@ -1,3 +1,11 @@
+Date: 2022-08-09
+
+# Update to Data Model ADR
+
+The team decided to update the data model to add a heartbeats table. This table will enable the developers and users to see how often the sensor is reporting to the database without issues. The sensor will write to the heartbeat table every hour with its status.
+
+![ER diagram for the IMLS Wifi project](/doc/images/ER%20Diagram%20-%20IMLS%20Wifi_v2.png)
+
 # 1. Record architecture decisions
 
 Date: 2022-07-22
