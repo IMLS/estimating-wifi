@@ -14,10 +14,10 @@ ENVVARS = CGO_ENABLED=1 GOOS=linux
 endif
 endif
 
+all: session-counter wifi-hardware-search-cli
+
 check:
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1 run ./...
-
-all: session-counter wifi-hardware-search-cli
 
 deps:
 	go mod download
