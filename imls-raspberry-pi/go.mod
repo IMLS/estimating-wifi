@@ -3,7 +3,7 @@ module gsa.gov/18f
 go 1.18
 
 require (
-	github.com/benbjohnson/clock v1.1.0
+	github.com/benbjohnson/clock v1.3.0
 	github.com/buger/jsonparser v1.1.1
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/go-resty/resty/v2 v2.7.0
