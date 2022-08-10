@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/robfig/cron/v3"
+	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gsa.gov/18f/cmd/session-counter/state"
