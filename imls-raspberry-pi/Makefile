@@ -27,6 +27,9 @@ session-counter: deps
 wifi-hardware-search-cli: deps
 	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
 
+wifi-hardware-search-windows: deps
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-windows
+
 test:
 	make -C internal/wifi-hardware-search test
 	make -C internal/state test
