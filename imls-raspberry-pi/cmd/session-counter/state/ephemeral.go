@@ -28,12 +28,9 @@ func ClearEphemeralDB() {
 // NOTE: Do not log MAC addresses.
 func RecordMAC(mac string) {
 	now := GetClock().Now().In(time.Local).Unix()
-	// cfg := GetConfig()
-	// cfg.Log().Debug("THE TIME IS NOW ", GetClock().Now().In(time.Local), " or ", now)
 
 	// Check if we already have the MAC address in the ephemeral table.
 	if p, ok := ed[mac]; ok {
-		//cfg.Log().Debug(mac, " exists, updating")
 		// Has this device been away for more than 2 hours?
 		// Start by grabbing the start/end times.
 		se := ed[mac]
@@ -42,7 +39,6 @@ func RecordMAC(mac string) {
 			// Do this by hashing the mac with the current time, store the original data
 			// unchanged, and create a new entry for the current mac address, in case we
 			// see it again (in less than 2h).
-			// cfg.Log().Debug(mac, " is an old mac, refreshing/changing")
 			sha1 := sha1.Sum([]byte(mac + fmt.Sprint(now)))
 			ed[fmt.Sprintf("%x", sha1)] = se
 			ed[mac] = StartEnd{Start: now, End: now}
@@ -52,7 +48,6 @@ func RecordMAC(mac string) {
 		}
 	} else {
 		// We have never seen the MAC address.
-		//cfg.Log().Debug(mac, " is new, inserting")
 		ed[mac] = StartEnd{Start: now, End: now}
 	}
 }

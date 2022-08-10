@@ -4,7 +4,7 @@ import (
 	"github.com/benbjohnson/clock"
 )
 
-var clockSingleton *clock.Clock
+var clockSingleton *clock.Clock = nil
 
 func GetClock() clock.Clock {
 	if clockSingleton == nil {
