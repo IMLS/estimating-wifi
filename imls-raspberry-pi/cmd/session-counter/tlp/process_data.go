@@ -2,6 +2,7 @@ package tlp
 
 import (
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
 )
@@ -26,10 +27,10 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 	for _, se := range state.GetMACs() {
 
 		d := &structs.Duration{
-			PiSerial:  state.GetSerial(),
+			PiSerial:  state.GetCachedSerial(),
 			SessionID: state.GetCurrentSessionID(),
-			FCFSSeqID: state.GetFCFSSeqID(),
-			DeviceTag: state.GetDeviceTag(),
+			FCFSSeqID: config.GetFCFSSeqID(),
+			DeviceTag: config.GetDeviceTag(),
 			PatronID:  pidCounter,
 			Start:     se.Start,
 			End:       se.End,
