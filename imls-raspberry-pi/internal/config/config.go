@@ -1,4 +1,4 @@
-package state
+package config
 
 import (
 	"fmt"
@@ -47,10 +47,6 @@ func SetConfigAtPath(configPath string) {
 	}
 }
 
-func GetSerial() string {
-	return getCachedSerial()
-}
-
 func GetFCFSSeqID() string {
 	return viper.GetString("device.fcfs_id")
 }
@@ -80,28 +76,8 @@ func SetAPIKey(key string) {
 	viper.Set("device.api_key", key)
 }
 
-func SetStorageMode(mode string) {
-	viper.Set("mode.storage", mode)
-}
-
 func SetRunMode(mode string) {
 	viper.Set("mode.run", mode)
-}
-
-func SetQueuesPath(where string) {
-	viper.Set("db.queues", where)
-}
-
-func SetDurationsPath(where string) {
-	viper.Set("db.durations", where)
-}
-
-func SetRootPath(mode string) {
-	viper.Set("www.root", mode)
-}
-
-func SetImagesPath(mode string) {
-	viper.Set("www.images", mode)
 }
 
 func SetUniquenessWindow(window int) {
@@ -123,22 +99,8 @@ func GetDurationsURI() string {
 	host := viper.GetString("api.host")
 	path := viper.GetString("api.uri")
 	return (scheme + "://" +
-		removeLeadingAndTrailingSlashes(host) +
-		startsWithSlash(removeLeadingSlashes(path)))
-}
-
-func IsStoringToAPI() bool {
-	mode := viper.GetString("mode.storage")
-	return strings.Contains(strings.ToLower(mode), "api")
-}
-
-func IsStoringLocally() bool {
-	mode := viper.GetString("mode.storage")
-	either := false
-	for _, s := range []string{"local", "sqlite"} {
-		either = either || strings.Contains(strings.ToLower(mode), s)
-	}
-	return either
+		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") + "/" +
+		strings.TrimPrefix(path, "/"))
 }
 
 func IsProductionMode() bool {
@@ -161,15 +123,6 @@ func IsDeveloperMode() bool {
 func IsTestMode() bool {
 	mode := viper.GetString("mode.run")
 	return strings.Contains(strings.ToLower(mode), "test")
-}
-
-func GetDurationsPath() string {
-	return viper.GetString("db.durations")
-}
-
-func GetDurationsDatabase() *DurationsDB {
-	db := NewDurationsDB()
-	return db
 }
 
 func GetWiresharkPath() string {
@@ -212,14 +165,6 @@ func GetResetCron() string {
 	return viper.GetString("cron.reset")
 }
 
-func GetWWWRoot() string {
-	return viper.GetString("www.root")
-}
-
-func GetWWWImages() string {
-	return viper.GetString("www.images")
-}
-
 func SetConfigDefaults() {
 	// these must be filled in by the user. NB: these settings will _not_ be
 	// present in the config and are set here for explicitness.
@@ -231,7 +176,6 @@ func SetConfigDefaults() {
 	viper.SetDefault("config.maximum_minutes", 600)
 	viper.SetDefault("log.level", "DEBUG")
 	viper.SetDefault("log.loggers", "local:stderr,local:tmp,api:directus")
-	viper.SetDefault("mode.storage", "api")
 	viper.SetDefault("mode.run", "prod")
 	viper.SetDefault("api.scheme", "https")
 	viper.SetDefault("api.host", "rabbit-phase-4.app.cloud.gov")
@@ -241,18 +185,10 @@ func SetConfigDefaults() {
 	if runtime.GOOS == "windows" {
 		viper.SetDefault("wireshark.path", "c:/Program Files/Wireshark/tshark.exe")
 		viper.SetDefault("wlanhelper.path", "c:/Windows/System32/Npcap/WlanHelper.exe")
-		viper.SetDefault("www.root", "c:/imls")
-		viper.SetDefault("www.images", "c:/imls/images")
-		viper.SetDefault("db.durations", "c:/imls/durations.sqlite")
-		viper.SetDefault("db.queues", "c:/imls/queues.sqlite")
 	} else {
 		viper.SetDefault("iw.path", "/usr/sbin/iw")
 		viper.SetDefault("ip.path", "/usr/sbin/ip")
 		viper.SetDefault("wireshark.path", "/usr/bin/tshark")
 		viper.SetDefault("lshw.path", "/usr/bin/lshw")
-		viper.SetDefault("www.root", "/www/imls")
-		viper.SetDefault("www.images", "/www/imls/images")
-		viper.SetDefault("db.durations", "/www/imls/durations.sqlite")
-		viper.SetDefault("db.queues", "/www/imls/queues.sqlite")
 	}
 }

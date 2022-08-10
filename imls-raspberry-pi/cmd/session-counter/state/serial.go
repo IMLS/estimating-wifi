@@ -42,7 +42,7 @@ func cpuinfoLines() (lines []string) {
 	return lines
 }
 
-func getCachedSerial() string {
+func GetCachedSerial() string {
 	serial := FakeSerial
 	if val, ok := cache["serial"]; ok {
 		serial = val

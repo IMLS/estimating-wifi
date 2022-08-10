@@ -6,7 +6,7 @@ import (
 	"regexp"
 
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
@@ -16,7 +16,7 @@ import (
 func GetDeviceHash(wlan *models.Device) []map[string]string {
 	wlan.Exists = false
 
-	cmd := exec.Command(state.GetLshwPath(), "-class", "network")
+	cmd := exec.Command(config.GetLshwPath(), "-class", "network")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal().Err(err).Msg("cpw: cannot get stdout from lshw")

@@ -4,6 +4,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
+	"gsa.gov/18f/internal/config"
 )
 
 // https://stackoverflow.com/questions/71274361/go-error-cannot-use-generic-type-without-instantiation
@@ -26,21 +27,19 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 	for _, se := range state.GetMACs() {
 
 		d := &structs.Duration{
-			PiSerial:  state.GetSerial(),
+			PiSerial:  state.GetCachedSerial(),
 			SessionID: state.GetCurrentSessionID(),
-			FCFSSeqID: state.GetFCFSSeqID(),
-			DeviceTag: state.GetDeviceTag(),
+			FCFSSeqID: config.GetFCFSSeqID(),
+			DeviceTag: config.GetDeviceTag(),
 			PatronID:  pidCounter,
 			Start:     se.Start,
 			End:       se.End,
 		}
 
-		//dDB.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
 		durations = append(durations, d)
 		pidCounter += 1
 	}
 
-	// dDB.GetTableFromStruct(structs.Duration{}).InsertMany(durations)
 	dDB.InsertMany(durations)
 	return true
 }

@@ -31,9 +31,7 @@ wifi-hardware-search-windows: deps
 	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-windows
 
 test:
-	make -C internal/wifi-hardware-search test
-	make -C internal/state test
-	make -C cmd/session-counter/ test
+	go test -coverprofile all.out -timeout 45m $(shell go list ./... | grep -v windows)
 
-old_test:
-	go test -coverprofile all.out -timeout 45m ./...
+show-test-coverage:
+	go tool cover -html=all.out

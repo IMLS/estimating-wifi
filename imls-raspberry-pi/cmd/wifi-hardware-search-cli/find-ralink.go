@@ -7,11 +7,10 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
-	"gsa.gov/18f/internal/zero-log-sentry"
 )
 
 var (
@@ -130,15 +129,7 @@ var versionCmd = &cobra.Command{
 }
 
 func initialize() {
-	state.SetConfigAtPath(cfgFile)
-	dsn := state.GetSentryDSN()
-	if dsn != "" {
-		zls.SetupZeroLogSentry("wifi-hardware-search-cli", dsn)
-		zls.SetTags(map[string]string{
-			"tag":     state.GetDeviceTag(),
-			"fcfs_id": state.GetFCFSSeqID(),
-		})
-	}
+	config.SetConfigAtPath(cfgFile)
 }
 
 func main() {

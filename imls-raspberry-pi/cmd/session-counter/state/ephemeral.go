@@ -4,6 +4,8 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"time"
+
+	"gsa.gov/18f/cmd/session-counter/constants"
 )
 
 type StartEnd struct {
@@ -35,7 +37,7 @@ func RecordMAC(mac string) {
 		// Has this device been away for more than 2 hours?
 		// Start by grabbing the start/end times.
 		se := ed[mac]
-		if (now > se.End) && ((now - se.End) > MAC_MEMORY_DURATION_SEC) {
+		if (now > se.End) && ((now - se.End) > constants.MAC_MEMORY_DURATION_SEC) {
 			// If it has been, we need to "forget" the old device.
 			// Do this by hashing the mac with the current time, store the original data
 			// unchanged, and create a new entry for the current mac address, in case we
