@@ -8,3 +8,5 @@ config.yaml
 release/
 report/
 megalinter-reports/
+.DS_Store
+.vscode

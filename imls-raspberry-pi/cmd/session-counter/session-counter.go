@@ -5,14 +5,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/robfig/cron/v3"
+	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/state"
+	zls "gsa.gov/18f/cmd/session-counter/zero-log-sentry"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
-	zls "gsa.gov/18f/internal/zero-log-sentry"
+
+	_ "net/http/pprof"
 )
 
 var (
@@ -33,9 +36,8 @@ func runEvery(crontab string, c *cron.Cron, fun func()) {
 }
 
 func run2() {
-	sq := state.NewQueue("sent")
-	iq := state.NewQueue("images")
-	durationsdb := state.GetDurationsDatabase()
+	sq := state.NewQueue[int64]("sent")
+	durationsdb := state.NewDurationsDB()
 	c := cron.New()
 
 	go runEvery("*/1 * * * *", c,
@@ -47,19 +49,23 @@ func run2() {
 				tlp.TSharkRunner)
 		})
 
-	go runEvery(state.GetResetCron(), c,
+	go runEvery(config.GetResetCron(), c,
 		func() {
 			log.Info().
 				Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
 				Msg("RUNNING PROCESSDATA")
 			// Copy ephemeral durations over to the durations table
-			tlp.ProcessData(durationsdb, sq, iq)
+			tlp.ProcessData(durationsdb, sq)
+			// Draw images of the data
+			// tlp.WriteImages(durationsdb)
 			// Try sending the data
 			tlp.SimpleSend(durationsdb)
 			// Increment the session counter
 			state.IncrementSessionID()
 			// Clear out the ephemeral data for the next day of monitoring
 			state.ClearEphemeralDB()
+			durationsdb.ClearDurationsDB()
+
 		})
 
 	// Start the cron jobs...
@@ -67,13 +73,20 @@ func run2() {
 }
 
 func launchTLP() {
-	state.SetConfigAtPath(cfgFile)
-	dsn := state.GetSentryDSN()
+	// if viper.GetBool("WITH_PROFILE") {
+	// 	go http.ListenAndServe("localhost:8080", nil)
+	// 	log.Info().
+	// 		Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
+	// 		Msg("Launching pprof server server")
+	// }
+
+	config.SetConfigAtPath(cfgFile)
+	dsn := config.GetSentryDSN()
 	if dsn != "" {
 		zls.SetupZeroLogSentry("session-counter", dsn)
 		zls.SetTags(map[string]string{
-			"tag":     state.GetDeviceTag(),
-			"fcfs_id": state.GetFCFSSeqID(),
+			"tag":     config.GetDeviceTag(),
+			"fcfs_id": config.GetFCFSSeqID(),
 		})
 	}
 
@@ -111,6 +124,7 @@ var versionCmd = &cobra.Command{
 }
 
 func main() {
+
 	rootCmd.PersistentFlags().StringVar(&cfgFile,
 		"config",
 		"session-counter.ini",

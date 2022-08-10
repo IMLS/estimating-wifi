@@ -4,20 +4,19 @@ VERSION := $(shell git describe --tags --abbrev=0)
 LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 
 ifeq ($(shell uname -m),armv7l)
-ENVVARS = CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
+ENVVARS = GOOS=linux GOARCH=arm GOARM=7
 else
 ifeq ($(OS),Windows_NT)
-# choco install mingw (for now, since we need CGO)
-ENVVARS = CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-gcc
+ENVVARS = GOOS=windows GOARCH=amd64
 else
-ENVVARS = CGO_ENABLED=1 GOOS=linux
+ENVVARS = GOOS=linux
 endif
 endif
+
+all: session-counter wifi-hardware-search-cli
 
 check:
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1 run ./...
-
-all: session-counter wifi-hardware-search-cli
 
 deps:
 	go mod download
@@ -28,10 +27,11 @@ session-counter: deps
 wifi-hardware-search-cli: deps
 	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
 
-test:
-	make -C internal/wifi-hardware-search test
-	make -C internal/state test
-	make -C cmd/session-counter/ test
+wifi-hardware-search-windows: deps
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-windows
 
-old_test:
-	go test -coverprofile all.out -timeout 45m ./...
+test:
+	go test -coverprofile all.out -timeout 45m $(shell go list ./... | grep -v windows)
+
+show-test-coverage:
+	go tool cover -html=all.out

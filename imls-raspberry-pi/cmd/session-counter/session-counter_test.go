@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"path/filepath"
+	"net/http"
 	"runtime"
 	"testing"
 	"time"
 
 	"github.com/benbjohnson/clock"
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
-	"gsa.gov/18f/internal/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
@@ -52,12 +52,11 @@ func isItMidnight(now time.Time) bool {
 
 }
 
-func MockRun(rundays int, nummacs int, numfoundperminute int) {
+func MockRun(rundays int, nummacs int, numfoundperminute int) *state.DurationsDB {
 	// The MAC database MUST be ephemeral. Put it in RAM.
 
-	sq := state.NewQueue("sent")
-	iq := state.NewQueue("images")
-	durationsdb := state.GetDurationsDatabase()
+	sq := state.NewQueue[int64]("sent")
+	durationsdb := state.NewDurationsDB()
 
 	// Create a pool of NUMMACS devices to draw from.
 	// We will send NUMFOUNDPERMINUTE each minute
@@ -87,7 +86,9 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 					Str("time", fmt.Sprint(state.GetClock().Now().In(time.Local))).
 					Msg("RUNNING PROCESSDATA")
 				// Copy ephemeral durations over to the durations table
-				tlp.ProcessData(durationsdb, sq, iq)
+				tlp.ProcessData(durationsdb, sq)
+				// Draw images of the data
+				// tlp.WriteImages(durationsdb)
 				// Try sending the data
 				tlp.SimpleSend(durationsdb)
 				// Increment the session counter
@@ -98,19 +99,19 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) {
 		}
 
 	}
+	return durationsdb
 }
 
 func TestAllUp(t *testing.T) {
+
+	// Provides profiling.
+	// curl -sK -v http://localhost:8080/debug/pprof/heap > heap.out
+	// go tool pprof heap.out
+	go http.ListenAndServe("localhost:8080", nil)
+
 	// DO NOT USE LOGGING YET
 	_, filename, _, _ := runtime.Caller(0)
 	fmt.Println(filename)
-	path := filepath.Dir(filename)
-	state.SetConfigAtPath(filepath.Join(path, "test", "config.sqlite"))
-	state.SetStorageMode("local")
-	state.SetRootPath(filepath.Join(path, "test", "www"))
-	state.SetImagesPath(filepath.Join(path, "test", "www", "images"))
-	state.SetQueuesPath(filepath.Join(path, "test", "queues.sqlite"))
-	state.SetDurationsPath(filepath.Join(path, "test", "durations.sqlite"))
 
 	log.Info().
 		Int64("session id", state.GetCurrentSessionID()).
@@ -122,7 +123,8 @@ func TestAllUp(t *testing.T) {
 	mock.Set(mt)
 	state.SetClock(mock)
 
-	MockRun(1, 200000, 10)
+	db := MockRun(1, 200000, 10)
+	db.ClearDurationsDB()
 
 	log.Info().Msg("WAITING")
 	time.Sleep(5 * time.Second)
@@ -138,11 +140,14 @@ func TestAllUp(t *testing.T) {
 	mock.Set(mt)
 	state.SetClock(mock)
 
-	MockRun(5, 200000, 10)
+	db = MockRun(5, 200000, 10)
+	db.ClearDurationsDB()
 
 	mt, _ = time.Parse("2006-01-02T15:04", "1978-01-01T00:01")
 	mock.Set(mt)
 	state.SetClock(mock)
 
-	MockRun(90, 2000000, 10)
+	db = MockRun(90, 2000000, 10)
+	db.ClearDurationsDB()
+
 }

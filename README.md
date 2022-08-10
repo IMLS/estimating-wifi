@@ -2,6 +2,7 @@
 
 [![MegaLinter](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/megalinter.yml)
 [![woke](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/woke.yml)
+[![CodeQL](https://github.com/IMLS/estimating-wifi/actions/workflows/codeql.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/codeql.yml)
 
 [![snyk](https://github.com/IMLS/estimating-wifi/actions/workflows/snyk.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/snyk.yml)
 
