@@ -6,26 +6,29 @@ body:
   - type: markdown
     attributes:
       value: |
-        This form will guide you through creating a new user story.
+        This form will guide you through creating a new [user story](https://www.agilealliance.org/glossary/user-stories/).
   - type: input
     id: persona
     attributes:
       label: User / Persona
-      description: A user story is viewed from the perspective of a user or persona, such "survey administrator" or "software engineer"
+      description: 'A user story is viewed from the perspective of a user or persona, such "survey administrator" or "software engineer"'
+      placeholder: who?
     validations:
       required: true
   - type: input
     id: request
     attributes:
       label: Request
-      description: 'Next, a user story involves a request: an answer to the question, "what would you like?"  Note: here we share what we want, not how we want it done'
+      description: 'Next, a user story includes the request; note: here we share what we want, not how we want it done'
+      placeholder: what?
     validations:
       required: true
   - type: input
     id: reason
     attributes:
       label: Reason / Justification
-      description: Finally, a user story involves a reason or a justification as to why the story should be completed -- it's an answer to "why should we do this?"
+      description: 'Finally, a user story involves a reason or a justification as to why the story should be completed -- an answer to "why should we do this?"'
+      placeholder: why?
     validations:
       required: true
   - type: markdown
@@ -36,8 +39,9 @@ body:
     id: dod
     attributes:
       label: Definition of Done (DoD)
-      description: The Definition of Done is a list of criteria under which the team would consider this story complete
-      placeholder: "1."
+      description: The Definition of Done is a list of criteria under which the team would consider this story complete; may include references to issues
+      value: "- [ ] "
+      render: markdown
     validations:
       required: false
   - type: textarea
@@ -45,7 +49,8 @@ body:
     attributes:
       label: Acceptance Criteria (AC)
       description: The Acceptance Criteria is a series of tests meant to confirm that things are working as-expected
-      placeholder: "1."
+      value: "- [ ] "
+      render: markdown
     validations:
       required: false
   - type: textarea
@@ -53,5 +58,6 @@ body:
     attributes:
       label: Other Notes
       description: List any additional notes (e.g., resources, links, diagrams, etc.) that the team may find useful or helpful when working on this user story.
+      render: markdown
     validations:
       required: false
