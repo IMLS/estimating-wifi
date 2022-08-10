@@ -2,9 +2,9 @@ package tlp
 
 import (
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
+	"gsa.gov/18f/internal/config"
 )
 
 // https://stackoverflow.com/questions/71274361/go-error-cannot-use-generic-type-without-instantiation
@@ -36,12 +36,10 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 			End:       se.End,
 		}
 
-		//dDB.GetTableFromStruct(structs.Duration{}).InsertStruct(d)
 		durations = append(durations, d)
 		pidCounter += 1
 	}
 
-	// dDB.GetTableFromStruct(structs.Duration{}).InsertMany(durations)
 	dDB.InsertMany(durations)
 	return true
 }
