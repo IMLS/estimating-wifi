@@ -81,7 +81,7 @@ func SetRunMode(mode string) {
 }
 
 func GetLogLevel() string {
-	return viper.GetString("log.level")
+	return strings.ToLower(viper.GetString("log.level"))
 }
 
 func GetLoggers() []string {
