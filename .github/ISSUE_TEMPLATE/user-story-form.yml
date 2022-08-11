@@ -5,7 +5,7 @@ labels: ["story"]
 body:
   - type: markdown
     attributes:
-      value: |
+      value: >
         This form will guide you through creating a new [user story](https://www.agilealliance.org/glossary/user-stories/).
 
         User stories capture requests and word them in terms of a persona
