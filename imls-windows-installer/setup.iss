@@ -63,8 +63,8 @@ Filename: "{app}\Wireshark\npcap-1.60.exe"; \
 Filename: "{app}\services\nssm.exe"; \
   WorkingDir: "{app}"; \
   Parameters: """install estimating-wifi session-counter.exe \
-    Application ""c:\imls\session-counter.exe"" \
-    AppDirectory ""c:\imls"" \
+    Application ""{app}\session-counter.exe"" \
+    AppDirectory ""{app}"" \
     DisplayName ""IMLS Session Counter"" \
     Start SERVICE_AUTO_START"""; \
   Description: "nssm 2.24"; \
@@ -187,5 +187,4 @@ procedure WriteOutIni();
 begin
   SetIniString('device', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
   SetIniString('device', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
-  SetIniString('device', 'device_tag', DevicePage.Values[0], ExpandConstant(CurrentFileName));
 end;
