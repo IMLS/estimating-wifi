@@ -36,7 +36,6 @@ This is for local configuration only and should never be run in production.
   - fscs_id VARCHAR(16) NOT NULL [FOREIGN KEY],
   - sensor_id SERIAL [FOREIGN KEY],
   - manufacturer_index INTEGER,
-  - patron_index INTEGER,
 
 ## Persisted Data
 
