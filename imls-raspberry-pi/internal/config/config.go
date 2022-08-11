@@ -25,6 +25,7 @@ func SetConfigAtPath(configPath string) {
 	viper.SetConfigFile(configPath)
 	viper.AutomaticEnv()
 
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Info().Msg("no configuration found: writing")
@@ -46,7 +47,6 @@ func SetConfigAtPath(configPath string) {
 	default:
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 }
 
 func GetFCFSSeqID() string {
