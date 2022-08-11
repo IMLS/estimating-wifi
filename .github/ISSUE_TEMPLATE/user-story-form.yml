@@ -12,7 +12,7 @@ body:
     attributes:
       label: User / Persona
       description: 'A user story is viewed from the perspective of a user or persona, such "survey administrator" or "software engineer"'
-      placeholder: who?
+      placeholder: '(who) As a...'
     validations:
       required: true
   - type: input
@@ -20,7 +20,7 @@ body:
     attributes:
       label: Request
       description: 'Next, a user story includes the request; note: here we share what we want, not how we want it done'
-      placeholder: what?
+      placeholder: '(what) I want...'
     validations:
       required: true
   - type: input
@@ -28,7 +28,7 @@ body:
     attributes:
       label: Reason / Justification
       description: 'Finally, a user story involves a reason or a justification as to why the story should be completed -- an answer to "why should we do this?"'
-      placeholder: why?
+      placeholder: '(why) so that....'
     validations:
       required: true
   - type: markdown
