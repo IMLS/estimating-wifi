@@ -62,7 +62,7 @@ Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Flags: runascurrentuser
 Filename: "{app}\service\nssm.exe"; \
   WorkingDir: "{app}"; \
-  Parameters: """install estimating-wifi session-counter.exe \
+  Parameters: """install estimating-wifi ""{app}\session-counter.exe"" \
     Application ""{app}\session-counter.exe"" \
     AppDirectory ""{app}"" \
     DisplayName ""IMLS Session Counter"" \
@@ -164,11 +164,8 @@ begin
         end;
       end;
     end;
-  end else begin
-     Result := True;
-  end;
-end else
-    Result := True;
+    end else
+      Result := True;
 end;
 
 procedure WriteOutIni();
