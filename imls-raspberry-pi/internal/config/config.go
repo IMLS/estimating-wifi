@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"strings"
 
@@ -45,6 +46,7 @@ func SetConfigAtPath(configPath string) {
 	default:
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 }
 
 func GetFCFSSeqID() string {
