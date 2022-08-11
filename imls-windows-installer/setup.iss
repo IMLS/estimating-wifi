@@ -74,7 +74,6 @@ Filename: "{app}\service\nssm.exe"; \
 var
   IntroPage: TOutputMsgWizardPage;
   LibraryPage: TInputQueryWizardPage;
-  DevicePage: TInputQueryWizardPage;
 
 procedure InitializeWizard;
 begin
@@ -92,12 +91,6 @@ begin
     'System (FSCS) ID, then click Next.');
   LibraryPage.Add('API key:', False);
   LibraryPage.Add('FSCS ID:', False);
-
-  DevicePage := CreateInputQueryPage(LibraryPage.ID,
-    'Device Information',
-    'This information will help uniquely identify your machine within your library.',
-    'Please enter a descriptive tag for this machine.');
-  DevicePage.Add('Device tag:', False);
 end;
 
 function IsAlphabetic(C: Char): Boolean;
@@ -171,11 +164,6 @@ begin
         end;
       end;
     end;
-  end else if CurPageID = DevicePage.ID then begin
-    { Check for empty data }
-    if Trim(DevicePage.Values[0]) = '' then begin
-      MsgBox('You must enter a device tag.', mbError, MB_OK);
-      Result := False;
   end else begin
      Result := True;
   end;
