@@ -1,3 +1,5 @@
+.PHONY: all clean test
+
 all:
 	cp ~/go/bin/session-counter.exe release/
 	cp ~/go/bin/wifi-hardware-search-windows release/
