@@ -31,18 +31,40 @@ Name: "{app}\service"
 [Files]
 ; NOTE: Do not use "Flags: ignoreversion" on any shared system files
 ; Our IMLS installer
-Source: ".\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
+Source: ".\release\{#MyAppExeName}"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion
+Source: "README.txt"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion
+Source: "session-counter.ini"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion; \
+  AfterInstall: WriteOutIni
 ; nssm 2.24
-Source:"nssm.exe"; DestDir: "{app}\service"; Flags: ignoreversion
+Source:"nssm.exe"; \
+  DestDir: "{app}\service"; \
+  Flags: ignoreversion
 ; Wireshark 3.6.5 portable app
-Source:"WiresharkPortable64_3.6.5.paf.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
-Source:"npcap-1.60.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
+Source:"WiresharkPortable64_3.6.5.paf.exe"; \
+  DestDir: "{app}\Wireshark"; \
+  Flags: ignoreversion
+Source:"npcap-1.60.exe"; \
+  DestDir: "{app}\Wireshark"; \
+  Flags: ignoreversion
 
 [Run]
-Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; Description: "Wireshark 3.6.5"; Flags: runascurrentuser
-Filename: "{app}\Wireshark\npcap-1.60.exe"; Description: "npcap 1.60"; Flags: runascurrentuser
+Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
+  Description: "Wireshark 3.6.5"; \
+  Flags: runascurrentuser
+Filename: "{app}\Wireshark\npcap-1.60.exe"; \
+  Description: "npcap 1.60"; \
+  Flags: runascurrentuser
+Filename: "{app}\services\nssm.exe"; \
+  WorkingDir: "{app}"; \
+  Parameters: "install estimating-wifi session-counter.exe Application "c:\imls\session-counter.exe" AppDirectory "c:\imls" DisplayName "IMLS Session Counter" Start SERVICE_AUTO_START; \
+  Description: "nssm 2.24"; \
+  Flags: runascurrentuser
 
 [Code]
 var
