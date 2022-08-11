@@ -62,7 +62,11 @@ Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Flags: runascurrentuser
 Filename: "{app}\services\nssm.exe"; \
   WorkingDir: "{app}"; \
-  Parameters: "install estimating-wifi session-counter.exe Application "c:\imls\session-counter.exe" AppDirectory "c:\imls" DisplayName "IMLS Session Counter" Start SERVICE_AUTO_START; \
+  Parameters: """install estimating-wifi session-counter.exe \
+    Application ""c:\imls\session-counter.exe"" \
+    AppDirectory ""c:\imls"" \
+    DisplayName ""IMLS Session Counter"" \
+    Start SERVICE_AUTO_START"""; \
   Description: "nssm 2.24"; \
   Flags: runascurrentuser
 
