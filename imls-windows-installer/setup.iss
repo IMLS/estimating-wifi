@@ -1,7 +1,7 @@
 #define MyAppName "IMLS Session Counter"
 #define MyAppVersion "1.0"
 #define MyAppPublisher "GSA 10x"
-#define MyAppURL "https://github.com/18F/imls-pi-stack"
+#define MyAppURL "https://github.com/IMLS/estimating-wifi"
 #define MyAppExeName "session-counter.exe"
 
 [Setup]
@@ -26,13 +26,16 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
 Name: "{app}\Wireshark"
+Name: "{app}\service"
 
 [Files]
 ; NOTE: Do not use "Flags: ignoreversion" on any shared system files
 ; Our IMLS installer
-Source: "..\release\bin\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
+; nssm 2.24
+Source:"nssm.exe"; DestDir: "{app}\service"; Flags: ignoreversion
 ; Wireshark 3.6.5 portable app
 Source:"WiresharkPortable64_3.6.5.paf.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
 Source:"npcap-1.60.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
@@ -156,7 +159,7 @@ end;
 
 procedure WriteOutIni();
 begin
-  SetIniString('user', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
-  SetIniString('user', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
-  SetIniString('user', 'device_tag', DevicePage.Values[0], ExpandConstant(CurrentFileName));
+  SetIniString('device', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
+  SetIniString('device', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
+  SetIniString('device', 'device_tag', DevicePage.Values[0], ExpandConstant(CurrentFileName));
 end;
