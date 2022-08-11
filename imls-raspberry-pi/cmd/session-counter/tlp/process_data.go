@@ -21,7 +21,6 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 		sq.Enqueue(thissession)
 	}
 
-	pidCounter := 0
 	durations := make([]*structs.Duration, 0)
 
 	for _, se := range state.GetMACs() {
@@ -31,13 +30,11 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 			SessionID: state.GetCurrentSessionID(),
 			FCFSSeqID: config.GetFCFSSeqID(),
 			DeviceTag: config.GetDeviceTag(),
-			PatronID:  pidCounter,
 			Start:     se.Start,
 			End:       se.End,
 		}
 
 		durations = append(durations, d)
-		pidCounter += 1
 	}
 
 	dDB.InsertMany(durations)

@@ -47,8 +47,7 @@ CREATE TABLE imlswifi.presences (
     end_time timestamp with time zone NOT NULL,
     fscs_id character varying(16) NOT NULL,
     sensor_id integer NOT NULL,
-    manufacturer_index integer,
-    patron_index integer
+    manufacturer_index integer
 );
 
 
@@ -62,8 +61,7 @@ CREATE VIEW api.presences AS
     presences.end_time,
     presences.fscs_id,
     presences.sensor_id,
-    presences.manufacturer_index,
-    presences.patron_index
+    presences.manufacturer_index
    FROM imlswifi.presences;
 
 
@@ -327,4 +325,5 @@ ALTER TABLE ONLY imlswifi.sensors
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220727163656'),
     ('20220729132839'),
-    ('20220729150547');
+    ('20220729150547'),
+    ('20220811194424');
