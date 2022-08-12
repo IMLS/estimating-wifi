@@ -1,15 +1,20 @@
 package state
 
-import "gsa.gov/18f/cmd/session-counter/structs"
+type Duration struct {
+	ID        int
+	SessionID int64
+	Start     int64
+	End       int64
+}
 
 type DurationsDB struct {
-	db map[int64]*structs.Duration
+	db map[int64]*Duration
 }
 
 var pk int64 = 0
 
 func NewDurationsDB() *DurationsDB {
-	db := make(map[int64]*structs.Duration, 0)
+	db := make(map[int64]*Duration, 0)
 	return &DurationsDB{db: db}
 }
 
@@ -21,19 +26,23 @@ func (mkv *DurationsDB) ClearDurationsDB() {
 	}
 }
 
-func (mkv *DurationsDB) Insert(d *structs.Duration) {
+func (mkv *DurationsDB) Insert(d *Duration) {
 	pk += 1
 	mkv.db[pk] = d
 }
 
-func (mkv *DurationsDB) InsertMany(ds []*structs.Duration) {
-	for _, d := range ds {
-		mkv.Insert(d)
+func (mkv *DurationsDB) InsertMany(s int64, e EphemeralDB) {
+	for _, ephemera := range e {
+		mkv.Insert(&Duration{
+			SessionID: s,
+			Start:     ephemera.Start,
+			End:       ephemera.End,
+		})
 	}
 }
 
-func (mkv *DurationsDB) GetSession(s int64) []*structs.Duration {
-	found := make([]*structs.Duration, 0)
+func (mkv *DurationsDB) GetSession(s int64) []*Duration {
+	found := make([]*Duration, 0)
 	for _, v := range mkv.db {
 		if v.SessionID == s {
 			found = append(found, v)

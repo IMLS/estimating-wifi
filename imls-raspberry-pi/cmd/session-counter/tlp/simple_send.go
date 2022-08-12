@@ -4,10 +4,8 @@ import (
 	"strconv"
 
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/cmd/session-counter/api"
 	"gsa.gov/18f/cmd/session-counter/state"
-	"gsa.gov/18f/cmd/session-counter/structs"
 )
 
 func SimpleSend(db *state.DurationsDB) {
@@ -19,10 +17,8 @@ func SimpleSend(db *state.DurationsDB) {
 	sessionsToSend := sq.AsList()
 
 	for _, nextSessionIDToSend := range sessionsToSend {
-		durations := []*structs.Duration{}
-		// FIXME: Leaky Abstraction
-		// err := db.GetPtr().Select(&durations, "SELECT * FROM durations WHERE session_id=?", nextSessionIDToSend)
-		durations = db.GetSession(nextSessionIDToSend)
+
+		durations := db.GetSession(nextSessionIDToSend)
 
 		if len(durations) == 0 {
 			log.Debug().
@@ -30,24 +26,14 @@ func SimpleSend(db *state.DurationsDB) {
 				Msg("found zero durations")
 			sq.Remove(nextSessionIDToSend)
 		} else {
-			log.Debug().
-				Int("durations", len(durations)).
-				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
-				Msg("preparing to send durations to API")
 
-			// convert []Duration to an array of map[string]interface{}
-			data := make([]map[string]interface{}, 0)
-			for _, duration := range durations {
-				data = append(data, duration.AsMap())
-			}
-
-			// After writing images, we come back and try and send the data remotely.
 			log.Debug().
-				Int("duration", len(data)).
+				Int("duration", len(durations)).
 				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("sending durations to API")
 
-			err := api.PostJSON(config.GetDurationsURI(), data)
+			err := api.PostDurations(durations)
+
 			if err != nil {
 				log.Error().
 					Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
