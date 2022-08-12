@@ -35,7 +35,7 @@ pip install pre-commit
 
 This should only have to be performed once.
 
-More information is available on the [pre-commit website](https://pre-commit.com/#install)
+More information is available on the [pre-commit website](https://pre-commit.com/#install).
 
 ### Installing the pre-commit hooks
 
@@ -48,7 +48,7 @@ pre-commit install
 
 This sould only have to be performed once.
 
-More information is available on the [pre-commit website](https://pre-commit.com/#3-install-the-git-hook-scripts)
+More information is available on the [pre-commit website](https://pre-commit.com/#3-install-the-git-hook-scripts).
 
 ### Usage
 
