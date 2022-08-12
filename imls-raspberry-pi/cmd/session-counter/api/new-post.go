@@ -1,9 +1,10 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
+	"bytes"
+	"encoding/csv"
 	"net/http"
+	"strconv"
 	"time"
 
 	resty "github.com/go-resty/resty/v2"
@@ -22,8 +23,15 @@ type AuthError struct {
 var timeOut int = 15
 
 func asCSV(durations []*state.Duration) []byte {
-	// TODO: import encoding/text
-	return []byte{}
+	b := new(bytes.Buffer)
+	w := csv.NewWriter(b)
+	w.Write([]string{"start_time", "end_time"})
+	for _, d := range durations {
+		s := strconv.FormatInt(d.Start, 10)
+		e := strconv.FormatInt(d.End, 10)
+		w.Write([]string{s, e})
+	}
+	return b.Bytes()
 }
 
 func PostDurations(durations []*state.Duration) error {
@@ -35,11 +43,6 @@ func PostDurations(durations []*state.Duration) error {
 	log.Debug().Str("fscs", fscs).Str("uri", uri).Msg("sending")
 
 	data := asCSV(durations)
-
-	//***for testing***
-	fmt.Println("Running Post")
-	myJson, _ := json.Marshal(data)
-	fmt.Println(string(myJson))
 
 	//***create client and conditions needed for the client***
 	client := resty.New()
@@ -64,7 +67,7 @@ func PostDurations(durations []*state.Duration) error {
 		log.Fatal().Err(err).Msg("could not send")
 		return err
 	} else {
-		fmt.Println("  Body       :\n", resp)
+		log.Debug().Str("body", resp.Status()).Msg("received response")
 	}
 
 	//***for testing response code***
