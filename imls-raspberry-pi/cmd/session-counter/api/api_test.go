@@ -20,7 +20,7 @@ func TestSimpleCall(t *testing.T) {
 		},
 	}
 
-	viper.Set("api.scheme", "http")
+	viper.Set("api.scheme", "https")
 	viper.Set("api.host", "10x.gsa.gov")
 	viper.Set("api.uri", "test/durations")
 
@@ -28,7 +28,7 @@ func TestSimpleCall(t *testing.T) {
 
 	httpmock.Activate()
 	httpmock.RegisterResponder("POST",
-		"http://10x.gsa.gov/test/durations",
+		"https://10x.gsa.gov/test/durations",
 		func(req *http.Request) (*http.Response, error) {
 			b, _ := io.ReadAll(req.Body)
 			body = string(b)
