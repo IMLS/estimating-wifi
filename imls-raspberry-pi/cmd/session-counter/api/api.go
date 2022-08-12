@@ -31,20 +31,18 @@ func asCSV(durations []*state.Duration) []byte {
 		e := strconv.FormatInt(d.End, 10)
 		w.Write([]string{s, e})
 	}
+	w.Flush()
 	return b.Bytes()
 }
 
 func PostDurations(durations []*state.Duration) error {
 
-	fscs := config.GetFSCSID()
+	// fscs := config.GetFSCSID()
 	uri := config.GetDurationsURI()
 	key := config.GetAPIKey()
 
-	log.Debug().Str("fscs", fscs).Str("uri", uri).Msg("sending")
-
 	data := asCSV(durations)
 
-	//***create client and conditions needed for the client***
 	client := resty.New()
 	client.AddRetryCondition(
 		func(r *resty.Response, err error) bool {
@@ -55,24 +53,21 @@ func PostDurations(durations []*state.Duration) error {
 
 	// TODO: chunking in case we send more than 2MB data
 
-	//***Client post data***
 	resp, err := client.R().
 		SetBody(data).
 		SetAuthToken(key).
+		SetHeader("Content-Type", "text/csv").
 		//SetResult(&AuthSuccess{}). Could be incorperated once we have defined response
 		//SetError(&AuthError{}). Could be incorperated once we have defined response
 		Post(uri)
 
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not send")
+		log.Fatal().
+			Err(err).
+			Str("response", resp.String()).
+			Msg("could not send")
 		return err
-	} else {
-		log.Debug().Str("body", resp.Status()).Msg("received response")
 	}
 
-	//***for testing response code***
-	//fmt.Println("Response Info:")
-	//fmt.Println("Status Code:", resp.StatusCode())
-	//fmt.Println("Status:", resp.Status())
 	return nil
 }
