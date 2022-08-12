@@ -49,8 +49,8 @@ func SetConfigAtPath(configPath string) {
 	}
 }
 
-func GetFCFSSeqID() string {
-	return viper.GetString("device.fcfs_id")
+func GetFSCSID() string {
+	return viper.GetString("device.fscs_id")
 }
 
 func GetDeviceTag() string {
@@ -66,8 +66,8 @@ func GetAPIKey() string {
 	return viper.GetString("device.api_key")
 }
 
-func SetFCFSSeqID(id string) {
-	viper.Set("device.fcfs_id", id)
+func SetFSCSID(id string) {
+	viper.Set("device.fscs_id", id)
 }
 
 func SetDeviceTag(tag string) {
@@ -150,7 +150,7 @@ func SetConfigDefaults() {
 	// these must be filled in by the user. NB: these settings will _not_ be
 	// present in the config and are set here for explicitness.
 	viper.SetDefault("device.api_key", "")
-	viper.SetDefault("device.fcfs_id", "")
+	viper.SetDefault("device.fscs_id", "")
 	viper.SetDefault("device.tag", "")
 	// defaults for running in production
 	viper.SetDefault("config.minimum_minutes", 5)

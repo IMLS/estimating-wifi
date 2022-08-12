@@ -22,13 +22,13 @@ type Durations struct {
 }
 
 type Duration struct {
-	ID        int    `json:"id" db:"id" type:"INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"`
-	PiSerial  string `json:"pi_serial" db:"pi_serial" type:"TEXT"`
-	SessionID int64  `json:"session_id" db:"session_id" type:"TEXT"`
-	FCFSSeqID string `json:"fcfs_seq_id" db:"fcfs_seq_id" type:"TEXT"`
-	DeviceTag string `json:"device_tag" db:"device_tag" type:"TEXT"`
-	Start     int64  `json:"start,string" db:"start" type:"INTEGER"`
-	End       int64  `json:"end,string" db:"end" type:"INTEGER"`
+	ID        int    `json:"id"`
+	Serial    string `json:"serial"`
+	SessionID int64  `json:"session_id"`
+	FSCSID    string `json:"fscs"`
+	DeviceTag string `json:"device_tag"`
+	Start     int64  `json:"start_time,string"`
+	End       int64  `json:"end_time,string"`
 }
 
 func (d Duration) AsMap() map[string]interface{} {

@@ -22,7 +22,7 @@ func setup() {
 
 	config.SetConfigAtPath(temp.Name())
 	config.SetRunMode("test")
-	config.SetFCFSSeqID("ME0000-001")
+	config.SetFSCSID("ME0000-001")
 	config.SetDeviceTag("testing")
 
 	log.Debug().Int64("session id", state.GetCurrentSessionID()).Msg("setup")
