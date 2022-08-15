@@ -27,7 +27,7 @@ body:
         slices.  This results in little to no surprises by going through all
         the layers. Rather than trying to do all of the research and then
         all of the design, etc, you do just enough of each layer in order
-        to have something tangible that you can demo & build upon. 
+        to have something tangible that you can demo & build upon.
 
         Think about what is the simplest path from beginning to end.  It’s
         a basic user path, a happy path.  Think about the type of user
