@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"strings"
 
@@ -24,6 +25,7 @@ func SetConfigAtPath(configPath string) {
 	viper.SetConfigFile(configPath)
 	viper.AutomaticEnv()
 
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Info().Msg("no configuration found: writing")
@@ -80,12 +82,8 @@ func SetRunMode(mode string) {
 	viper.Set("mode.run", mode)
 }
 
-func SetUniquenessWindow(window int) {
-	viper.Set("config.uniqueness_window", window)
-}
-
 func GetLogLevel() string {
-	return viper.GetString("log.level")
+	return strings.ToLower(viper.GetString("log.level"))
 }
 
 func GetLoggers() []string {
@@ -109,20 +107,7 @@ func IsProductionMode() bool {
 }
 
 func IsDeveloperMode() bool {
-	mode := viper.GetString("mode.run")
-	either := false
-	for _, s := range []string{"dev", "test"} {
-		either = either || strings.Contains(strings.ToLower(mode), s)
-	}
-	if either {
-		log.Info().Msg("running in developer mode")
-	}
-	return either
-}
-
-func IsTestMode() bool {
-	mode := viper.GetString("mode.run")
-	return strings.Contains(strings.ToLower(mode), "test")
+	return !IsProductionMode()
 }
 
 func GetWiresharkPath() string {
@@ -155,10 +140,6 @@ func GetMinimumMinutes() int {
 
 func GetMaximumMinutes() int {
 	return viper.GetInt("config.maximum_minutes")
-}
-
-func GetUniquenessWindow() int {
-	return viper.GetInt("config.uniqueness_window")
 }
 
 func GetResetCron() string {

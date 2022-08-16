@@ -1,3 +1,15 @@
+Date: 2022-08-12
+
+# Update to Data Model ADR
+
+The team decided to update the data model. The sensors and libraries tables will be loaded during the bulk install process, so all of the fields need to be accessible to the State IT Admin Director for the library systems they will set up. The serial and version of the sensor will not be available at bulk install time for the IT director, so the team decided to move these fields to the heartbeats table.
+
+The sensors and libraries tables will be populated and updated during the bulk install or update processes. The heartbeats and presences tables will be populated after the bulk installation process.
+
+The team also decided to remove the patron_index as a field from the presences table. The imls-raspberry-pi directory does currently does not track return patrons, so the team decided that this feature was out of scope for the time being.
+
+![ER diagram for the IMLS Wifi project](/doc/images/ER_Diagram_IMLS_Wifi_v3.png)
+
 Date: 2022-08-09
 
 # Update to Data Model ADR

@@ -125,9 +125,7 @@ func SimpleShark(
 }
 
 func StoreMacs(keepers []string) {
-	//cfg := state.GetConfig()
 	// Do not log MAC addresses...
-	//cfg.Log().Debug("found ", len(keepers), " keepers")
 	for _, mac := range keepers {
 		state.RecordMAC(mac)
 	}
