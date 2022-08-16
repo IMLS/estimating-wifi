@@ -67,7 +67,6 @@ body:
       label: Definition of Done (DoD)
       description: The Definition of Done is a list of criteria under which the team would consider this story complete; may include references to issues
       value: "- [ ] "
-      render: markdown
     validations:
       required: false
   - type: textarea
@@ -76,7 +75,6 @@ body:
       label: Acceptance Criteria (AC)
       description: The Acceptance Criteria are a series of tests meant to confirm that things are working as-expected
       value: "- [ ] "
-      render: markdown
     validations:
       required: false
   - type: textarea
@@ -84,6 +82,5 @@ body:
     attributes:
       label: Other Notes
       description: List any additional notes (e.g., resources, links, diagrams, etc.) that the team may find useful or helpful when working on this user story.
-      render: markdown
     validations:
       required: false
