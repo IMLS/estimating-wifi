@@ -42,14 +42,6 @@ body:
     validations:
       required: true
   - type: input
-    id: request
-    attributes:
-      label: Request
-      description: "Next, a user story includes the request; note: here we share what we want, not how we want it done"
-      placeholder: "(what) I want..."
-    validations:
-      required: true
-  - type: input
     id: reason
     attributes:
       label: Reason / Justification
@@ -57,7 +49,16 @@ body:
       placeholder: "(why) so that...."
     validations:
       required: true
-  - type: markdown
+  - type: input
+    id: request
+    attributes:
+      label: Request
+      description: "Next, a user story includes the request; note: here we share what we want, not how we want it done"
+      placeholder: "(what) I want..."
+    validations:
+      required: true
+
+- type: markdown
     attributes:
       value: |
         ## Optional fields
