@@ -1,7 +1,7 @@
 ---
 name: User Story
 description: Use this form to create a new user story
-labels: ["story"]
+labels: ["story", "needs refinement"]
 body:
   - type: markdown
     attributes:
