@@ -37,6 +37,18 @@ This is for local configuration only and should never be run in production.
   - sensor_id SERIAL [FOREIGN KEY],
   - manufacturer_index INTEGER,
 
+## Query Stored Procedures and Functions from the DB
+
+- `curl "http://localhost:3000/rpc/{function_or_sp_name}`
+- Current stored procedures and functions in the `api` schema
+    - bin_devices_per_hour
+      - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_day={DATE variable}&_fscs_id={TEXT variable}"`
+      - EXAMPLE:
+        `curl "http://localhost:3000/rpc/bin_devices_per_hour?_day=2022-05-10&_fscs_id=AA0003-001"`
+      - Returns an array of INTs (device counts per hour) starting at 12 AM EDT, length 24
+      - EXAMPLE:
+      [22,23,23,27,26,21,23,37,44,50,66,75,75,75,70,88,88,86,70,30,25,25,25,25]                                                                             
+
 ## Persisted Data
 
 - Lives in /imls-backend/data folder

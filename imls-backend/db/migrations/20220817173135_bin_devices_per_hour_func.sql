@@ -7,15 +7,16 @@ DECLARE
     _end TIMESTAMPTZ;
     _count INT;
     _hour INT := 0;
-    _period TIMESTAMPTZ;
+    _day_end INT := 24;
     num_devices_arr INT[];
 BEGIN
     -- CREATE TEMP TABLE _results (hour TIMESTAMPTZ, count INT);
     -- _period := _day::TIMESTAMPTZ + '1 day'::INTERVAL;    
     _hour := _hour + 4;
+    _day_end := _day_end + 4;
     -- Hardcoded EDT for now. Will add the look up table next to pass in the time zone
-    WHILE _hour < 24 LOOP
-    
+    WHILE _hour < _day_end LOOP
+
         -- Casting the DATE variable to a TIMESTAMP to add it to the interval
         _start = _day::TIMESTAMP + make_interval(hours=> _hour);
         _end =  _day + make_interval(hours=> _hour, mins => 59, secs => 59);
