@@ -23,6 +23,62 @@ CREATE SCHEMA api;
 CREATE SCHEMA imlswifi;
 
 
+--
+-- Name: bin_devices_per_hour(date, text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.bin_devices_per_hour(_day date, _fscs_id text) RETURNS integer[]
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    _start TIMESTAMPTZ;
+    _end TIMESTAMPTZ;
+    _count INT;
+    _hour INT := 0;
+    _day_end INT := 24;
+    num_devices_arr INT[];
+BEGIN
+    -- CREATE TEMP TABLE _results (hour TIMESTAMPTZ, count INT);
+    -- _period := _day::TIMESTAMPTZ + '1 day'::INTERVAL;
+    _hour := _hour + 4;
+    _day_end := _day_end + 4;
+    -- Hardcoded EDT for now. Will add the look up table next to pass in the time zone
+    WHILE _hour < _day_end LOOP
+
+        -- Casting the DATE variable to a TIMESTAMP to add it to the interval
+        _start = _day::TIMESTAMP + make_interval(hours=> _hour);
+        _end =  _day + make_interval(hours=> _hour, mins => 59, secs => 59);
+
+        -- This select stores the result in the variable _count.
+        SELECT count(*) INTO _count
+        FROM api.presences
+        WHERE  fscs_id = _fscs_id
+        AND (presences.start_time::TIMESTAMPTZ < presences.end_time::TIMESTAMPTZ)
+        AND (presences.start_time::TIMESTAMPTZ <= _end::TIMESTAMPTZ)
+        AND (presences.end_time > _start::TIMESTAMPTZ);
+        num_devices_arr := array_append(num_devices_arr, _count);
+
+        _hour := _hour + 1;
+    END LOOP;
+    RETURN num_devices_arr;
+END
+$$;
+
+
+--
+-- Name: test(); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.test() RETURNS TABLE(start_time timestamp with time zone, end_time timestamp with time zone)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+RETURN QUERY
+SELECT presences.start_time, presences.end_time
+FROM api.presences;
+END; $$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -327,4 +383,6 @@ ALTER TABLE ONLY imlswifi.sensors
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220727163656'),
     ('20220729132839'),
-    ('20220729150547');
+    ('20220729150547'),
+    ('20220810132049'),
+    ('20220817173135');

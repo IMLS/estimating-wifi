@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth: 1
 
       # MegaLinter
       - name: MegaLinter
@@ -42,8 +42,7 @@ jobs:
         env:
           # All available variables are described in documentation
           # https://oxsecurity.github.io/megalinter/configuration/
-          # VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} # Validates all source when push on main, else just the git diff with main. Override with true if you always want to lint all sources
-          VALIDATE_ALL_CODEBASE: true # always validate everything
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} # Validates all source when push on main, else just the git diff with main. Override with true if you always want to lint all sources
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
@@ -66,8 +65,8 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-          commit-message: "[MegaLinter] Apply linters automatic fixes"
-          title: "[MegaLinter] Apply linters automatic fixes"
+          commit-message: "[MegaLinter] Apply linter automatic fixes"
+          title: "[MegaLinter] Apply linter automatic fixes"
           labels: bot
       - name: Create PR output
         if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -84,10 +83,16 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: ${{ github.event.pull_request.head.ref || github.head_ref || github.ref }}
-          commit_message: "[MegaLinter] Apply linters fixes"
+          commit_message: "[MegaLinter] Apply linter fixes"
+
+      - name: Check to see if the SARIF a was generated
+        id: sarif_file_exists
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "megalinter-reports/megalinter-report.sarif"
 
       - name: Upload MegaLinter scan results to GitHub Security tab
-        if: ${{ success() }} || ${{ failure() }}
+        if: steps.sarif_file_exists.outputs.files_exists == 'true'
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "megalinter-reports/megalinter-report.sarif"
