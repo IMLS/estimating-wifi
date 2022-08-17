@@ -1,2 +1,4 @@
 ---
+
+# This allows users to create blank issues and not use forms
 blank_issues_enabled: true
