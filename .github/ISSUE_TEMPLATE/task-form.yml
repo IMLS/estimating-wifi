@@ -1,7 +1,7 @@
 ---
 name: Task
 description: Use this form to create a new Tasks
-labels: ["task"]
+labels: ["task", "needs refinement"]
 body:
   - type: markdown
     attributes:
