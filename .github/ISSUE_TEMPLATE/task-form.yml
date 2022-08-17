@@ -55,11 +55,3 @@ body:
       description: "If any User Stories (the what) are related to this Task (the how), please #mention the issue number(s) here"
     validations:
       required: false
-
-  - type: textarea
-    id: adrs
-    attributes:
-      label: Architectural Decision Records (ADRs)
-      description: "If any Architectural Decision Records (ADRs) are relevant to the execution of this Task, please reference them here"
-    validations:
-      required: false
