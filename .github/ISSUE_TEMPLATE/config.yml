@@ -1,5 +1,4 @@
 ---
-
 # This allows users to create blank issues and not use forms
 # https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
 blank_issues_enabled: true
