@@ -63,11 +63,3 @@ body:
       description: "If any Architectural Decision Records (ADRs) are relevant to the execution of this Task, please reference them here"
     validations:
       required: false
-
-  - type: input
-    id: estimate
-    attributes:
-      label: Size Estimate
-      description: "For planning purposes, it's often helpful to see the expected amount of effort involved with completing a task; common scales are Fibonacci numbers (1, 2, 3, 5, 8) and Tee shirt sizes (S, M, L, XL)"
-    validations:
-      required: false
