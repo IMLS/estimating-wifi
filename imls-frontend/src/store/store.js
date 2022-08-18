@@ -1,6 +1,6 @@
 import { reactive, computed, readonly } from "vue";
 
-const BASEURL = "http://127.0.0.1:3000"
+const BASEURL = "http://127.0.0.1:3000";
 
 export const store = readonly({
   fscs_ids: [
@@ -37,9 +37,9 @@ export const store = readonly({
     "10pm",
     "11pm",
   ],
-  backendPaths: { 
-    get24HoursBinnedByHour: "/rpc/bin_devices_per_hour" 
-  }
+  backendPaths: {
+    get24HoursBinnedByHour: "/rpc/bin_devices_per_hour",
+  },
 });
 
 export const state = reactive({
@@ -50,14 +50,14 @@ export const state = reactive({
   isLoading: false,
 
   async fetchData(path, queryString) {
-    this.isLoading = true
+    this.isLoading = true;
     try {
       // todo: let queryString be an array of params instead of a string
-      const response = await fetch(`${BASEURL}${path}${queryString}`)
-      this.fetchedData = (await response.json());
+      const response = await fetch(`${BASEURL}${path}${queryString}`);
+      this.fetchedData = await response.json();
     } catch (error) {
-      this.fetchError = error
+      this.fetchError = error;
     }
-    this.isLoading = false
-  }
+    this.isLoading = false;
+  },
 });
