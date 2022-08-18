@@ -35,9 +35,7 @@ export default {
       </h2>
     </header>
     <div class="usa-card__body">
-      <p>
-        <slot />
-      </p>
+      <slot />
     </div>
     <div class="usa-card__footer" v-if="!noFooter">
       <router-link

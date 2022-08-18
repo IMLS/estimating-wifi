@@ -183,18 +183,18 @@ export default {
               <button
                 class="usa-accordion__button usa-nav__link"
                 aria-expanded="false"
-                aria-controls="extended-nav-section-systems"
+                aria-controls="extended-nav-section-libraries"
               >
-                <span>Systems</span>
+                <span>Libraries</span>
               </button>
 
               <ul
-                id="extended-nav-section-systems"
+                id="extended-nav-section-libraries"
                 class="usa-nav__submenu"
               >
-                <li v-for="system in store.fscs_ids" :key="system.id" class="usa-nav__submenu-item">
-                  <RouterLink :to="'/system/' + system.id + '/'">
-                    {{ system.id }}
+                <li v-for="library in store.fscs_ids" :key="library.id" class="usa-nav__submenu-item">
+                  <RouterLink :to="'/library/' + library.id + '/'">
+                    Test library {{ library.id }}
                   </RouterLink>
                 </li>
                

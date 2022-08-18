@@ -1,5 +1,6 @@
 <script>
 import Histogram from '../components/Histogram.vue';
+import USWDSTable from '../components/USWDSTable.vue';
 import { store } from "@/store/store.js";
 
 //todo: make the backend function name configurable
@@ -7,7 +8,7 @@ const baseUrl = 'http://127.0.0.1:3000/rpc/bin_devices_per_hour'
 
 export default {
   name: 'Fetch Data',
-  components: {Histogram },
+  components: {Histogram, USWDSTable },
   props: {
     fscsId: {
       type: String,
@@ -74,18 +75,44 @@ export default {
 </script>
 
 <template>
-<div>
     <div v-if="loadedError && loadedError.message">
       <p>Oops! Error encountered: {{ loadedError.message }}</p>
       <button @click="retry">Retry</button>
     </div>
     <div v-else-if="loadedData">
-      <Histogram :dataset="loadedData" :labels="getLabels" ></Histogram>
-      <h3>Raw output from  <code>{{ loadUrl }}</code>:</h3>
-      <pre>{{ loadedData }}</pre>
-      <div v-if="loadedData.length < 1">Request succeeded but no data was found.</div>
+      <Histogram :dataset="loadedData" :labels="getLabels" :datasetIdKey="fscsId"></Histogram>
+
+      <div class="usa-accordion usa-accordion--bordered margin-top-4">
+        <h3 class="usa-accordion__heading">
+          <button
+            type="button"
+            class="usa-accordion__button"
+            aria-expanded="false"
+            aria-controls="viewTable"
+          >
+            View as table
+          </button>
+        </h3>
+        <div id="viewTable" class="usa-accordion__content usa-prose" hidden>
+          <USWDSTable :headers="getLabels" :rows="loadedData" :caption="`Devices present during each hour of the day, starting at 12am on ${startDate}`" />
+          <div v-if="loadedData.length < 1">Request succeeded but no data was found.</div>
+        </div>
+        <h3 class="usa-accordion__heading">
+          <button
+            type="button"
+            class="usa-accordion__button"
+            aria-expanded="false"
+            aria-controls="viewRaw"
+          >
+            View raw response
+          </button>
+        </h3>
+        <div id="viewRaw" class="usa-accordion__content usa-prose" hidden>
+          <h4>Raw output from  <code class="text-no-wrap">{{ loadUrl }}</code>:</h4>
+          <pre>{{ loadedData }}</pre>
+          <div v-if="loadedData.length < 1">Request succeeded but no data was found.</div>
+        </div>
+      </div>
     </div>
     <div v-else>Loading...</div>
-
-</div>
 </template>

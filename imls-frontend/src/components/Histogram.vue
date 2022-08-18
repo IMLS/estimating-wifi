@@ -53,7 +53,45 @@ export default {
   data() {
     return {
       chartOptions: {
-        responsive: true
+        responsive: true,
+        plugins: {
+          tooltip: {
+            displayColors: false,
+            borderWidth: 0.25,
+            borderColor: '#333',
+            backgroundColor: '#FFF',
+            // titleColor:'#333',
+            // titleAlign: 'center',
+            // titleFont: {
+            //   size: 20
+            // },
+            bodyColor:'#333',
+            bodyAlign: 'center',
+            bodyFont: {
+              size: 20,
+              weight: 'bold',
+              family: 'Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif'
+            },
+            yAlign: 'bottom',
+            padding: {
+              left: 10,
+              right: 10,
+              top: 6,
+              bottom:  6
+            },
+            caretSize: 10,
+            callbacks: {
+              title: () => '',
+              label: function(context) {
+                let label = '';
+                if (context.parsed.y !== null) {
+                    label += context.parsed.y + " devices present"
+                }
+                return label;
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -64,7 +102,13 @@ export default {
     computedChartData: function() { 
       return {
         labels:  this.labels,
-        datasets: [ { data: this.dataset } ] ,
+        datasets: [ 
+          { 
+            label: this.datasetIdKey,
+            backgroundColor: '#005ea2',
+            data: this.dataset
+          }
+        ] ,
       }
     
     },

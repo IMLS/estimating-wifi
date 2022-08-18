@@ -26,8 +26,8 @@ const router = createRouter({
       props: (route) => ({ query: route.query.query }),
     },
     {
-      path: "/system/:id/",
-      component: () => import("../views/PageSystem.vue"),
+      path: "/library/:id/",
+      component: () => import("../views/PageLibrary.vue"),
       props: true,
     },
     // will match everything and put it under `$route.params.pathMatch`
