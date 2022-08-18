@@ -4,7 +4,6 @@ import { state } from "@/store/store.js";
 
 export default {
   name: "USWDS Date Picker",
-  expose: ['selectedDate'],
   props: {
     label: {  
       type: String,

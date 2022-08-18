@@ -1,14 +1,17 @@
 <script>
-import { state } from "@/store/store.js";
+import { store, state } from "@/store/store.js";
 import { format } from "date-fns";
 
 import FetchData from "@/components/FetchData.vue";
 import USWDSCard from "@/components/USWDSCard.vue";
 import USWDSDatePicker from "@/components/USWDSDatePicker.vue";
+import Histogram from '../components/Histogram.vue';
+import USWDSTable from '../components/USWDSTable.vue';
+
 
 export default {
   name: 'Single Library',
-  components: {FetchData, USWDSCard, USWDSDatePicker },
+  components: {FetchData, USWDSCard, USWDSDatePicker, Histogram, USWDSTable },
 
   props: {
     id: {
@@ -19,14 +22,8 @@ export default {
   },
   data() {
     return {
+      store,
       state,
-      possibleStartDates: [
-        '2022-05-10',
-        '2022-05-11',
-        '2022-05-12',
-        '2022-05-13',
-        '2022-05-14'
-      ]
     }
   },
   methods: {},
@@ -34,7 +31,10 @@ export default {
     chartTitle: () => {
       const localDate = state.selectedDate + "T00:00";
       return "Devices present by hour on " + format(new Date(localDate), 'PP')
-    }
+    },
+      getLabels(){
+       return store.hourlyLabels;
+    },
   }
 };
 </script>
@@ -50,7 +50,46 @@ export default {
         <USWDSCard :title="chartTitle" no-footer>
           <div class="grid-row">
             <div class="grid-col">
-              <FetchData :fscs-id=id :start-date="state.selectedDate"/>
+              <FetchData 
+              :fscs-id=id 
+              :path="store.backendPaths.get24HoursBinnedByHour"
+              :queryString="`?_fscs_id=${id}&_day=${state.selectedDate}`">
+                <Histogram 
+                :dataset="state.fetchedData" 
+                :labels="getLabels" 
+                :datasetIdKey="id"></Histogram>
+                
+                <div class="usa-accordion usa-accordion--bordered margin-top-4">
+                  <h3 class="usa-accordion__heading">
+                    <button
+                      type="button"
+                      class="usa-accordion__button"
+                      aria-expanded="false"
+                      aria-controls="viewTable"
+                    >
+                      View as table
+                    </button>
+                  </h3>
+                  <div id="viewTable" class="usa-accordion__content usa-prose" hidden>
+                    <USWDSTable :headers="getLabels" :rows="state.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}`" />
+                    <div v-if="state.fetchedData.length < 1">Request succeeded but no data was found.</div>
+                  </div>
+                  <h3 class="usa-accordion__heading">
+                    <button
+                      type="button"
+                      class="usa-accordion__button"
+                      aria-expanded="false"
+                      aria-controls="viewRaw"
+                    >
+                      View raw response
+                    </button>
+                  </h3>
+                  <div id="viewRaw" class="usa-accordion__content usa-prose" hidden>
+                    <pre>{{ state.fetchedData }}</pre>
+                    <div v-if="state.fetchedData.length < 1">Request succeeded but no data was found.</div>
+                  </div>
+                </div>
+              </FetchData>
             </div>
           </div>
   

@@ -1,16 +1,8 @@
 import { reactive, computed, readonly } from "vue";
 
-function sortByAttributes(attributeKey) {
-  return (a, b) => {
-    const first = a.attributes[attributeKey] || "zzz"; // sort undefined values to the end
-    const second = b.attributes[attributeKey] || "zzz";
-    return first.localeCompare(second);
-  };
-}
+const BASEURL = "http://127.0.0.1:3000"
 
 export const store = readonly({
-  // replace with real data
-  sensors: [{ id: "GA0027-008-01" }],
   fscs_ids: [
     { id: "AA0001-001" },
     { id: "AA0002-001" },
@@ -45,7 +37,27 @@ export const store = readonly({
     "10pm",
     "11pm",
   ],
+  backendPaths: { 
+    get24HoursBinnedByHour: "/rpc/bin_devices_per_hour" 
+  }
 });
+
 export const state = reactive({
   selectedDate: "2022-05-01",
+  fetchCount: null,
+  fetchError: {},
+  fetchedData: {},
+  isLoading: false,
+
+  async fetchData(path, queryString) {
+    this.isLoading = true
+    try {
+      // todo: let queryString be an array of params instead of a string
+      const response = await fetch(`${BASEURL}${path}${queryString}`)
+      this.fetchedData = (await response.json());
+    } catch (error) {
+      this.fetchError = error
+    }
+    this.isLoading = false
+  }
 });

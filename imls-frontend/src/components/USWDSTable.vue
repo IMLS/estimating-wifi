@@ -30,7 +30,7 @@ export default {
     </thead>
     <tbody>
       <tr>
-        <td v-bind:key="row" v-for="row in rows">{{ row }}</td>
+        <td v-bind:key="i" v-for="row, i in rows">{{ row }}</td>
       </tr>
     </tbody>
   </table>
