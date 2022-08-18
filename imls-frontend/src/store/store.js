@@ -12,12 +12,12 @@ export const store = readonly({
   // replace with real data
   sensors: [{ id: "GA0027-008-01" }],
   fscs_ids: [
-    { id: "AA0001-001" }, 
-    { id: "AA0002-001" }, 
+    { id: "AA0001-001" },
+    { id: "AA0002-001" },
     { id: "AA0003-001" },
-    { id: "AA0004-001" }, 
-    { id: "AA0005-001" }, 
-    { id: "AA0006-001" }
+    { id: "AA0004-001" },
+    { id: "AA0005-001" },
+    { id: "AA0006-001" },
   ],
   hourlyLabels: [
     "12am",
@@ -43,9 +43,8 @@ export const store = readonly({
     "8pm",
     "9pm",
     "10pm",
-    "11pm"
-
-  ]
+    "11pm",
+  ],
 });
 export const state = reactive({
   selectedDate: '2022-05-01'
