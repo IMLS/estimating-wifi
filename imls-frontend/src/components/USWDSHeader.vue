@@ -1,9 +1,14 @@
 <script>
 import { RouterLink } from "vue-router";
+import { store } from "@/store/store.js";
+
 export default {
+  name: "USWDS Header",
+  components: { RouterLink },
   data() {
     return {
       searchString: "",
+      store,
     };
   },
   methods: {
@@ -178,26 +183,6 @@ export default {
               <button
                 class="usa-accordion__button usa-nav__link"
                 aria-expanded="false"
-                aria-controls="extended-nav-section-sensors"
-              >
-                <span>Sensors</span>
-              </button>
-
-              <ul
-                id="extended-nav-section-sensors"
-                class="usa-nav__submenu"
-              >
-                <li class="usa-nav__submenu-item">
-                  <RouterLink to="/sensors/GA0027-008-01/">
-                    Sensor GA0027-008-01
-                  </RouterLink>
-                </li>
-              </ul>
-            </li>
-            <li class="usa-nav__primary-item">
-              <button
-                class="usa-accordion__button usa-nav__link"
-                aria-expanded="false"
                 aria-controls="extended-nav-section-systems"
               >
                 <span>Systems</span>
@@ -207,21 +192,12 @@ export default {
                 id="extended-nav-section-systems"
                 class="usa-nav__submenu"
               >
-                <li class="usa-nav__submenu-item">
-                  <RouterLink to="/system/AA0001-001/">
-                    FSCS AA0001-001
+                <li v-for="system in store.fscs_ids" :key="system.id" class="usa-nav__submenu-item">
+                  <RouterLink :to="'/system/' + system.id + '/'">
+                    {{ system.id }}
                   </RouterLink>
                 </li>
-                <li class="usa-nav__submenu-item">
-                  <RouterLink to="/system/AA0002-001/">
-                    FSCS AA0002-001
-                  </RouterLink>
-                </li>
-                <li class="usa-nav__submenu-item">
-                  <RouterLink to="/system/AA0003-001/">
-                    FSCS AA0003-001
-                  </RouterLink>
-                </li>
+               
               </ul>
             </li>
           </ul>

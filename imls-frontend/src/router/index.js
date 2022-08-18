@@ -26,11 +26,6 @@ const router = createRouter({
       props: (route) => ({ query: route.query.query }),
     },
     {
-      path: "/sensors/:id/",
-      component: () => import("../views/PageSingleSensor.vue"),
-      props: true,
-    },
-    {
       path: "/system/:id/",
       component: () => import("../views/PageSystem.vue"),
       props: true,
