@@ -47,5 +47,5 @@ export const store = readonly({
   ],
 });
 export const state = reactive({
-  selectedDate: '2022-05-01'
+  selectedDate: "2022-05-01",
 });
