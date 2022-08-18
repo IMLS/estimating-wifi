@@ -5,6 +5,11 @@ labels: ["story"]
 body:
   - type: markdown
     attributes:
+      value: |
+        ## Introduction
+
+  - type: markdown
+    attributes:
       value: >
         This form will guide you through creating a new [user story](https://www.agilealliance.org/glossary/user-stories/).
 
@@ -32,6 +37,11 @@ body:
         Think about what is the simplest path from beginning to end.  It’s
         a basic user path, a happy path.  Think about the type of user
         and what they would want to do.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Required fields
 
   - type: input
     id: persona
