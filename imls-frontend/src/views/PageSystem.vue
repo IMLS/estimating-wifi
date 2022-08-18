@@ -2,10 +2,11 @@
 import { store } from "@/store/store.js";
 
 import FetchData from "@/components/FetchData.vue";
+import USWDSCard from "@/components/USWDSCard.vue";
 
 export default {
   name: 'Single System',
-  components: {FetchData },
+  components: {FetchData, USWDSCard },
 
   props: {
     id: {
@@ -16,13 +17,13 @@ export default {
   data() {
     return {
       store,
-      startDate: '2022-05-01',
+      startDate: '2022-05-10',
       possibleStartDates: [
-        '2022-05-01',
-        '2022-05-02',
-        '2022-05-03',
+        '2022-05-10',
         '2022-05-11',
-        '2022-05-12'
+        '2022-05-12',
+        '2022-05-13',
+        '2022-05-14'
       ]
     }
   },
@@ -32,7 +33,7 @@ export default {
 
 <template>
   <div>
-    <h1>(FSCS) ID {{ id }}</h1>
+    <h1>{{ id }}</h1>
 
 
     <fieldset class="usa-fieldset">
@@ -56,7 +57,14 @@ export default {
       </div>
     </fieldset>
 
-    <FetchData :fscs-id=id :start-date="startDate"/>
+    <div class="usa-card-group margin-top-6">
+      <div class="usa-card tablet:grid-col-12">
+        <USWDSCard title="Devices present by hour" no-footer>
+          <FetchData :fscs-id=id :start-date="startDate"/>
+        </USWDSCard>
+      </div>
+    </div>
+
   
   </div>
 </template>

@@ -1,14 +1,13 @@
 <script>
-import formatISO from 'date-fns/formatISO'
-import parseISO from 'date-fns/parseISO'
-import format from 'date-fns/format'
-import endOfDay from 'date-fns/endOfDay'
+import Histogram from '../components/Histogram.vue';
+import { store } from "@/store/store.js";
 
-
-const baseUrl = 'http://127.0.0.1:3000/presences'
+//todo: make the backend function name configurable
+const baseUrl = 'http://127.0.0.1:3000/rpc/bin_devices_per_hour'
 
 export default {
   name: 'Fetch Data',
+  components: {Histogram },
   props: {
     fscsId: {
       type: String,
@@ -17,23 +16,24 @@ export default {
     startDate: {
       type: String,
       required: false,
-      default: () => '2022-05-01'
+      default: () => '2022-05-10'
     }
   },
   data() {
     return {
       totalFound: 0,
       loadedData: {},
-      loadedError: {}
+      loadedError: {},
+      store
     }
   },
   computed: {
     loadUrl() {
-      return `${baseUrl}?limit=1000&fscs_id=eq.${this.fscsId}&start_time=gte.${formatISO(this.localStartDate)}&end_time=lt.${formatISO(endOfDay(this.localStartDate))}&order=start_time`;
+      return `${baseUrl}?_fscs_id=${this.fscsId}&_day=${this.startDate}`;
     },
-    localStartDate() {
-      return parseISO(this.startDate, 'yyyy-MM-dd', new Date())
-    }
+    getLabels(){
+       return store.hourlyLabels;
+    },
   },
   watch: {
     fscsId(newVal, oldVal) {
@@ -51,10 +51,7 @@ export default {
     this.fetchData();
   },
   methods: {
-    formatHumanReadableDateFromISO(dateString) {
-      return format(parseISO(dateString), "bbb 'on' PPPP, zzzz");
 
-    },
     async fetchData() {
       try {
         const response = await fetch(this.loadUrl, {
@@ -78,23 +75,17 @@ export default {
 
 <template>
 <div>
-    <div>
-      <h3>
-        Load the first 1k entries from <b>{{ fscsId }}</b> for a full day starting {{ formatHumanReadableDateFromISO(startDate) }}:
-      </h3>
-    </div>
-    <div class="margin-y-2">
-      <code>{{ loadUrl }}</code>
-    </div>
     <div v-if="loadedError && loadedError.message">
       <p>Oops! Error encountered: {{ loadedError.message }}</p>
       <button @click="retry">Retry</button>
     </div>
     <div v-else-if="loadedData">
-      <h3>Display {{ formatCount(loadedData.length) }} of {{ formatCount(totalFound) }} total entries found:</h3>
+      <Histogram :dataset="loadedData" :labels="getLabels" ></Histogram>
+      <h3>Raw output from  <code>{{ loadUrl }}</code>:</h3>
       <pre>{{ loadedData }}</pre>
       <div v-if="loadedData.length < 1">Request succeeded but no data was found.</div>
     </div>
     <div v-else>Loading...</div>
+
 </div>
 </template>
