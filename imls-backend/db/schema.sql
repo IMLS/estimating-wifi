@@ -44,13 +44,12 @@ DECLARE
     _hour INT := 0;
     _day_end INT := 24;
     num_devices_arr INT[];
-    _time_offset INT;
+    _timezone_offset INT;
 BEGIN
-    -- CREATE TEMP TABLE _results (hour TIMESTAMPTZ, count INT);
-    -- _period := _day::TIMESTAMPTZ + '1 day'::INTERVAL;
-    SELECT api.get_timezone_from_fscs_id(_fscs_id) INTO _time_offset;
-    _hour := _hour - _time_offset;
-    _day_end := _day_end - _time_offset;
+    SELECT api.get_timezone_from_fscs_id(_fscs_id) INTO _timezone_offset;
+    _hour := _hour - _timezone_offset;
+    _day_end := _day_end - _timezone_offset;
+
     -- Hardcoded EDT for now. Will add the look up table next to pass in the time zone
     WHILE _hour < _day_end LOOP
 
@@ -70,6 +69,7 @@ BEGIN
         _hour := _hour + 1;
     END LOOP;
     RETURN num_devices_arr;
+
 END
 $$;
 
@@ -83,21 +83,16 @@ CREATE FUNCTION api.get_timezone_from_fscs_id(_fscs_id text) RETURNS integer
     AS $$
 DECLARE
     _timezone TIMETZ;
-    _time_offset INT:=0;
-    _fscs_id TEXT;
+    _timezone_offset INT:=0;
 BEGIN
     SELECT imls_lookup.timezone::TIMETZ INTO _timezone::TIMETZ
     FROM api.imls_lookup
     WHERE imls_lookup.fscs_id = _fscs_id;
 
-    RAISE NOTICE 'VAlUE: %', _timezone;
+    _timezone_offset := extract(timezone_hour FROM _timezone::TIMETZ);
+    SELECT extract(timezone_hour FROM _timezone::TIMETZ) INTO _timezone_offset;
 
-    -- _time_offset := extract(timezone_hour FROM _timezone::TIMETZ);
-    SELECT extract(timezone_hour FROM _timezone::TIMETZ) INTO _time_offset;
-
-    RAISE NOTICE 'VALUE: %', _time_offset;
-
-    RETURN _time_offset;
+    RETURN _timezone_offset;
 END
 
 $$;

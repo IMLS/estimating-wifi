@@ -10,7 +10,7 @@ CREATE TABLE imlswifi.imls_lookup (
 );
 
 INSERT INTO imlswifi.imls_lookup (fscs_id, timezone) (
-        SELECT DISTINCT fscs_id,'00:00:00-04'::TIMETZ FROM imlswifi.libraries
+    SELECT DISTINCT fscs_id,'00:00:00-04'::TIMETZ FROM imlswifi.libraries
 );
 
 CREATE VIEW api.imls_lookup AS SELECT * FROM imlswifi.imls_lookup;
