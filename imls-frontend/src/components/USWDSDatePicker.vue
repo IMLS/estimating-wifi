@@ -30,7 +30,6 @@ export default {
   },
   methods: {
     detectChange(e) {
-      console.log(e.detail.value)
       state.selectedDate = e.detail.value;
       return state.selectedDate;
     }

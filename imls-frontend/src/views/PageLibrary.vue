@@ -32,9 +32,9 @@ export default {
       const localDate = state.selectedDate + "T00:00";
       return "Devices present by hour on " + format(new Date(localDate), 'PP')
     },
-      getLabels(){
+    getLabels(){
        return store.hourlyLabels;
-    },
+    }
   }
 };
 </script>
@@ -51,9 +51,8 @@ export default {
           <div class="grid-row">
             <div class="grid-col">
               <FetchData 
-              :fscs-id=id 
-              :path="store.backendPaths.get24HoursBinnedByHour"
-              :queryString="`?_fscs_id=${id}&_day=${state.selectedDate}`">
+              :fscsId=id
+              :path="store.backendPaths.get24HoursBinnedByHour">
                 <Histogram 
                 :dataset="state.fetchedData" 
                 :labels="getLabels" 

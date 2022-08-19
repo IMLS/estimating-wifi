@@ -7,15 +7,12 @@ export default {
   props: {
     fscsId: {
       type: String,
-      required: true    
+      required: true,
+      default: ""
     },
     path: {
       type: String,
       default: '/'
-    },
-    queryString: {
-      type: String,
-      default: '?'
     }
   },
   data() {
@@ -25,6 +22,11 @@ export default {
   },
   watch: {
     'state.selectedDate'(newVal, oldVal) {
+      if (newVal !== oldVal) {
+     this.fetchDataFromState();
+      }
+    },
+    fscsId(newVal, oldVal) {
       if (newVal !== oldVal) {
      this.fetchDataFromState();
       }
@@ -38,45 +40,59 @@ export default {
       if (this.fscsId.length !== 0) await state.fetchData(this.path, this.queryString);
     }
   },
+  computed: {
+    queryString() { 
+      return `?_fscs_id=${this.fscsId}&_day=${state.selectedDate}` 
+    },
+    responseIsOKButEmpty() {
+      return state.fetchedData.reduce((previous, current) => previous + current, 0)
+    }
+  }
 };
 </script>
 
 <template>
   <div class="loading-area">
+
     <div v-if="state.isLoading" class="loading-indicator">
       <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">
         <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>
       </svg>
     </div>
-    <div v-if="state.fetchError && state.fetchError.message">
+    <div class="loaded--error" v-if="state.fetchError && state.fetchError.message">
       <p>Oops! Error encountered: {{ state.fetchError.message }}</p>
     </div>
-    <div v-else-if="state.fetchedData.length < 1">
-      <p>No data was found that matched your request.</p>
+    <div class="loaded--no-data" v-if="(state.fetchedData.length > 1 && responseIsOKButEmpty === 0) || state.fetchedData.length < 1">
+      <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ state.selectedDate }}</b>. Please choose a different date or library.</p>
     </div>
-    <div v-else-if="state.fetchedData.length > 1">
+    <div class="loaded--has-data" v-else-if="state.fetchedData.length > 1">
       <slot></slot>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .loading-area {
   position: relative;
   width: 100%;
-  min-height: 20rem;
+  min-height: 10rem;
+  @media (min-width: 64em ) {
+    min-height: 20rem;
+  }
 }
 .loading-indicator {
-  margin: auto auto;
   text-align: center;
-  position: absolute;
   width: 100px;
   height: 100px;
   padding: 14px;
-  top: calc(10rem - 50px);
-  left: calc(50% - 50px);
   background: #FFFFFFC0;
   border-radius: 100%;
+  position: absolute;
+  left: calc(50% - 50px);
+  top: calc(5rem - 50px);
+  @media (min-width: 64em ) {
+    top: calc(10rem - 50px);
+  }
 }
 .loading-indicator .usa-icon {
   animation-duration: 1s;
@@ -93,6 +109,19 @@ export default {
     transform: rotate(359deg);
   }
 }
+.loaded--no-data {
+  text-align: center;
+  padding: 20px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+  justify-content: center;
+  min-height: 10rem;
+  @media (min-width: 64em ) {
+    min-height: 20rem;
+  }
 
+}
 
 </style>
