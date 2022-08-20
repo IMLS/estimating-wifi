@@ -7,7 +7,6 @@ export default {
   props: {
     fscsId: {
       type: String,
-      required: true,
       default: ""
     },
     path: {
@@ -23,12 +22,12 @@ export default {
   watch: {
     'state.selectedDate'(newVal, oldVal) {
       if (newVal !== oldVal) {
-     this.fetchDataFromState();
+        this.fetchDataFromState();
       }
     },
     fscsId(newVal, oldVal) {
       if (newVal !== oldVal) {
-     this.fetchDataFromState();
+        this.fetchDataFromState();
       }
     }
   },
@@ -37,13 +36,10 @@ export default {
   },
   methods: {
     async fetchDataFromState() {
-      if (this.fscsId.length !== 0) await state.fetchData(this.path, this.queryString);
+      if (this.fscsId.length !== 0) await state.fetchData(this.path, `?_fscs_id=${this.fscsId}&_day=${state.selectedDate}`);
     }
   },
   computed: {
-    queryString() { 
-      return `?_fscs_id=${this.fscsId}&_day=${state.selectedDate}` 
-    },
     responseIsOKButEmpty() {
       return state.fetchedData.reduce((previous, current) => previous + current, 0)
     }
@@ -53,7 +49,6 @@ export default {
 
 <template>
   <div class="loading-area">
-
     <div v-if="state.isLoading" class="loading-indicator">
       <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">
         <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>

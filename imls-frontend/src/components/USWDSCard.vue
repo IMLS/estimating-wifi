@@ -1,27 +1,8 @@
 <script>
-import { RouterLink } from 'vue-router'
-
 export default {
   props: {
     title: {  type: String,
       default: "No title content provided" 
-    },
-    ctaText: {
-      type: String,
-      default: "Find out more"
-    },
-    ctaLink: {
-      type: String,
-      default: "#"
-    },
-    noFooter: {
-      type: Boolean,
-      default: false
-    }
-  },
-  computed: {
-    isButtonDisabled() {
-      return this.ctaLink == '' ? true : undefined
     }
   }
 }
@@ -36,14 +17,6 @@ export default {
     </header>
     <div class="usa-card__body">
       <slot />
-    </div>
-    <div class="usa-card__footer" v-if="!noFooter">
-      <router-link
-        class="usa-button"
-        :to="ctaLink"
-      >
-        {{ ctaText }}
-      </router-link>
     </div>
   </div>
 </template>

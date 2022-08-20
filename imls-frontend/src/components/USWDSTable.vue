@@ -29,8 +29,8 @@ export default {
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td v-bind:key="i" v-for="row, i in rows">{{ row }}</td>
+      <tr v-bind:key="i" v-for="row, i in rows">
+        <td v-bind:key="i" v-for="cell, i in row" >{{ cell }}</td>
       </tr>
     </tbody>
   </table>

@@ -33,7 +33,7 @@ export default {
       return "Devices present by hour on " + format(new Date(localDate), 'PP')
     },
     getLabels(){
-       return store.hourlyLabels;
+      return store.hourlyLabels;
     }
   }
 };
@@ -43,11 +43,11 @@ export default {
   <div>
     <h1>Library {{ id }}</h1>
 
-  <USWDSDatePicker :initialDate=state.selectedDate />
+    <USWDSDatePicker :initialDate=state.selectedDate />
 
     <div class="usa-card-group margin-top-6">
       <div class="usa-card tablet:grid-col-12">
-        <USWDSCard :title="chartTitle" no-footer>
+        <USWDSCard :title="chartTitle">
           <div class="grid-row">
             <div class="grid-col">
               <FetchData 
@@ -70,7 +70,7 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTable" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :headers="getLabels" :rows="state.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}`" />
+                    <USWDSTable :headers="getLabels" :rows="[state.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}`" />
                     <div v-if="state.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
                   <h3 class="usa-accordion__heading">

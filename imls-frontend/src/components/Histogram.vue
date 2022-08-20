@@ -82,12 +82,15 @@ export default {
             caretSize: 10,
             callbacks: {
               title: () => '',
+              /* this would mean test chartjs Tooltip internals */
+              /* c8 ignore start */
               label: function(context) {
                 let label = '';
                 if (context.parsed.y !== null) {
                     label += context.parsed.y + " devices present"
                 }
                 return label;
+                /* c8 ignore end */
               }
             }
           }
@@ -95,9 +98,7 @@ export default {
       }
     }
   },
-  methods: {
-
-  },
+  methods: {},
   computed: {
     computedChartData: function() { 
       return {
@@ -110,13 +111,10 @@ export default {
           }
         ] ,
       }
-    
     },
   }
 }
 </script>
-
-
 
 <template>
   <Bar

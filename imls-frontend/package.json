@@ -35,6 +35,8 @@
   "devDependencies": {
     "@vue/test-utils": "^2.0.2",
     "c8": "^7.12.0",
+    "msw": "^0.44.2",
+    "node-fetch": "^3.2.10",
     "vitest": "^0.20.3"
   }
 }

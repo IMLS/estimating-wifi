@@ -11,7 +11,7 @@ export default {
     },
     initialDate: {
       type: String,
-      default: () => new Date().toString()
+      default: () => new Date().toISOString().split("T")[0]
     },
     
   },
@@ -21,16 +21,15 @@ export default {
     }
   },
   mounted() {
-    try {
-      datePicker.init();
-      datePicker.enable(this.$refs.picker);
-    } catch(e) {
-      throw new Error(e)
-    }
+    this.enableUSWDSFeatures();
   },
   methods: {
+    async enableUSWDSFeatures(){
+      await datePicker.init();
+      await datePicker.enable(this.$refs.picker);
+    },
     detectChange(e) {
-      state.selectedDate = e.detail.value;
+      if (e && e.detail ) state.selectedDate = e.detail.value;
       return state.selectedDate;
     }
   }
