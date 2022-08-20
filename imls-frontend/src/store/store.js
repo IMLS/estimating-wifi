@@ -55,10 +55,9 @@ export const state = reactive({
       // todo: let queryString be an array of params instead of a string
       const response = await fetch(`${BASEURL}${path}${queryString}`);
       if (await !response.ok) {
-        throw new Error(response.status)
+        throw new Error(response.status);
       }
       this.fetchedData = await response.json();
-
     } catch (error) {
       this.fetchError = error;
     }

@@ -17,9 +17,9 @@ describe("App", () => {
   it("should render a Header and Footer", () => {
     const wrapper = mount(App, {
       global: {
-      //  plugins: [router],
-        stubs: ["router-link", "router-view", "RouterView"], 
-      }
+        //  plugins: [router],
+        stubs: ["router-link", "router-view", "RouterView"],
+      },
     });
 
     expect(wrapper.findAll(".usa-header")).toHaveLength(1);
