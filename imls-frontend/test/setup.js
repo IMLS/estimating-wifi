@@ -31,7 +31,9 @@ const errorMock = {
 }
 
 export const restHandlers = [
-  rest.get('http://127.0.0.1:3000/rpc/bin_devices_per_hour', (req, res, ctx) => {
+  // todo: update when the backend has a real host
+  // https://mswjs.io/docs/basics/request-matching#path-with-wildcard
+  rest.get('*/rpc/bin_devices_per_hour', (req, res, ctx) => {
     let requestedID = req.url.searchParams.get("_fscs_id");
     let requestedDay = req.url.searchParams.get("_day");
     switch (requestedID) {

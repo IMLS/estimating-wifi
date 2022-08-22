@@ -21,7 +21,6 @@ describe("USWDSHeader", () => {
         plugins: [router],
       },
     });
-    expect(wrapper.findAll(".usa-banner")).toHaveLength(1);
     expect(wrapper.findAll(".usa-header")).toHaveLength(1);
   });
 

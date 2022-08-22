@@ -1,6 +1,7 @@
 import { reactive, computed, readonly } from "vue";
 
-const BASEURL = "http://127.0.0.1:3000";
+// todo: update when the backend has a real host
+const BACKEND_BASEURL = `${window.location.protocol}//127.0.0.1:3000`;
 
 export const store = readonly({
   fscs_ids: [
@@ -43,6 +44,7 @@ export const store = readonly({
 });
 
 export const state = reactive({
+  // todo: Update selectedDate when we have real data
   selectedDate: "2022-05-01",
   fetchCount: null,
   fetchError: {},
@@ -53,7 +55,7 @@ export const state = reactive({
     this.isLoading = true;
     try {
       // todo: let queryString be an array of params instead of a string
-      const response = await fetch(`${BASEURL}${path}${queryString}`);
+      const response = await fetch(`${BACKEND_BASEURL}${path}${queryString}`);
       if (await !response.ok) {
         throw new Error(response.status);
       }

@@ -2,6 +2,12 @@
 import datePicker from "uswds/src/js/components/date-picker";
 import { state } from "@/store/store.js";
 
+// artificially limits selectable dates to the time we have 
+// deterministic placeholder data for. 
+// todo: refactor when we're using actual data
+const MIN_DATE = "2022-05-01";
+const MAX_DATE = "2022-06-01";
+
 export default {
   name: "USWDS Date Picker",
   props: {
@@ -17,7 +23,9 @@ export default {
   },
   data() {
     return {
-      state
+      state,
+      minDate: MIN_DATE,
+      maxDate: MAX_DATE,
     }
   },
   mounted() {
@@ -46,8 +54,8 @@ export default {
       ref="picker" 
       :data-default-value="initialDate"
       :data-selected-date="state.selectedDate"
-      data-min-date="2022-05-01"
-      data-max-date="2022-06-01"
+      :data-min-date="minDate"
+      :data-max-date="maxDate"
       >
       <input
         @change="detectChange"
