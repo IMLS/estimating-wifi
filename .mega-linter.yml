@@ -34,3 +34,6 @@ SARIF_REPORTER: true
 
 # only scan the files in This commit, not the entire history of the repo
 REPOSITORY_GITLEAKS_ARGUMENTS: --no-git
+
+# only run CSS linting on CSS files (SCSS has it's own linter)
+CSS_STYLELINT_FILE_EXTENSIONS: [".css"]
