@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/cmd/session-counter/api"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/structs"
@@ -28,7 +29,7 @@ func SimpleSend(db *state.DurationsDB) {
 				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("found zero durations")
 			sq.Remove(nextSessionIDToSend)
-		} else if state.IsStoringToAPI() {
+		} else {
 			log.Debug().
 				Int("durations", len(durations)).
 				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
@@ -46,7 +47,7 @@ func SimpleSend(db *state.DurationsDB) {
 				Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
 				Msg("sending durations to API")
 
-			err := api.PostJSON(state.GetDurationsURI(), data)
+			err := api.PostJSON(config.GetDurationsURI(), data)
 			if err != nil {
 				log.Error().
 					Str("session", strconv.FormatInt(nextSessionIDToSend, 10)).
@@ -56,13 +57,6 @@ func SimpleSend(db *state.DurationsDB) {
 				// If we successfully sent the data remotely, we can now mark it is as sent.
 				sq.Remove(nextSessionIDToSend)
 			}
-		} else {
-			// Always dequeue. We're storing locally "for free" into the
-			// durations table before trying to do the send.
-			log.Info().
-				Msg("not in API mode, not sending data")
-			sq.Remove(nextSessionIDToSend)
 		}
 	}
-
 }

@@ -12,19 +12,14 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/internal/config"
 )
 
 var slashWarned bool = false
 
 func PostJSON(uri string, data []map[string]interface{}) error {
 
-	if state.IsStoringLocally() {
-		// do nothing.
-		return nil
-	}
-
-	tok := state.GetAPIKey()
+	tok := config.GetAPIKey()
 	matched, _ := regexp.MatchString(".*/$", uri)
 	if !slashWarned && !matched {
 		slashWarned = true

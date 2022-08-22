@@ -5,12 +5,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/robfig/cron/v3"
+	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	zls "gsa.gov/18f/cmd/session-counter/zero-log-sentry"
+	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/version"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 
 	_ "net/http/pprof"
@@ -35,7 +37,7 @@ func runEvery(crontab string, c *cron.Cron, fun func()) {
 
 func run2() {
 	sq := state.NewQueue[int64]("sent")
-	durationsdb := state.GetDurationsDatabase()
+	durationsdb := state.NewDurationsDB()
 	c := cron.New()
 
 	go runEvery("*/1 * * * *", c,
@@ -47,7 +49,7 @@ func run2() {
 				tlp.TSharkRunner)
 		})
 
-	go runEvery(state.GetResetCron(), c,
+	go runEvery(config.GetResetCron(), c,
 		func() {
 			log.Info().
 				Str("time", fmt.Sprintf("%v", state.GetClock().Now().In(time.Local))).
@@ -78,13 +80,13 @@ func launchTLP() {
 	// 		Msg("Launching pprof server server")
 	// }
 
-	state.SetConfigAtPath(cfgFile)
-	dsn := state.GetSentryDSN()
+	config.SetConfigAtPath(cfgFile)
+	dsn := config.GetSentryDSN()
 	if dsn != "" {
 		zls.SetupZeroLogSentry("session-counter", dsn)
 		zls.SetTags(map[string]string{
-			"tag":     state.GetDeviceTag(),
-			"fcfs_id": state.GetFCFSSeqID(),
+			"tag":     config.GetDeviceTag(),
+			"fcfs_id": config.GetFCFSSeqID(),
 		})
 	}
 
@@ -117,7 +119,7 @@ var versionCmd = &cobra.Command{
 	Short: "session-counter version",
 	Long:  `Print the version number of session-counter`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(state.GetVersion())
+		fmt.Println(version.GetVersion())
 	},
 }
 

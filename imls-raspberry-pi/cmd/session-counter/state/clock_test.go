@@ -1,11 +1,19 @@
 package state
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/benbjohnson/clock"
 )
+
+func TestGetClock(t *testing.T) {
+	c := GetClock()
+	if fmt.Sprintf("%T", c) != "*clock.clock" {
+		t.Fatal("wrong type: ", fmt.Sprintf("%T", c))
+	}
+}
 
 func TestMock(t *testing.T) {
 	mock := clock.NewMock()

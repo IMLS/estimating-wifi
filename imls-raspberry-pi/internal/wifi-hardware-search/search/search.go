@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/internal/state"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/wifi-hardware-search/lshw"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/netadapter"
@@ -49,11 +49,11 @@ func GetSearches() []models.Search {
 func SetMonitorMode(dev *models.Device) {
 	cmds := make([]*exec.Cmd, 0)
 	if runtime.GOOS == "windows" {
-		cmds = append(cmds, exec.Command(state.GetWlanHelperPath(), dev.Logicalname, "mode", "monitor"))
+		cmds = append(cmds, exec.Command(config.GetWlanHelperPath(), dev.Logicalname, "mode", "monitor"))
 	} else {
-		cmds = append(cmds, exec.Command(state.GetIpPath(), "link", "set", dev.Logicalname, "down"))
-		cmds = append(cmds, exec.Command(state.GetIwPath(), dev.Logicalname, "set", "monitor", "none"))
-		cmds = append(cmds, exec.Command(state.GetIpPath(), "link", "set", dev.Logicalname, "up"))
+		cmds = append(cmds, exec.Command(config.GetIpPath(), "link", "set", dev.Logicalname, "down"))
+		cmds = append(cmds, exec.Command(config.GetIwPath(), dev.Logicalname, "set", "monitor", "none"))
+		cmds = append(cmds, exec.Command(config.GetIpPath(), "link", "set", dev.Logicalname, "up"))
 	}
 	// Run the commands to set the adapter into monitor mode.
 	for _, c := range cmds {

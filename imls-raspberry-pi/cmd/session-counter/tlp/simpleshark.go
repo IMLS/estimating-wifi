@@ -1,3 +1,4 @@
+//nolint:typecheck
 package tlp
 
 import (
@@ -10,13 +11,14 @@ import (
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/cmd/session-counter/constants"
 	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
 func TSharkRunner(adapter string) []string {
 	tsharkCmd := exec.Command(
-		state.GetWiresharkPath(),
-		"-a", fmt.Sprintf("duration:%d", state.GetWiresharkDuration()),
+		config.GetWiresharkPath(),
+		"-a", fmt.Sprintf("duration:%d", config.GetWiresharkDuration()),
 		"-I", "-i", adapter,
 		"-Tfields", "-e", "wlan.sa")
 
@@ -123,9 +125,7 @@ func SimpleShark(
 }
 
 func StoreMacs(keepers []string) {
-	//cfg := state.GetConfig()
 	// Do not log MAC addresses...
-	//cfg.Log().Debug("found ", len(keepers), " keepers")
 	for _, mac := range keepers {
 		state.RecordMAC(mac)
 	}

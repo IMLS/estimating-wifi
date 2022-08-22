@@ -1,3 +1,4 @@
+//nolint:typecheck
 package state
 
 import (
@@ -59,6 +60,49 @@ func (suite *QueueSuite) TestDequeue() {
 	}
 	if removed != shouldremove {
 		suite.Fail("did not find appropriate next item.")
+	}
+}
+
+func (suite *QueueSuite) TestDequeueEmpty() {
+	q := NewQueue[string]("queue1")
+	removed, err := q.Dequeue()
+	if removed != "" {
+		suite.Fail("dequeued a value from empty queue")
+	}
+	if err == nil {
+		suite.Fail("dequeued an empty queue")
+	}
+}
+
+func (suite *QueueSuite) TestDequeueAsList() {
+	q := NewQueue[int64]("queue1")
+	q.Enqueue(1)
+	q.Enqueue(2)
+	q.Enqueue(100)
+	l := q.AsList()
+	if l[0] != 1 {
+		suite.Fail("incorrect first value")
+	}
+	if l[1] != 2 {
+		suite.Fail("incorrect second value")
+	}
+	if l[2] != 100 {
+		suite.Fail("incorrect third value")
+	}
+}
+
+func (suite *QueueSuite) TestDequeueRemove() {
+	q := NewQueue[int64]("queue1")
+	q.Enqueue(1)
+	q.Enqueue(2)
+	q.Enqueue(100)
+	q.Remove(2)
+	l := q.AsList()
+	if l[0] != 1 {
+		suite.Fail("incorrect first value")
+	}
+	if l[1] != 100 {
+		suite.Fail("incorrect second value")
 	}
 }
 

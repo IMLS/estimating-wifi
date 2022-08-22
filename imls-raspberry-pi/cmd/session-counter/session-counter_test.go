@@ -56,7 +56,7 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) *state.DurationsDB
 	// The MAC database MUST be ephemeral. Put it in RAM.
 
 	sq := state.NewQueue[int64]("sent")
-	durationsdb := state.GetDurationsDatabase()
+	durationsdb := state.NewDurationsDB()
 
 	// Create a pool of NUMMACS devices to draw from.
 	// We will send NUMFOUNDPERMINUTE each minute
