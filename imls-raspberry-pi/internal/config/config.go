@@ -92,10 +92,21 @@ func GetLoggers() []string {
 	return strings.Split(loggers, ",")
 }
 
+// Updated to use the presence API endpoint
 func GetDurationsURI() string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
-	path := viper.GetString("api.uri")
+	path := viper.GetString("api.pres_uri")
+	return (scheme + "://" +
+		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") + "/" +
+		strings.TrimPrefix(path, "/"))
+}
+
+// Function to create heartbeat URI
+func GetHeartbeatURI() string {
+	scheme := viper.GetString("api.scheme")
+	host := viper.GetString("api.host")
+	path := viper.GetString("api.hb_uri")
 	return (scheme + "://" +
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") + "/" +
 		strings.TrimPrefix(path, "/"))
