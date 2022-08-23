@@ -112,7 +112,7 @@ CREATE TABLE imlswifi.heartbeats (
     heartbeat_id integer NOT NULL,
     fscs_id character varying(16) NOT NULL,
     sensor_id integer NOT NULL,
-    hourly_ping timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    ping_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     sensor_serial character varying(32) NOT NULL,
     sensor_version character varying(16) NOT NULL
 );
