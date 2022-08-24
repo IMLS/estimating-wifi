@@ -10,13 +10,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: admin; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA admin;
-
-
---
 -- Name: api; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -98,65 +91,9 @@ END
 $$;
 
 
---
--- Name: test(); Type: FUNCTION; Schema: api; Owner: -
---
-
-CREATE FUNCTION api.test() RETURNS TABLE(start_time timestamp with time zone, end_time timestamp with time zone)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-RETURN QUERY
-SELECT presences.start_time, presences.end_time
-FROM api.presences;
-END; $$;
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
-
---
--- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
---
-
-CREATE TABLE imlswifi.libraries (
-    fscs_id character varying(16) NOT NULL
-);
-
-
---
--- Name: libraries; Type: VIEW; Schema: admin; Owner: -
---
-
-CREATE VIEW admin.libraries AS
- SELECT libraries.fscs_id
-   FROM imlswifi.libraries;
-
-
---
--- Name: sensors; Type: TABLE; Schema: imlswifi; Owner: -
---
-
-CREATE TABLE imlswifi.sensors (
-    sensor_id integer NOT NULL,
-    sensor_serial character varying(32) NOT NULL,
-    sensor_version character varying(16) NOT NULL,
-    fscs_id character varying(16) NOT NULL
-);
-
-
---
--- Name: sensors; Type: VIEW; Schema: admin; Owner: -
---
-
-CREATE VIEW admin.sensors AS
- SELECT sensors.sensor_id,
-    sensors.sensor_serial,
-    sensors.sensor_version,
-    sensors.fscs_id
-   FROM imlswifi.sensors;
-
 
 --
 -- Name: helo; Type: TABLE; Schema: api; Owner: -
@@ -219,58 +156,6 @@ CREATE VIEW api.presences AS
 
 
 --
--- Name: heartbeats; Type: TABLE; Schema: imlswifi; Owner: -
---
-
-CREATE TABLE imlswifi.heartbeats (
-    heartbeat_id integer NOT NULL,
-    fscs_id character varying(16) NOT NULL,
-    sensor_id integer NOT NULL,
-    hourly_ping timestamp with time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: heartbeats_heartbeat_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
---
-
-CREATE SEQUENCE imlswifi.heartbeats_heartbeat_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: heartbeats_heartbeat_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
---
-
-ALTER SEQUENCE imlswifi.heartbeats_heartbeat_id_seq OWNED BY imlswifi.heartbeats.heartbeat_id;
-
-
---
--- Name: heartbeats_sensor_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
---
-
-CREATE SEQUENCE imlswifi.heartbeats_sensor_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: heartbeats_sensor_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
---
-
-ALTER SEQUENCE imlswifi.heartbeats_sensor_id_seq OWNED BY imlswifi.heartbeats.sensor_id;
-
-
---
 -- Name: imls_lookup_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
 --
 
@@ -288,6 +173,15 @@ CREATE SEQUENCE imlswifi.imls_lookup_id_seq
 --
 
 ALTER SEQUENCE imlswifi.imls_lookup_id_seq OWNED BY imlswifi.imls_lookup.id;
+
+
+--
+-- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
+--
+
+CREATE TABLE imlswifi.libraries (
+    fscs_id character varying(16) NOT NULL
+);
 
 
 --
@@ -328,6 +222,18 @@ CREATE SEQUENCE imlswifi.presences_sensor_id_seq
 --
 
 ALTER SEQUENCE imlswifi.presences_sensor_id_seq OWNED BY imlswifi.presences.sensor_id;
+
+
+--
+-- Name: sensors; Type: TABLE; Schema: imlswifi; Owner: -
+--
+
+CREATE TABLE imlswifi.sensors (
+    sensor_id integer NOT NULL,
+    sensor_serial character varying(32) NOT NULL,
+    sensor_version character varying(16) NOT NULL,
+    fscs_id character varying(16) NOT NULL
+);
 
 
 --
@@ -397,20 +303,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: heartbeats heartbeat_id; Type: DEFAULT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.heartbeats ALTER COLUMN heartbeat_id SET DEFAULT nextval('imlswifi.heartbeats_heartbeat_id_seq'::regclass);
-
-
---
--- Name: heartbeats sensor_id; Type: DEFAULT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.heartbeats ALTER COLUMN sensor_id SET DEFAULT nextval('imlswifi.heartbeats_sensor_id_seq'::regclass);
-
-
---
 -- Name: imls_lookup id; Type: DEFAULT; Schema: imlswifi; Owner: -
 --
 
@@ -451,14 +343,6 @@ ALTER TABLE ONLY public.durations_v2 ALTER COLUMN id SET DEFAULT nextval('public
 
 ALTER TABLE ONLY api.helo
     ADD CONSTRAINT helo_pkey PRIMARY KEY (uid);
-
-
---
--- Name: heartbeats heartbeats_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.heartbeats
-    ADD CONSTRAINT heartbeats_pkey PRIMARY KEY (heartbeat_id);
 
 
 --
@@ -510,20 +394,6 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: fk_heartbeat_library_index; Type: INDEX; Schema: imlswifi; Owner: -
---
-
-CREATE INDEX fk_heartbeat_library_index ON imlswifi.heartbeats USING btree (fscs_id);
-
-
---
--- Name: fk_heartbeat_sensor_index; Type: INDEX; Schema: imlswifi; Owner: -
---
-
-CREATE INDEX fk_heartbeat_sensor_index ON imlswifi.heartbeats USING btree (sensor_id);
-
-
---
 -- Name: fk_presence_library_index; Type: INDEX; Schema: imlswifi; Owner: -
 --
 
@@ -542,22 +412,6 @@ CREATE INDEX fk_presence_sensor_index ON imlswifi.presences USING btree (sensor_
 --
 
 CREATE INDEX fk_sensor_library_index ON imlswifi.sensors USING btree (fscs_id);
-
-
---
--- Name: heartbeats fk_heartbeat_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.heartbeats
-    ADD CONSTRAINT fk_heartbeat_library FOREIGN KEY (fscs_id) REFERENCES imlswifi.libraries(fscs_id);
-
-
---
--- Name: heartbeats fk_heartbeat_sensor; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.heartbeats
-    ADD CONSTRAINT fk_heartbeat_sensor FOREIGN KEY (sensor_id) REFERENCES imlswifi.sensors(sensor_id);
 
 
 --
@@ -605,10 +459,7 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220727163656'),
     ('20220729132839'),
     ('20220729150547'),
-    ('20220810132049'),
-    ('20220811192329'),
     ('20220811194424'),
-    ('20220811195049'),
     ('20220817173135'),
     ('20220818150144'),
     ('20220818154959');
