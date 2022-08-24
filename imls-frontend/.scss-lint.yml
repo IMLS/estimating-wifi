@@ -1,0 +1,6 @@
+scss_files: "src/assets/**/*.scss"
+exclude: "src/assets/uswds/**/*.scss"
+
+linters:
+  StringQuotes:
+    style: "double_quotes"

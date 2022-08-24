@@ -12,7 +12,8 @@ For the full history of this project, please see the [previous repository](https
 
 This project provides:
 
-- imls-directus: Custom [Directus](https://directus.io/) extensions for data visualization
+- imls-backend: PostGREST API over a PostGres database for storing & querying sensor data
+- imls-frontend: NodeJS / VueJS web app for displaying the reported data in visualizations
 - imls-raspberry-pi: Command line programs to gather and analyze wifi sessions
 - imls-windows-installer: Scripts to generate a Windows installer
 - doc: Developer documentation

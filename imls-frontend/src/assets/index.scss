@@ -1,0 +1,24 @@
+// Include a USWDS settings file (required)
+@import "./uswds/scss/uswds-settings.module.scss";
+
+@media (min-width: 64em) {
+  .usa-header--extended .usa-logo {
+    max-width: 75%;
+  }
+}
+
+@media (min-width: 40em) {
+  .usa-card:last-child {
+      // scss-lint:disable ImportantRule
+    margin-bottom: 1rem !important;
+  }
+}
+
+.usa-prose > p,
+.usa-prose p {
+  max-width: 90ch;
+}
+.usa-banner__content,
+.usa-banner__inner {
+  max-width: units("widescreen");
+}
