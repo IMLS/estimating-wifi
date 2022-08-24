@@ -9,11 +9,12 @@ DECLARE
     _hour INT := 0;
     _day_end INT := 24;
     num_devices_arr INT[];
+    _timezone_offset INT;
 BEGIN
-    -- CREATE TEMP TABLE _results (hour TIMESTAMPTZ, count INT);
-    -- _period := _day::TIMESTAMPTZ + '1 day'::INTERVAL;    
-    _hour := _hour + 4;
-    _day_end := _day_end + 4;
+    SELECT api.get_timezone_from_fscs_id(_fscs_id) INTO _timezone_offset;
+    _hour := _hour - _timezone_offset;
+    _day_end := _day_end - _timezone_offset;
+
     -- Hardcoded EDT for now. Will add the look up table next to pass in the time zone
     WHILE _hour < _day_end LOOP
 
@@ -33,6 +34,7 @@ BEGIN
         _hour := _hour + 1;
     END LOOP;
     RETURN num_devices_arr;
+
 END
 $$ LANGUAGE plpgsql;
 
