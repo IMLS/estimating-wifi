@@ -31,6 +31,71 @@ CREATE SCHEMA imlswifi;
 
 
 --
+-- Name: bin_devices_per_hour(date, text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.bin_devices_per_hour(_day date, _fscs_id text) RETURNS integer[]
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    _start TIMESTAMPTZ;
+    _end TIMESTAMPTZ;
+    _count INT;
+    _hour INT := 0;
+    _day_end INT := 24;
+    num_devices_arr INT[];
+    _timezone_offset INT;
+BEGIN
+    SELECT api.get_timezone_from_fscs_id(_fscs_id) INTO _timezone_offset;
+    _hour := _hour - _timezone_offset;
+    _day_end := _day_end - _timezone_offset;
+
+    -- Hardcoded EDT for now. Will add the look up table next to pass in the time zone
+    WHILE _hour < _day_end LOOP
+
+        -- Casting the DATE variable to a TIMESTAMP to add it to the interval
+        _start = _day::TIMESTAMP + make_interval(hours=> _hour);
+        _end =  _day + make_interval(hours=> _hour, mins => 59, secs => 59);
+
+        -- This select stores the result in the variable _count.
+        SELECT count(*) INTO _count
+        FROM api.presences
+        WHERE  fscs_id = _fscs_id
+        AND (presences.start_time::TIMESTAMPTZ < presences.end_time::TIMESTAMPTZ)
+        AND (presences.start_time::TIMESTAMPTZ <= _end::TIMESTAMPTZ)
+        AND (presences.end_time > _start::TIMESTAMPTZ);
+        num_devices_arr := array_append(num_devices_arr, _count);
+
+        _hour := _hour + 1;
+    END LOOP;
+    RETURN num_devices_arr;
+
+END
+$$;
+
+
+--
+-- Name: get_timezone_from_fscs_id(text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.get_timezone_from_fscs_id(_fscs_id text) RETURNS integer
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+DECLARE
+    _timezone TIMETZ;
+    _timezone_offset INT:=0;
+BEGIN
+    SELECT imls_lookup.timezone::TIMETZ INTO _timezone::TIMETZ
+    FROM api.imls_lookup
+    WHERE imls_lookup.fscs_id = _fscs_id;
+
+    _timezone_offset := extract(timezone_hour FROM _timezone::TIMETZ);
+    SELECT extract(timezone_hour FROM _timezone::TIMETZ) INTO _timezone_offset;
+
+    RETURN _timezone_offset;
+END
+
+$$;
 -- Name: test(); Type: FUNCTION; Schema: api; Owner: -
 --
 
@@ -77,6 +142,28 @@ CREATE TABLE api.helo (
 
 
 --
+-- Name: imls_lookup; Type: TABLE; Schema: imlswifi; Owner: -
+--
+
+CREATE TABLE imlswifi.imls_lookup (
+    id integer NOT NULL,
+    fscs_id character varying(16) NOT NULL,
+    timezone time with time zone NOT NULL
+);
+
+
+--
+-- Name: imls_lookup; Type: VIEW; Schema: api; Owner: -
+--
+
+CREATE VIEW api.imls_lookup AS
+ SELECT imls_lookup.id,
+    imls_lookup.fscs_id,
+    imls_lookup.timezone
+   FROM imlswifi.imls_lookup;
+
+
+--
 -- Name: presences; Type: TABLE; Schema: imlswifi; Owner: -
 --
 
@@ -105,6 +192,27 @@ CREATE VIEW api.presences AS
 
 
 --
+-- Name: imls_lookup_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
+--
+
+CREATE SEQUENCE imlswifi.imls_lookup_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: imls_lookup_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
+--
+
+ALTER SEQUENCE imlswifi.imls_lookup_id_seq OWNED BY imlswifi.imls_lookup.id;
+
+
+--
+-- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
 -- Name: heartbeats; Type: TABLE; Schema: imlswifi; Owner: -
 --
 
@@ -275,6 +383,10 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: imls_lookup id; Type: DEFAULT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.imls_lookup ALTER COLUMN id SET DEFAULT nextval('imlswifi.imls_lookup_id_seq'::regclass);
 -- Name: heartbeats heartbeat_id; Type: DEFAULT; Schema: imlswifi; Owner: -
 --
 
@@ -325,6 +437,11 @@ ALTER TABLE ONLY api.helo
 
 
 --
+-- Name: imls_lookup imls_lookup_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.imls_lookup
+    ADD CONSTRAINT imls_lookup_pkey PRIMARY KEY (id);
 -- Name: heartbeats heartbeats_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
 --
 
@@ -408,6 +525,11 @@ CREATE INDEX fk_sensor_library_index ON imlswifi.sensors USING btree (fscs_id);
 
 
 --
+-- Name: imls_lookup fk_lookup_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.imls_lookup
+    ADD CONSTRAINT fk_lookup_library FOREIGN KEY (fscs_id) REFERENCES imlswifi.libraries(fscs_id);
 -- Name: heartbeats fk_heartbeat_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
 --
 
@@ -463,4 +585,7 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220811192329'),
     ('20220811194424'),
     ('20220811195049'),
+    ('20220817173135'),
+    ('20220818150144'),
+    ('20220818154959');
     ('20220822125647');
