@@ -1,14 +1,13 @@
 FROM node:18-buster-slim
-RUN mkdir -p /app
-COPY package*.json /app/
+RUN mkdir -p /app && chown -R 1000 /app
 
+COPY package*.json /app/
 WORKDIR /app
-ENV NODE_ENV=development
-COPY . /app/
+
 RUN npm install
 
-# This CMD will attempt to make sure the node_modules are
-# present which may be problematic if there is no connection
-# to the Internet (npm install will hang); therefore, in
-# such a use-case, specify a CMD with 'npm run dev' instead.
-CMD ["/bin/sh -c 'npm install && npm run dev'"]
+COPY --chown=1000 . /app/
+ENV NODE_ENV=development
+
+USER 1000
+CMD ["/bin/sh -c 'npm run dev'"]
