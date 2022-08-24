@@ -10,6 +10,13 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: admin; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA admin;
+
+
+--
 -- Name: api; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -89,11 +96,40 @@ BEGIN
 END
 
 $$;
+-- Name: test(); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.test() RETURNS TABLE(start_time timestamp with time zone, end_time timestamp with time zone)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+RETURN QUERY
+SELECT presences.start_time, presences.end_time
+FROM api.presences;
+END; $$;
 
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
+--
+
+CREATE TABLE imlswifi.libraries (
+    fscs_id character varying(16) NOT NULL
+);
+
+
+--
+-- Name: libraries; Type: VIEW; Schema: admin; Owner: -
+--
+
+CREATE VIEW admin.libraries AS
+ SELECT libraries.fscs_id
+   FROM imlswifi.libraries;
+
 
 --
 -- Name: helo; Type: TABLE; Schema: api; Owner: -
@@ -177,11 +213,57 @@ ALTER SEQUENCE imlswifi.imls_lookup_id_seq OWNED BY imlswifi.imls_lookup.id;
 
 --
 -- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
+-- Name: heartbeats; Type: TABLE; Schema: imlswifi; Owner: -
 --
 
-CREATE TABLE imlswifi.libraries (
-    fscs_id character varying(16) NOT NULL
+CREATE TABLE imlswifi.heartbeats (
+    heartbeat_id integer NOT NULL,
+    fscs_id character varying(16) NOT NULL,
+    sensor_id integer NOT NULL,
+    ping_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    sensor_serial character varying(32) NOT NULL,
+    sensor_version character varying(16) NOT NULL
 );
+
+
+--
+-- Name: heartbeats_heartbeat_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
+--
+
+CREATE SEQUENCE imlswifi.heartbeats_heartbeat_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: heartbeats_heartbeat_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
+--
+
+ALTER SEQUENCE imlswifi.heartbeats_heartbeat_id_seq OWNED BY imlswifi.heartbeats.heartbeat_id;
+
+
+--
+-- Name: heartbeats_sensor_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
+--
+
+CREATE SEQUENCE imlswifi.heartbeats_sensor_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: heartbeats_sensor_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
+--
+
+ALTER SEQUENCE imlswifi.heartbeats_sensor_id_seq OWNED BY imlswifi.heartbeats.sensor_id;
 
 
 --
@@ -230,8 +312,6 @@ ALTER SEQUENCE imlswifi.presences_sensor_id_seq OWNED BY imlswifi.presences.sens
 
 CREATE TABLE imlswifi.sensors (
     sensor_id integer NOT NULL,
-    sensor_serial character varying(32) NOT NULL,
-    sensor_version character varying(16) NOT NULL,
     fscs_id character varying(16) NOT NULL
 );
 
@@ -307,6 +387,17 @@ CREATE TABLE public.schema_migrations (
 --
 
 ALTER TABLE ONLY imlswifi.imls_lookup ALTER COLUMN id SET DEFAULT nextval('imlswifi.imls_lookup_id_seq'::regclass);
+-- Name: heartbeats heartbeat_id; Type: DEFAULT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.heartbeats ALTER COLUMN heartbeat_id SET DEFAULT nextval('imlswifi.heartbeats_heartbeat_id_seq'::regclass);
+
+
+--
+-- Name: heartbeats sensor_id; Type: DEFAULT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.heartbeats ALTER COLUMN sensor_id SET DEFAULT nextval('imlswifi.heartbeats_sensor_id_seq'::regclass);
 
 
 --
@@ -351,6 +442,11 @@ ALTER TABLE ONLY api.helo
 
 ALTER TABLE ONLY imlswifi.imls_lookup
     ADD CONSTRAINT imls_lookup_pkey PRIMARY KEY (id);
+-- Name: heartbeats heartbeats_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.heartbeats
+    ADD CONSTRAINT heartbeats_pkey PRIMARY KEY (heartbeat_id);
 
 
 --
@@ -394,6 +490,20 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: fk_heartbeat_library_index; Type: INDEX; Schema: imlswifi; Owner: -
+--
+
+CREATE INDEX fk_heartbeat_library_index ON imlswifi.heartbeats USING btree (fscs_id);
+
+
+--
+-- Name: fk_heartbeat_sensor_index; Type: INDEX; Schema: imlswifi; Owner: -
+--
+
+CREATE INDEX fk_heartbeat_sensor_index ON imlswifi.heartbeats USING btree (sensor_id);
+
+
+--
 -- Name: fk_presence_library_index; Type: INDEX; Schema: imlswifi; Owner: -
 --
 
@@ -420,6 +530,19 @@ CREATE INDEX fk_sensor_library_index ON imlswifi.sensors USING btree (fscs_id);
 
 ALTER TABLE ONLY imlswifi.imls_lookup
     ADD CONSTRAINT fk_lookup_library FOREIGN KEY (fscs_id) REFERENCES imlswifi.libraries(fscs_id);
+-- Name: heartbeats fk_heartbeat_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.heartbeats
+    ADD CONSTRAINT fk_heartbeat_library FOREIGN KEY (fscs_id) REFERENCES imlswifi.libraries(fscs_id);
+
+
+--
+-- Name: heartbeats fk_heartbeat_sensor; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.heartbeats
+    ADD CONSTRAINT fk_heartbeat_sensor FOREIGN KEY (sensor_id) REFERENCES imlswifi.sensors(sensor_id);
 
 
 --
@@ -459,7 +582,10 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220727163656'),
     ('20220729132839'),
     ('20220729150547'),
+    ('20220811192329'),
     ('20220811194424'),
+    ('20220811195049'),
     ('20220817173135'),
     ('20220818150144'),
     ('20220818154959');
+    ('20220822125647');
