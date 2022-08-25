@@ -1,54 +1,50 @@
 package api
 
 import (
-	"encoding/json"
-	"log"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
+	"github.com/spf13/viper"
+	"gsa.gov/18f/cmd/session-counter/state"
 )
 
-func TestRevalResponseUnmarshall(t *testing.T) {
-	testString := `{
-		"tables": [
-		  {
-			"headers": [
-			  "event_id",
-			  "device_uuid",
-			  "lib_user",
-			  "localtime",
-			  "servertime",
-			  "session_id",
-			  "device_id"
-			],
-			"whole_table_errors": [],
-			"rows": [
-			  {
-				"row_number": 2,
-				"errors": [],
-				"data": {
-				  "event_id": "-1",
-				  "device_uuid": "1000000089bbf88b",
-				  "lib_user": "matthew.jadud@gsa.gov",
-				  "localtime": "2021-04-02T10:46:53-04:00",
-				  "servertime": "2021-04-02T10:46:53-04:00",
-				  "session_id": "9475068c05fea81f",
-				  "device_id": "unknown:6"
-				}
-			  }
-			],
-			"valid_row_count": 1,
-			"invalid_row_count": 0
-		  }
-		],
-		"valid": true
-	  }`
+func TestSimpleCall(t *testing.T) {
+	durations := []*state.Duration{
+		{
+			SessionID: 0,
+			Start:     1,
+			End:       2,
+		},
+	}
 
-	var rev RevalResponse
-	err := json.Unmarshal([]byte(testString), &rev)
+	viper.Set("api.scheme", "https")
+	viper.Set("api.host", "10x.gsa.gov")
+	viper.Set("api.uri", "test/durations")
+
+	var body string
+
+	httpmock.Activate()
+	httpmock.RegisterResponder("POST",
+		"https://10x.gsa.gov/test/durations",
+		func(req *http.Request) (*http.Response, error) {
+			b, _ := io.ReadAll(req.Body)
+			body = string(b)
+			return httpmock.NewJsonResponse(200, `{}`)
+		},
+	)
+
+	err := PostDurations(durations)
 	if err != nil {
-		log.Println("unmarshalling error:", err)
+		t.Fatal("posting durations failed")
+	}
 
-	} else {
-		log.Println(rev)
-
+	if !strings.Contains("start_time,end_time\n", body) {
+		t.Fatal("posting durations did not contain csv header")
+	}
+	if !strings.Contains("1,2\n", body) {
+		t.Fatal("posting durations did not contain csv body")
 	}
 }
