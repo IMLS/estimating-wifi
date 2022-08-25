@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"sync"
 	"time"
@@ -8,6 +9,8 @@ import (
 	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	zls "gsa.gov/18f/cmd/session-counter/zero-log-sentry"
@@ -42,11 +45,25 @@ func run2() {
 
 	go runEvery("*/1 * * * *", c,
 		func() {
-			log.Debug().Msg("RUNNING SIMPLESHARK")
-			tlp.SimpleShark(
-				search.SetMonitorMode,
-				search.SearchForMatchingDevice,
-				tlp.TSharkRunner)
+			flag.Bool("isDeveloperMode", true, "Running dev mode")
+
+			pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+			pflag.Parse()
+			viper.BindPFlags(pflag.CommandLine)
+
+			// serverCmd.Flags().Bool("isDeveloperMode", true, "Running dev mode")
+			// viper.BindPFlag("isDeveloperMode", serverCmd.Flags().Lookup("isDeveloperMode"))
+
+			if viper.GetBool("isDeveloperMode") {
+				log.Debug().Msg("DEV MODE, RUNNING FAKE MOCK RUN")
+				fakeWiresharkHelper(1, 200000)
+			} else {
+				log.Debug().Msg("RUNNING SIMPLESHARK")
+				tlp.SimpleShark(
+					search.SetMonitorMode,
+					search.SearchForMatchingDevice,
+					tlp.TSharkRunner)
+			}
 		})
 
 	go runEvery(config.GetResetCron(), c,
