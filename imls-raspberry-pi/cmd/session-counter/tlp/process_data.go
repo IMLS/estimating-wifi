@@ -26,9 +26,9 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 	for _, se := range state.GetMACs() {
 
 		d := &structs.Duration{
-			PiSerial:  state.GetCachedSerial(),
+			Serial:    state.GetCachedSerial(),
 			SessionID: state.GetCurrentSessionID(),
-			FCFSSeqID: config.GetFCFSSeqID(),
+			FSCSID:    config.GetFSCSID(),
 			DeviceTag: config.GetDeviceTag(),
 			Start:     se.Start,
 			End:       se.End,

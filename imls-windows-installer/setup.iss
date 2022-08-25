@@ -157,6 +157,6 @@ end;
 procedure WriteOutIni();
 begin
   SetIniString('user', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
-  SetIniString('user', 'fcfs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
+  SetIniString('user', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
   SetIniString('user', 'device_tag', DevicePage.Values[0], ExpandConstant(CurrentFileName));
 end;

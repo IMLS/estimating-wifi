@@ -86,7 +86,7 @@ func launchTLP() {
 		zls.SetupZeroLogSentry("session-counter", dsn)
 		zls.SetTags(map[string]string{
 			"tag":     config.GetDeviceTag(),
-			"fcfs_id": config.GetFCFSSeqID(),
+			"fscs_id": config.GetFSCSID(),
 		})
 	}
 
