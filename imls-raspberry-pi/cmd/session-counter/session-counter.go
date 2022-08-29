@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"sync"
 	"time"
@@ -9,8 +8,8 @@ import (
 	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"gsa.gov/18f/cmd/session-counter/mock_hw"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 	zls "gsa.gov/18f/cmd/session-counter/zero-log-sentry"
@@ -23,6 +22,7 @@ import (
 
 var (
 	cfgFile string
+	mode    string
 )
 
 func runEvery(crontab string, c *cron.Cron, fun func()) {
@@ -45,18 +45,9 @@ func run2() {
 
 	go runEvery("*/1 * * * *", c,
 		func() {
-			flag.Bool("isDeveloperMode", true, "Running dev mode")
-
-			pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
-			pflag.Parse()
-			viper.BindPFlags(pflag.CommandLine)
-
-			// serverCmd.Flags().Bool("isDeveloperMode", true, "Running dev mode")
-			// viper.BindPFlag("isDeveloperMode", serverCmd.Flags().Lookup("isDeveloperMode"))
-
-			if viper.GetBool("isDeveloperMode") {
+			if config.IsDeveloperMode() {
 				log.Debug().Msg("DEV MODE, RUNNING FAKE MOCK RUN")
-				fakeWiresharkHelper(1, 200000)
+				mock_hw.FakeWiresharkHelper(10, 200000)
 			} else {
 				log.Debug().Msg("RUNNING SIMPLESHARK")
 				tlp.SimpleShark(
@@ -146,6 +137,9 @@ func main() {
 		"config",
 		"session-counter.ini",
 		"config file (default is session-counter.ini in /etc/imls, %PROGRAMDATA%\\IMLS, or current directory")
+	//Sets default mode to "prod"
+	rootCmd.PersistentFlags().StringVar(&mode, "mode", "prod", "Mode to run the program in")
+	viper.BindPFlag("mode.run", rootCmd.PersistentFlags().Lookup("mode"))
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.Execute()
 }

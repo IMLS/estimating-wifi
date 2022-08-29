@@ -1,4 +1,4 @@
-package main
+package mock_hw
 
 import (
 	"math/rand"
@@ -37,7 +37,7 @@ func runFakeWireshark(device string) []string {
 	return send
 }
 
-func fakeWiresharkHelper(numfoundperminute int, nummacs int) {
+func FakeWiresharkHelper(numfoundperminute int, nummacs int) {
 	// Create a pool of NUMMACS devices to draw from.
 	// We will send NUMFOUNDPERMINUTE each minute
 	NUMFOUNDPERMINUTEHELPER = numfoundperminute

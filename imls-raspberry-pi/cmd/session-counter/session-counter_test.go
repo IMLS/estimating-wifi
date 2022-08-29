@@ -9,6 +9,7 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/cmd/session-counter/mock_hw"
 	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/cmd/session-counter/tlp"
 )
@@ -32,7 +33,7 @@ func MockRun(rundays int, nummacs int, numfoundperminute int) *state.DurationsDB
 	for days := 0; days < rundays; days++ {
 		// Pretend we run once per minute for 24 hours
 		for minutes := 0; minutes < 60*24; minutes++ {
-			fakeWiresharkHelper(NUMFOUNDPERMINUTE, nummacs)
+			mock_hw.FakeWiresharkHelper(NUMFOUNDPERMINUTE, nummacs)
 			// Add one minute to the fake clock
 			state.GetClock().(*clock.Mock).Add(1 * time.Minute)
 

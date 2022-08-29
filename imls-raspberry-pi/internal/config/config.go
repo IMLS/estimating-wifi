@@ -107,9 +107,7 @@ func IsProductionMode() bool {
 }
 
 func IsDeveloperMode() bool {
-	mode := viper.GetString("mode.test")
-	return strings.Contains(strings.ToLower(mode), "dev")
-	// return !IsProductionMode()
+	return !IsProductionMode()
 }
 
 func GetWiresharkPath() string {
