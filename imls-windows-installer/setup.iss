@@ -1,7 +1,7 @@
 #define MyAppName "IMLS Session Counter"
 #define MyAppVersion "1.0"
 #define MyAppPublisher "GSA 10x"
-#define MyAppURL "https://github.com/18F/imls-pi-stack"
+#define MyAppURL "https://github.com/IMLS/estimating-wifi"
 #define MyAppExeName "session-counter.exe"
 
 [Setup]
@@ -26,26 +26,54 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
 Name: "{app}\Wireshark"
+Name: "{app}\service"
 
 [Files]
 ; NOTE: Do not use "Flags: ignoreversion" on any shared system files
 ; Our IMLS installer
-Source: "..\release\bin\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "session-counter.ini"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: WriteOutIni
+Source: ".\release\{#MyAppExeName}"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion
+Source: "README.txt"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion
+Source: "session-counter.ini"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion; \
+  AfterInstall: WriteOutIni
+; nssm 2.24
+Source:"nssm.exe"; \
+  DestDir: "{app}\service"; \
+  Flags: ignoreversion
 ; Wireshark 3.6.5 portable app
-Source:"WiresharkPortable64_3.6.5.paf.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
-Source:"npcap-1.60.exe"; DestDir: "{app}\Wireshark"; Flags: ignoreversion
+Source:"WiresharkPortable64_3.6.5.paf.exe"; \
+  DestDir: "{app}\Wireshark"; \
+  Flags: ignoreversion
+Source:"npcap-1.60.exe"; \
+  DestDir: "{app}\Wireshark"; \
+  Flags: ignoreversion
 
 [Run]
-Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; Description: "Wireshark 3.6.5"; Flags: runascurrentuser
-Filename: "{app}\Wireshark\npcap-1.60.exe"; Description: "npcap 1.60"; Flags: runascurrentuser
+Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
+  Description: "Wireshark 3.6.5"; \
+  Flags: runascurrentuser
+Filename: "{app}\Wireshark\npcap-1.60.exe"; \
+  Description: "npcap 1.60"; \
+  Flags: runascurrentuser
+Filename: "{app}\service\nssm.exe"; \
+  WorkingDir: "{app}"; \
+  Parameters: "install estimating-wifi ""{app}\session-counter.exe"" \
+    Application ""{app}\session-counter.exe"" \
+    AppDirectory ""{app}"" \
+    DisplayName ""IMLS Session Counter"" \
+    Start SERVICE_AUTO_START"; \
+  Description: "nssm 2.24"; \
+  Flags: runascurrentuser
 
 [Code]
 var
   IntroPage: TOutputMsgWizardPage;
   LibraryPage: TInputQueryWizardPage;
-  DevicePage: TInputQueryWizardPage;
 
 procedure InitializeWizard;
 begin
@@ -63,12 +91,6 @@ begin
     'System (FSCS) ID, then click Next.');
   LibraryPage.Add('API key:', False);
   LibraryPage.Add('FSCS ID:', False);
-
-  DevicePage := CreateInputQueryPage(LibraryPage.ID,
-    'Device Information',
-    'This information will help uniquely identify your machine within your library.',
-    'Please enter a descriptive tag for this machine.');
-  DevicePage.Add('Device tag:', False);
 end;
 
 function IsAlphabetic(C: Char): Boolean;
@@ -142,21 +164,12 @@ begin
         end;
       end;
     end;
-  end else if CurPageID = DevicePage.ID then begin
-    { Check for empty data }
-    if Trim(DevicePage.Values[0]) = '' then begin
-      MsgBox('You must enter a device tag.', mbError, MB_OK);
-      Result := False;
-  end else begin
-     Result := True;
-  end;
-end else
-    Result := True;
+    end else
+      Result := True;
 end;
 
 procedure WriteOutIni();
 begin
-  SetIniString('user', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
-  SetIniString('user', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
-  SetIniString('user', 'device_tag', DevicePage.Values[0], ExpandConstant(CurrentFileName));
+  SetIniString('device', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
+  SetIniString('device', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
 end;

@@ -1,2 +1,6 @@
+.PHONY: all clean test
+
 all:
-	c:\Program Files (x86)\Inno Setup 6\ISCC.exe setup.iss
+	cp ~/go/bin/session-counter.exe release/
+	cp ~/go/bin/wifi-hardware-search-windows release/
+	"c:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
