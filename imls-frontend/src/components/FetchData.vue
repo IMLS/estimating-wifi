@@ -1,6 +1,6 @@
 <script>
 
-import { state } from "@/store/store.js";
+import { store, state } from "@/store/store.js";
 
 export default {
   name: 'Fetch Data Wrapper',
@@ -12,36 +12,58 @@ export default {
     path: {
       type: String,
       default: '/'
+    }, 
+    queryParams: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
-      state
+      store,
+      state,
+      fetchCount: null,
+      fetchError: {},
+      fetchedData: {},
+      isLoading: false,
     }
   },
   watch: {
     'state.selectedDate'(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.fetchDataFromState();
+        this.fetchData();
       }
     },
     fscsId(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.fetchDataFromState();
+        this.fetchData();
       }
     }
   },
   async beforeMount() {
-     await this.fetchDataFromState();
+     await this.fetchData();
   },
   methods: {
-    async fetchDataFromState() {
-      if (this.fscsId.length !== 0) await state.fetchData(this.path, `?_fscs_id=${this.fscsId}&_day=${state.selectedDate}`);
-    }
+    async fetchData() {
+      if (this.fscsId.length !== 0) {
+        this.isLoading = true;
+        try {
+          // todo: compose the rest of the query string from the array in props
+          const response = await fetch(`${store.backendBaseUrl}${this.path}?_fscs_id=${this.fscsId}&_day=${state.selectedDate}`);
+          if (await !response.ok) {
+            throw new Error(response.status);
+          }
+          this.fetchedData = await response.json();
+        } catch (error) {
+          this.fetchError = error;
+        }
+        this.isLoading = false;
+      }
+    },
   },
   computed: {
     responseIsOKButEmpty() {
-      return state.fetchedData.reduce((previous, current) => previous + current, 0)
+      return this.fetchedData.reduce((previous, current) => previous + current, 0)
     }
   }
 };
@@ -49,19 +71,19 @@ export default {
 
 <template>
   <div class="loading-area">
-    <div v-if="state.isLoading" class="loading-indicator">
+    <div v-if="this.isLoading" class="loading-indicator">
       <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">
         <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>
       </svg>
     </div>
-    <div class="loaded--error" v-if="state.fetchError && state.fetchError.message">
-      <p>Oops! Error encountered: {{ state.fetchError.message }}</p>
+    <div class="loaded--error" v-if="this.fetchError && this.fetchError.message">
+      <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
     </div>
-    <div class="loaded--no-data" v-if="(state.fetchedData.length > 1 && responseIsOKButEmpty === 0) || state.fetchedData.length < 1">
+    <div class="loaded--no-data" v-if="(this.fetchedData.length > 1 && responseIsOKButEmpty === 0) || this.fetchedData.length < 1">
       <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ state.selectedDate }}</b>. Please choose a different date or library.</p>
     </div>
-    <div class="loaded--has-data" v-else-if="state.fetchedData.length > 1">
-      <slot></slot>
+    <div class="loaded--has-data" v-else-if="this.fetchedData.length > 1">
+      <slot :fetchedData="this.fetchedData" ></slot>
     </div>
   </div>
 </template>

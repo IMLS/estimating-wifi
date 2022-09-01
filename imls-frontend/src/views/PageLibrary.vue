@@ -28,9 +28,13 @@ export default {
   },
   methods: {},
   computed: {
-    chartTitle: () => {
+    dailyChartTitle: () => {
       const localDate = state.selectedDate + "T00:00";
       return "Devices present by hour on " + format(new Date(localDate), 'PP')
+    },
+    weeklyChartTitle: () => {
+      const localDate = state.selectedDate + "T00:00";
+      return "Devices present by hour for a week, starting on " + format(new Date(localDate), 'PP')
     },
     getLabels(){
       return store.hourlyLabels;
@@ -47,14 +51,15 @@ export default {
 
     <div class="usa-card-group margin-top-6">
       <div class="usa-card tablet:grid-col-12">
-        <USWDSCard :title="chartTitle">
+        <USWDSCard :title="dailyChartTitle">
           <div class="grid-row">
             <div class="grid-col">
               <FetchData 
+              v-slot="slotProps"
               :fscsId=id
               :path="store.backendPaths.get24HoursBinnedByHour">
                 <Histogram 
-                :dataset="state.fetchedData" 
+                :dataset="slotProps.fetchedData" 
                 :labels="getLabels" 
                 :datasetIdKey="id"></Histogram>
                 
@@ -70,8 +75,8 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTable" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :headers="getLabels" :rows="[state.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}`" />
-                    <div v-if="state.fetchedData.length < 1">Request succeeded but no data was found.</div>
+                    <USWDSTable :headers="getLabels" :rows="[slotProps.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}`" />
+                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
                   <h3 class="usa-accordion__heading">
                     <button
@@ -84,8 +89,8 @@ export default {
                     </button>
                   </h3>
                   <div id="viewRaw" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ state.fetchedData }}</pre>
-                    <div v-if="state.fetchedData.length < 1">Request succeeded but no data was found.</div>
+                    <pre>{{ slotProps.fetchedData }}</pre>
+                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
                 </div>
               </FetchData>
@@ -99,6 +104,9 @@ export default {
           </div>
         </USWDSCard>
       </div>
+
+    
+
     </div>
 
   
