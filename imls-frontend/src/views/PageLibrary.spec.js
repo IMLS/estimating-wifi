@@ -19,6 +19,6 @@ describe("PageLibrary", () => {
       },
     });
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
-    expect(wrapper.findAll(".usa-card")).toHaveLength(1);
+    expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
   });
 });

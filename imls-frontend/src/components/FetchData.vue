@@ -1,6 +1,7 @@
 <script>
 
 import { store, state } from "@/store/store.js";
+import { nextTick } from 'vue'
 
 export default {
   name: 'Fetch Data Wrapper',
@@ -14,8 +15,8 @@ export default {
       default: '/'
     }, 
     queryParams: {
-      type: Array,
-      default: () => []
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -29,11 +30,31 @@ export default {
     }
   },
   watch: {
-    'state.selectedDate'(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.fetchData();
-      }
+    // this might not be the best way to react to selectedDate changes from the date picker. 
+    // However, we might refactor the date to use URL query params, which would make the
+    // query parameters available from the $route as props. 
+    // Vue would prefer to pass this down through props. Consider refactoring.
+    'state.selectedDate': {
+      async handler(newVal, oldVal)  {
+        console.log(newVal, oldVal)
+        if (newVal !== oldVal) {
+          await nextTick();
+          this.fetchData();
+        }
+      },
+      deep: true, 
     },
+    // maybe watch queryParams._start for now?
+    // 'queryParams._start': {
+    //   async handler(newVal, oldVal)  {
+    //     console.log(newVal, oldVal)
+    //     if (newVal !== oldVal) {
+    //       await nextTick();
+    //       this.fetchData();
+    //     }
+    //   },
+    //   deep: true, 
+    // },
     fscsId(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.fetchData();
@@ -49,7 +70,7 @@ export default {
         this.isLoading = true;
         try {
           // todo: compose the rest of the query string from the array in props
-          const response = await fetch(`${store.backendBaseUrl}${this.path}?_fscs_id=${this.fscsId}&_day=${state.selectedDate}`);
+          const response = await fetch(`${store.backendBaseUrl}${this.path}?_fscs_id=${this.fscsId}${this.queryString}`);
           if (await !response.ok) {
             throw new Error(response.status);
           }
@@ -62,6 +83,13 @@ export default {
     },
   },
   computed: {
+    // revisit when _start and _day aren't separate props -- this is computed too early, before the state.selectedDate prop change has filtered its way through the components 
+    queryString() {
+      if (this.queryParams && Object.keys(this.queryParams).length !== 0) {
+        return '&' + Object.keys(this.queryParams).map(key => key + '=' + this.queryParams[key]).join('&');
+      }
+      return ''
+    },
     responseIsOKButEmpty() {
       return this.fetchedData.reduce((previous, current) => previous + current, 0)
     }

@@ -49,6 +49,26 @@ export const restHandlers = [
         return res(ctx.status(400), ctx.json(errorMock))
     }
   }),
+  // NOTE: Anastasia said she'd refactor so that both of these functions expect _start, rather than _start in one and _day in the other. Update when available.
+  rest.get('*/rpc/bin_devices_over_time', (req, res, ctx) => {
+    let requestedID = req.url.searchParams.get("_fscs_id");
+    let requestedDay = req.url.searchParams.get("_start"); // TODO: right now this uses _start, asked about making this consistent between all the backend queries
+    // todo test these other query params
+    let requestedDirection = req.url.searchParams.get("_direction");
+    let requestedDuration = req.url.searchParams.get("_days");
+    switch (requestedID) {
+      case 'KnownGoodId' :
+        if (requestedDay == "9999-99-99") {
+          return res(ctx.status(200), ctx.json([knownGoodDevicesPerHourMock2, knownGoodDevicesPerHourMock1]))
+        }
+        return res(ctx.status(200), ctx.json([knownGoodDevicesPerHourMock1, knownGoodDevicesPerHourMock2]))
+      case 'KnownEmptyId':
+        return res(ctx.status(200), ctx.json([knownEmptyDevicesPerHourMock, knownEmptyDevicesPerHourMock]))
+      case 'notARealID':
+      default:
+        return res(ctx.status(400), ctx.json(errorMock))
+    }
+  }),
 ]
 
 
