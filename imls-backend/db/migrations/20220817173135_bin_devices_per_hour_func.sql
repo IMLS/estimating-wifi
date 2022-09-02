@@ -19,8 +19,8 @@ BEGIN
     WHILE _hour < _day_end LOOP
 
         -- Casting the DATE variable to a TIMESTAMP to add it to the interval
-        _init_start = _day::TIMESTAMP + make_interval(hours=> _hour);
-        _end =  _day + make_interval(hours=> _hour, mins => 59, secs => 59);
+        _init_start = _start::TIMESTAMP + make_interval(hours=> _hour);
+        _end =  _start + make_interval(hours=> _hour, mins => 59, secs => 59);
 
         -- This select stores the result in the variable _count.
         SELECT count(*) INTO _count
