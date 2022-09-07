@@ -1,0 +1,8 @@
+-- migrate:up
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgjwt;
+
+-- migrate:down
+DROP EXTENSION IF EXISTS pgjwt;
+DROP EXTENSION IF EXISTS pgcrypto;
+
