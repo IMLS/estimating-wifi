@@ -57,15 +57,19 @@ export default {
         responsive: true,
         plugins: {
           datalabels: {
-            color: '#FFF',
+            // USWSDS blue-70v
+            color: '#0b4778',
             anchor: 'end',
-            align: 'start',
+            align: 'end',
+            offset: 1,
+            padding: 2,
             labels: {
               title: {
                 font: {
-                  weight: 'bold'
+                  weight: 'bold',
+                  size: 20
                 }
-              }
+              },
             }
           },
           tooltip: {
@@ -120,8 +124,11 @@ export default {
         datasets: [ 
           { 
             label: this.datasetIdKey,
-            backgroundColor: '#005ea2',
-            data: this.dataset
+            // uswds blue-70v
+            backgroundColor: '#0b4778',
+            data: this.dataset,
+            barPercentage: .9,
+            categoryPercentage: 1,
           }
         ] ,
       }

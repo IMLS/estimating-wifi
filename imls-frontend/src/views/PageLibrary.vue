@@ -85,7 +85,7 @@ export default {
                   <h3 class="usa-accordion__heading">
                     <button
                       type="button"
-                      class="usa-accordion__button"
+                      class="usa-accordion__button bg-primary-lighter"
                       aria-expanded="false"
                       aria-controls="viewTableDaily"
                     >
