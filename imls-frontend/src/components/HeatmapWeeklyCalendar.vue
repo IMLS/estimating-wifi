@@ -103,7 +103,7 @@ export default {
 
     </div>
   </div>
-
+<!-- 
   <div class="legend-container">
     <h3 class="legend-title">
       Percentile Legend
@@ -113,7 +113,7 @@ export default {
         {{ i*10 }}
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
 </template>
 
