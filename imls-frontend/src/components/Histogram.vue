@@ -69,43 +69,44 @@ export default {
             }
           },
           tooltip: {
-            displayColors: false,
-            borderWidth: 0.25,
-            borderColor: '#333',
-            backgroundColor: '#FFF',
-            // titleColor:'#333',
-            // titleAlign: 'center',
-            // titleFont: {
-            //   size: 20
+            enabled: false
+            // displayColors: false,
+            // borderWidth: 0.25,
+            // borderColor: '#333',
+            // backgroundColor: '#FFF',
+            // // titleColor:'#333',
+            // // titleAlign: 'center',
+            // // titleFont: {
+            // //   size: 20
+            // // },
+            // bodyColor:'#333',
+            // bodyAlign: 'center',
+            // bodyFont: {
+            //   size: 20,
+            //   weight: 'bold',
+            //   family: 'Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif'
             // },
-            bodyColor:'#333',
-            bodyAlign: 'center',
-            bodyFont: {
-              size: 20,
-              weight: 'bold',
-              family: 'Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif'
-            },
-            yAlign: 'bottom',
-            padding: {
-              left: 10,
-              right: 10,
-              top: 6,
-              bottom:  6
-            },
-            caretSize: 10,
-            callbacks: {
-              title: () => '',
-              /* this would mean test chartjs Tooltip internals */
-              /* c8 ignore start */
-              label: function(context) {
-                let label = '';
-                if (context.parsed.y !== null) {
-                    label += context.parsed.y + " devices present"
-                }
-                return label;
-                /* c8 ignore end */
-              }
-            }
+            // yAlign: 'bottom',
+            // padding: {
+            //   left: 10,
+            //   right: 10,
+            //   top: 6,
+            //   bottom:  6
+            // },
+            // caretSize: 10,
+            // callbacks: {
+            //   title: () => '',
+            //   /* this would mean test chartjs Tooltip internals */
+            //   /* c8 ignore start */
+            //   label: function(context) {
+            //     let label = '';
+            //     if (context.parsed.y !== null) {
+            //         label += context.parsed.y + " devices present"
+            //     }
+            //     return label;
+            //     /* c8 ignore end */
+            //   }
+            // }
           }
         }
       }

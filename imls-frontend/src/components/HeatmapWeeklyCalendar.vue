@@ -70,6 +70,7 @@ export default {
 
 
 <template>
+<div>
   <div class="scroll-container">
     <div class="usa-sr-only">A more accessible data table follows this infographic.</div>
 
@@ -101,26 +102,27 @@ export default {
       </div>
 
     </div>
+  </div>
 
-    <div class="legend-container">
-      <h3 class="legend-title">
-        Percentile Legend
-      </h3>
-      <div class="legend">
-        <div class="legend__step font-mono-md text-center padding-1" v-bind:key="i" v-for="step, i in Array(11)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + i/10 +')'}">
-          {{ i*10 }}
-        </div>
+  <div class="legend-container">
+    <h3 class="legend-title">
+      Percentile Legend
+    </h3>
+    <div class="legend">
+      <div class="legend__step font-mono-md text-center padding-1" v-bind:key="i" v-for="step, i in Array(11)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + i/10 +')'}">
+        {{ i*10 }}
       </div>
     </div>
-
-
   </div>
+</div>
 </template>
 
 <style scoped lang="scss">
 .scroll-container {
-  max-width: 100%;
-  overflow-x: auto;
+  @media (max-width: 40em) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
 .weekly-calendar {
   display: grid;
@@ -145,30 +147,29 @@ export default {
     // use box-shadow because it renders over the background color, not instead of it
     box-shadow: inset -1px -1px 0 0px rgb(0 0 0 / 50%);
     // fake tooltips for now
-    position: relative;
+    // position: relative;
     &:hover {
       border-color:#fff;
       cursor: default;
-      &:after {
-        display: block;
-      }
+      // &:after {
+      //   display: block;
+      // }
     }
-    // todo: real tooltips someday?
-    &:after {
-      font-size: 14px;
-      font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans;
-      display: none;
-      position: absolute;
-      content: 'Percentile: ' attr(data-percentile);
-      padding: .5ch 1ch;
-      background: #fff;
-      border: 1px solid #CCC;
-      border-radius: 3px;
-      width: 70%;
-      left: 15%;
-      bottom: -3ch;
-      z-index: 10;
-    }
+    // &:after {
+    //   font-size: 14px;
+    //   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans;
+    //   display: none;
+    //   position: absolute;
+    //   content: 'Percentile: ' attr(data-percentile);
+    //   padding: .5ch 1ch;
+    //   background: #fff;
+    //   border: 1px solid #CCC;
+    //   border-radius: 3px;
+    //   width: 70%;
+    //   left: 15%;
+    //   bottom: -3ch;
+    //   z-index: 10;
+    // }
   }
 }
 
@@ -178,9 +179,13 @@ export default {
   flex-flow: column;
   justify-content: center;
   height: 5rem;
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: start;
   box-shadow: none;
   border-bottom: .25px solid rgba(0,0,0, .5);
+  background: #ffffffe8;
+  z-index: 1;
   &:after {
     position: absolute;
     bottom: 0;
@@ -225,6 +230,8 @@ export default {
   }
 }
 .weekly-calendar__hour-labels__label.weekly-calendar__day__label {
+  position: sticky;
+  top: 0;
   justify-content: end;
   border-bottom: none;
   border-right: none;

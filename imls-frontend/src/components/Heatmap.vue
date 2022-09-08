@@ -71,7 +71,7 @@ export default {
         </tr>
       </tbody>
     </table>
-    <div class="legend-container">
+    <!-- <div class="legend-container">
       <h3 class="legend-title">
         Percentile Legend
       </h3>
@@ -80,7 +80,7 @@ export default {
           {{ i*10 }}
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <!-- TODO ADD COLOR LEGEND -->
@@ -123,32 +123,31 @@ th, td {
     transform: rotate(-45deg) translateY(1.5ch) translateX(-.75ch);
   }
 }
-.data-grid__cell {
-  position: relative;
-  &:hover {
-    border-color:#fff;
-    cursor: default;
-    &:after {
-      display: block;
-    }
-  }
-  // todo: real tooltips someday?
-  &:after {
-    font-size: 14px;
-    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans;
-    display: none;
-    position: absolute;
-    content: 'Percentile: ' attr(data-percentile);
-    padding: .5ch 1ch;
-    background: #fff;
-    border: 1px solid #CCC;
-    border-radius: 3px;
-    width: 15ch;
-    left: -4.5ch;
-    bottom: -3ch;
-    z-index: 1;
-  }
-}
+// .data-grid__cell {
+  // position: relative;
+  // &:hover {
+  //   border-color:#fff;
+  //   cursor: default;
+  //   &:after {
+  //     display: block;
+  //   }
+  // }
+  // &:after {
+  //   font-size: 14px;
+  //   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans;
+  //   display: none;
+  //   position: absolute;
+  //   content: 'Percentile: ' attr(data-percentile);
+  //   padding: .5ch 1ch;
+  //   background: #fff;
+  //   border: 1px solid #CCC;
+  //   border-radius: 3px;
+  //   width: 15ch;
+  //   left: -4.5ch;
+  //   bottom: -3ch;
+  //   z-index: 1;
+  // }
+// }
 .legend-container {
   @media (min-width: 40em) {
     padding-left: 14ch;
