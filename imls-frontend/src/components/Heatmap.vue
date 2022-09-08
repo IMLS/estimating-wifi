@@ -19,6 +19,10 @@ export default {
       type: String,
       // todo: decide if this needs a caption or if it should direct screen reader users to the simple table that follows
       default: ''
+    },
+    colorRGB: {
+      type: Array,
+      default: () => [120,124,206]
     }
   },
   methods: {
@@ -27,13 +31,13 @@ export default {
     },
     // todo: get Quartile instead?
     getPercentile(thisVal) {
-      if (thisVal === 0 ) return 0;
-      return (this.allValues.slice().filter((item) => item <= thisVal).length / this.allValues.length);
+      if (thisVal === this.allValuesSorted[0] ) return 0;
+      return (this.allValuesSorted.slice().filter((item) => item <= (thisVal) ).length / this.allValuesSorted.length);
     },
     // todo: determine saturation separately from alpha channel of background color (to prevent low contrast)
   },
   computed: {
-    allValues() {
+    allValuesSorted() {
       return [...this.sortArrayAscending(this.dataset.slice().flat())];
     }
 
@@ -61,13 +65,24 @@ export default {
               {{ datasetLabels[i] }}
             </span>
           </th>
-          <td v-bind:key="i" v-for="cell, i in row" class="data-grid__cell font-mono-md text-center padding-y-2 border" :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(120,124,206, ' + getPercentile(cell) +')'}">
+          <td v-bind:key="i" v-for="cell, i in row" class="data-grid__cell font-mono-md text-center padding-y-2 border" :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}">
             {{ cell }}
           </td>
         </tr>
       </tbody>
     </table>
+    <div class="legend-container">
+      <h3 class="legend-title">
+        Percentile Legend
+      </h3>
+      <div class="legend border">
+        <div class="legend__step font-mono-md text-center padding-1 border" v-bind:key="i" v-for="step, i in Array(11)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + i/10 +')'}">
+          {{ i*10 }}
+        </div>
+      </div>
+    </div>
   </div>
+
   <!-- TODO ADD COLOR LEGEND -->
 </template>
 
@@ -82,7 +97,9 @@ export default {
   grid-template-columns: 14ch repeat( v-bind('binLabels.length'), minmax(5ch, auto));
   width: 100%;
   min-width: calc(14ch + 5ch * v-bind('binLabels.length'));
-  padding-bottom: 4ch;
+  padding-bottom: 2ch;
+  padding-right: 5ch;
+  
 }
 thead,
 tbody, 
@@ -131,5 +148,22 @@ th, td {
     bottom: -3ch;
     z-index: 1;
   }
+}
+.legend-container {
+  @media (min-width: 40em) {
+    padding-left: 14ch;
+    padding-right: 5ch;
+  }
+  margin-bottom: 3ch;
+  min-width: 100%;
+}
+.legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.legend__step {
+  flex: 1 1 5ch;
 }
 </style>
