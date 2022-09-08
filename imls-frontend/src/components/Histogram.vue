@@ -1,9 +1,10 @@
 <script>
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 
-ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale, ChartDataLabels)
 
 export default {
   name: 'BarChart',
@@ -55,6 +56,18 @@ export default {
       chartOptions: {
         responsive: true,
         plugins: {
+          datalabels: {
+            color: '#FFF',
+            anchor: 'end',
+            align: 'start',
+            labels: {
+              title: {
+                font: {
+                  weight: 'bold'
+                }
+              }
+            }
+          },
           tooltip: {
             displayColors: false,
             borderWidth: 0.25,
