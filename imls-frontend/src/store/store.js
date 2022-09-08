@@ -38,6 +38,15 @@ export const store = readonly({
     "10pm",
     "11pm",
   ],
+  dayOfWeekLabels: [
+    "Sun",
+    "Mon",
+    "Tue", 
+    "Wed", 
+    "Thu",
+    "Fri",
+    "Sat"
+  ],
   backendBaseUrl: BACKEND_BASEURL,
   backendPaths: {
     get24HoursBinnedByHour: "/rpc/bin_devices_per_hour",

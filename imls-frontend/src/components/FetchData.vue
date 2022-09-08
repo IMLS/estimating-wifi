@@ -135,8 +135,9 @@ export default {
   position: absolute;
   left: calc(50% - 50px);
   top: calc(5rem - 50px);
+  z-index: 100;
   @media (min-width: 64em ) {
-    top: calc(10rem - 50px);
+    top: calc(40% - 50px);
   }
 }
 .loading-indicator .usa-icon {
