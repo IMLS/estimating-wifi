@@ -58,6 +58,11 @@ export default {
     },
     allValuesSorted() {
       return [...this.sortArrayAscending(this.dataset.slice().flat())];
+    },
+    // the calendar axis origin is 12am, the first tick is 1am
+    shiftedHourlyLabels() {
+      const [first, ...rest] = store.hourlyLabels;
+      return [...rest, first]
     }
   }
 }
@@ -75,8 +80,8 @@ export default {
           Local time
         </div>
         <!-- Each hour/bin gets a row: -->
-        <div class="weekly-calendar__hour-labels__label weekly-calendar__cell" v-bind:key="header" v-for="header in binLabels">
-          {{ header }} 
+        <div class="weekly-calendar__hour-labels__label weekly-calendar__cell" v-bind:key="hour" v-for="hour in shiftedHourlyLabels">
+          <span>{{ hour }}</span>
         </div>
       </div>
 
@@ -213,17 +218,22 @@ export default {
     content: "";
     border-bottom: .25px solid rgba(0,0,0, .5);
   }
+  span {
+    position: absolute;
+    right: 3ch;
+    bottom: -1.5ch;
+  }
 }
 .weekly-calendar__hour-labels__label.weekly-calendar__day__label {
   justify-content: end;
   border-bottom: none;
   border-right: none;
+  text-align: center;
   &:after {
     width: 100%;
     border-right: .25px solid rgba(0,0,0, .5);
   }
 }
-
 
 .isSelectedDate {
   position: relative;
