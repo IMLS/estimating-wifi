@@ -41,7 +41,7 @@ If(-Not $installation_status ) {
 <# 	# -- Testing purposes
 	Start-Process $env:userprofile\Downloads\TestGolang\$current_time\go1.19.windows-amd64.msi -Wait
  #>	
-	Start-Process $env:userprofile\Downloads\go1.19.windows-amd64.msi -Wait
+	Start-Process $env:userprofile\Downloads\go1.19.windows-amd64.msi -Wait -ArgumentList "/quiet /norestart"
 	
 	# -- Confirm install was successful
 	$installation_status = (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where { $_.DisplayName -Match $program }) -ne $null
