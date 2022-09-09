@@ -1,5 +1,7 @@
 -- migrate:up
 
+DROP FUNCTION IF EXISTS api.bin_devices_per_hour;
+
 CREATE OR REPLACE FUNCTION api.bin_devices_per_hour(_start DATE, _fscs_id TEXT) RETURNS INT[]
     AS $$
 DECLARE 
