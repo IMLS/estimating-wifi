@@ -43,18 +43,18 @@ describe("FetchData", () => {
   });
 
   it("should update with new data when the selected date changes in state", async () => {
-    const spyChangeDate = vi.spyOn(FetchData.methods, "fetchDataFromState");
+    const spyChangeDate = vi.spyOn(FetchData.methods, "fetchData");
     const wrapper = await mount(FetchData, {
       props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId" },
     });
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);
-    expect(wrapper.vm.state.fetchedData).toEqual([0, 1, 2, 3, 4]);
+    expect(wrapper.vm.fetchedData).toEqual([0, 1, 2, 3, 4]);
     state.selectedDate = "9999-99-99";
     await flushPromises();
     await wrapper.vm.$nextTick();
     expect(spyChangeDate).toHaveBeenCalledTimes(2);
-    expect(wrapper.vm.state.fetchedData).toEqual([9, 9, 9, 9, 9]);
+    expect(wrapper.vm.fetchedData).toEqual([9, 9, 9, 9, 9]);
   });
 
   it("should render a loading indicator before the backend resolves", async () => {

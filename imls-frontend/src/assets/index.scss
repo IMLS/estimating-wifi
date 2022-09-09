@@ -22,3 +22,10 @@
 .usa-banner__inner {
   max-width: units("widescreen");
 }
+
+.usa-accordion__button {
+  @include u-bg('blue-warm-5');
+  &:hover {
+    @include u-bg('blue-warm-10');
+  }
+}
