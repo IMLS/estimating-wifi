@@ -4,6 +4,7 @@ CREATE SCHEMA data;
 CREATE ROLE web_anon NOLOGIN;
 
 GRANT USAGE ON SCHEMA api TO web_anon;
+GRANT USAGE ON SCHEMA data TO web_anon;
 
 CREATE TABLE api.helo (
     uid INT PRIMARY KEY,
