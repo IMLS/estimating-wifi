@@ -75,7 +75,7 @@ export default {
               v-slot="slotProps"
               :fscsId=id
               :path="store.backendPaths.get24HoursBinnedByHour"
-              :queryParams="{ _day: state.selectedDate }">
+              :queryParams="{ _start: state.selectedDate }">
                 <Histogram 
                 :dataset="slotProps.fetchedData" 
                 :labels="store.hourlyLabels" 
