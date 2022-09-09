@@ -1,7 +1,7 @@
 import { reactive, computed, readonly } from "vue";
 
 // todo: update when the backend has a real host
-const BACKEND_BASEURL = `${window.location.protocol}//127.0.0.1:3000`;
+const BACKEND_BASEURL = `${window.location.protocol}//${window.location.hostname}:3000`;
 
 export const store = readonly({
   fscs_ids: [
@@ -38,31 +38,15 @@ export const store = readonly({
     "10pm",
     "11pm",
   ],
+  dayOfWeekLabels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  backendBaseUrl: BACKEND_BASEURL,
   backendPaths: {
     get24HoursBinnedByHour: "/rpc/bin_devices_per_hour",
+    get24HoursBinnedByHourForNDays: "/rpc/bin_devices_over_time",
   },
 });
 
 export const state = reactive({
   // todo: Update selectedDate when we have real data
   selectedDate: "2022-05-01",
-  fetchCount: null,
-  fetchError: {},
-  fetchedData: {},
-  isLoading: false,
-
-  async fetchData(path, queryString) {
-    this.isLoading = true;
-    try {
-      // todo: let queryString be an array of params instead of a string
-      const response = await fetch(`${BACKEND_BASEURL}${path}${queryString}`);
-      if (await !response.ok) {
-        throw new Error(response.status);
-      }
-      this.fetchedData = await response.json();
-    } catch (error) {
-      this.fetchError = error;
-    }
-    this.isLoading = false;
-  },
 });

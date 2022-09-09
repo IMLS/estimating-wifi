@@ -1,9 +1,10 @@
 <script>
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 
-ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale, ChartDataLabels)
 
 export default {
   name: 'BarChart',
@@ -55,44 +56,61 @@ export default {
       chartOptions: {
         responsive: true,
         plugins: {
-          tooltip: {
-            displayColors: false,
-            borderWidth: 0.25,
-            borderColor: '#333',
-            backgroundColor: '#FFF',
-            // titleColor:'#333',
-            // titleAlign: 'center',
-            // titleFont: {
-            //   size: 20
-            // },
-            bodyColor:'#333',
-            bodyAlign: 'center',
-            bodyFont: {
-              size: 20,
-              weight: 'bold',
-              family: 'Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif'
-            },
-            yAlign: 'bottom',
-            padding: {
-              left: 10,
-              right: 10,
-              top: 6,
-              bottom:  6
-            },
-            caretSize: 10,
-            callbacks: {
-              title: () => '',
-              /* this would mean test chartjs Tooltip internals */
-              /* c8 ignore start */
-              label: function(context) {
-                let label = '';
-                if (context.parsed.y !== null) {
-                    label += context.parsed.y + " devices present"
+          datalabels: {
+            // USWSDS blue-70v
+            color: '#0b4778',
+            anchor: 'end',
+            align: 'end',
+            offset: 1,
+            padding: 2,
+            labels: {
+              title: {
+                font: {
+                  weight: 'bold',
+                  size: 20
                 }
-                return label;
-                /* c8 ignore end */
-              }
+              },
             }
+          },
+          tooltip: {
+            enabled: false
+            // displayColors: false,
+            // borderWidth: 0.25,
+            // borderColor: '#333',
+            // backgroundColor: '#FFF',
+            // // titleColor:'#333',
+            // // titleAlign: 'center',
+            // // titleFont: {
+            // //   size: 20
+            // // },
+            // bodyColor:'#333',
+            // bodyAlign: 'center',
+            // bodyFont: {
+            //   size: 20,
+            //   weight: 'bold',
+            //   family: 'Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif'
+            // },
+            // yAlign: 'bottom',
+            // padding: {
+            //   left: 10,
+            //   right: 10,
+            //   top: 6,
+            //   bottom:  6
+            // },
+            // caretSize: 10,
+            // callbacks: {
+            //   title: () => '',
+            //   /* this would mean test chartjs Tooltip internals */
+            //   /* c8 ignore start */
+            //   label: function(context) {
+            //     let label = '';
+            //     if (context.parsed.y !== null) {
+            //         label += context.parsed.y + " devices present"
+            //     }
+            //     return label;
+            //     /* c8 ignore end */
+            //   }
+            // }
           }
         }
       }
@@ -106,8 +124,11 @@ export default {
         datasets: [ 
           { 
             label: this.datasetIdKey,
-            backgroundColor: '#005ea2',
-            data: this.dataset
+            // uswds blue-70v
+            backgroundColor: '#0b4778',
+            data: this.dataset,
+            barPercentage: .9,
+            categoryPercentage: 1,
           }
         ] ,
       }

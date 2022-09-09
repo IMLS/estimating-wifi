@@ -21,7 +21,7 @@ describe("USWDSUSWDSTable", () => {
           ["row 1, column A", "row 1, column B"],
           ["row 2, column A", "row 2, column B"],
         ],
-        headers: ["Header for column A", "Header for column B"],
+        columnHeaders: ["Header for column A", "Header for column B"],
       },
     });
 
