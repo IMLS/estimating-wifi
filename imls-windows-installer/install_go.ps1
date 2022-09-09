@@ -18,12 +18,12 @@ If(-Not $installation_status ) {
 	#TODO: Remove all testing purposes code eventually
 	<# # -- Adding a new directory for testing purposes
 	$current_time = Get-Date -Format o | ForEach-Object { $_ -replace ":", "-"}
-	New-Item -Path C:\Users\Administrator\Downloads\TestGolang\$current_time -Type Directory #>
+	New-Item -Path $env:userprofile\Downloads\TestGolang\$current_time -Type Directory #>
 
 	# -- Use 1.19 Golang version
 	$url = "https://go.dev/dl/go1.19.windows-amd64.msi"
 	<# # -- Testing purposes
-	$result = "C:\Users\Administrator\Downloads\TestGolang\$current_time\go1.19.windows-amd64.msi"
+	$result = "$env:userprofile\Downloads\TestGolang\$current_time\go1.19.windows-amd64.msi"
 	 #>
 	$result = "$env:userprofile\Downloads\go1.19.windows-amd64.msi"
 
@@ -39,9 +39,9 @@ If(-Not $installation_status ) {
 	}
 	# -- Install on the system
 <# 	# -- Testing purposes
-	Start-Process C:\Users\Administrator\Downloads\TestGolang\$current_time\go1.19.windows-amd64.msi -Wait
+	Start-Process $env:userprofile\Downloads\TestGolang\$current_time\go1.19.windows-amd64.msi -Wait
  #>	
-	Start-Process C:\Users\Administrator\Downloads\go1.19.windows-amd64.msi -Wait
+	Start-Process $env:userprofile\Downloads\go1.19.windows-amd64.msi -Wait
 	
 	# -- Confirm install was successful
 	$installation_status = (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where { $_.DisplayName -Match $program }) -ne $null
