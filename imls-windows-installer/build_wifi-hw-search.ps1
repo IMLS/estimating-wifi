@@ -4,6 +4,11 @@
 
 $installer_path = Get-Location
 
+# -- Remove session-counter if it already exists
+If (Test-Path -Path wifi-hardware-search-windows.exe) {
+	Remove-Item wifi-hardware-search-windows.exe
+}
+
 # -- Move from estimating-wifi/imls-windowsinstaller to estimating-wifi
 Set-Location ..
 
@@ -17,4 +22,10 @@ $exe_path = "$wd\wifi-hardware-search-windows.exe"
 # -- Move the exe into imls-windowsinstaller
 Write-Host "Executable built. Terminating script"
 Move-Item -Path $exe_path -Destination $installer_path
+
+# -- Update location
+Set-Location ..
+Set-Location ..
+Set-Location ..
+Set-Location imls-windows-installer
 Exit
