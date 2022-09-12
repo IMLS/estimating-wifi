@@ -15,7 +15,7 @@ describe("FetchData", () => {
 
   it("should render loaded data when the backend returns good data", async () => {
     const wrapper = await mount(FetchData, {
-      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId" },
+      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId", selectedDate: "2022-05-01" },
     });
     await flushPromises();
     expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
@@ -31,7 +31,7 @@ describe("FetchData", () => {
 
   it("should update with new data when the prop for library id changes", async () => {
     const wrapper = await mount(FetchData, {
-      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId" },
+      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId", selectedDate: "2022-05-01" },
     });
     await flushPromises();
     expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
@@ -45,12 +45,12 @@ describe("FetchData", () => {
   it("should update with new data when the selected date changes in state", async () => {
     const spyChangeDate = vi.spyOn(FetchData.methods, "fetchData");
     const wrapper = await mount(FetchData, {
-      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId" },
+      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId", selectedDate: "2022-05-01" },
     });
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.fetchedData).toEqual([0, 1, 2, 3, 4]);
-    state.selectedDate = "9999-99-99";
+    wrapper.setProps({ selectedDate: "9999-99-99" });
     await flushPromises();
     await wrapper.vm.$nextTick();
     expect(spyChangeDate).toHaveBeenCalledTimes(2);

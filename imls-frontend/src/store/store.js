@@ -44,5 +44,4 @@ export const store = readonly({
     get24HoursBinnedByHour: "/rpc/bin_devices_per_hour",
     get24HoursBinnedByHourForNDays: "/rpc/bin_devices_over_time",
   },
-  startingDate: "2022-05-01"
 });

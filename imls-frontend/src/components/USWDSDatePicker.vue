@@ -30,18 +30,15 @@ export default {
   mounted() {
     this.enableUSWDSFeatures();
   },
+  emits: ['dateChanged'],
   methods: {
     async enableUSWDSFeatures(){
       await datePicker.init();
       await datePicker.enable(this.$refs.picker);
     },
     detectChange(e) {
-      if (e && e.detail ) {
-        this.selectedDate = e.detail.value;
-        this.$router.push({
-          query: { ...this.$router.query, date: encodeURIComponent(e.detail.value) }
-        });
-      }
+      this.selectedDate = this.$refs.date.value;
+      this.$emit('date_changed', encodeURIComponent(e.target.value) )
     }
   }
 }
@@ -61,6 +58,7 @@ export default {
       :data-max-date="maxDate"
       >
       <input
+        ref="date"
         @change="detectChange"
         class="usa-input"
         id="date"

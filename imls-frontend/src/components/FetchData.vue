@@ -20,7 +20,6 @@ export default {
     },
     selectedDate: {
       type: String,
-      required: true,
       default: ''
     }, 
   },

@@ -23,10 +23,8 @@ export default {
     },
     selectedDate: {
       type: String,
-      required: true,
       // load yesterday by default
       default: () => startOfYesterday().toISOString().split("T")[0]
-
     }, 
   },
   data() {
@@ -41,11 +39,16 @@ export default {
           return format(addDays(startingDate, i), 'M/d/yy' )
       });
       return dates
+    },
+    navigateToSelectedDate(date) {
+      this.$router.push({
+        query: { ...this.$router.query, date: encodeURIComponent(date) }
+      })
     }
   },
   computed: {
     activeDate() {
-      return this.selectedDate || this.store.startingDate;
+      return this.selectedDate;
     },
     dailyChartTitle() {
       const localDate = this.selectedDate + "T00:00";
@@ -69,7 +72,7 @@ export default {
   <div>
     <h1>Library {{ id }}</h1>
 
-    <USWDSDatePicker :initialDate=activeDate />
+    <USWDSDatePicker :initialDate=activeDate @date_changed="navigateToSelectedDate" />
 
     <div class="usa-card-group margin-top-6">
 
@@ -101,22 +104,7 @@ export default {
                   </h3>
                   <div id="viewTableDaily" class="usa-accordion__content usa-prose" hidden>
                     <USWDSTable :columnHeaders="store.hourlyLabels" :rows="[slotProps.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${this.selectedDate}`" />
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
-                  <!-- <h3 class="usa-accordion__heading">
-                    <button
-                      type="button"
-                      class="usa-accordion__button"
-                      aria-expanded="false"
-                      aria-controls="viewRawDaily"
-                    >
-                      View raw response
-                    </button>
-                  </h3>
-                  <div id="viewRawDaily" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ slotProps.fetchedData }}</pre>
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
-                  </div> -->
                 </div>
               </FetchData>
             </div>
@@ -158,22 +146,7 @@ export default {
                   </h3>
                   <div id="viewTableWeekly" class="usa-accordion__content usa-prose" hidden>
                     <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(this.selectedDate, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${this.selectedDate}, for one week`" />
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
-                  <!-- <h3 class="usa-accordion__heading">
-                    <button
-                      type="button"
-                      class="usa-accordion__button"
-                      aria-expanded="false"
-                      aria-controls="viewRawWeekly"
-                    >
-                      View raw response
-                    </button>
-                  </h3>
-                  <div id="viewRawWeekly" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ slotProps.fetchedData }}</pre>
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
-                  </div> -->
                 </div>
               </FetchData>
             </div>
@@ -217,22 +190,7 @@ export default {
                   </h3>
                   <div id="viewTableWeeklyCalendar" class="usa-accordion__content usa-prose" hidden>
                     <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(startOfWeekInISO, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${startOfWeekInISO}, for one week`" />
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
-                  <!-- <h3 class="usa-accordion__heading">
-                    <button
-                      type="button"
-                      class="usa-accordion__button"
-                      aria-expanded="false"
-                      aria-controls="viewRawWeeklyCalendar"
-                    >
-                      View raw response
-                    </button>
-                  </h3>
-                  <div id="viewRawWeeklyCalendar" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ slotProps.fetchedData }}</pre>
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
-                  </div> -->
                 </div>
               </FetchData>
             </div>
