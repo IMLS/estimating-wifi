@@ -37,7 +37,7 @@ describe("HeatmapWeeklyCalendar", () => {
     // 100th percentile color should have no alpha channel / be at 100% opacity
     expect(getAlphaFromRGBAColor(allValuesRendered[5].element.style.backgroundColor)).toEqual(0.5);
 
-    // the last value in the dample  dataset is also the lowest percentile
+    // the last value in the sample dataset is also the lowest percentile
     expect(allValuesRendered[13].attributes("data-percentile")).toEqual("0");
     // 0th percentile color should have 0% alpha channel / be at 0% opacity
     expect(getAlphaFromRGBAColor(allValuesRendered[13].element.style.backgroundColor)).toEqual(0);

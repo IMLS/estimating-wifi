@@ -41,7 +41,7 @@ describe("Heatmap", () => {
     // 100th percentile color should have no alpha channel / be at 100% opacity
     expect(getAlphaFromRGBAColor(allValuesRendered[3].element.style.backgroundColor)).toEqual(0.4);
 
-    // the last value in the dample  dataset is also the lowest value
+    // the last value in the sample dataset is also the lowest value
     expect(allValuesRendered[14].attributes("data-percentile")).toEqual("0");
     // 0th percentile color should have 0% alpha channel / be at 0% opacity
     expect(getAlphaFromRGBAColor(allValuesRendered[14].element.style.backgroundColor)).toEqual(0);
