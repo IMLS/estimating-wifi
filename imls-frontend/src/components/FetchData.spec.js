@@ -14,7 +14,11 @@ describe("FetchData", () => {
 
   it("should render loaded data when the backend returns good data", async () => {
     const wrapper = await shallowMount(FetchData, {
-      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId", selectedDate: "2022-05-01" },
+      props: {
+        path: "/rpc/bin_devices_per_hour",
+        fscsId: "KnownGoodId",
+        selectedDate: "2022-05-01",
+      },
     });
     await flushPromises();
     expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
@@ -30,7 +34,11 @@ describe("FetchData", () => {
 
   it("should update with new data when the library id prop changes", async () => {
     const wrapper = await shallowMount(FetchData, {
-      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId", selectedDate: "2022-05-01" },
+      props: {
+        path: "/rpc/bin_devices_per_hour",
+        fscsId: "KnownGoodId",
+        selectedDate: "2022-05-01",
+      },
     });
     await flushPromises();
     expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
@@ -44,7 +52,11 @@ describe("FetchData", () => {
   it("should update with new data when the selected date prop changes", async () => {
     const spyChangeDate = vi.spyOn(FetchData.methods, "fetchData");
     const wrapper = await shallowMount(FetchData, {
-      props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownGoodId", selectedDate: "2022-05-01" },
+      props: {
+        path: "/rpc/bin_devices_per_hour",
+        fscsId: "KnownGoodId",
+        selectedDate: "2022-05-01",
+      },
     });
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);

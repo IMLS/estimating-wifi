@@ -1,16 +1,16 @@
 import { mount } from "@vue/test-utils";
 import App from "./App.vue";
 import { routes } from "./router/index.js";
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router";
 let router;
 
 beforeEach(async () => {
   router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: routes,
-  })
-  router.push('/')
-  await router.isReady()
+  });
+  router.push("/");
+  await router.isReady();
 });
 
 describe("App", () => {

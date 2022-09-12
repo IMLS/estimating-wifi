@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
 import USWDSDatePicker from "../components/USWDSDatePicker.vue";
 
-
 let router;
 
 beforeEach(async () => {
@@ -35,14 +34,15 @@ describe("PageLibrary", () => {
     });
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
-    expect(wrapper.vm.activeDate).toEqual(new Date(Date.now() - 86400 * 1000).toISOString().split("T")[0]);
-
+    expect(wrapper.vm.activeDate).toEqual(
+      new Date(Date.now() - 86400 * 1000).toISOString().split("T")[0]
+    );
   });
-    it("should render with a preset date if one is provided", () => {
+  it("should render with a preset date if one is provided", () => {
     const wrapper = mount(PageLibrary, {
       props: {
         id: "KnownGoodId",
-        selectedDate: "2022-05-02"
+        selectedDate: "2022-05-02",
       },
       global: {
         stubs: [
@@ -55,27 +55,26 @@ describe("PageLibrary", () => {
       },
     });
     expect(wrapper.vm.activeDate).toEqual("2022-05-02");
-
   });
   it("should respond by navigating to a new route query param when the selected date changes", async () => {
-    const spyChangeDate = vi.spyOn(PageLibrary.methods, "navigateToSelectedDate");
+    const spyChangeDate = vi.spyOn(
+      PageLibrary.methods,
+      "navigateToSelectedDate"
+    );
     const wrapper = shallowMount(PageLibrary, {
       props: {
         id: "KnownGoodId",
       },
       global: {
         plugins: [router],
-        stubs: [
-          "USWDSDatePicker",
-        ],
+        stubs: ["USWDSDatePicker"],
       },
     });
     expect(spyChangeDate).toHaveBeenCalledTimes(0);
     const childWrapper = wrapper.findComponent({ name: "USWDSDatePicker" });
-    childWrapper.vm.$emit('date_changed', "2022-05-02")
-    await wrapper.vm.$nextTick()
+    childWrapper.vm.$emit("date_changed", "2022-05-02");
+    await wrapper.vm.$nextTick();
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);
-
   });
 });
