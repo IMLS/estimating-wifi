@@ -44,9 +44,5 @@ export const store = readonly({
     get24HoursBinnedByHour: "/rpc/bin_devices_per_hour",
     get24HoursBinnedByHourForNDays: "/rpc/bin_devices_over_time",
   },
-});
-
-export const state = reactive({
-  // todo: Update selectedDate when we have real data
-  selectedDate: "2022-05-01",
+  startingDate: "2022-05-01"
 });

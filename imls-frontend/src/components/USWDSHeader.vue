@@ -79,7 +79,7 @@ export default {
                 class="usa-nav__submenu"
               >
                 <li v-for="library in store.fscs_ids" :key="library.id" class="usa-nav__submenu-item">
-                  <RouterLink :to="'/library/' + library.id + '/'">
+                  <RouterLink :to="{ path: '/library/' + library.id + '/' , query: $route.query}">
                     Test library {{ library.id }}
                   </RouterLink>
                 </li>

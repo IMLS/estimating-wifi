@@ -1,6 +1,6 @@
 <script>
 
-import { store, state } from "@/store/store.js";
+import { store } from "@/store/store.js";
 import { nextTick } from 'vue'
 
 export default {
@@ -17,12 +17,16 @@ export default {
     queryParams: {
       type: Object,
       default: () => {}
-    }
+    },
+    selectedDate: {
+      type: String,
+      required: true,
+      default: ''
+    }, 
   },
   data() {
     return {
       store,
-      state,
       fetchCount: null,
       fetchError: {},
       fetchedData: {},
@@ -30,13 +34,8 @@ export default {
     }
   },
   watch: {
-    // this might not be the best way to react to selectedDate changes from the date picker. 
-    // However, we might refactor the date to use URL query params, which would make the
-    // query parameters available from the $route as props. 
-    // Vue would prefer to pass this down through props. Consider refactoring.
-    'state.selectedDate': {
+    "selectedDate": {
       async handler(newVal, oldVal)  {
-        console.log(newVal, oldVal)
         if (newVal !== oldVal) {
           await nextTick();
           this.fetchData();
@@ -44,17 +43,6 @@ export default {
       },
       deep: true, 
     },
-    // maybe watch queryParams._start for now?
-    // 'queryParams._start': {
-    //   async handler(newVal, oldVal)  {
-    //     console.log(newVal, oldVal)
-    //     if (newVal !== oldVal) {
-    //       await nextTick();
-    //       this.fetchData();
-    //     }
-    //   },
-    //   deep: true, 
-    // },
     fscsId(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.fetchData();
@@ -70,7 +58,7 @@ export default {
         this.isLoading = true;
         try {
           // todo: compose the rest of the query string from the array in props
-          const response = await fetch(`${store.backendBaseUrl}${this.path}?_fscs_id=${this.fscsId}${this.queryString}`);
+          const response = await fetch(`${store.backendBaseUrl}${this.path}?_fscs_id=${this.fscsId}&_start=${this.selectedDate}${this.queryString}`);
           if (await !response.ok) {
             throw new Error(response.status);
           }
@@ -83,7 +71,6 @@ export default {
     },
   },
   computed: {
-    // revisit when _start and _day aren't separate props -- this is computed too early, before the state.selectedDate prop change has filtered its way through the components 
     queryString() {
       if (this.queryParams && Object.keys(this.queryParams).length !== 0) {
         return '&' + Object.keys(this.queryParams).map(key => key + '=' + this.queryParams[key]).join('&');
@@ -108,7 +95,7 @@ export default {
       <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
     </div>
     <div class="loaded--no-data" v-if="(this.fetchedData.length > 1 && responseIsOKButEmpty === 0) || this.fetchedData.length < 1">
-      <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ state.selectedDate }}</b>. Please choose a different date or library.</p>
+      <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ this.selectedDate }}</b>. Please choose a different date or library.</p>
     </div>
     <div class="loaded--has-data" v-else-if="this.fetchedData.length > 1">
       <slot :fetchedData="this.fetchedData" ></slot>

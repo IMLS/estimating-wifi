@@ -1,12 +1,11 @@
 <script>
 import datePicker from "uswds/src/js/components/date-picker";
-import { state } from "@/store/store.js";
 
 // artificially limits selectable dates to the time we have 
 // deterministic placeholder data for. 
 // todo: refactor when we're using actual data
 const MIN_DATE = "2022-05-01";
-const MAX_DATE = "2022-06-01";
+const MAX_DATE = "2022-05-31";
 
 export default {
   name: "USWDS Date Picker",
@@ -23,7 +22,7 @@ export default {
   },
   data() {
     return {
-      state,
+      selectedDate: null,
       minDate: MIN_DATE,
       maxDate: MAX_DATE,
     }
@@ -37,8 +36,12 @@ export default {
       await datePicker.enable(this.$refs.picker);
     },
     detectChange(e) {
-      if (e && e.detail ) state.selectedDate = e.detail.value;
-      return state.selectedDate;
+      if (e && e.detail ) {
+        this.selectedDate = e.detail.value;
+        this.$router.push({
+          query: { ...this.$router.query, date: encodeURIComponent(e.detail.value) }
+        });
+      }
     }
   }
 }
@@ -53,7 +56,7 @@ export default {
     <div class="usa-date-picker maxw-card-lg" 
       ref="picker" 
       :data-default-value="initialDate"
-      :data-selected-date="state.selectedDate"
+      :data-selected-date="!!selectedDate ? selectedDate : initialDate"
       :data-min-date="minDate"
       :data-max-date="maxDate"
       >
