@@ -69,6 +69,14 @@ export default {
         this.isLoading = false;
       }
     },
+    reduceArray(arr) {
+      if (Array.isArray(arr) ) {
+        const reduced = arr.reduce((previous, current) => parseInt(previous) + parseInt(current), 0)
+        return this.reduceArray(reduced)
+      } else {
+        return arr
+      }
+    }
   },
   computed: {
     queryString() {
@@ -78,7 +86,7 @@ export default {
       return ''
     },
     responseIsOKButEmpty() {
-      return this.fetchedData.reduce((previous, current) => previous + current, 0)
+      return (this.reduceArray(this.fetchedData) === 0)
     }
   }
 };
@@ -94,7 +102,7 @@ export default {
     <div class="loaded--error" v-if="this.fetchError && this.fetchError.message">
       <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
     </div>
-    <div class="loaded--no-data" v-if="(this.fetchedData.length > 1 && responseIsOKButEmpty === 0) || this.fetchedData.length < 1">
+    <div class="loaded--no-data" v-if="(this.fetchedData.length > 1 && responseIsOKButEmpty) || this.fetchedData.length < 1">
       <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ this.selectedDate }}</b>. Please choose a different date or library.</p>
     </div>
     <div class="loaded--has-data" v-else-if="this.fetchedData.length > 1">
