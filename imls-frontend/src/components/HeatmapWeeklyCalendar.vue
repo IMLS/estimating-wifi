@@ -23,7 +23,6 @@ export default {
     },
     selectedDate: {
       type: String,
-      required: true,
       default: ''
     }, 
   },  
@@ -107,17 +106,7 @@ export default {
 
     </div>
   </div>
-<!-- 
-  <div class="legend-container">
-    <h3 class="legend-title">
-      Percentile Legend
-    </h3>
-    <div class="legend">
-      <div class="legend__step font-mono-md text-center padding-1" v-bind:key="i" v-for="step, i in Array(11)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + i/10 +')'}">
-        {{ i*10 }}
-      </div>
-    </div>
-  </div> -->
+
 </div>
 </template>
 
