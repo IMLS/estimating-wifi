@@ -8,7 +8,9 @@ describe("Heatmap", () => {
     expect(wrapper.findAll(".data-grid")).toHaveLength(1);
   });
   it("should sort an array to calculate percentile", () => {
-    expect(Heatmap.methods.sortArrayAscending([3,4,5,1,2])).toStrictEqual([1,2,3,4,5])
+    expect(Heatmap.methods.sortArrayAscending([3, 4, 5, 1, 2])).toStrictEqual([
+      1, 2, 3, 4, 5,
+    ]);
   });
   it("should render a matrix of values in columns and rows, with percentile shading", () => {
     const wrapper = mount(Heatmap, {
