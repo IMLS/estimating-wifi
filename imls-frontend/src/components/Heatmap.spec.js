@@ -7,10 +7,9 @@ describe("Heatmap", () => {
     const wrapper = mount(Heatmap, {});
     expect(wrapper.findAll(".data-grid")).toHaveLength(1);
   });
-  // it("should sort an array to calculate percentile", () => {
-  //   const arrayToSort = [3,4,5,1,2];
-  //     expect(Heatmap.methods.sortArrayAscending.call(arrayToSort)).toBe("1, 2, 3, 4, 5")
-  // });
+  it("should sort an array to calculate percentile", () => {
+    expect(Heatmap.methods.sortArrayAscending([3,4,5,1,2])).toStrictEqual([1,2,3,4,5])
+  });
   it("should render a matrix of values in columns and rows, with percentile shading", () => {
     const wrapper = mount(Heatmap, {
       props: {
@@ -36,21 +35,21 @@ describe("Heatmap", () => {
 
     // should be the size of the matrix
     expect(allValuesRendered).toHaveLength(5 * 3);
-    // the first value in the sample dataset is also the highest value
+    // the first value in the sample dataset is also the highest percentile
     expect(allValuesRendered[0].attributes("data-percentile")).toEqual("100");
     // 100th percentile color should have no alpha channel / be at 100% opacity
     expect(
       getAlphaFromRGBAColor(allValuesRendered[0].element.style.backgroundColor)
     ).toEqual(1);
 
-    // the fourth value in the sample dataset is also at the 40th value
+    // the fourth value in the sample dataset is also at the 40th percentile
     expect(allValuesRendered[3].attributes("data-percentile")).toEqual("40");
-    // 100th percentile color should have no alpha channel / be at 100% opacity
+    // 100th percentile color should have no alpha channel / be at 40% opacity
     expect(
       getAlphaFromRGBAColor(allValuesRendered[3].element.style.backgroundColor)
     ).toEqual(0.4);
 
-    // the last value in the sample dataset is also the lowest value
+    // the last value in the sample dataset is also the lowest percentile
     expect(allValuesRendered[14].attributes("data-percentile")).toEqual("0");
     // 0th percentile color should have 0% alpha channel / be at 0% opacity
     expect(

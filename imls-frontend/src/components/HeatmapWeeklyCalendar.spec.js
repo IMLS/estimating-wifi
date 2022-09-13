@@ -11,7 +11,7 @@ describe("HeatmapWeeklyCalendar", () => {
     const wrapper = mount(HeatmapWeeklyCalendar, {
       props: {
         selectedDate: "1999-12-31", // note: this is on a Friday
-        weekStartDateISO: "1999-12-26",
+        weekStartDateISO: "1999-12-26", // this is the previous Sunday
         dataset: [
           [5, 4],
           [1, 2],
@@ -45,9 +45,9 @@ describe("HeatmapWeeklyCalendar", () => {
       getAlphaFromRGBAColor(allValuesRendered[0].element.style.backgroundColor)
     ).toEqual(1);
 
-    // the sixth value in the sample dataset is also at the 40th percentile
+    // the sixth value in the sample dataset is also at the 50th percentile
     expect(allValuesRendered[5].attributes("data-percentile")).toEqual("50");
-    // 100th percentile color should have no alpha channel / be at 100% opacity
+    // 100th percentile color should have no alpha channel / be at 50% opacity
     expect(
       getAlphaFromRGBAColor(allValuesRendered[5].element.style.backgroundColor)
     ).toEqual(0.5);

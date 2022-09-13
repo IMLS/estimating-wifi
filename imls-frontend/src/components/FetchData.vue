@@ -56,7 +56,6 @@ export default {
       if (this.fscsId.length !== 0) {
         this.isLoading = true;
         try {
-          // todo: compose the rest of the query string from the array in props
           const response = await fetch(`${store.backendBaseUrl}${this.path}?_fscs_id=${this.fscsId}&_start=${this.selectedDate}${this.queryString}`);
           if (await !response.ok) {
             throw new Error(response.status);
