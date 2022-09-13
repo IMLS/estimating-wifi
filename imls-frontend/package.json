@@ -7,7 +7,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "test": "vitest run --coverage",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest --coverage && open ./coverage/lcov-report/index.html"
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@rushstack/eslint-patch": "^1.1.0",

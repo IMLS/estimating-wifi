@@ -1,5 +1,5 @@
 <script>
-import { state, store } from "@/store/store.js";
+import { store } from "@/store/store.js";
 import { addDays, parseISO, isSameDay, format } from "date-fns";
 
 export default {
@@ -15,16 +15,19 @@ export default {
     },
     weekStartDateISO: {
       type: String,
-      default: "05-01-2022"
+      default: ""
     },
     colorRGB: {
       type: Array,
       default: () => [0,189,227]
-    }
+    },
+    selectedDate: {
+      type: String,
+      default: ''
+    }, 
   },  
   data() {
     return {
-      state,
       store
     }
   },
@@ -46,7 +49,7 @@ export default {
       return (this.allValuesSorted.slice().filter((item) => item <= (thisVal) ).length / this.allValuesSorted.length);
     },
     isSelectedDate(dateLabel) {
-      return isSameDay(parseISO(state.selectedDate + "T00:00"), dateLabel)
+      return isSameDay(parseISO(this.selectedDate + "T00:00"), dateLabel)
     },
     formatDateLabel(date, pattern) {
       return format(date, pattern);
@@ -103,17 +106,7 @@ export default {
 
     </div>
   </div>
-<!-- 
-  <div class="legend-container">
-    <h3 class="legend-title">
-      Percentile Legend
-    </h3>
-    <div class="legend">
-      <div class="legend__step font-mono-md text-center padding-1" v-bind:key="i" v-for="step, i in Array(11)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + i/10 +')'}">
-        {{ i*10 }}
-      </div>
-    </div>
-  </div> -->
+
 </div>
 </template>
 

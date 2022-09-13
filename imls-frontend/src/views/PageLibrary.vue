@@ -1,6 +1,6 @@
 <script>
-import { store, state } from "@/store/store.js";
-import { format, formatISO, addDays, parseISO, startOfWeek } from "date-fns";
+import { store } from "@/store/store.js";
+import { format, formatISO, addDays, parseISO, startOfWeek, startOfYesterday } from "date-fns";
 
 import FetchData from "@/components/FetchData.vue";
 import USWDSCard from "@/components/USWDSCard.vue";
@@ -9,7 +9,6 @@ import Histogram from '../components/Histogram.vue';
 import Heatmap from '../components/Heatmap.vue';
 import HeatmapWeeklyCalendar from '../components/HeatmapWeeklyCalendar.vue';
 import USWDSTable from '../components/USWDSTable.vue';
-
 
 export default {
   name: 'Single Library',
@@ -21,11 +20,15 @@ export default {
       required: true,
       default: ''
     },
+    selectedDate: {
+      type: String,
+      // load yesterday by default
+      default: () => startOfYesterday().toISOString().split("T")[0]
+    }, 
   },
   data() {
     return {
-      store,
-      state,
+      store
     }
   },
   methods: {
@@ -34,25 +37,31 @@ export default {
       let dates = Array.from(Array(count), ( _, i ) => { 
           return format(addDays(startingDate, i), 'M/d/yy' )
       });
-      // let labels = dates.map(each => { format(each, 'PP' )})
-      // console.log(labels)
       return dates
+    },
+    navigateToSelectedDate(date) {
+      this.$router.push({
+        query: { ...this.$router.query, date: encodeURIComponent(date) }
+      })
     }
   },
   computed: {
+    activeDate() {
+      return this.selectedDate;
+    },
     dailyChartTitle() {
-      const localDate = state.selectedDate + "T00:00";
+      const localDate = this.selectedDate + "T00:00";
       return "Devices present by hour on " + format(new Date(localDate), 'PP')
     },
     weeklyChartTitle() {
-      const localDate = state.selectedDate + "T00:00";
+      const localDate = this.selectedDate + "T00:00";
       return "Devices present by hour for 7 consecutive days, starting on " + format(new Date(localDate), 'PP')
     },
     weeklyCalendarChartTitle() {
-      return "Devices present by hour for a week, starting on " + format(startOfWeek(parseISO(state.selectedDate)), 'PP')
+      return "Devices present by hour for a week, starting on " + format(startOfWeek(parseISO(this.selectedDate)), 'PP')
     },
     startOfWeekInISO() {
-      return formatISO(startOfWeek(parseISO(state.selectedDate)), { representation: 'date' })
+      return formatISO(startOfWeek(parseISO(this.selectedDate)), { representation: 'date' })
     }
   }
 };
@@ -62,7 +71,7 @@ export default {
   <div>
     <h1>Library {{ id }}</h1>
 
-    <USWDSDatePicker :initialDate=state.selectedDate />
+    <USWDSDatePicker :initialDate=activeDate @date_changed="navigateToSelectedDate" />
 
     <div class="usa-card-group margin-top-6">
 
@@ -75,7 +84,7 @@ export default {
               v-slot="slotProps"
               :fscsId=id
               :path="store.backendPaths.get24HoursBinnedByHour"
-              :queryParams="{ _day: state.selectedDate }">
+              :selectedDate="selectedDate">
                 <Histogram 
                 :dataset="slotProps.fetchedData" 
                 :labels="store.hourlyLabels" 
@@ -93,23 +102,8 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTableDaily" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :columnHeaders="store.hourlyLabels" :rows="[slotProps.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}`" />
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
+                    <USWDSTable :columnHeaders="store.hourlyLabels" :rows="[slotProps.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${this.selectedDate}`" />
                   </div>
-                  <!-- <h3 class="usa-accordion__heading">
-                    <button
-                      type="button"
-                      class="usa-accordion__button"
-                      aria-expanded="false"
-                      aria-controls="viewRawDaily"
-                    >
-                      View raw response
-                    </button>
-                  </h3>
-                  <div id="viewRawDaily" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ slotProps.fetchedData }}</pre>
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
-                  </div> -->
                 </div>
               </FetchData>
             </div>
@@ -131,11 +125,12 @@ export default {
               v-slot="slotProps"
               :fscsId=id
               :path="store.backendPaths.get24HoursBinnedByHourForNDays"
-              :queryParams="{ _start: state.selectedDate, _direction: true,  _days : 7 }">
+              :selectedDate="selectedDate"
+              :queryParams="{ _direction: true,  _days : 7 }">
                 <Heatmap 
                 :dataset="slotProps.fetchedData" 
                 :binLabels="store.hourlyLabels"
-                :datasetLabels="generateDayLabels(state.selectedDate, 7)"></Heatmap>
+                :datasetLabels="generateDayLabels(this.selectedDate, 7)"></Heatmap>
                 
                 <div class="usa-accordion usa-accordion--bordered margin-top-4">
                   <h3 class="usa-accordion__heading">
@@ -149,23 +144,8 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTableWeekly" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(state.selectedDate, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${state.selectedDate}, for one week`" />
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
+                    <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(this.selectedDate, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${this.selectedDate}, for one week`" />
                   </div>
-                  <!-- <h3 class="usa-accordion__heading">
-                    <button
-                      type="button"
-                      class="usa-accordion__button"
-                      aria-expanded="false"
-                      aria-controls="viewRawWeekly"
-                    >
-                      View raw response
-                    </button>
-                  </h3>
-                  <div id="viewRawWeekly" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ slotProps.fetchedData }}</pre>
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
-                  </div> -->
                 </div>
               </FetchData>
             </div>
@@ -187,11 +167,13 @@ export default {
               v-slot="slotProps"
               :fscsId=id
               :path="store.backendPaths.get24HoursBinnedByHourForNDays"
-              :queryParams="{ _start: startOfWeekInISO, _direction: true,  _days : 7 }">
+              :selectedDate="startOfWeekInISO"
+              :queryParams="{ _direction: true,  _days : 7 }">
                 <HeatmapWeeklyCalendar 
                 :dataset="slotProps.fetchedData" 
                 :binLabels="store.hourlyLabels"
                 :weekStartDateISO="startOfWeekInISO"
+                :selectedDate="selectedDate"
                 ></HeatmapWeeklyCalendar>
                 
                 <div class="usa-accordion usa-accordion--bordered margin-top-4">
@@ -207,22 +189,7 @@ export default {
                   </h3>
                   <div id="viewTableWeeklyCalendar" class="usa-accordion__content usa-prose" hidden>
                     <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(startOfWeekInISO, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${startOfWeekInISO}, for one week`" />
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
                   </div>
-                  <!-- <h3 class="usa-accordion__heading">
-                    <button
-                      type="button"
-                      class="usa-accordion__button"
-                      aria-expanded="false"
-                      aria-controls="viewRawWeeklyCalendar"
-                    >
-                      View raw response
-                    </button>
-                  </h3>
-                  <div id="viewRawWeeklyCalendar" class="usa-accordion__content usa-prose" hidden>
-                    <pre>{{ slotProps.fetchedData }}</pre>
-                    <div v-if="slotProps.fetchedData.length < 1">Request succeeded but no data was found.</div>
-                  </div> -->
                 </div>
               </FetchData>
             </div>

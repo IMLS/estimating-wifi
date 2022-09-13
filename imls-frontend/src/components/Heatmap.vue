@@ -34,7 +34,7 @@ export default {
       if (thisVal === this.allValuesSorted[0] ) return 0;
       return (this.allValuesSorted.slice().filter((item) => item <= (thisVal) ).length / this.allValuesSorted.length);
     },
-    // todo: determine saturation separately from alpha channel of background color (to prevent low contrast)
+    // todo: consider determining saturation separately from alpha channel of background color (to prevent low contrast conflicts)
   },
   computed: {
     allValuesSorted() {
@@ -71,19 +71,8 @@ export default {
         </tr>
       </tbody>
     </table>
-    <!-- <div class="legend-container">
-      <h3 class="legend-title">
-        Percentile Legend
-      </h3>
-      <div class="legend border">
-        <div class="legend__step font-mono-md text-center padding-1 border" v-bind:key="i" v-for="step, i in Array(11)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + i/10 +')'}">
-          {{ i*10 }}
-        </div>
-      </div>
-    </div> -->
   </div>
 
-  <!-- TODO ADD COLOR LEGEND -->
 </template>
 
 <style scoped lang="scss">
@@ -123,31 +112,6 @@ th, td {
     transform: rotate(-45deg) translateY(1.5ch) translateX(-.75ch);
   }
 }
-// .data-grid__cell {
-  // position: relative;
-  // &:hover {
-  //   border-color:#fff;
-  //   cursor: default;
-  //   &:after {
-  //     display: block;
-  //   }
-  // }
-  // &:after {
-  //   font-size: 14px;
-  //   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans;
-  //   display: none;
-  //   position: absolute;
-  //   content: 'Percentile: ' attr(data-percentile);
-  //   padding: .5ch 1ch;
-  //   background: #fff;
-  //   border: 1px solid #CCC;
-  //   border-radius: 3px;
-  //   width: 15ch;
-  //   left: -4.5ch;
-  //   bottom: -3ch;
-  //   z-index: 1;
-  // }
-// }
 .legend-container {
   @media (min-width: 40em) {
     padding-left: 14ch;
