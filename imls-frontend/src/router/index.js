@@ -26,9 +26,9 @@ const routes = [
   {
     path: "/library/:fscs_id/",
     component: () => import("../views/PageLibrary.vue"),
-    props: (route) => ({ 
+    props: (route) => ({
       selectedDate: route.query.date,
-      id: route.params.fscs_id 
+      id: route.params.fscs_id,
     }),
   },
   // will match everything and put it under `$route.params.pathMatch`
@@ -49,8 +49,6 @@ let router = createRouter({
   linkActiveClass: "usa-current",
   linkExactActiveClass: "usa-current",
 });
-
-
 
 export { routes };
 export default router;

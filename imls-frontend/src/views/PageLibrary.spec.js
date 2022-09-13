@@ -48,7 +48,7 @@ describe("PageLibrary", () => {
     const wrapper = shallowMount(PageLibrary, {
       props: {
         id: "KnownGoodId",
-        selectedDate: "2022-05-02"
+        selectedDate: "2022-05-02",
       },
       global: {
         stubs: [
@@ -71,7 +71,10 @@ describe("PageLibrary", () => {
   });
 
   it("should respond by navigating to a new route query param when the selected date changes", async () => {
-    const spyChangeDate = vi.spyOn(PageLibrary.methods, "navigateToSelectedDate");
+    const spyChangeDate = vi.spyOn(
+      PageLibrary.methods,
+      "navigateToSelectedDate"
+    );
     const wrapper = shallowMount(PageLibrary, {
       props: {
         id: "KnownGoodId",
@@ -91,10 +94,9 @@ describe("PageLibrary", () => {
     });
     expect(spyChangeDate).toHaveBeenCalledTimes(0);
     const childWrapper = wrapper.findComponent({ name: "USWDSDatePicker" });
-    childWrapper.vm.$emit('date_changed', "2022-05-02")
-    await wrapper.vm.$nextTick()
+    childWrapper.vm.$emit("date_changed", "2022-05-02");
+    await wrapper.vm.$nextTick();
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);
-
   });
 });
