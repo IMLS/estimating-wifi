@@ -24,8 +24,5 @@ Write-Host "Executable built. Terminating script"
 Move-Item -Path $exe_path -Destination $installer_path
 
 # -- Update location
-Set-Location ..
-Set-Location ..
-Set-Location ..
-Set-Location imls-windows-installer
+Set-Location $installer_path
 Exit
