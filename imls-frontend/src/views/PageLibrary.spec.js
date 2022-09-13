@@ -3,7 +3,7 @@ import { expect } from "vitest";
 import PageLibrary from "./PageLibrary.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
-import USWDSDatePicker from "../components/USWDSDatePicker.vue";
+import { startOfYesterday } from "date-fns";
 
 
 let router;
@@ -30,16 +30,22 @@ describe("PageLibrary", () => {
           "RouterView",
           "RouterLink",
           "USWDSDatePicker",
+          "USWDSCard", 
+          "FetchData",
+          "Histogram", 
+          "Heatmap",
+          "HeatmapWeeklyCalendar", 
+          "USWDSTable"
         ],
       },
     });
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
-    expect(wrapper.vm.activeDate).toEqual(new Date(Date.now() - 86400 * 1000).toISOString().split("T")[0]);
+    expect(wrapper.vm.activeDate).toEqual(startOfYesterday().toISOString().split("T")[0]);
 
   });
-    it("should render with a preset date if one is provided", () => {
-    const wrapper = mount(PageLibrary, {
+  it("should render with a preset date if one is provided", () => {
+    const wrapper = shallowMount(PageLibrary, {
       props: {
         id: "KnownGoodId",
         selectedDate: "2022-05-02"
@@ -50,13 +56,20 @@ describe("PageLibrary", () => {
           "router-view",
           "RouterView",
           "RouterLink",
-          "USWDSDatePicker",
         ],
       },
     });
     expect(wrapper.vm.activeDate).toEqual("2022-05-02");
 
   });
+
+  it("should format day labels for n days given a date and count", () => {
+    expect(PageLibrary.methods.generateDayLabels( "1999-12-31", 3 )).toStrictEqual(['12/31/99','1/1/00','1/2/00']);
+  });
+  it("should return the first day of the week in ISO", () => {
+    expect(PageLibrary.computed.startOfWeekInISO.call({ selectedDate: "1999-12-31" })).toBe('1999-12-26');
+  });
+
   it("should respond by navigating to a new route query param when the selected date changes", async () => {
     const spyChangeDate = vi.spyOn(PageLibrary.methods, "navigateToSelectedDate");
     const wrapper = shallowMount(PageLibrary, {
@@ -67,6 +80,12 @@ describe("PageLibrary", () => {
         plugins: [router],
         stubs: [
           "USWDSDatePicker",
+          "USWDSCard", 
+          "FetchData",
+          "Histogram", 
+          "Heatmap",
+          "HeatmapWeeklyCalendar", 
+          "USWDSTable" 
         ],
       },
     });

@@ -79,4 +79,7 @@ describe("FetchData", () => {
     await flushPromises();
     expect(await wrapper.findAll(".loaded--error")).toHaveLength(1);
   });
+  it("should compose params in a query string from an object's key/value pairs", () => {
+    expect(FetchData.computed.queryString.call({ queryParams: { key1: "val1", key2: "val2" } })).toBe('&key1=val1&key2=val2');
+  });
 });

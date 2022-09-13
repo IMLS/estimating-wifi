@@ -10,7 +10,6 @@ import Heatmap from '../components/Heatmap.vue';
 import HeatmapWeeklyCalendar from '../components/HeatmapWeeklyCalendar.vue';
 import USWDSTable from '../components/USWDSTable.vue';
 
-
 export default {
   name: 'Single Library',
   components: {FetchData, USWDSCard, USWDSDatePicker, Histogram, Heatmap, HeatmapWeeklyCalendar, USWDSTable },

@@ -17,7 +17,7 @@ export default defineConfig({
     environment: "jsdom",
     coverage: {
       "check-coverage": true,
-      reporter: ["lcovonly", "text", "text-summary"],
+      reporter: ["lcovonly", "text", "text-summary", "html"],
       all: true,
       include: ["src/**/*.vue"],
       lines: 90,
