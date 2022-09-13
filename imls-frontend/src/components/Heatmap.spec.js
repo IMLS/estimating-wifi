@@ -46,7 +46,7 @@ describe("Heatmap", () => {
 
     // the fourth value in the sample dataset is also at the 40th percentile
     expect(allValuesRendered[3].attributes("data-percentile")).toEqual("40");
-    // 40th percentile color should have no alpha channel / be at 40% opacity
+    // 40th percentile color should be at 40% opacity
     expect(
       getAlphaFromRGBAColor(allValuesRendered[3].element.style.backgroundColor)
     ).toEqual(0.4);

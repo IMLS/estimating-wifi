@@ -47,7 +47,7 @@ describe("HeatmapWeeklyCalendar", () => {
 
     // the sixth value in the sample dataset is also at the 50th percentile
     expect(allValuesRendered[5].attributes("data-percentile")).toEqual("50");
-    // 50th percentile color should have no alpha channel / be at 50% opacity
+    // 50th percentile color should be at 50% opacity
     expect(
       getAlphaFromRGBAColor(allValuesRendered[5].element.style.backgroundColor)
     ).toEqual(0.5);
