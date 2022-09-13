@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
 import { startOfYesterday } from "date-fns";
 
-
 let router;
 
 beforeEach(async () => {
@@ -30,19 +29,20 @@ describe("PageLibrary", () => {
           "RouterView",
           "RouterLink",
           "USWDSDatePicker",
-          "USWDSCard", 
+          "USWDSCard",
           "FetchData",
-          "Histogram", 
+          "Histogram",
           "Heatmap",
-          "HeatmapWeeklyCalendar", 
-          "USWDSTable"
+          "HeatmapWeeklyCalendar",
+          "USWDSTable",
         ],
       },
     });
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
-    expect(wrapper.vm.activeDate).toEqual(startOfYesterday().toISOString().split("T")[0]);
-
+    expect(wrapper.vm.activeDate).toEqual(
+      startOfYesterday().toISOString().split("T")[0]
+    );
   });
   it("should render with a preset date if one is provided", () => {
     const wrapper = shallowMount(PageLibrary, {
@@ -51,23 +51,21 @@ describe("PageLibrary", () => {
         selectedDate: "2022-05-02",
       },
       global: {
-        stubs: [
-          "router-link",
-          "router-view",
-          "RouterView",
-          "RouterLink",
-        ],
+        stubs: ["router-link", "router-view", "RouterView", "RouterLink"],
       },
     });
     expect(wrapper.vm.activeDate).toEqual("2022-05-02");
-
   });
 
   it("should format day labels for n days given a date and count", () => {
-    expect(PageLibrary.methods.generateDayLabels( "1999-12-31", 3 )).toStrictEqual(['12/31/99','1/1/00','1/2/00']);
+    expect(
+      PageLibrary.methods.generateDayLabels("1999-12-31", 3)
+    ).toStrictEqual(["12/31/99", "1/1/00", "1/2/00"]);
   });
   it("should return the first day of the week in ISO", () => {
-    expect(PageLibrary.computed.startOfWeekInISO.call({ selectedDate: "1999-12-31" })).toBe('1999-12-26');
+    expect(
+      PageLibrary.computed.startOfWeekInISO.call({ selectedDate: "1999-12-31" })
+    ).toBe("1999-12-26");
   });
 
   it("should respond by navigating to a new route query param when the selected date changes", async () => {
@@ -83,12 +81,12 @@ describe("PageLibrary", () => {
         plugins: [router],
         stubs: [
           "USWDSDatePicker",
-          "USWDSCard", 
+          "USWDSCard",
           "FetchData",
-          "Histogram", 
+          "Histogram",
           "Heatmap",
-          "HeatmapWeeklyCalendar", 
-          "USWDSTable" 
+          "HeatmapWeeklyCalendar",
+          "USWDSTable",
         ],
       },
     });
