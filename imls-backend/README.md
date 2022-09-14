@@ -57,6 +57,11 @@ This is for local configuration only and should never be run in production.
   - EXAMPLE:  
         [[12,13,13,13,13,13,17,17,15,16,21,22,20,23,20,16,18,21,21,20,20,26,21,21],[26,26,26,25,24,25,25,24,23,27,21,20,18,19,23,17,20,15,18,20,18,15,15,14]]
 
+  - update_presence
+  - `curl “http://localhost:3000/rpc/update_presence?_start={TIMESTAMPTZ variable}&_end={TIMESTAMPTZ variable}_fscs_id={CHAR(16) variable}&_sensor={INT varialbe}&_manufacture={INT variable}“`
+  - EXAMPLE:
+    `curl “http://localhost:3000/rpc/update_presence?_start=2022-09-12 02:21:50+00&_end=2022-09-12 04:21:50+00&_fscs_id=AA0003-001&_sensor=2&_manufacture=7”`
+  - Returns sensor_id upon success requires valid JWT
 ## Persisted Data
 
 - Lives in /imls-backend/data folder
