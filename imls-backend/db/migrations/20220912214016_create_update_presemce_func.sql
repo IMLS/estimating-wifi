@@ -9,8 +9,6 @@ CREATE OR REPLACE FUNCTION api.update_presence(
 	_manufacture integer)
     RETURNS character varying
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 begin
 INSERT INTO imlswifi.presences(start_time, end_time, fscs_id, sensor_id, manufacturer_index)
