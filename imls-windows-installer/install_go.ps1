@@ -50,6 +50,11 @@ If(-Not $installation_status ) {
 		Write-Host "Go was not installed properly. Terminating install_go script."
 		Exit
 	} else {
+			$gorootdir = "C:\Program Files\Go"
+		[System.Environment]::SetEnvironmentVariable("GOROOT", $gorootdir, "Machine")
+		$path = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
+		$path = "$gorootdir\bin;$path"
+		[System.Environment]::SetEnvironmentVariable("PATH", "$path", "Machine")
 		Write-Host "Go was installed. Terminating install_go script."
 		Exit
 	}
