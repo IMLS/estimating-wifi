@@ -3,6 +3,7 @@
 #define MyAppPublisher "GSA 10x"
 #define MyAppURL "https://github.com/IMLS/estimating-wifi"
 #define MyAppExeName "session-counter.exe"
+#define MySecondaryAppExeName "wifi-hardware-search-windows.exe"
 
 [Setup]
 AppId={{8D2CDEA5-9C55-44D4-84B3-ACDE9D4035BD}
@@ -31,7 +32,10 @@ Name: "{app}\service"
 [Files]
 ; NOTE: Do not use "Flags: ignoreversion" on any shared system files
 ; Our IMLS installer
-Source: ".\release\{#MyAppExeName}"; \
+Source: "{#MyAppExeName}"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion
+Source: "{#MySecondaryAppExeName}"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
 Source: "README.txt"; \
@@ -62,12 +66,17 @@ Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Flags: runascurrentuser
 Filename: "{app}\service\nssm.exe"; \
   WorkingDir: "{app}"; \
-  Parameters: "install estimating-wifi ""{app}\session-counter.exe"" \
-    Application ""{app}\session-counter.exe"" \
+  Parameters: "install estimating-wifi ""{app}\{#MyAppExeName}"" \
+    Application ""{app}\{#MyAppExeName}"" \
     AppDirectory ""{app}"" \
     DisplayName ""IMLS Session Counter"" \
     Start SERVICE_AUTO_START"; \
-  Description: "nssm 2.24"; \
+  Description: "nssm 2.24 configuration"; \
+  Flags: runascurrentuser
+Filename: "{app}\service\nssm.exe"; \
+  WorkingDir: "{app}"; \
+  Parameters: "start estimating-wifi"; \
+  Description: "nssm 2.24 startup"; \
   Flags: runascurrentuser
 
 [Code]
