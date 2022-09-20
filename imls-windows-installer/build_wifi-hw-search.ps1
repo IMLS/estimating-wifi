@@ -15,7 +15,9 @@ Set-Location ..
 # -- Build the exe
 Set-Location imls-raspberry-pi\cmd\wifi-hardware-search-windows
 Write-Host "Building wifi-hardware-search executable."
-go build
+# call the Go executable directly since we might have just installed Go and it
+# may not be in our Path yet
+& 'C:\Program Files\Go\bin\go.exe' build
 $wd = Get-Location
 $exe_path = "$wd\wifi-hardware-search-windows.exe"
 
