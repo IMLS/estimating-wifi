@@ -64,6 +64,9 @@ Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
 Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Description: "npcap 1.60"; \
   Flags: runascurrentuser
+Filename: "{app}\{#MySecondaryAppExeName}"; \
+  Description: "wifi-hardware-search-windows"
+  Flags: runascurrentuser
 Filename: "{app}\service\nssm.exe"; \
   WorkingDir: "{app}"; \
   Parameters: "install estimating-wifi ""{app}\{#MyAppExeName}"" \
