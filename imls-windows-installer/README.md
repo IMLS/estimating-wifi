@@ -8,14 +8,14 @@ This process assumes a user is using a Windows machine, has downloaded the entir
 
 - Open Windows powershell and cd to estimating-wifi\imls-windows-installer
 - Enter `./session-counter_build_prereqs.ps1` to run the script
-	1. Downloads, installs, and adds GoLang 1.19 to your Windows Path
-		- If GoLang is already installed on your system, the script proceeds to the next step
-	2. Downloads, installs, and adds the latest version of Inno Setup to your system
-		- If Inno Setup is already installed on your system, the script proceeds to the nexts tep
-	3. Builds session-counter.exe from the imls-raspberry-pi directory and moves it to the imls-windows-installer directory
-		- If session-counter.exe is already found in imls-windows-installer, the script deletes it and builds a new one
-	4. Builds wifi-hardware-search-windows.exe from the imls-raspberry-pi directory and moves it to the imls-windows-installer directory
-		- If wifi-hardware-search-windows.exe is already found in imls-windows-installer, the script deletes it and builds a new one
+ 1. Downloads, installs, and adds GoLang 1.19 to your Windows Path
+  - If GoLang is already installed on your system, the script proceeds to the next step
+ 2. Downloads, installs, and adds the latest version of Inno Setup to your system
+  - If Inno Setup is already installed on your system, the script proceeds to the nexts tep
+ 3. Builds session-counter.exe from the imls-raspberry-pi directory and moves it to the imls-windows-installer directory
+  - If session-counter.exe is already found in imls-windows-installer, the script deletes it and builds a new one
+ 4. Builds wifi-hardware-search-windows.exe from the imls-raspberry-pi directory and moves it to the imls-windows-installer directory
+  - If wifi-hardware-search-windows.exe is already found in imls-windows-installer, the script deletes it and builds a new one
 
 ### Build the Installer
 
