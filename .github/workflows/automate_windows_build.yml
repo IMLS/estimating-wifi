@@ -30,4 +30,4 @@ jobs:
         run: |
           cd imls-windows-installer
           pwd
-          # ./session-counter_build_preqs.ps1
+          ./session-counter_build_prereqs.ps1
