@@ -1,0 +1,31 @@
+# Worfklow that installs prerequisite software and builds the Windows installer using Inno Setup
+
+name: Build the Windows Installer
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "226-automate-windows-build" ]
+  pull_request:
+    branches: [ "226-automate-windows-build" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a single command using the runners shell
+      - name: Download the prerequisite software
+        run: |
+          ./session-counter_build_preqs.psq
