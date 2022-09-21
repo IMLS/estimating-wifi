@@ -1,0 +1,1 @@
+Get-WmiObject win32_service | ?{$_.PathName -like '*WinSW*'} | select Name, DisplayName, State, PathName

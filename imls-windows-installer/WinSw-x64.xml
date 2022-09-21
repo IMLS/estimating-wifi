@@ -1,0 +1,13 @@
+<!-- Configuration file for Windows Service Wrapper  -->
+<service>
+  <id>estimating-wifi</id>
+  <name>estimating-wifi</name>
+  <description>This service runs session-counter.</description>
+  <executable>C:\Program Files (x86)\IMLS Session Counter\session-counter.exe</executable>
+  
+  <onfailure action="restart" delay="10 sec"/>
+  
+  <startmode>Automatic</startmode>
+  <delayedAutoStart>false</delayedAutoStart>
+
+</service>
