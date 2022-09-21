@@ -1,0 +1,42 @@
+# Worfklow that installs prerequisite software and builds the Windows installer using Inno Setup
+
+name: Build the Windows Installer
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "226-automate-windows-build" ]
+  pull_request:
+    branches: [ "226-automate-windows-build" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Download the prerequisite software
+        run: |
+          cd imls-windows-installer
+          ./session-counter_build_prereqs.ps1
+      
+      - name: Build the installer
+        run: |
+          cd 'imls-windows-installer\Inno Setup 6'
+          ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
+          
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: SessionCounterInstall
+          path: imls-windows-installer\Output\SessionCounterInstall.exe

@@ -1,8 +1,28 @@
 # Windows Installer
 
+## Automated Build Process
+
+This process assumes a user is using a Windows machine and has admin rights.
+
+### Download the installer
+
+Visit [this page](https://github.com/IMLS/estimating-wifi/actions/runs/3100996980) and click on the SessionCounterInstall artifact.
+
+Navigate to your Downloads folder, and extract the .zip file.
+
+### Run the Installer
+- Right click on SessionCounterInstall.exe and click "Run as Administrator"
+- Follow the instructions
+- Note: the WiresharkPortable app cannot be placed in any Program Files directories
+
+### Check to Ensure Session-Counter is Running
+- Ctrl + Alt + Delete to open the Task Manager
+- Scroll to the Background Processes section
+- If `Windows Service Wrapper` is running the `estimating-wifi` program, then it's running in the background as expected
+
 ## Manual Build Process
 
-This process assumes a user is using a Windows machine, has downloaded the entire repository as a .zip, extracted all files into a folder, and is currently in the imls-windows-installer directory.
+This process assumes a user is using a Windows machine, has admin rights, has downloaded the entire repository as a .zip, extracted all files into a folder, and is currently in the imls-windows-installer directory.
 
 ### Download and Build the Prerequisite Software
 
@@ -31,8 +51,4 @@ This process assumes a user is using a Windows machine, has downloaded the entir
 ### Check to Ensure Session-Counter is Running
 - Ctrl + Alt + Delete to open the Task Manager
 - Scroll to the Background Processes section
-- If `The non-sucking service manager` is running the `IMLS Session Counter` program, then it's running in the background as expected
-
-## Automated Build Process
-
-Once this is implemented, the README will be updated.
+- If `Windows Service Wrapper` is running the `estimating-wifi` program, then it's running in the background as expected
