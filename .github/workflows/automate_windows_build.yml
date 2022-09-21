@@ -34,3 +34,9 @@ jobs:
         run: |
           cd 'imls-windows-installer\Inno Setup 6'
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
+          
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: SessionCounterInstall
+          path: imls-windows-installer\Output\SessionCounterInstall.exe
