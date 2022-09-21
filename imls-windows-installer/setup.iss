@@ -38,15 +38,17 @@ Source: "{#MyAppExeName}"; \
 Source: "{#MySecondaryAppExeName}"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
-Source: "README.txt"; \
+Source: "README.md"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
 Source: "session-counter.ini"; \
   DestDir: "{app}"; \
   Flags: ignoreversion; \
   AfterInstall: WriteOutIni
-; nssm 2.24
-Source:"nssm.exe"; \
+Source:"WinSw-x64.exe"; \
+  DestDir: "{app}\service"; \
+  Flags: ignoreversion
+Source:"WinSw-x64.xml"; \
   DestDir: "{app}\service"; \
   Flags: ignoreversion
 ; Wireshark 3.6.5 portable app
@@ -65,21 +67,15 @@ Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Description: "npcap 1.60"; \
   Flags: runascurrentuser
 Filename: "{app}\{#MySecondaryAppExeName}"; \
-  Description: "wifi-hardware-search-windows"
+  Description: "wifi-hardware-search-windows"; \
   Flags: runascurrentuser
-Filename: "{app}\service\nssm.exe"; \
-  WorkingDir: "{app}"; \
-  Parameters: "install estimating-wifi ""{app}\{#MyAppExeName}"" \
-    Application ""{app}\{#MyAppExeName}"" \
-    AppDirectory ""{app}"" \
-    DisplayName ""IMLS Session Counter"" \
-    Start SERVICE_AUTO_START"; \
-  Description: "nssm 2.24 configuration"; \
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "install"; \
+  Description: "WinSw-x64 install"; \
   Flags: runascurrentuser
-Filename: "{app}\service\nssm.exe"; \
-  WorkingDir: "{app}"; \
-  Parameters: "start estimating-wifi"; \
-  Description: "nssm 2.24 startup"; \
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "start"; \
+  Description: "WinSw-x64 start"; \
   Flags: runascurrentuser
 
 [Code]
