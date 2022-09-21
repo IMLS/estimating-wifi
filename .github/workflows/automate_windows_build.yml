@@ -28,4 +28,5 @@ jobs:
       # Runs a single command using the runners shell
       - name: Download the prerequisite software
         run: |
-          ./session-counter_build_preqs.psq
+          cd imls-windows-installer
+          ./session-counter_build_preqs.ps1
