@@ -32,5 +32,5 @@ jobs:
       
       - name: Build the installer
         run: |
-          ${{ github.action_path }}\InnoSetup6\ISCC.exe setup.iss /0.\
+          issc setup.iss
           shell: pwsh
