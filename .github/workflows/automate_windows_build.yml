@@ -32,6 +32,5 @@ jobs:
       
       - name: Build the installer
         run: |
-          cd 'C:\Program Files(x86)\Inno Setup 6'
-          ISSC.exe ${{ github.action_path }}\imls-windows-installer\setup.iss
-          shell: pwsh
+          cd 'C:\Program Files(x86)'
+          ls
