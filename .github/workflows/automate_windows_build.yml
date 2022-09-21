@@ -32,5 +32,5 @@ jobs:
       
       - name: Build the installer
         run: |
-          cd 'Inno Setup 6'
+          cd 'imls-windows-installer\Inno Setup 6'
           ISCC.exe ${{ github.action_path }}\imls-windows-installer\setup.iss
