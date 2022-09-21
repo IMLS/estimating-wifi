@@ -12,7 +12,7 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+  
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -25,9 +25,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
       - name: Download the prerequisite software
         run: |
           cd imls-windows-installer
-          pwd
           ./session-counter_build_prereqs.ps1
+      
+      - name: Build the installer
+        run: |
+          run: ${{ github.action_path }}\InnoSetup6\ISCC.exe setup.iss /0.\
+          shell: pwsh
