@@ -32,4 +32,5 @@ jobs:
       
       - name: Build the installer
         run: |
-          Get-ChildItem -Filter iscc.exe -Recurse
+          cd 'Inno Setup 6'
+          ISCC.exe ${{ github.action_path }}\imls-windows-installer\setup.iss
