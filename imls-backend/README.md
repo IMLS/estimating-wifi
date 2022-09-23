@@ -68,7 +68,7 @@ This is for local configuration only and should never be run in production.
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_fscs_id={TEXT variable}"`
     - EXAMPLE:
         `curl "http://localhost:3000/rpc/lib_search_fscs?_fscs_id=AA0003-001"`
-    - Returns a single row entry matching the fscs_id 
+    - Returns a single row entry matching the fscs_id
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
   
@@ -76,8 +76,8 @@ This is for local configuration only and should never be run in production.
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_state={TEXT variable}"`
     - EXAMPLE:
         `curl "http://localhost:3000/rpc/lib_search_state?_state=AK"`
-    - Returns any row matching the _state, case insensative, will search 
-    on 1-2 chars. 
+    - Returns any row matching the _state, case insensative, will search
+    on 1-2 chars.
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
 
@@ -85,7 +85,7 @@ This is for local configuration only and should never be run in production.
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_name={TEXT variable}"`
     - EXAMPLE:
         `curl "http://localhost:3000/rpc/lib_search_state?_name=POINT"`
-    - Returns any row matching the _point, case insensative, will search for %_name% meaning all chars before or after the _name param. 
+    - Returns any row matching the _point, case insensative, will search for %_name% meaning all chars before or after the _name param.
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
 
