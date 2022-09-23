@@ -50,18 +50,46 @@ This is for local configuration only and should never be run in production.
       [22,23,23,27,26,21,23,37,44,50,66,75,75,75,70,88,88,86,70,30,25,25,25,25]
 
   - bin_devices_over_time
-  - `curl “http://localhost:3000/rpc/{function_or_sp_name}?_start={DATE variable}&_fscs_id={TEXT variable}&direction={BOOL varialbe}&_days={INT variable}“`
-  - EXAMPLE:
-    `curl “http://localhost:3000/rpc/bin_devices_per_hour?_day=2022-05-10&_fscs_id=AA0003-001&_direction=true&_days=2”`
-  - Returns an array of INTs (device counts per hour) starting at 12 AM EDT, length 24, for Date+1 Day
-  - EXAMPLE:  
-        [[12,13,13,13,13,13,17,17,15,16,21,22,20,23,20,16,18,21,21,20,20,26,21,21],[26,26,26,25,24,25,25,24,23,27,21,20,18,19,23,17,20,15,18,20,18,15,15,14]]
+    - `curl “http://localhost:3000/rpc/{function_or_sp_name}?_start={DATE variable}&_fscs_id={TEXT variable}&direction={BOOL varialbe}&_days={INT variable}“`
+    - EXAMPLE:
+      `curl “http://localhost:3000/rpc/bin_devices_per_hour?_day=2022-05-10&_fscs_id=AA0003-001&_direction=true&_days=2”`
+    - Returns an array of INTs (device counts per hour) starting at 12 AM EDT, length 24, for Date+1 Day
+    - EXAMPLE:  
+          [[12,13,13,13,13,13,17,17,15,16,21,22,20,23,20,16,18,21,21,20,20,26,21,21],[26,26,26,25,24,25,25,24,23,27,21,20,18,19,23,17,20,15,18,20,18,15,15,14]]
 
   - update_presence
-  - `curl “http://localhost:3000/rpc/update_presence?_start={TIMESTAMPTZ variable}&_end={TIMESTAMPTZ variable}_fscs_id={CHAR(16) variable}&_sensor={INT varialbe}&_manufacture={INT variable}“`
-  - EXAMPLE:
-    `curl “http://localhost:3000/rpc/update_presence?_start=2022-09-12 02:21:50+00&_end=2022-09-12 04:21:50+00&_fscs_id=AA0003-001&_sensor=2&_manufacture=7”`
-  - Returns sensor_id upon success requires valid JWT
+    - `curl “http://localhost:3000/rpc/update_presence?_start={TIMESTAMPTZ variable}&_end={TIMESTAMPTZ variable}_fscs_id={CHAR(16) variable}&_sensor={INT varialbe}&_manufacture={INT variable}“`
+    - EXAMPLE:
+      `curl “http://localhost:3000/rpc/update_presence?_start=2022-09-12 02:21:50+00&_end=2022-09-12 04:21:50+00&_fscs_id=AA0003-001&_sensor=2&_manufacture=7”`
+    - Returns sensor_id upon success requires valid JWT
+    - `curl "http://localhost:3000/rpc/{function_or_sp_name}`
+
+  - lib_search_fscs
+    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_fscs_id={TEXT variable}"`
+    - EXAMPLE:
+        `curl "http://localhost:3000/rpc/lib_search_fscs?_fscs_id=AA0003-001"`
+    - Returns a single row entry matching the fscs_id 
+    - EXAMPLE:
+      [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
+  
+  - lib_search_state
+    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_state={TEXT variable}"`
+    - EXAMPLE:
+        `curl "http://localhost:3000/rpc/lib_search_state?_state=AK"`
+    - Returns any row matching the _state, case insensative, will search 
+    on 1-2 chars. 
+    - EXAMPLE:
+      [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
+
+  - lib_search_name
+    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_name={TEXT variable}"`
+    - EXAMPLE:
+        `curl "http://localhost:3000/rpc/lib_search_state?_name=POINT"`
+    - Returns any row matching the _point, case insensative, will search for %_name% meaning all chars before or after the _name param. 
+    - EXAMPLE:
+      [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
+
+
 ## Persisted Data
 
 - Lives in /imls-backend/data folder
