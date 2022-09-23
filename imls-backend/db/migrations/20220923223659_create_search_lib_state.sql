@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION api.lib_search_state(
     COST 100
 AS $$
 SELECT json_agg(X) FROM
-(SELECT *  FROM data.imls_data WHERE stabr LIKE _state_code || '%') AS X;
+(SELECT *  FROM data.imls_data WHERE stabr LIKE UPPER(_state_code) || '%') AS X;
 $$;
 
 ALTER FUNCTION api.lib_search_state
