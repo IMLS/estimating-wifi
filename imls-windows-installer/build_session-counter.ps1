@@ -13,11 +13,11 @@ If (Test-Path -Path session-counter.exe) {
 Set-Location ..
 
 # -- Build the exe
-Set-Location imls-raspberry-pi\cmd\session-counter
+Set-Location imls-wifi-sensor\cmd\windows-session-counter
 Write-Host "Building session-counter executable."
 # call the Go executable directly since we might have just installed Go and it
 # may not be in our Path yet
-& 'C:\Program Files\Go\bin\go.exe' build session-counter.go
+& 'C:\Program Files\Go\bin\go.exe' build windows-session-counter.go
 $wd = Get-Location
 $exe_path = "$wd\session-counter.exe"
 

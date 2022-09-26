@@ -13,7 +13,7 @@ If (Test-Path -Path wifi-hardware-search-windows.exe) {
 Set-Location ..
 
 # -- Build the exe
-Set-Location imls-raspberry-pi\cmd\wifi-hardware-search-windows
+Set-Location imls-wifi-sensor\cmd\wifi-hardware-search-windows
 Write-Host "Building wifi-hardware-search executable."
 # call the Go executable directly since we might have just installed Go and it
 # may not be in our Path yet

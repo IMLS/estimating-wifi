@@ -1,4 +1,4 @@
-package main
+package session_counter
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/cmd/session-counter/mock_hw"
-	"gsa.gov/18f/cmd/session-counter/state"
-	"gsa.gov/18f/cmd/session-counter/tlp"
+	"gsa.gov/18f/internal/session-counter-helper/mock_hw"
+	"gsa.gov/18f/internal/session-counter-helper/state"
+	"gsa.gov/18f/internal/session-counter-helper/tlp"
 )
 
 var NUMMACS int

@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/internal/session-counter-helper/state"
 )
 
 func GetYesterday() time.Time {

@@ -3,7 +3,7 @@ package mock_hw
 import (
 	"math/rand"
 
-	"gsa.gov/18f/cmd/session-counter/tlp"
+	"gsa.gov/18f/internal/session-counter-helper/tlp"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 

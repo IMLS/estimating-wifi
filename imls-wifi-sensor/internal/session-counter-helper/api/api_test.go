@@ -8,7 +8,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 	"github.com/spf13/viper"
-	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/internal/session-counter-helper/state"
 )
 
 func TestSimpleCall(t *testing.T) {

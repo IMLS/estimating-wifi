@@ -7,8 +7,8 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/cmd/session-counter/state"
 	"gsa.gov/18f/internal/config"
+	"gsa.gov/18f/internal/session-counter-helper/state"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
 )
 
