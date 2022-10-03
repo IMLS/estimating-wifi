@@ -41,6 +41,8 @@ func launchTLP() {
 		Msg("session id at launch")
 
 	toastNotifSuccessfulInstall()
+	log.Info().
+		Msg("Toast notification sent")
 	// Run the network
 	var wg sync.WaitGroup
 	wg.Add(1)
