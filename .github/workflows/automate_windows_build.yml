@@ -8,17 +8,7 @@ on:
   push:
     paths:
       - 'imls-windows-installer/**'
-      - 'imls-raspberry-pi/**'
-    branches:
-      - main
-      - 239-refactor-imls-raspberry-pi
-  pull_request:
-    paths:
-      - 'imls-windows-installer/**'
-      - 'imls-raspberry-pi/**'
-    branches:
-      - main
-      - 239-refactor-imls-raspberry-pi
+      - 'imls-wifi-sensor/**'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
