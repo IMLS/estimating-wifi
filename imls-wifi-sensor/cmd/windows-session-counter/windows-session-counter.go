@@ -68,8 +68,13 @@ func toastNotifSuccessfulInstall() {
 		AppID:   "estimating-wifi",
 		Title:   "session-counter",
 		Message: "IMLS session counter is running in the background. Open Task Manager using Ctrl + Alt + Delete to make sure it's running.",
+		Actions: []toast.Action{
+			{"protocol", "Ok", ""},
+		},
 	}
 	err := notification.Push()
+	log.Info().
+		Msg("%v\n", err)
 	if err != nil {
 		log.Fatal()
 	}
