@@ -73,8 +73,6 @@ func toastNotifSuccessfulInstall() {
 		},
 	}
 	err := notification.Push()
-	log.Info().
-		Msg("%v\n", err)
 	if err != nil {
 		log.Fatal()
 	}
