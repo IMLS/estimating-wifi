@@ -43,8 +43,7 @@ func launch() {
 		log.Warn().Msg("wifi-hardware-search-cli needs to be run as root.")
 	}
 
-	device := new(models.Device)
-	device.Extract = extract
+	var device *models.Device
 
 	// If either --field or --search are used, then we need to do two things
 	//  1. disable --discovery
@@ -61,29 +60,11 @@ func launch() {
 
 	// If we ask for auto-discovery, try it and exit.
 	if discover {
-		// We either have searches in /etc, or a few held in reserve
-		// that are compiled in via `embed`. GetSearches pulls the "live"
-		// searches if it can, and falls back to the embedded if needed.
-		// It goes through each one-by-one.
-		for _, s := range search.GetSearches() {
-			log.Debug().
-				Str("field", s.Field).
-				Str("query", s.Query).
-				Msg("searching")
-			device.Search = &s
-			// FindMatchingDevice populates device.Exists if something is found.
-			search.FindMatchingDevice(device)
-			// We can stop searching if we find something.
-			if device.Exists {
-				break
-			}
-		}
+		device = search.SearchForMatchingDevice()
 	} else {
 		// The alternative is we're not doing an exhaustive/discovery search.
 		// Therefore, we should use the field/search params
-		s := &models.Search{Field: lshwField, Query: lshwSearch}
-		device.Search = s
-		search.FindMatchingDevice(device)
+		device = search.SearchForMatchingDeviceWithQuery(lshwField, lshwSearch)
 	}
 
 	// If we asked for a true/false value, print that.

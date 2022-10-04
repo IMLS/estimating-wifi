@@ -19,5 +19,4 @@ type Device struct {
 	Mac           string
 	Configuration string
 	Vendor        string
-	Extract       string
 }
