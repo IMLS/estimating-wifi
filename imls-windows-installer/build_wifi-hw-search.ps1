@@ -4,7 +4,7 @@
 
 $installer_path = Get-Location
 
-# -- Remove session-counter if it already exists
+# -- Remove wifi-hardware-search if it already exists
 If (Test-Path -Path wifi-hardware-search-windows.exe) {
 	Remove-Item wifi-hardware-search-windows.exe
 }

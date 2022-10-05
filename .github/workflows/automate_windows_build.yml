@@ -28,7 +28,7 @@ jobs:
       - name: Download the prerequisite software
         run: |
           cd imls-windows-installer
-          ./session-counter_build_prereqs.ps1
+          ./windows-session-counter_build_prereqs.ps1
       
       - name: Build the installer
         run: |

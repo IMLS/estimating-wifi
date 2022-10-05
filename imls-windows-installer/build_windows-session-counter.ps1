@@ -1,10 +1,10 @@
-#build_session-counter.ps1
+#build_windows-session-counter.ps1
 
 #Requires -RunAsAdministrator
 
 $installer_path = Get-Location
 
-# -- Remove session-counter if it already exists
+# -- Remove windows-session-counter if it already exists
 If (Test-Path -Path windows-session-counter.exe) {
 	Remove-Item windows-session-counter.exe
 }
@@ -14,7 +14,7 @@ Set-Location ..
 
 # -- Build the exe
 Set-Location imls-wifi-sensor\cmd\windows-session-counter
-Write-Host "Building session-counter executable."
+Write-Host "Building windows-session-counter executable."
 # call the Go executable directly since we might have just installed Go and it
 # may not be in our Path yet
 & 'C:\Program Files\Go\bin\go.exe' build windows-session-counter.go

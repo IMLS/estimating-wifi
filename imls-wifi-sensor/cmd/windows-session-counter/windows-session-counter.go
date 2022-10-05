@@ -6,7 +6,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/toast.v1"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/session-counter-helper/session_counter"
 	"gsa.gov/18f/internal/session-counter-helper/state"
@@ -40,10 +39,6 @@ func launchTLP() {
 		Int64("session_id", state.GetCurrentSessionID()).
 		Msg("session id at launch")
 
-	toastNotifSuccessfulInstall()
-	log.Info().
-		Msg("Toast notification sent")
-		
 	// Run the network
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -61,21 +56,6 @@ around you.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		launchTLP()
 	},
-}
-
-func toastNotifSuccessfulInstall() {
-	notification := toast.Notification{
-		AppID:   "estimating-wifi",
-		Title:   "session-counter",
-		Message: "IMLS session counter is running in the background. Open Task Manager using Ctrl + Alt + Delete to make sure it's running.",
-		Actions: []toast.Action{
-			{"protocol", "Ok", ""},
-		},
-	}
-	err := notification.Push()
-	if err != nil {
-		log.Fatal()
-	}
 }
 
 func main() {
