@@ -14,7 +14,7 @@ This project provides:
 
 - imls-backend: PostGREST API over a PostGres database for storing & querying sensor data
 - imls-frontend: NodeJS / VueJS web app for displaying the reported data in visualizations
-- imls-raspberry-pi: Command line programs to gather and analyze wifi sessions
+- imls-wifi-sensor: Command line programs to gather and analyze wifi sessions using Raspberry Pi and Windows machines as sensors
 - imls-windows-installer: Scripts to generate a Windows installer
 - doc: Developer documentation
 

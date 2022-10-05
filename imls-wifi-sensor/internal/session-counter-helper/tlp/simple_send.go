@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/cmd/session-counter/api"
-	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/internal/session-counter-helper/api"
+	"gsa.gov/18f/internal/session-counter-helper/state"
 )
 
 func SimpleSend(db *state.DurationsDB) {

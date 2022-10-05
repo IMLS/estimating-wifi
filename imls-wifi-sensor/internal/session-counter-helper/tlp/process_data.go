@@ -2,7 +2,7 @@ package tlp
 
 import (
 	"github.com/rs/zerolog/log"
-	"gsa.gov/18f/cmd/session-counter/state"
+	"gsa.gov/18f/internal/session-counter-helper/state"
 )
 
 func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {

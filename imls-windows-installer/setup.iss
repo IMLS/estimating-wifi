@@ -2,7 +2,7 @@
 #define MyAppVersion "1.0"
 #define MyAppPublisher "GSA 10x"
 #define MyAppURL "https://github.com/IMLS/estimating-wifi"
-#define MyAppExeName "session-counter.exe"
+#define MyAppExeName "windows-session-counter.exe"
 #define MySecondaryAppExeName "wifi-hardware-search-windows.exe"
 
 [Setup]

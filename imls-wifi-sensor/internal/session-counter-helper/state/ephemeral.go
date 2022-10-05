@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"gsa.gov/18f/cmd/session-counter/constants"
+	"gsa.gov/18f/internal/session-counter-helper/constants"
 )
 
 type StartEnd struct {

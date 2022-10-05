@@ -32,9 +32,9 @@ This process assumes a user is using a Windows machine, has admin rights, has do
 - If GoLang is already installed on your system, the script proceeds to the next step
  2. Downloads, installs, and adds the latest version of Inno Setup to your system
 - If Inno Setup is already installed on your system, the script proceeds to the nexts tep
- 3. Builds session-counter.exe from the imls-raspberry-pi directory and moves it to the imls-windows-installer directory
+ 3. Builds session-counter.exe from the imls-wifi-sensor directory and moves it to the imls-windows-installer directory
 - If session-counter.exe is already found in imls-windows-installer, the script deletes it and builds a new one
- 4. Builds wifi-hardware-search-windows.exe from the imls-raspberry-pi directory and moves it to the imls-windows-installer directory
+ 4. Builds wifi-hardware-search-windows.exe from the imls-wifi-sensor directory and moves it to the imls-windows-installer directory
 - If wifi-hardware-search-windows.exe is already found in imls-windows-installer, the script deletes it and builds a new one
 
 ### Build the Installer
