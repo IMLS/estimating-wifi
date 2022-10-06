@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/toast.v1"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/session-counter-helper/session_counter"
 	"gsa.gov/18f/internal/session-counter-helper/state"
@@ -16,6 +17,20 @@ var (
 	cfgFile string
 	mode    string
 )
+
+func sendSuccessfulInstallNotification() {
+	notification := toast.Notification{
+		AppID:    "IMLS Session Counter",
+		Title:    "windows-session-counter installed",
+		Message:  "windows-session-counter is currently running as a service in the background.",
+		Duration: toast.Long,
+	}
+
+	err := notification.Push()
+	if err != nil {
+		log.Error().Msg("toast notification error")
+	}
+}
 
 func launchTLP() {
 	// if viper.GetBool("WITH_PROFILE") {
