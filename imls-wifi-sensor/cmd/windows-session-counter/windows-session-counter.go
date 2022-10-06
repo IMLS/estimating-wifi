@@ -19,8 +19,10 @@ var (
 )
 
 func sendSuccessfulInstallNotification() {
+	log.Info().Msg("Debug: in toast notif function")
 	notification := toast.Notification{
-		AppID:    "IMLS Session Counter",
+		//AppID:    "IMLS Session Counter",
+		AppID: "{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\WindowsPowerShell\\v1.0\\powershell.exe",
 		Title:    "windows-session-counter installed",
 		Message:  "windows-session-counter is currently running as a service in the background.",
 		Duration: toast.Long,
