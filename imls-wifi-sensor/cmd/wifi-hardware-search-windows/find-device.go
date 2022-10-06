@@ -5,14 +5,11 @@ import (
 	"fmt"
 
 	"golang.org/x/sys/windows"
-	"gsa.gov/18f/internal/wifi-hardware-search/models"
 	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
 func main() {
-	device := new(models.Device)
-	device.Exists = false
-	search.FindMatchingDevice(device)
+	device := search.SearchForMatchingDevice()
 	title := windows.StringToUTF16Ptr("IMLS: compatible wifi device query")
 	if device.Exists {
 		message := windows.StringToUTF16Ptr(fmt.Sprintf("found a compatible wifi device: %s (%s) [%s]",
