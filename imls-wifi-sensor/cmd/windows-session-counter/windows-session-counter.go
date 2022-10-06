@@ -54,6 +54,8 @@ func launchTLP() {
 		Int64("session_id", state.GetCurrentSessionID()).
 		Msg("session id at launch")
 
+	sendSuccessfulInstallNotification()
+
 	// Run the network
 	var wg sync.WaitGroup
 	wg.Add(1)
