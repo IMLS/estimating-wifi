@@ -22,7 +22,7 @@ deps:
 	go mod download
 
 session-counter: deps
-	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/session-counter
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/linux-session-counter
 
 wifi-hardware-search-cli: deps
 	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli
