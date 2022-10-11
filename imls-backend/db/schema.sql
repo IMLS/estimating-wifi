@@ -24,6 +24,13 @@ CREATE SCHEMA api;
 
 
 --
+-- Name: data; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA data;
+
+
+--
 -- Name: imlswifi; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -31,14 +38,92 @@ CREATE SCHEMA imlswifi;
 
 
 --
--- Name: bin_devices_per_hour(date, text); Type: FUNCTION; Schema: api; Owner: -
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE FUNCTION api.bin_devices_per_hour(_day date, _fscs_id text) RETURNS integer[]
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
+-- Name: pgjwt; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgjwt WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgjwt; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgjwt IS 'JSON Web Token API for Postgresql';
+
+
+--
+-- Name: jwt_token; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.jwt_token AS (
+	token text
+);
+
+
+--
+-- Name: bin_devices_over_time(date, text, boolean, integer); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.bin_devices_over_time(_start date, _fscs_id text, _direction boolean, _days integer) RETURNS integer[]
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    _start TIMESTAMPTZ;
+	_new_start DATE;
+	_cnt INTEGER;
+	_full INTEGER[][]= '{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}';
+	--_full INTEGER[][];
+	_day_return INTEGER[];
+BEGIN
+    _cnt := 0;
+	_new_start := _start;
+	WHILE _cnt < _days LOOP
+		IF _cnt != 0 THEN
+			IF _direction THEN
+				_new_start := _new_start::date + 1;
+			ELSE
+				_new_start := _new_start::date - 1;
+			END IF;
+		END IF;
+
+		raise notice 'Value: %', _new_start;
+
+		SELECT api.bin_devices_per_hour(_new_start, _fscs_id) INTO _day_return;
+
+		_full := array_cat(_full, _day_return);
+
+	    _cnt := _cnt + 1;
+
+    END LOOP;
+	SELECT (_full)[2:_cnt +1] INTO _full;
+    RETURN _full;
+
+END
+$$;
+
+
+--
+-- Name: bin_devices_per_hour(date, text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.bin_devices_per_hour(_start date, _fscs_id text) RETURNS integer[]
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    _init_start TIMESTAMPTZ;
     _end TIMESTAMPTZ;
     _count INT;
     _hour INT := 0;
@@ -54,8 +139,8 @@ BEGIN
     WHILE _hour < _day_end LOOP
 
         -- Casting the DATE variable to a TIMESTAMP to add it to the interval
-        _start = _day::TIMESTAMP + make_interval(hours=> _hour);
-        _end =  _day + make_interval(hours=> _hour, mins => 59, secs => 59);
+        _init_start = _start::TIMESTAMP + make_interval(hours=> _hour);
+        _end =  _start + make_interval(hours=> _hour, mins => 59, secs => 59);
 
         -- This select stores the result in the variable _count.
         SELECT count(*) INTO _count
@@ -63,7 +148,7 @@ BEGIN
         WHERE  fscs_id = _fscs_id
         AND (presences.start_time::TIMESTAMPTZ < presences.end_time::TIMESTAMPTZ)
         AND (presences.start_time::TIMESTAMPTZ <= _end::TIMESTAMPTZ)
-        AND (presences.end_time > _start::TIMESTAMPTZ);
+        AND (presences.end_time > _init_start::TIMESTAMPTZ);
         num_devices_arr := array_append(num_devices_arr, _count);
 
         _hour := _hour + 1;
@@ -96,17 +181,77 @@ BEGIN
 END
 
 $$;
--- Name: test(); Type: FUNCTION; Schema: api; Owner: -
+
+
+--
+-- Name: jwt_gen(text, text); Type: FUNCTION; Schema: api; Owner: -
 --
 
-CREATE FUNCTION api.test() RETURNS TABLE(start_time timestamp with time zone, end_time timestamp with time zone)
+CREATE FUNCTION api.jwt_gen(s_key text, s_role text) RETURNS public.jwt_token
+    LANGUAGE sql
+    AS $$
+  SELECT public.sign(
+    row_to_json(r), s_key
+  ) AS token
+  FROM (
+    SELECT
+      s_role as role,
+      extract(epoch from now())::integer + 315360000  AS exp
+  ) r;
+$$;
+
+
+--
+-- Name: lib_search_fscs(text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.lib_search_fscs(_fscs_id text) RETURNS json
+    LANGUAGE sql
+    AS $$
+SELECT row_to_json(X) FROM
+(SELECT *, CONCAT(fscskey,'-',TO_CHAR(fscs_seq, 'fm000')) AS fscs_id
+FROM data.imls_data) AS X
+WHERE X.fscs_id = _fscs_id;
+$$;
+
+
+--
+-- Name: lib_search_name(text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.lib_search_name(_name text) RETURNS json
+    LANGUAGE sql
+    AS $$
+SELECT json_agg(X) FROM
+(SELECT *  FROM data.imls_data WHERE libname LIKE '%'|| UPPER(_name) || '%') AS X;
+$$;
+
+
+--
+-- Name: lib_search_state(text); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.lib_search_state(_state_code text) RETURNS json
+    LANGUAGE sql
+    AS $$
+SELECT json_agg(X) FROM
+(SELECT *  FROM data.imls_data WHERE stabr LIKE UPPER(_state_code) || '%') AS X;
+$$;
+
+
+--
+-- Name: update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.update_presence(_start timestamp with time zone, _end timestamp with time zone, _fscs character varying, _sensor integer, _manufacture integer) RETURNS character varying
     LANGUAGE plpgsql
     AS $$
-BEGIN
-RETURN QUERY
-SELECT presences.start_time, presences.end_time
-FROM api.presences;
-END; $$;
+begin
+INSERT INTO imlswifi.presences(start_time, end_time, fscs_id, sensor_id, manufacturer_index)
+   VALUES(_start, _end, _fscs, _sensor, _manufacture);
+   RETURN _sensor;
+end;
+$$;
 
 
 SET default_tablespace = '';
@@ -192,27 +337,56 @@ CREATE VIEW api.presences AS
 
 
 --
--- Name: imls_lookup_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
+-- Name: imls_data; Type: TABLE; Schema: data; Owner: -
 --
 
-CREATE SEQUENCE imlswifi.imls_lookup_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE TABLE data.imls_data (
+    stabr character(2),
+    fscskey character(6),
+    fscs_seq integer,
+    c_fscs character(1),
+    libid character varying(64),
+    libname character varying(256),
+    address character varying(256),
+    city character varying(32),
+    zip character(5),
+    zip4 character(4),
+    cnty character varying(64),
+    phone character(10),
+    c_out_ty character(2),
+    sq_feet integer,
+    f_sq_ft character(4),
+    l_num_bm integer,
+    hours integer,
+    f_hours character(4),
+    wks_open integer,
+    f_wksopn character(4),
+    yr_sub integer,
+    obereg integer,
+    statstru integer,
+    statname integer,
+    stataddr integer,
+    longitud double precision,
+    latitude double precision,
+    incitsst integer,
+    incitsco integer,
+    gnisplac character varying(6),
+    cntypop integer,
+    locale character varying(2),
+    centract double precision,
+    cenblock integer,
+    cdcode integer,
+    cbsa integer,
+    microf character(1),
+    geostatus character(1),
+    geoscore double precision,
+    geomtype character varying(32),
+    c19wkscl integer,
+    c19wkslo integer
+);
 
 
 --
--- Name: imls_lookup_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
---
-
-ALTER SEQUENCE imlswifi.imls_lookup_id_seq OWNED BY imlswifi.imls_lookup.id;
-
-
---
--- Name: libraries; Type: TABLE; Schema: imlswifi; Owner: -
 -- Name: heartbeats; Type: TABLE; Schema: imlswifi; Owner: -
 --
 
@@ -264,6 +438,26 @@ CREATE SEQUENCE imlswifi.heartbeats_sensor_id_seq
 --
 
 ALTER SEQUENCE imlswifi.heartbeats_sensor_id_seq OWNED BY imlswifi.heartbeats.sensor_id;
+
+
+--
+-- Name: imls_lookup_id_seq; Type: SEQUENCE; Schema: imlswifi; Owner: -
+--
+
+CREATE SEQUENCE imlswifi.imls_lookup_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: imls_lookup_id_seq; Type: SEQUENCE OWNED BY; Schema: imlswifi; Owner: -
+--
+
+ALTER SEQUENCE imlswifi.imls_lookup_id_seq OWNED BY imlswifi.imls_lookup.id;
 
 
 --
@@ -383,10 +577,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: imls_lookup id; Type: DEFAULT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.imls_lookup ALTER COLUMN id SET DEFAULT nextval('imlswifi.imls_lookup_id_seq'::regclass);
 -- Name: heartbeats heartbeat_id; Type: DEFAULT; Schema: imlswifi; Owner: -
 --
 
@@ -398,6 +588,13 @@ ALTER TABLE ONLY imlswifi.heartbeats ALTER COLUMN heartbeat_id SET DEFAULT nextv
 --
 
 ALTER TABLE ONLY imlswifi.heartbeats ALTER COLUMN sensor_id SET DEFAULT nextval('imlswifi.heartbeats_sensor_id_seq'::regclass);
+
+
+--
+-- Name: imls_lookup id; Type: DEFAULT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.imls_lookup ALTER COLUMN id SET DEFAULT nextval('imlswifi.imls_lookup_id_seq'::regclass);
 
 
 --
@@ -437,16 +634,19 @@ ALTER TABLE ONLY api.helo
 
 
 --
--- Name: imls_lookup imls_lookup_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.imls_lookup
-    ADD CONSTRAINT imls_lookup_pkey PRIMARY KEY (id);
 -- Name: heartbeats heartbeats_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
 --
 
 ALTER TABLE ONLY imlswifi.heartbeats
     ADD CONSTRAINT heartbeats_pkey PRIMARY KEY (heartbeat_id);
+
+
+--
+-- Name: imls_lookup imls_lookup_pkey; Type: CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.imls_lookup
+    ADD CONSTRAINT imls_lookup_pkey PRIMARY KEY (id);
 
 
 --
@@ -525,11 +725,6 @@ CREATE INDEX fk_sensor_library_index ON imlswifi.sensors USING btree (fscs_id);
 
 
 --
--- Name: imls_lookup fk_lookup_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
---
-
-ALTER TABLE ONLY imlswifi.imls_lookup
-    ADD CONSTRAINT fk_lookup_library FOREIGN KEY (fscs_id) REFERENCES imlswifi.libraries(fscs_id);
 -- Name: heartbeats fk_heartbeat_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
 --
 
@@ -543,6 +738,14 @@ ALTER TABLE ONLY imlswifi.heartbeats
 
 ALTER TABLE ONLY imlswifi.heartbeats
     ADD CONSTRAINT fk_heartbeat_sensor FOREIGN KEY (sensor_id) REFERENCES imlswifi.sensors(sensor_id);
+
+
+--
+-- Name: imls_lookup fk_lookup_library; Type: FK CONSTRAINT; Schema: imlswifi; Owner: -
+--
+
+ALTER TABLE ONLY imlswifi.imls_lookup
+    ADD CONSTRAINT fk_lookup_library FOREIGN KEY (fscs_id) REFERENCES imlswifi.libraries(fscs_id);
 
 
 --
@@ -587,5 +790,16 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220811195049'),
     ('20220817173135'),
     ('20220818150144'),
-    ('20220818154959');
-    ('20220822125647');
+    ('20220818154959'),
+    ('20220822125647'),
+    ('20220831042321'),
+    ('20220902032142'),
+    ('20220902033013'),
+    ('20220902033729'),
+    ('20220902170318'),
+    ('20220907165121'),
+    ('20220912214016'),
+    ('20220923222643'),
+    ('20220923223659'),
+    ('20220923230122'),
+    ('20221006171547');

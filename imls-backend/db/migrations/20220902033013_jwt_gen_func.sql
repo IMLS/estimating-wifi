@@ -1,7 +1,10 @@
 -- migrate:up
--- FUNCTION: api.jwt_gen(text, text)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgjwt;
 
--- DROP FUNCTION IF EXISTS api.jwt_gen(text, text);
+CREATE TYPE jwt_token AS (
+  token TEXT
+);
 
 CREATE OR REPLACE FUNCTION api.jwt_gen(
 	s_key text,
@@ -26,5 +29,8 @@ ALTER FUNCTION api.jwt_gen(text, text)
 
 
 -- migrate:down
+DROP EXTENSION IF EXISTS pgjwt;
+DROP EXTENSION IF EXISTS pgcrypto;
+
 
 DROP FUNCTION api.jwt_gen;
