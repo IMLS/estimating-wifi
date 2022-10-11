@@ -7,11 +7,11 @@ Modify session-counter.ini in imls-wifi-sensor/cmd/linux-session-counter and/or 
 
 - If in prod:
   - [cron]
-    reset=0 0 * * *
+    reset=0 0 ** *
   - This sends data to the database every 24 hours
 - If in dev:
   - [cron]
-    reset=*/5 * * * *
+    reset=*/5* ** *
   - This sends data to the database every 5 minutes
 
 
