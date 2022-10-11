@@ -6,7 +6,7 @@ For local development, we have multiple data files.
 
 `imls-data-2020.csv` is data from the Institute of Museum and Library Services (IMLS). Specifically, we are using outlet data from 2020. It is public domain data, and we sourced it from <https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey>.
 
-The IMLS data file is loaded via `\copy`, and therefore we need both an `.sql` file and the `.csv`; the `.sql` file defines the table, and then uses the Postgres-specific `\copy` command to load the CSV file into that table. 
+The IMLS data file is loaded via `\copy`, and therefore we need both an `.sql` file and the `.csv`; the `.sql` file defines the table, and then uses the Postgres-specific `\copy` command to load the CSV file into that table.
 
 # To use this data
 

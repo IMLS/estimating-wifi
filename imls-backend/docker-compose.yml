@@ -1,5 +1,5 @@
 # To use this compose, first:
-# docker build -t imls:postgres -f Dockerfile.pgjwt . 
+# docker build -t imls:postgres -f Dockerfile.pgjwt .
 version: "3"
 services:
   server:
