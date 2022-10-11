@@ -13,7 +13,8 @@ The IMLS data file is loaded via `\copy`, and therefore we need both an `.sql` f
 You will need to:
 
 1. Delete your `data` directory.
-2. `docker compose up`
-3. Run your migrations (`dbmate up`)
+2. `docker build -t imls:postgres -f Dockerfile.pgjwt .`
+3. `docker compose up`
+4. Run your migrations (`dbmate up`)
 
 The test data and IMLS data are loaded during step two. However, they are *only* loaded the *first time* the database is created (when it is initialized). Hence, the `data` directory must be cleared/removed and the containers spun up again "for the first time."
