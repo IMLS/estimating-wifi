@@ -42,7 +42,7 @@ Source: "README.md"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
 Source: "session-counter.ini"; \
-  DestDir: "{app}"; \
+  DestDir: "{app}\service"; \
   Flags: ignoreversion; \
   AfterInstall: WriteOutIni
 Source:"WinSw-x64.exe"; \
@@ -62,9 +62,11 @@ Source:"npcap-1.60.exe"; \
 [Run]
 Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
   Description: "Wireshark 3.6.5"; \
+  Parameters: "\D C:\imls"; \
   Flags: runascurrentuser
 Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Description: "npcap 1.60"; \
+  Parameters: "\D C:\imls"; \
   Flags: runascurrentuser
 Filename: "{app}\{#MySecondaryAppExeName}"; \
   Description: "wifi-hardware-search-windows"; \
@@ -76,6 +78,22 @@ Filename: "{app}\service\WinSw-x64.exe"; \
 Filename: "{app}\service\WinSw-x64.exe"; \
   Parameters: "start"; \
   Description: "WinSw-x64 start"; \
+  Flags: runascurrentuser
+
+[UninstallDelete]
+Type: files; Name: "{app}\service\WinSw-x64.wrapper.log"
+Type: files; Name: "{app}\service\WinSw-x64.err.log"
+Type: files; Name: "{app}\service\WinSw-x64.out.log"
+
+[UninstallRun]
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "stop --force"; \
+  Flags: runascurrentuser
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "dev kill"; \
+  Flags: runascurrentuser
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "uninstall"; \
   Flags: runascurrentuser
 
 [Code]
