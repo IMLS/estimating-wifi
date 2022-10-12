@@ -79,6 +79,6 @@ To run end-to-end tests on Windows requires WSL2. The basic idea is to run the b
 - Install the Windows session-counter service as normal, if you haven't already.
 - Edit your session-counter.ini:
   - Under `[api]`, you should have: `host=127.0.0.1:3000`
-  - The windows session-counter should run with the default ini configuration 
+  - The windows session-counter should run with the default ini configuration
   - _But_ if you need to change any ini settings:
     - After changing the ini file, restart session-counter by running `WinSw-x64.exe restart` in the installed IMLS Session Counter directory.
