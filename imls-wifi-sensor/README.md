@@ -1,7 +1,21 @@
 # Wifi Sensor
 
-## Running session-counter
 Assumes you are a developer with git and Golang installed
+
+## Changing the Time to Send Data
+Modify session-counter.ini in imls-wifi-sensor/cmd/linux-session-counter and/or imls-wifi-sensor/cmd/windows-session-counter
+
+- If in prod:
+  - [cron]
+    `reset=0 0 ** *`
+  - This sends data to the database every 24 hours
+- If in dev:
+  - [cron]
+    `reset=*/5* ** *`
+  - This sends data to the database every 5 minutes
+
+
+## Running session-counter
 
 - Open your terminal to this repository
 - cd to imls-raspberry-pi/cmd/session-counter
