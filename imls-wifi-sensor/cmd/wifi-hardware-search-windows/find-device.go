@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-\	title := windows.StringToUTF16Ptr("IMLS: compatible wifi device query")
+	title := windows.StringToUTF16Ptr("IMLS: compatible wifi device query")
 
 	// Gives the user 5 tries to insert USB wifi adapter
 	for i := 1; i <= 5; i++ {
