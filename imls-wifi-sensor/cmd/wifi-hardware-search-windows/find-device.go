@@ -11,11 +11,11 @@ import (
 )
 
 func main() {
-	device := search.SearchForMatchingDevice()
-	title := windows.StringToUTF16Ptr("IMLS: compatible wifi device query")
+\	title := windows.StringToUTF16Ptr("IMLS: compatible wifi device query")
 
 	// Gives the user 5 tries to insert USB wifi adapter
 	for i := 1; i <= 5; i++ {
+		device := search.SearchForMatchingDevice()
 		if device.Exists {
 			message := windows.StringToUTF16Ptr(fmt.Sprintf("Found a compatible wifi device: %s (%s) [%s]",
 				device.Logicalname,
