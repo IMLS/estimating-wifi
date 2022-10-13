@@ -22,8 +22,6 @@ ALTER FUNCTION api.update_presence(timestamp with time zone, timestamp with time
 
 GRANT EXECUTE ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer) TO postgres;
 
-GRANT EXECUTE ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer) TO sensor;
-
 REVOKE ALL ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer) FROM PUBLIC;
 
 -- migrate:down
