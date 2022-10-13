@@ -100,7 +100,7 @@ If you get error messages from the API that say "could not find the function in 
 
 # Tests
 
-We use [poetry](https://python-poetry.org/) to manage python dependencies (mostly `requests`). 
+We use [poetry](https://python-poetry.org/) to manage python dependencies (mostly `requests`).
 
 - `poetry install` (if doing this for the first time or updating dependencies)
 - `poetry run pytest`
