@@ -18,9 +18,11 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ;PrivilegesRequired=lowest
 OutputBaseFilename=SessionCounterInstall
+OutputDir=.
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+SetupLogging=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -60,6 +62,9 @@ Source:"npcap-1.60.exe"; \
   Flags: ignoreversion
 
 [Run]
+;Filename: "{app}\{#MySecondaryAppExeName}"; \
+  Description: "wifi-hardware-search-windows"; \
+  Flags: runascurrentuser
 Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
   Description: "Wireshark 3.6.5"; \
   Parameters: "\D C:\imls"; \
@@ -67,9 +72,6 @@ Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
 Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Description: "npcap 1.60"; \
   Parameters: "\D C:\imls"; \
-  Flags: runascurrentuser
-Filename: "{app}\{#MySecondaryAppExeName}"; \
-  Description: "wifi-hardware-search-windows"; \
   Flags: runascurrentuser
 Filename: "{app}\service\WinSw-x64.exe"; \
   Parameters: "install"; \
@@ -97,6 +99,7 @@ Filename: "{app}\service\WinSw-x64.exe"; \
   Flags: runascurrentuser
 
 [Code]
+
 var
   IntroPage: TOutputMsgWizardPage;
   LibraryPage: TInputQueryWizardPage;
@@ -198,4 +201,26 @@ procedure WriteOutIni();
 begin
   SetIniString('device', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
   SetIniString('device', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
+end;
+
+var
+  ExitCode: Integer;
+  FullFilePath: String;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+ if CurStep = ssInstall then
+  begin
+    FullFilePath:= GetCurrentDir + '\wifi-hardware-search-windows.exe';
+    //Run wifi-hardware-search
+    if ExecAsOriginalUser(
+      ExpandConstant(FullFilePath), '', '', SW_SHOW, ewWaitUntilTerminated, ExitCode) then
+    begin
+      if ExitCode <> 0 then begin
+        //wifi-hardware-search failed, abort install
+        SuppressibleMsgBox('Failed to find hardware device, aborting install.', mbError, MB_OK, IDOK);
+        Abort;
+      end;
+    end;
+  end;
 end;
