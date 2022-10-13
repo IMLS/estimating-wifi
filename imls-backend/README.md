@@ -93,3 +93,14 @@ This is for local configuration only and should never be run in production.
 ## Persisted Data
 
 - Lives in /imls-backend/data folder
+
+## Errors
+
+If you get error messages from the API that say "could not find the function in the schema cache", `docker-compose kill -s SIGUSR1 server` will reload the PostgREST cache.
+
+# Tests
+
+We use [poetry](https://python-poetry.org/) to manage python dependencies (mostly `requests`). 
+
+- `poetry install` (if doing this for the first time or updating dependencies)
+- `poetry run pytest`
