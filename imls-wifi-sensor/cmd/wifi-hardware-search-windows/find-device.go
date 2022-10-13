@@ -22,7 +22,7 @@ func main() {
 				device.Description,
 				device.Vendor))
 			windows.MessageBox(0, message, title, windows.MB_OK)
-			return
+			os.Exit(0)
 		} else {
 			numTriesLeft := 5 - i
 			messageConcat := "No compatible wifi device was found. You have " + strconv.Itoa(numTriesLeft) + " tries left."

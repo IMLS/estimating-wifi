@@ -216,12 +216,11 @@ begin
     if ExecAsOriginalUser(
       ExpandConstant(FullFilePath), '', '', SW_SHOW, ewWaitUntilTerminated, ExitCode) then
     begin
-      begin
-      if ExitCode <> 1 then
+      if ExitCode <> 0 then begin
         //wifi-hardware-search failed, abort install
         SuppressibleMsgBox('Failed to find hardware device, aborting install.', mbError, MB_OK, IDOK);
         Abort;
-      end
+      end;
     end;
   end;
 end;
