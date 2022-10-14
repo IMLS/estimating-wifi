@@ -6,7 +6,7 @@ This is for local configuration only and should never be run in production.
 
 ### Run Postgrest
 
-The backend stack relies on an extended postgres image that includes pgcrypto and pgjwt. This must be built before running.
+The backend stack relies on a postgres image that includes pgcrypto and pgjwt. This must be built before running.
 
 - Run `docker build -t imls:postgres -f Dockerfile.pgjwt .`
 - Run `docker-compose up`
