@@ -63,8 +63,8 @@ Source:"npcap-1.60.exe"; \
 
 [Run]
 ;Filename: "{app}\{#MySecondaryAppExeName}"; \
-  Description: "wifi-hardware-search-windows"; \
-  Flags: runascurrentuser
+  ;Description: "wifi-hardware-search-windows"; \
+  ;Flags: runascurrentuser
 Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
   Description: "Wireshark 3.6.5"; \
   Parameters: "\D C:\imls"; \
