@@ -18,9 +18,11 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ;PrivilegesRequired=lowest
 OutputBaseFilename=SessionCounterInstall
+OutputDir=.
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+SetupLogging=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -42,7 +44,7 @@ Source: "README.md"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
 Source: "session-counter.ini"; \
-  DestDir: "{app}"; \
+  DestDir: "{app}\service"; \
   Flags: ignoreversion; \
   AfterInstall: WriteOutIni
 Source:"WinSw-x64.exe"; \
@@ -60,14 +62,16 @@ Source:"npcap-1.60.exe"; \
   Flags: ignoreversion
 
 [Run]
+;Filename: "{app}\{#MySecondaryAppExeName}"; \
+  Description: "wifi-hardware-search-windows"; \
+  Flags: runascurrentuser
 Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
   Description: "Wireshark 3.6.5"; \
+  Parameters: "\D C:\imls"; \
   Flags: runascurrentuser
 Filename: "{app}\Wireshark\npcap-1.60.exe"; \
   Description: "npcap 1.60"; \
-  Flags: runascurrentuser
-Filename: "{app}\{#MySecondaryAppExeName}"; \
-  Description: "wifi-hardware-search-windows"; \
+  Parameters: "\D C:\imls"; \
   Flags: runascurrentuser
 Filename: "{app}\service\WinSw-x64.exe"; \
   Parameters: "install"; \
@@ -78,7 +82,24 @@ Filename: "{app}\service\WinSw-x64.exe"; \
   Description: "WinSw-x64 start"; \
   Flags: runascurrentuser
 
+[UninstallDelete]
+Type: files; Name: "{app}\service\WinSw-x64.wrapper.log"
+Type: files; Name: "{app}\service\WinSw-x64.err.log"
+Type: files; Name: "{app}\service\WinSw-x64.out.log"
+
+[UninstallRun]
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "stop --force"; \
+  Flags: runascurrentuser
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "dev kill"; \
+  Flags: runascurrentuser
+Filename: "{app}\service\WinSw-x64.exe"; \
+  Parameters: "uninstall"; \
+  Flags: runascurrentuser
+
 [Code]
+
 var
   IntroPage: TOutputMsgWizardPage;
   LibraryPage: TInputQueryWizardPage;
@@ -180,4 +201,26 @@ procedure WriteOutIni();
 begin
   SetIniString('device', 'api_key', LibraryPage.Values[0], ExpandConstant(CurrentFileName));
   SetIniString('device', 'fscs_id', LibraryPage.Values[1], ExpandConstant(CurrentFileName));
+end;
+
+var
+  ExitCode: Integer;
+  FullFilePath: String;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+ if CurStep = ssInstall then
+  begin
+    FullFilePath:= GetCurrentDir + '\wifi-hardware-search-windows.exe';
+    //Run wifi-hardware-search
+    if ExecAsOriginalUser(
+      ExpandConstant(FullFilePath), '', '', SW_SHOW, ewWaitUntilTerminated, ExitCode) then
+    begin
+      if ExitCode <> 0 then begin
+        //wifi-hardware-search failed, abort install
+        SuppressibleMsgBox('Failed to find hardware device, aborting install.', mbError, MB_OK, IDOK);
+        Abort;
+      end;
+    end;
+  end;
 end;
