@@ -32,6 +32,7 @@ jobs:
       
       - name: Build the installer
         run: |
+          Get-Content setup.iss
           cd 'imls-windows-installer\Inno Setup 6'
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
           
