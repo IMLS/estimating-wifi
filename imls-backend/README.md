@@ -6,6 +6,7 @@ This is for local configuration only and should never be run in production.
 
 ### Run Postgrest
 
+- Run `docker build -t imls:postgres -f Dockerfile.pgjwt .`
 - Run `docker-compose up`
 
 ### Run Migrations
