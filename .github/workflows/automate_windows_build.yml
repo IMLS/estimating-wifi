@@ -33,7 +33,8 @@ jobs:
       - name: Build the installer
         run: |
           cd imls-windows-installer
-          iscc setup.iss
+          "%programfiles(x86)%\Inno Setup 6\iscc.exe" "setup.iss"\
+        shell: cmd
           
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
