@@ -25,10 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      - name: Install Inno Setup
-        run: |
-          choco install innosetup
-
       - name: Download the prerequisite software
         run: |
           cd imls-windows-installer
@@ -36,9 +32,10 @@ jobs:
       
       - name: Build the installer
         run: |
-          # cd imls-windows-installer
+          cd imls-windows-installer
           # cd 'Inno Setup 6'
-          ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
+          # ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
+          iscc setup.iss
           
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
