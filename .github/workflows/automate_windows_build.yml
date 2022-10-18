@@ -32,9 +32,8 @@ jobs:
       
       - name: Build the installer
         run: |
-          cd 'imls-windows-installer\Inno Setup 6'
-          ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss' /LOG="D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup_log.txt"
-          cd 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer'
+          cd imls-windows-installer
+          iscc setup.iss /LOG="setup_log.txt"
           Get-Content setup_log.txt
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
