@@ -36,7 +36,7 @@ jobs:
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
           cd $env:temp
           ls
-          cd 1
+          cd '1'
           ls          
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
