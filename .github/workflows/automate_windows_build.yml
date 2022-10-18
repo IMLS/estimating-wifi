@@ -32,11 +32,8 @@ jobs:
       
       - name: Build the installer
         run: |
-          dir "env:ProgramFiles(x86)"
-          cd "C:\Program Files (x86)\Inno Setup 6"
-          ls
-          # cd imls-windows-installer
-          #& "c:\program files (x86)\Inno Setup 6\compil32.exe" setup.iss
+          cd imls-windows-installer
+          & "c:\program files (x86)\Inno Setup 6\compil32.exe" /cc setup.iss
           
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
