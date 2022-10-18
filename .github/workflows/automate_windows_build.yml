@@ -32,8 +32,8 @@ jobs:
       
       - name: Build the installer
         run: |
-          cd imls-windows-installer
-          & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" setup.iss
+          cd 'imls-windows-installer\Inno Setup 6'
+          Compil32.exe /cc 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
           
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
