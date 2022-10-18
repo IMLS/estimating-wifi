@@ -34,10 +34,8 @@ jobs:
         run: |
           cd 'imls-windows-installer\Inno Setup 6'
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
-          cd $env:temp
+          cd 'C:\Users\runneradmin\AppData\Local\Temp\1'
           ls
-          cd '1'
-          ls          
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
         with:
