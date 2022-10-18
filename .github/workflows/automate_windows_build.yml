@@ -36,7 +36,7 @@ jobs:
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
           cd $env:temp
           ls
-          cd 2
+          cd 1
           Get-Content 'Setup Log 2022-10-18 #001.txt'
           
       - name: Upload the artifact
