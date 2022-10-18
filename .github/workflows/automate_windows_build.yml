@@ -37,8 +37,7 @@ jobs:
           cd $env:temp
           ls
           cd 1
-          Get-Content 'Setup Log 2022-10-18 #001.txt'
-          
+          ls          
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
         with:
