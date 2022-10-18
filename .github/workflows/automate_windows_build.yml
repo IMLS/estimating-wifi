@@ -32,6 +32,7 @@ jobs:
       
       - name: Build the installer
         run: |
+          dir "env:ProgramFiles(x86)"
           cd imls-windows-installer
           iscc setup.iss
           
