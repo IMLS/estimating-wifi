@@ -1,4 +1,11 @@
 -- migrate:up
+-- Modify sensor table for new fields required for new sensor setup and info functions. 
+ALTER TABLE imlswifi.sensors
+ADD COLUMN labels VARCHAR,
+ADD COLUMN install_key VARCHAR,
+ADD COLUMN jwt VARCHAR;
+
+
 -- FUNCTION: api.sensor_setup(character varying, character varying, character varying)
 
 -- DROP FUNCTION IF EXISTS api.sensor_setup(character varying, character varying, character varying);
