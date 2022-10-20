@@ -12,7 +12,7 @@ EX_SENSOR_ID = 10
 FSCS_ID = "AA0001-001"
 EX_INSTALL_KEY = "blue-red-dog-bird"
 NEW_INSTALL_KEY = "orange-black-xxx-yyy"
-JWT = ""
+JWT = "supersekr1t"
 
 
 class Presences(TestCase):
@@ -23,11 +23,17 @@ class Presences(TestCase):
         self.assertTrue(len(items) > 0)
 
     def test_post_presences(self):
-        body = f'{{"_start": "{NOW}", "_end": "{NOW_5}", \
-                   "_fscs":"{FSCS_ID}","_sensor":{EX_SENSOR_ID}, \
-                   "_serial": "123A", "_version": "X999"}}'
-        token = f'{{"Authorization": "{JWT}"}}'
-        response = requests.post(f"{HOST}/update_presence", headers=token, data=body)
+        body = {
+            "_start": str(NOW), 
+            "_end": str(NOW_5), 
+            "_fscs": str(FSCS_ID),
+            "_sensor": str(EX_SENSOR_ID),
+            "_serial": "123A", 
+            "_version": "X999"
+            }
+        token = { "Authorization": f'Bearer {JWT}'}
+        response = requests.post(f"{HOST}/rpc/update_presence", headers=token, json=body)
+        print(response.json())
         self.assertTrue(response.status_code == 200)
         items = response.json()
         self.assertTrue(len(items) == 1)
@@ -69,10 +75,14 @@ class Heartbeats(TestCase):
 
 class JWT(TestCase):
     def test_jwt_gen(self):
-        body = '{"s_key": "BlahBlahBlahBlahBlahBlahBlahBlah, "s_role" : "sensor"}'
         response = requests.post(
-            f"{HOST}/rpc/jwt_gen", data=body
+            f"{HOST}/rpc/jwt_gen", 
+            json={
+                "s_key" : "BlahBlahBlahBlahBlahBlahBlahBlah", 
+                "s_role" : "sensor"
+                }
         )
+        print(response.json())
         self.assertTrue(response.status_code == 200)
         items = response.json()
         self.assertTrue(len(items) == 1)

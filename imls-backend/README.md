@@ -103,7 +103,9 @@ If you get error messages from the API that say "could not find the function in 
 
 # Tests
 
-We use [poetry](https://python-poetry.org/) to manage python dependencies (mostly `requests`).
+We use [poetry](https://python-poetry.org/) to manage python dependencies (mostly `requests`). If testing under a recent Ubuntu, `apt install` both `python3-poetry` and `python3-cachecontrol` first.
 
 - `poetry install` (if doing this for the first time or updating dependencies)
 - `poetry run pytest`
+
+If your `poetry install` fails,  try a `poetry update` followed by an install. `cd` into the `test` directory to run the `poetry run pytest` successfully.

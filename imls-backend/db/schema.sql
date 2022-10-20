@@ -240,6 +240,57 @@ $$;
 
 
 --
+-- Name: sensor_info(integer, character varying); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.sensor_info(_sensor integer, _install_key character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+declare
+_jwt varchar;
+begin
+SELECT jwt FROM imlswifi.sensors WHERE sensor_id = _sensor AND install_key = _install_key INTO _jwt;
+   RETURN _jwt;
+end;
+$$;
+
+
+--
+-- Name: sensor_setup(character varying, character varying, character varying); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.sensor_setup(_fscs character varying, _label character varying, _install_key character varying) RETURNS integer
+    LANGUAGE plpgsql
+    AS $$
+declare
+_jwt varchar;
+_sensor integer;
+begin
+SELECT api.jwt_gen(current_setting('app.jwt_secret'), 'sensor') INTO _jwt;
+INSERT INTO imlswifi.sensors(fscs_id, labels, install_key, jwt)
+   VALUES(_fscs, _label, _install_key, _jwt);
+SELECT currval(pg_get_serial_sequence('imlswifi.sensors','sensor_id')) INTO _sensor;
+   RETURN _sensor;
+end;
+$$;
+
+
+--
+-- Name: update_hb(character varying, integer, timestamp with time zone, character varying, character varying); Type: FUNCTION; Schema: api; Owner: -
+--
+
+CREATE FUNCTION api.update_hb(_fscs character varying, _sensor integer, _hb timestamp with time zone, _serial character varying, _version character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+begin
+INSERT INTO imlswifi.heartbeats(fscs_id, sensor_id, ping_time, sensor_serial, sensor_version)
+   VALUES(_fscs, _sensor, _hb, _serial, _version);
+   RETURN _sensor;
+end;
+$$;
+
+
+--
 -- Name: update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer); Type: FUNCTION; Schema: api; Owner: -
 --
 
@@ -251,6 +302,19 @@ INSERT INTO imlswifi.presences(start_time, end_time, fscs_id, sensor_id, manufac
    VALUES(_start, _end, _fscs, _sensor, _manufacture);
    RETURN _sensor;
 end;
+$$;
+
+
+--
+-- Name: pgrst_watch(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.pgrst_watch() RETURNS event_trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NOTIFY pgrst, 'reload schema';
+END;
 $$;
 
 
@@ -506,7 +570,10 @@ ALTER SEQUENCE imlswifi.presences_sensor_id_seq OWNED BY imlswifi.presences.sens
 
 CREATE TABLE imlswifi.sensors (
     sensor_id integer NOT NULL,
-    fscs_id character varying(16) NOT NULL
+    fscs_id character varying(16) NOT NULL,
+    labels character varying,
+    install_key character varying,
+    jwt character varying
 );
 
 
@@ -773,6 +840,14 @@ ALTER TABLE ONLY imlswifi.sensors
 
 
 --
+-- Name: pgrst_watch; Type: EVENT TRIGGER; Schema: -; Owner: -
+--
+
+CREATE EVENT TRIGGER pgrst_watch ON ddl_command_end
+   EXECUTE FUNCTION public.pgrst_watch();
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -793,13 +868,17 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220818154959'),
     ('20220822125647'),
     ('20220831042321'),
-    ('20220902032142'),
-    ('20220902033013'),
-    ('20220902033729'),
     ('20220902170318'),
     ('20220907165121'),
     ('20220912214016'),
     ('20220923222643'),
     ('20220923223659'),
     ('20220923230122'),
-    ('20221006171547');
+    ('20221007044807'),
+    ('20221007045130'),
+    ('20221007045430'),
+    ('20221007045511'),
+    ('20221017220651'),
+    ('20221017221845'),
+    ('20221018044654'),
+    ('20221020173024');
