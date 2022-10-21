@@ -28,8 +28,7 @@ $BODY$;
 
 ALTER FUNCTION api.jwt_gen(text, text)
     OWNER TO postgres;
-
-
+    
 -- migrate:down
 DROP EXTENSION IF EXISTS pgjwt;
 DROP EXTENSION IF EXISTS pgcrypto;

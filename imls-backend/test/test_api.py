@@ -1,7 +1,8 @@
-from unittest import TestCase
 from datetime import datetime, timedelta
+import jwt
 import requests
 import pytz
+from unittest import TestCase
 
 
 
@@ -9,54 +10,75 @@ HOST = "http://localhost:3000"
 NOW = datetime.now()
 NOW_5 = NOW + timedelta(minutes=5)
 EX_SENSOR_ID = 10
-FSCS_ID = "AA0001-001"
+FSCS_ID = "AA0005-001"
 EX_INSTALL_KEY = "blue-red-dog-bird"
 NEW_INSTALL_KEY = "orange-black-xxx-yyy"
-JWT = "supersekr1t"
+JWTSECRET = "DozeDischargeLadderStriveUnthawedCharting"
 
+def generate_jwt(role):
+    payload = {"role": str(role), "email": "anyone@anywhere.com"}
+    token = jwt.encode(payload=payload, key=JWTSECRET,  algorithm="HS256")
+    print(f"TOKEN: |{token}|")
+    return token
 
-class Presences(TestCase):
+class PresencesTests(TestCase):
     def test_presences(self):
         response = requests.get(f"{HOST}/presences")
         self.assertTrue(response.status_code == 200)
         items = response.json()
         self.assertTrue(len(items) > 0)
+        print("test_presences PASSED")
 
-    def test_post_presences(self):
-        body = {
-            "_start": str(NOW), 
-            "_end": str(NOW_5), 
-            "_fscs": str(FSCS_ID),
-            "_sensor": str(EX_SENSOR_ID),
-            "_serial": "123A", 
-            "_version": "X999"
-            }
-        token = { "Authorization": f'Bearer {JWT}'}
-        response = requests.post(f"{HOST}/rpc/update_presence", headers=token, json=body)
-        print(response.json())
-        self.assertTrue(response.status_code == 200)
-        items = response.json()
-        self.assertTrue(len(items) == 1)
+    # This function is currently marked as a 'postgres' function.
+    # Does that mean we cannot call it via the API externally?
+    # If so, we need to test this differently. Or, we need to create a user
+    # that we authenticate as for *testing*, and test it that way.
+    # def test_post_presences(self):
+    #     body = {
+    #         "_start": str(NOW), 
+    #         "_end": str(NOW_5), 
+    #         "_fscs": str(FSCS_ID),
+    #         "_sensor": str(EX_SENSOR_ID),
+    #         "_serial": "123A", 
+    #         "_version": "X999"
+    #         }
+    #     token = { "Authorization": f"Bearer {generate_jwt('sensor')}"}
+    #     response = requests.post(f"{HOST}/rpc/update_presence", headers=token, json=body)
+    #     print(response.json())
+    #     self.assertTrue(response.status_code == 200)
+    #     items = response.json()
+    #     self.assertTrue(len(items) == 1)
 
 
-class BinDevices(TestCase):
+class BinDevicesTests(TestCase):
     def test_day_query(self):
         response = requests.get(
             f"{HOST}/rpc/bin_devices_per_hour?_start=2022-05-10&_fscs_id={FSCS_ID}"
         )
         self.assertTrue(response.status_code == 200)
         items = response.json()
+        print(f"ITEMS: {items}")
         self.assertTrue(len(items) == 24)
 
     def test_multi_day_query(self):
-        response = requests.get(
-            f"{HOST}/rpc/bin_devices_over_time?_start=2022-05-10&_fscs_id={FSCS_ID}&_direction=true&_days=7"
-        )
+        _start = "2022-05-10"
+        _fscs_id = "AA0003-001"
+        _direction = "true"
+        _days = "7"
+        url = (f"{HOST}/rpc/bin_devices_over_time" + 
+            f"?_start={_start}" +
+            f"&_fscs_id={_fscs_id}" + 
+            f"&_direction={_direction}" + 
+            f"&_days={_days}")
+        print(f"URL: |{url}|")
+        response = requests.get(url)
+        print(f"RESPONSE: |{response}|")
         self.assertTrue(response.status_code == 200)
         items = response.json()
-        self.assertTrue(len(items) > 24)
+        print(f"ITEMS: {items}")
+        self.assertEquals(list(map(len, items)), [24, 24, 24, 24, 24, 24, 24])
 
-class Heartbeats(TestCase):
+class HeartbeatTests(TestCase):
     def test_heartbeats(self):
         response = requests.get(f"{HOST}/presences")
         self.assertTrue(response.status_code == 200)
@@ -73,7 +95,7 @@ class Heartbeats(TestCase):
         items = response.json()
         self.assertTrue(len(items) == 1)
 
-class JWT(TestCase):
+class JWTTests(TestCase):
     def test_jwt_gen(self):
         response = requests.post(
             f"{HOST}/rpc/jwt_gen", 
@@ -87,7 +109,7 @@ class JWT(TestCase):
         items = response.json()
         self.assertTrue(len(items) == 1)
 
-class LibSearch(TestCase):
+class LibSearchTests(TestCase):
     def test_imls_query(self):
         response = requests.get(f"{HOST}/imls_lookup")
         self.assertTrue(response.status_code == 200)
@@ -118,7 +140,7 @@ class LibSearch(TestCase):
         items = response.json()
         self.assertTrue(len(items) > 0)
 
-class Sensor(TestCase):
+class SensorTests(TestCase):
     def test_setup_post(self):
         body = f'{{"_fscs":"{FSCS_ID}","_label": "test label", "_install_key": "{NEW_INSTALL_KEY}"}}'
         token = f'{{"Authorization": "{JWT}"}}'

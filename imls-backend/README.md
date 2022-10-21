@@ -55,7 +55,7 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
   - bin_devices_over_time
     - `curl “http://localhost:3000/rpc/{function_or_sp_name}?_start={DATE variable}&_fscs_id={TEXT variable}&direction={BOOL varialbe}&_days={INT variable}“`
     - EXAMPLE:
-      `curl “http://localhost:3000/rpc/bin_devices_per_hour?_day=2022-05-10&_fscs_id=AA0003-001&_direction=true&_days=2”`
+      `curl "http://localhost:3000/rpc/bin_devices_over_time?_start=2022-05-10&_fscs_id=AA0003-001&_direction=true&_days=2"`
     - Returns an array of INTs (device counts per hour) starting at 12 AM EDT, length 24, for Date+1 Day
     - EXAMPLE:  
           [[12,13,13,13,13,13,17,17,15,16,21,22,20,23,20,16,18,21,21,20,20,26,21,21],[26,26,26,25,24,25,25,24,23,27,21,20,18,19,23,17,20,15,18,20,18,15,15,14]]
