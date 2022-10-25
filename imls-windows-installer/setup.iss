@@ -192,6 +192,7 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+ Log('CurStepChanged(' + IntToStr(Ord(CurStep)) + ') called');
  if CurStep = ssInstall then
   begin
     FullFilePath:= GetCurrentDir + '\wifi-hardware-search-windows.exe';
