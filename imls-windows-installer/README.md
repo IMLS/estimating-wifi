@@ -58,6 +58,8 @@ This process assumes a user is using a Windows machine, has admin rights, has do
 To run end-to-end tests on Windows requires WSL2. The basic idea is to run the backend in a Linux VM and have the Windows service "talk" to this backend. Steps:
 
 - Install WSL2 and your favorite Linux distribution.
+  - Run `wsl --install` in Powershell (Run as Administrator)
+  - Restart your machine
   - Ubuntu has a good guide on [how to install Ubuntu on WSL2](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview).
 - In Ubuntu, install the tools necessary to run Docker. `sudo apt-get -y install docker-compose docker.io`
   - You might need to run `sudo apt-get update` beforehand.
@@ -67,15 +69,17 @@ To run end-to-end tests on Windows requires WSL2. The basic idea is to run the b
   - Open up a separate Ubuntu terminal
   - Clone this repository
   - Change directory to the `imls-backend` directory
+  - Run `sudo docker build -t imls:postgres -f Dockerfile.pgjwt .`
+    - You might need to run `sudo apt-get update` again beforehand
   - Run `DOCKER_HOST=unix:///var/run/docker.sock docker-compose up`
     - Please note, if this command fails as a normal user, you can add your user to the group `sudo usermod -aG docker $USER` or you can just `sudo` this command.
 - You probably also want to run migrations. Unfortunately, `dbmate` is not easily installable on Ubuntu, so we'll download the binary ourselves.
-  - Open up a separate (third!) Ubuntu terminal
+  - Open up a separate (third!) Ubuntu terminal (make sure you are in the `imls-backend` directory)
   - `sudo curl -fsSL -o dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64`
-  - `sudo chown +x dbmate`
-  - `./dbmate up`
+  - `sudo chmod +x dbmate`
+  - `sudo ./dbmate -u "postgres://postgres:imlsimls@localhost:5432/imls?sslmodel=disable" up`
 - To verify that all is running correctly:
-  - Open up a separate Powershell terminal and run `curl.exe -v 127.0.0.1:300/presences`
+  - Open up a separate Powershell terminal and run `curl.exe -v 127.0.0.1:3000/presences`
 - Install the Windows session-counter service as normal, if you haven't already.
 - Edit your session-counter.ini:
   - Under `[api]`, you should have: `host=127.0.0.1:3000`
