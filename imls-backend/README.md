@@ -29,6 +29,15 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
 - List tables `\dt`
 - List views `\dv`
 
+## Install Postgrest secret in DB via CLI or pgAdmin
+- This must be run before utilizing sensor_setup endpoint
+  - Reference (https://postgrest.org/en/stable/auth.html)
+- `psql -h localhost -U postgres -W`
+- Enter the password from the docker compose file
+- Connect to the database: `\c imls`
+- Store the secret
+  - `ALTER DATABASE mydb SET "app.jwt_secret" TO 'reallyreallyreallyreallyverysafe';`
+
 ## Query the DB
 
 - `curl -s http://127.0.0.1:3000/presences`
@@ -62,11 +71,20 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
 
   - update_presence
     - `curl “http://localhost:3000/rpc/update_presence?_start={TIMESTAMPTZ variable}&_end={TIMESTAMPTZ variable}_fscs_id={CHAR(16) variable}&_sensor={INT varialbe}&_manufacture={INT variable}“`
+    - Returns sensor_id upon success requires valid JWT
     - EXAMPLE:
       `curl “http://localhost:3000/rpc/update_presence?_start=2022-09-12 02:21:50+00&_end=2022-09-12 04:21:50+00&_fscs_id=AA0003-001&_sensor=2&_manufacture=7”`
-    - Returns sensor_id upon success requires valid JWT
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}`
+    - EXAMPLE:
+      [2]
 
+    - update_hb
+    - `curl “http://localhost:3000/rpc/update_hb?_sensor={INT variable}&_fscs={CHAR(16) variable}&_hb={TIMESTAMPTZ variable}&_serial={CHAR varialbe}&_version={CHAR variable}“`
+    - Returns sensor_id upon success requires valid JWT
+    - EXAMPLE:
+      `curl “http://localhost:3000/rpc/update_hb?_sensor=1&_fscs=AA0003-001&_hb=2022-09-12 02:21:50+00&_serial=A01S10&_version=1A”`
+    - EXAMPLE:
+      [1]
+   
   - lib_search_fscs
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_fscs_id={TEXT variable}"`
     - EXAMPLE:
@@ -76,9 +94,9 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
   
   - lib_search_state
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_state={TEXT variable}"`
+    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_state_code={TEXT variable}"`
     - EXAMPLE:
-        `curl "http://localhost:3000/rpc/lib_search_state?_state=AK"`
+        `curl "http://localhost:3000/rpc/lib_search_state?_state_code=AK"`
     - Returns any row matching the _state, case insensative, will search
     on 1-2 chars.
     - EXAMPLE:
@@ -92,6 +110,21 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
 
+  - sensor_setup
+    - `curl -d '{"_fscs":{CHAR variale}, "_label" : "{CHAR variable", "_install_key": "{CHAR variable}"}' -H "Content-Type: application/json" -X POST http://localhost:3000/rpc/sensor_setup“`
+    - Returns sensor_id upon success requires valid JWT to execute
+    - EXAMPLE:
+      `curl -d '{"_fscs":"AA0001-001", "_label" : "Middle of Room", "_install_key": "first-word-in-key"}' -H "Content-Type: application/json" -X POST http://localhost:3000/rpc/sensor_setup`
+    -EXAMPLE:
+      [{1}]
+
+  - sensor_info
+    - `curl -d '{"_sensor": {INT variable}, "_install_key": "{CHAR variable}"}' -H "Content-Type: application/json" -X POST http://localhost:3000/rpc/sensor_info“`
+    - Returns JWT string upon success requires valid JWT to execute
+    - EXAMPLE:
+      `curl -d '{"_sensor": 1, "_install_key": "first-word-in-key"}' -H "Content-Type: application/json" -X POST http://localhost:3000/rpc/sensor_info`
+    - EXAMPLE:
+      [{JWT_STRING}]
 
 ## Persisted Data
 
