@@ -22,7 +22,10 @@ ALTER FUNCTION api.update_presence(timestamp with time zone, timestamp with time
 
 GRANT EXECUTE ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer) TO postgres;
 
-REVOKE ALL ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer) FROM PUBLIC;
+-- FIXME MCJ 20221020
+-- The REVOKE ALL was here. That meant we did a GRANT EXECUTE immediately followed by  REVOKE ALL.
+-- Was the REVOKE ALL supposed to be in the migrate:down? I moved it there.
 
 -- migrate:down
 DROP FUNCTION api.update_presence;
+REVOKE ALL ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying, integer, integer) FROM PUBLIC;

@@ -21,6 +21,7 @@ REVOKE ALL ON SCHEMA api FROM sensor;
 REVOKE ALL ON SCHEMA imlswifi FROM sensor;
 REVOKE ALL ON imlswifi.heartbeats FROM sensor;
 REVOKE ALL ON imlswifi.presences FROM sensor;
+
 REVOKE ALL ON FUNCTION api.update_hb FROM sensor;
 REVOKE ALL ON FUNCTION api.update_presence FROM sensor;
 REVOKE ALL ON SEQUENCE imlswifi.heartbeats_heartbeat_id_seq FROM sensor;
