@@ -32,19 +32,45 @@ class LoginTests(TestCase):
         print("RESPONSE ", r.json())
         self.assertEqual(r.status_code, 200)
         t0 = r.json()['token'];
+        # This comes back as three parts separated by periods.
+        # blasdlkfjasdflkjas.balskdjfaskjdfhaksjdhf.baskdjhfaskdjhfashkldj
         # The first part of the token will always be the same.
         t1 = t0.split(".")[0]
         t2 = t0.split(".")[1]
         self.assertEqual(t1, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
-    
+
+    # Call "beat_the_heart" to see if we can get through authentication.    
+    # CREATE OR REPLACE FUNCTION api.beat_the_heart(
+	# _fscs character varying,
+	# _sensor integer,
+	# _hb timestamp with time zone,
+	# _serial character varying,
+	# _version character varying)
+    # RETURNS character varying
     def test_use_token(self):
-        url = endpoint(["rpc", "login"])
+        token_url = endpoint(["rpc", "login"])
         body = {
             "fscs_id": "KY0069-002",
             "api_key": "hello-goodbye"
         }
         # Need to post, not get, if you're passing params in the body.
-        r = requests.post(url, json=body)
+        tr = requests.post(token_url, json=body)
+        print("URL ", token_url)
+        print("RESPONSE ", tr.json())
+        self.assertEqual(tr.status_code, 200)
+        t0 = tr.json()['token'];
+
+        url = endpoint(["rpc", "beat_the_heart"])
+        body = {
+            "_fscs_id": "KY0069-002",
+            "_sensor_id": 42,
+            "_sensor_serial": "abcde",
+            "_sensor_version": "3.0"
+        }
+        headers = {
+            "Authorization": f"Bearer {t0}"
+        }
+        r = requests.post(url, json=body, headers=headers)
+        print(r.json())
         self.assertEqual(r.status_code, 200)
         token = r.json()['token']
-        
