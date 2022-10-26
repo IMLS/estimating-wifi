@@ -19,7 +19,7 @@ export default {
       store,
       fetchCount: null,
       fetchError: {},
-      fetchedData: {},
+      fetchedData: [],
       isLoading: false,
     }
   },
@@ -99,16 +99,14 @@ export default {
       <div class="loaded--error" v-if="this.fetchError && this.fetchError.message">
         <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
       </div> 
-      <div class="loaded--has-data" v-else-if="this.fetchedData.length > 1">
+      <div class="loaded--has-data" v-else-if="this.fetchedData.length > 0">
 
         <ol class="usa-list">
-          <template v-for="system in this.fetchedData">
-            <li>
-            <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' , query: $route.query}">
-              {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
-            </RouterLink>
-            </li>
-          </template>
+          <li v-for="system in this.fetchedData"  :key=system>
+          <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
+            {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
+          </RouterLink>
+          </li>
         </ol>
       
 

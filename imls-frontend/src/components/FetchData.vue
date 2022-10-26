@@ -103,7 +103,7 @@ export default {
     <div class="loaded--no-data" v-if="!this.fetchedData || (this.fetchedData.length > 1 && responseIsOKButEmpty) ||  (this.fetchedData && this.fetchedData.length < 1)">
       <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ this.selectedDate }}</b>. Please choose a different date or library.</p>
     </div>
-    <div class="loaded--has-data" v-else-if="this.fetchedData.length > 1">
+    <div class="loaded--has-data" v-else-if="this.fetchedData.length > 0">
       <slot :fetchedData="this.fetchedData" ></slot>
     </div>
   </div>

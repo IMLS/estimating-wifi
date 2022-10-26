@@ -30,6 +30,20 @@ const errorMock = {
   message: "\"failed to parse filter (notARealID)\" (line 1, column 4)"
 }
 
+const knownGoodLibraryMock = {
+  "stabr":"AK",
+  "fscskey":"AK0001",
+  "fscs_seq":2,
+  "libname":"ANCHOR POINT PUBLIC LIBRARY",
+  "address":"34020 NORTH FORK ROAD",
+  "city":"ANCHOR POINT",
+  "zip":"99556",
+}
+
+const statewideLibrariesMock = [
+  {...knownGoodLibraryMock}
+]
+
 export const restHandlers = [
   // todo: update when the backend has a real host
   // https://mswjs.io/docs/basics/request-matching#path-with-wildcard
@@ -64,6 +78,24 @@ export const restHandlers = [
       case 'KnownEmptyId':
         return res(ctx.status(200), ctx.json([knownEmptyDevicesPerHourMock, knownEmptyDevicesPerHourMock]))
       case 'notARealID':
+      default:
+        return res(ctx.status(400), ctx.json(errorMock))
+    }
+  }),
+  rest.get('*/rpc/lib_search_fscs', (req, res, ctx) => {
+    let requestedID = req.url.searchParams.get("_fscs_id");
+    switch (requestedID) {
+      case 'KnownGoodId' :
+        return res(ctx.status(200), ctx.json(knownGoodLibraryMock))
+      default:
+        return res(ctx.status(400), ctx.json(errorMock))
+    }
+  }),
+    rest.get('*/rpc/lib_search_state', (req, res, ctx) => {
+    let stateAbbr = req.url.searchParams.get("_state_code");
+    switch (stateAbbr) {
+      case 'AK' :
+        return res(ctx.status(200), ctx.json(statewideLibrariesMock))
       default:
         return res(ctx.status(400), ctx.json(errorMock))
     }

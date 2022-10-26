@@ -24,7 +24,7 @@ export default {
       class="usa-list"
     >
       <li v-for="(stateName, stateAbbr) in store.states" :key="stateName" class="">
-        <RouterLink class="usa-link" :to="{ path: '/state/' + stateAbbr + '/' , query: $route.query}">
+        <RouterLink class="usa-link" :to="{ path: '/state/' + stateAbbr }">
           {{ stateName }}
         </RouterLink>
       </li>
