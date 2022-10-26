@@ -12,9 +12,10 @@
 INSERT INTO imlswifi.libraries
     (SELECT DISTINCT(fcfs_seq_id) FROM durations_v2);
 
--- Note we're giving sensors random ids in the range 1 to 1000.
+-- FIXME -- This is part of the *test* data.
+-- Note we're giving sensors random ids in the range 1 to 1M.
 INSERT INTO imlswifi.sensors(sensor_id, fscs_id)
-    (SELECT floor(random() * 1000 + 1)::int AS sensor_id, fcfs_seq_id AS fscs_id
+    (SELECT floor(random() * 1000000 + 1)::int AS sensor_id, fcfs_seq_id AS fscs_id
      FROM durations_v2
      GROUP BY pi_serial, fcfs_seq_id);
 

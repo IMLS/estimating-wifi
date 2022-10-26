@@ -3,14 +3,6 @@
 -- We put things inside the basic_auth schema to hide
 -- them from public view. Certain public procs/views will
 -- refer to helpers and tables inside.
-create schema if not exists basic_auth;
-
-create table if not exists
-basic_auth.users (
-  email    text primary key check ( email ~* '^.+@.+\..+$' ),
-  pass     text not null check (length(pass) < 512),
-  role     name not null check (length(role) < 512)
-);
 
 create or replace function
 basic_auth.check_role_exists() returns trigger as $$
@@ -35,8 +27,8 @@ create extension if not exists pgcrypto;
 create or replace function
 basic_auth.encrypt_pass() returns trigger as $$
 begin
-  if tg_op = 'INSERT' or new.pass <> old.pass then
-    new.pass = crypt(new.pass, gen_salt('bf'));
+  if tg_op = 'INSERT' or new.api_key <> old.api_key then
+    new.api_key = crypt(new.api_key, gen_salt('bf'));
   end if;
   return new;
 end
@@ -48,18 +40,19 @@ create trigger encrypt_pass
   for each row
   execute procedure basic_auth.encrypt_pass();
 
-create or replace function
-basic_auth.user_role(email text, pass text) returns name
-  language plpgsql
-  as $$
+CREATE OR REPLACE FUNCTION basic_auth.user_role(fscs_id text, api_key text)
+ RETURNS name
+ LANGUAGE plpgsql
+AS $function$
 begin
-  return (
-  select role from basic_auth.users
-   where users.email = user_role.email
-     and users.pass = crypt(user_role.pass, users.pass)
-  );
+  	return (
+  		select role from basic_auth.users
+   			where users.fscs_id = user_role.fscs_id
+     			and users.api_key = crypt(user_role.api_key, users.api_key)
+			);
 end;
-$$;
+$function$
+;
 
 -- add type
 CREATE TYPE basic_auth.jwt_token AS (
@@ -68,13 +61,13 @@ CREATE TYPE basic_auth.jwt_token AS (
 
 -- login should be on your exposed schema
 create or replace function
-api.login(email text, pass text) returns basic_auth.jwt_token as $$
+api.login(fscs_id text, api_key text) returns basic_auth.jwt_token as $$
 declare
   _role name;
   result basic_auth.jwt_token;
 begin
   -- check email and password
-  select basic_auth.user_role(email, pass) into _role;
+  select basic_auth.user_role(login.fscs_id, login.api_key) into _role;
   if _role is null then
     raise invalid_password using message = 'invalid user or password';
   end if;
@@ -83,7 +76,7 @@ begin
       row_to_json(r), current_setting('app.jwt_secret')
     ) as token
     from (
-      select _role as role, login.email as email,
+      select _role as role, login.fscs_id as fscs_id,
          extract(epoch from now())::integer + 60*60 as exp
     ) r
     into result;
@@ -94,6 +87,4 @@ $$ language plpgsql security definer;
 -- the names "anon" and "authenticator" are configurable and not
 -- sacred, we simply choose them for clarity
 
-grant execute on function api.login(text,text) to web_anon;
-
--- migrate:down
+INSERT INTO basic_auth.users VALUES ('KY0069-002', 'hello-goodbye', 'sensor');

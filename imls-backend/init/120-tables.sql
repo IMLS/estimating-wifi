@@ -93,6 +93,14 @@ CREATE TABLE public.schema_migrations (
 );
 
 
+CREATE TABLE IF NOT EXISTS
+basic_auth.users (
+  fscs_id   text primary key check ( fscs_id ~* '^[A-Z][A-Z][0-9]{4}-[0-9]{3}$' ),
+  api_key   text not null check (length(api_key) < 512),
+  role      name not null check (length(role) < 512)
+);
+
+
 CREATE SEQUENCE imlswifi.heartbeats_heartbeat_id_seq
     AS integer
     START WITH 1

@@ -8,16 +8,21 @@ CREATE SCHEMA admin;
 --
 -- Name: api; Type: SCHEMA; Schema: -; Owner: -
 --
-CREATE SCHEMA api;
+CREATE SCHEMA IF NOT EXISTS api;
 
 --
 -- Name: data; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA data;
+CREATE SCHEMA IF NOT EXISTS data;
 
 --
 -- Name: imlswifi; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA imlswifi;
+CREATE SCHEMA IF NOT EXISTS imlswifi;
+
+--
+-- Table for authenticating sensors.
+--
+CREATE SCHEMA IF NOT EXISTS basic_auth;
