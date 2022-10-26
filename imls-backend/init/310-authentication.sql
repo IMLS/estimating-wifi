@@ -87,4 +87,3 @@ $$ language plpgsql security definer;
 -- the names "anon" and "authenticator" are configurable and not
 -- sacred, we simply choose them for clarity
 
-INSERT INTO basic_auth.users VALUES ('KY0069-002', 'hello-goodbye', 'sensor');
