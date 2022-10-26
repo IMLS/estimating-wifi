@@ -19,10 +19,18 @@ class IMLSTests(TestCase):
         # If we don't that means something is very broken.
         self.assertTrue(len(items) > 0)
     
+    # NOTE: There's a ?limit parameter on these, because otherwise a lot of 
+    # values come back by default, and that makes for  slow tests.
     def test_existence_of_presences(self):
-        url = endpoint(["presences"])
+        url = endpoint(["presences?limit=25"])
         response = requests.get(url)
         if response.status_code != 200:
             print(response.json())
         self.assertTrue(response.status_code == 200)
-        
+    
+    def test_presences_is_big(self):
+        url = endpoint(["presences?limit=25"])
+        headers = {"Prefer": "count=estimated"}
+        response = requests.get(url, headers=headers)
+        estimated_count = int(response.headers["Content-Range"].split("/")[1])
+        self.assertGreater(estimated_count, 10000)
