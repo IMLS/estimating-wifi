@@ -62,8 +62,8 @@ class LoginTests(TestCase):
 
         url = endpoint(["rpc", "beat_the_heart"])
         body = {
-            "_fscs_id": "KY0069-002",
-            "_sensor_id": 42,
+            "_fscs_id": "AA0005-001",
+            "_sensor_id": 802220,
             "_sensor_serial": "abcde",
             "_sensor_version": "3.0"
         }
@@ -73,4 +73,4 @@ class LoginTests(TestCase):
         r = requests.post(url, json=body, headers=headers)
         print(r.json())
         self.assertEqual(r.status_code, 200)
-        token = r.json()['token']
+        self.assertEqual(r.json(), str(802220))

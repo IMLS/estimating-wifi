@@ -7,9 +7,9 @@ CREATE OR REPLACE FUNCTION api.beat_the_heart(
     RETURNS character varying
     LANGUAGE 'plpgsql'
 AS $BODY$
-begin
+BEGIN
 INSERT INTO imlswifi.heartbeats(fscs_id, sensor_id, sensor_serial, sensor_version)
-   VALUES(_fscs_id, _sensor_id, _sensor_serial, _sensor_version);
-   RETURN _sensor;
-end;
+   VALUES(_fscs_id, _sensor_id,  _sensor_serial, _sensor_version);
+   RETURN _sensor_id;
+END;
 $BODY$;
