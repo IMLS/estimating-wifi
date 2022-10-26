@@ -40,7 +40,7 @@ export default {
               to="/"
               title="Public Library Wifi Estimator"
             > 
-            Public Library Wifi Estimator </RouterLink>
+            Public Library Wifi Access Estimator </RouterLink>
           </em>
         </div>
         <button class="usa-menu-btn">
@@ -61,17 +61,12 @@ export default {
           </button>
           <ul class="usa-nav__primary usa-accordion">
             <li class="usa-nav__primary-item">
-              <RouterLink to="/about">
-                About
-              </RouterLink>
-            </li>
-            <li class="usa-nav__primary-item">
               <button
                 class="usa-accordion__button usa-nav__link"
                 aria-expanded="false"
                 aria-controls="extended-nav-section-libraries"
               >
-                <span>Libraries</span>
+                <span>Example Libraries</span>
               </button>
 
               <ul
@@ -80,11 +75,37 @@ export default {
               >
                 <li v-for="library in store.fscs_ids" :key="library.id" class="usa-nav__submenu-item">
                   <RouterLink :to="{ path: '/library/' + library.id + '/' , query: $route.query}">
-                    Test library {{ library.id }}
+                    Example library {{ library.id }}
                   </RouterLink>
                 </li>
                
               </ul>
+            </li>
+            <li class="usa-nav__primary-item">
+              <button
+                class="usa-accordion__button usa-nav__link"
+                aria-expanded="false"
+                aria-controls="extended-nav-section-states"
+              >
+                <span>All States</span>
+              </button>
+
+              <ul
+                id="extended-nav-section-states"
+                class="usa-nav__submenu"
+              >
+                <li v-for="(stateName, stateAbbr) in store.states" :key="stateName" class="usa-nav__submenu-item">
+                  <RouterLink :to="{ path: '/state/' + stateAbbr + '/' , query: $route.query}">
+                    {{ stateName }}
+                  </RouterLink>
+                </li>
+               
+              </ul>
+            </li>
+            <li class="usa-nav__primary-item">
+              <RouterLink to="/about">
+                About
+              </RouterLink>
             </li>
           </ul>
           <div class="usa-nav__secondary">

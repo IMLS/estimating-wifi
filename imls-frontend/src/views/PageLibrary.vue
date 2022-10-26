@@ -9,10 +9,11 @@ import Histogram from '../components/Histogram.vue';
 import Heatmap from '../components/Heatmap.vue';
 import HeatmapWeeklyCalendar from '../components/HeatmapWeeklyCalendar.vue';
 import USWDSTable from '../components/USWDSTable.vue';
+import USWDSBreadcrumb from '../components/USWDSBreadcrumb.vue';
 
 export default {
   name: 'Single Library',
-  components: {FetchData, USWDSCard, USWDSDatePicker, Histogram, Heatmap, HeatmapWeeklyCalendar, USWDSTable },
+  components: {FetchData, USWDSCard, USWDSDatePicker, Histogram, Heatmap, HeatmapWeeklyCalendar, USWDSTable, USWDSBreadcrumb },
 
   props: {
     id: {
@@ -28,7 +29,10 @@ export default {
   },
   data() {
     return {
-      store
+      store,
+      fetchedLibraryData: null, 
+      fetchError: {},
+      isLoading: false
     }
   },
   methods: {
@@ -43,7 +47,38 @@ export default {
       this.$router.push({
         query: { ...this.$router.query, date: encodeURIComponent(date) }
       })
+    },
+    async fetchLibraryData() {
+      if (this.id.length !== 0) {
+        this.isLoading = true;
+        try {
+          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getLibraryDetailsById}?_fscs_id=${this.id}`);
+          if (await !response.ok) {
+            throw new Error(response.status);
+          }
+          this.fetchedLibraryData = await response.json();
+        } catch (error) {
+          this.fetchError = error;
+        }
+        this.isLoading = false;
+      }
+    },
+    leftPadSequence(seq) {
+      return (parseInt(seq) + 1000).toString().substring(1);
+    },
+    formatFSCSandSequence(fscsid, seq) {
+      return fscsid + '-' + this.leftPadSequence(seq)
     }
+  },
+  watch: {
+    id(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchLibraryData();
+      }
+    }
+  },
+  async beforeMount() {
+    await this.fetchLibraryData();
   },
   computed: {
     activeDate() {
@@ -62,6 +97,26 @@ export default {
     },
     startOfWeekInISO() {
       return formatISO(startOfWeek(parseISO(this.selectedDate)), { representation: 'date' })
+    },
+    libraryName() {
+      if (this.fetchedLibraryData && this.fetchedLibraryData.libname )  return this.fetchedLibraryData.libname;
+      return "Library " + this.id
+    },
+    breadcrumbs () {
+      if ( this.fetchedLibraryData == null ) return []
+      return [
+         { 
+          name: "All States",
+          link: "/" 
+        },
+        { 
+          name: this.store.states[this.fetchedLibraryData.stabr],
+          link: `/state/${this.fetchedLibraryData.stabr}` 
+        },
+        {
+          name: this.libraryName
+        }
+      ]
     }
   }
 };
@@ -69,7 +124,13 @@ export default {
 
 <template>
   <div>
-    <h1>Library {{ id }}</h1>
+    <USWDSBreadcrumb :crumbs=breadcrumbs />
+    <h1>{{ libraryName }}</h1>
+    <div v-if="fetchedLibraryData !== null">
+      <h2>{{ formatFSCSandSequence(fetchedLibraryData.fscskey, fetchedLibraryData.fscs_seq) }}</h2>
+      {{ fetchedLibraryData.address }}<br>
+      {{ fetchedLibraryData.city }},   {{ fetchedLibraryData.stabr }}   {{ fetchedLibraryData.zip }}
+    </div>
 
     <USWDSDatePicker :initialDate=activeDate @date_changed="navigateToSelectedDate" />
 
