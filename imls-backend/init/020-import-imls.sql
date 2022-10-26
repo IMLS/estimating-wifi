@@ -1,3 +1,9 @@
+-- This code creates a table for data pulled directly from IMLS.
+-- We are using it to look up library information for use in the interface.
+-- Copying new data in requires pulling a CSV from IMLS and restarting the database.
+
+-- FIXME: This is a horrible process. It is not sustainable long-term.
+
 DROP TABLE IF EXISTS data.imls_data;
 
 CREATE TABLE data.imls_data (
