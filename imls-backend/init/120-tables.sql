@@ -61,8 +61,8 @@ CREATE TABLE imlswifi.sensors (
     sensor_id integer NOT NULL,
     fscs_id character varying(16) NOT NULL,
     labels character varying,
-    install_key character varying,
-    jwt character varying
+    api_key character varying
+    -- jwt character varying
 );
 
 

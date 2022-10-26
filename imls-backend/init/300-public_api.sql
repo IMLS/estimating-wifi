@@ -1,11 +1,5 @@
 -- migrate:up
 
-CREATE ROLE web_anon NOLOGIN;
-
-GRANT USAGE ON SCHEMA api TO web_anon;
-GRANT USAGE ON SCHEMA data TO web_anon;
-
-
 --
 -- Name: bin_devices_over_time(date, text, boolean, integer); Type: FUNCTION; Schema: api; Owner: -
 --
