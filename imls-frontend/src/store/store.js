@@ -1,7 +1,6 @@
 import { reactive, computed, readonly } from "vue";
 
-// todo: update when the backend has a real host
-const BACKEND_BASEURL = `${window.location.protocol}//${window.location.hostname}:3000`;
+const BACKEND_BASEURL = import.meta.env.VITE_BACKEND_BASEURL;
 
 export const store = readonly({
   fscs_ids: [
