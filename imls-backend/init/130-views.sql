@@ -25,13 +25,12 @@ CREATE VIEW api.imls_lookup AS SELECT * FROM imlswifi.imls_lookup;
 -- Name: presences; Type: VIEW; Schema: api; Owner: -
 --
 
-CREATE VIEW api.presences AS
- SELECT presences.presence_id,
-    presences.start_time,
-    presences.end_time,
-    presences.fscs_id,
-    presences.sensor_id,
-    presences.manufacturer_index
-   FROM imlswifi.presences;
-
--- migrate:down
+-- CREATE VIEW api.presences AS
+--  SELECT presences.presence_id,
+--     presences.start_time,
+--     presences.end_time,
+--     presences.fscs_id,
+--     presences.sensor_id,
+--     presences.manufacturer_index
+--    FROM imlswifi.presences;
+CREATE VIEW api.presences AS SELECT * FROM imlswifi.presences;

@@ -2,25 +2,27 @@ import os
 import requests
 from unittest import TestCase
 
-scheme = "http"
-hostname = "localhost"
-port = 3000
-test_url = f"{scheme}://{hostname}:{port}"
-
 def endpoint(ep_arr):
     test_url = f"{os.getenv('POETRY_SCHEME')}://{os.getenv('POETRY_HOSTNAME')}:{os.getenv('POETRY_PORT')}"
     return test_url + "/" + "/".join(ep_arr)
 
 class IMLSTests(TestCase):
-    def test_imls_query(self):
+    def test_existence_of_libraries_in_imls_lookup_table(self):
         url = endpoint(["imls_lookup"])
-        print("URL: ", url)
         response = requests.get(url)
+        # If we don't see a 200 response, that's just plain bad.
         if response.status_code != 200:
             print(response.json())
         self.assertTrue(response.status_code == 200)
         items = response.json()
-        if len(items) <= 0:
-            print("ITEMS: ", items)
+        # We should always see multiple libraries here, even in production.
+        # If we don't that means something is very broken.
         self.assertTrue(len(items) > 0)
     
+    def test_existence_of_presences(self):
+        url = endpoint(["presences"])
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(response.json())
+        self.assertTrue(response.status_code == 200)
+        

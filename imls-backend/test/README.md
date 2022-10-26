@@ -53,6 +53,8 @@ poetry install
 Now, we use Poetry to run the tests.
 
 ```
-poetry run pytest
+source .env ; poetry run pytest
 ```
+
+is a one-liner you can use to make sure you always have the most recent env variables.
 
