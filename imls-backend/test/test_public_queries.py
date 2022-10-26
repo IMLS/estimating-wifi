@@ -1,4 +1,4 @@
-import jwt
+import os
 import requests
 from unittest import TestCase
 
@@ -7,16 +7,9 @@ hostname = "localhost"
 port = 3000
 test_url = f"{scheme}://{hostname}:{port}"
 
-JWTSECRET = "DozeDischargeLadderStriveUnthawedCharting"
-
 def endpoint(ep_arr):
+    test_url = f"{os.getenv('POETRY_SCHEME')}://{os.getenv('POETRY_HOSTNAME')}:{os.getenv('POETRY_PORT')}"
     return test_url + "/" + "/".join(ep_arr)
-
-def generate_jwt(role):
-    payload = {"role": str(role), "email": "anyone@anywhere.com"}
-    token = jwt.encode(payload=payload, key=JWTSECRET,  algorithm="HS256")
-    print(f"TOKEN: |{token}|")
-    return token
 
 class IMLSTests(TestCase):
     def test_imls_query(self):
