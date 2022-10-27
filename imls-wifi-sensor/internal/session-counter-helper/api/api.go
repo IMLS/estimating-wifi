@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	resty "github.com/go-resty/resty/v2"
@@ -74,8 +75,8 @@ func PostDurations(durations []*state.Duration) error {
 		return auth_err
 	}
 
+	fscs := config.GetFSCSID()
 	uri := config.GetDurationsURI()
-	data := make(map[string]string)
 
 	// TODO: we need to chunk in case we send more than 2MB data
 	client := resty.New()
@@ -85,19 +86,27 @@ func PostDurations(durations []*state.Duration) error {
 		},
 	)
 	client.SetTimeout(time.Duration(timeOut) * time.Second)
-	resp, err := client.R().
-		SetBody(data).
-		SetAuthToken(token.Token).
-		SetHeader("Content-Type", "text/csv").
-		SetError(&AuthError{}).
-		Post(uri)
 
-	if err != nil || resp.StatusCode() != http.StatusOK {
-		log.Error().
-			Err(err).
-			Str("response", resp.String()).
-			Msg("could not send durations")
-		return err
+	for _, d := range durations {
+		data := make(map[string]string)
+		data["_start"] = strconv.FormatInt(d.Start, 10)
+		data["_end"] = strconv.FormatInt(d.End, 10)
+		data["_fscs"] = fscs
+
+		resp, err := client.R().
+			SetBody(data).
+			SetAuthToken(token.Token).
+			SetHeader("Content-Type", "text/csv").
+			SetError(&AuthError{}).
+			Post(uri)
+
+		if err != nil || resp.StatusCode() != http.StatusOK {
+			log.Error().
+				Err(err).
+				Str("response", resp.String()).
+				Msg("could not send durations")
+			return err
+		}
 	}
 
 	return nil
