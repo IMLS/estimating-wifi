@@ -23,14 +23,17 @@ services:
       - "5432:5432"
     networks:
       - postgrest
+    command: postgres -c app.jwt_secret='${POSTGRES_JWT_SECRET}'
     environment:
       POSTGRES_DB: "${POSTGRES_DB:-imls}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
-      POSTGRES_JWT_SECRET: "${POSTGRES_JWT_SECRET:-DozeDischargeLadderStriveUnthawedCharting}"
     volumes:
       - "./data/database:/var/lib/postgresql/data"
       - "./init:/docker-entrypoint-initdb.d"
+networks:
+  postgrest:
+
   # admin:
   #   image: dpage/pgadmin4:6.12
   #   ports:
@@ -48,28 +51,24 @@ services:
   # This configures our database at runtime. There's things we can't 
   # inject the easy way. To use, you have to do this first:
   # docker build -t imls/liveconfig:latest -f Dockerfile.liveconfig .
-  liveconfig:
-    image: imls/liveconfig
-    networks:
-      - postgrest
-    environment:
-      WAIT_HOSTS: db:5432
-      # Wait for up to 10 minutes.
-      WAIT_TIMEOUT: 600
-      # Wait between checks
-      WAIT_SLEEP_INTERVAL: 5
-      # Configuration parameters; they need to match up above
-      POSTGRES_DB: "${POSTGRES_DB:-imls}"
-      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
-      POSTGRES_JWT_SECRET: "${POSTGRES_JWT_SECRET:-DozeDischargeLadderStriveUnthawedCharting}"
-      POSTGRES_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
-
-    volumes:
-        - "./runtime:/runtime"
-        - "./imls-live-config.sh:/usr/local/bin/imls-live-config.sh"
-    depends_on:
-      - db
-
-networks:
-  postgrest:
+  # liveconfig:
+  #   image: imls/liveconfig
+  #   networks:
+  #     - postgrest
+  #   environment:
+  #     WAIT_HOSTS: db:5432
+  #     # Wait for up to 10 minutes.
+  #     WAIT_TIMEOUT: 600
+  #     # Wait between checks
+  #     WAIT_SLEEP_INTERVAL: 5
+  #     # Configuration parameters; they need to match up above
+  #     POSTGRES_DB: "${POSTGRES_DB:-imls}"
+  #     POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+  #     POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+  #     POSTGRES_JWT_SECRET: "${POSTGRES_JWT_SECRET:-DozeDischargeLadderStriveUnthawedCharting}"
+  #     POSTGRES_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
+  #   volumes:
+  #       - "./runtime:/runtime"
+  #       - "./imls-live-config.sh:/usr/local/bin/imls-live-config.sh"
+  #   depends_on:
+  #     - db
