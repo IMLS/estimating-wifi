@@ -1,0 +1,12 @@
+## Use whatever base image
+FROM debian:bullseye-slim
+RUN apt-get update ; apt-get install -y postgresql-client
+## Add the wait script to the image
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
+RUN chmod +x /wait
+
+## Add your application to the docker image
+ADD imls-live-config.sh /usr/local/bin/imls-live-config.sh
+RUN chmod a+x /usr/local/bin/imls-live-config.sh
+## Launch the wait tool and then your application
+CMD /wait && imls-live-config.sh

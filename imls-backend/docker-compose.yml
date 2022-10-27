@@ -1,5 +1,5 @@
 # To use this compose, first:
-# docker build -t imls:postgres -f Dockerfile.pgjwt .
+# docker build -t imls/postgres:latest -f Dockerfile.pgjwt .
 version: "3"
 services:
   server:
@@ -31,19 +31,45 @@ services:
     volumes:
       - "./data/database:/var/lib/postgresql/data"
       - "./init:/docker-entrypoint-initdb.d"
-  admin:
-    image: dpage/pgadmin4:6.12
-    ports:
-      - "8080:80"
+  # admin:
+  #   image: dpage/pgadmin4:6.12
+  #   ports:
+  #     - "8080:80"
+  #   networks:
+  #     - postgrest
+  #   environment:
+  #     # connection string in the app is host.docker.internal
+  #     # user is `postgres` (or as above), password is as below.
+  #     PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL:-imls@gsa.gov}"
+  #     PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+  #     PGADMIN_DISABLE_POSTFIX: 1
+  #     PGADMIN_LISTEN_ADDRESS: "0.0.0.0"
+  
+  # This configures our database at runtime. There's things we can't 
+  # inject the easy way. To use, you have to do this first:
+  # docker build -t imls/liveconfig:latest -f Dockerfile.liveconfig .
+  liveconfig:
+    image: imls/liveconfig
     networks:
       - postgrest
     environment:
-      # connection string in the app is host.docker.internal
-      # user is `postgres` (or as above), password is as below.
-      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL:-imls@gsa.gov}"
-      PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
-      PGADMIN_DISABLE_POSTFIX: 1
-      PGADMIN_LISTEN_ADDRESS: "0.0.0.0"
+      WAIT_HOSTS: db:5432
+      # Wait for up to 10 minutes.
+      WAIT_TIMEOUT: 600
+      # Wait between checks
+      WAIT_SLEEP_INTERVAL: 5
+      # Configuration parameters; they need to match up above
+      POSTGRES_DB: "${POSTGRES_DB:-imls}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+      POSTGRES_JWT_SECRET: "${POSTGRES_JWT_SECRET:-DozeDischargeLadderStriveUnthawedCharting}"
+      POSTGRES_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
+
+    volumes:
+        - "./runtime:/runtime"
+        - "./imls-live-config.sh:/usr/local/bin/imls-live-config.sh"
+    depends_on:
+      - db
 
 networks:
   postgrest:
