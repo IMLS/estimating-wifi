@@ -96,7 +96,7 @@ func PostDurations(durations []*state.Duration) error {
 		resp, err := client.R().
 			SetBody(data).
 			SetAuthToken(token.Token).
-			SetHeader("Content-Type", "text/csv").
+			SetHeader("Content-Type", "application/json").
 			SetError(&AuthError{}).
 			Post(uri)
 
