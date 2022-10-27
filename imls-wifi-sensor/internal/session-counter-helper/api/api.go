@@ -16,8 +16,13 @@ import (
 type AuthSuccess struct {
 	/* variables */
 }
+
+// postgrest error response
 type AuthError struct {
-	/* variables */
+	code string
+	details string
+	hint string
+	message string
 }
 
 var timeOut int = 15
@@ -58,7 +63,7 @@ func PostDurations(durations []*state.Duration) error {
 		SetAuthToken(key).
 		SetHeader("Content-Type", "text/csv").
 		//SetResult(&AuthSuccess{}). Could be incorperated once we have defined response
-		//SetError(&AuthError{}). Could be incorperated once we have defined response
+		SetError(&AuthError{}).
 		Post(uri)
 
 	if err != nil {
@@ -97,7 +102,7 @@ func PostHeartBeat() error {
 		SetAuthToken(key).
 		SetHeader("Content-Type", "application/json").
 		//SetResult(&AuthSuccess{}). Could be incorperated once we have defined response
-		//SetError(&AuthError{}). Could be incorperated once we have defined response
+		SetError(&AuthError{}).
 		Post(uri)
 
 	if err != nil {
