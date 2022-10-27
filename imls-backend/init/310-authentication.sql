@@ -4,6 +4,16 @@
 -- them from public view. Certain public procs/views will
 -- refer to helpers and tables inside.
 
+
+-- We don't need to know the JWT secret on the client side. The server needs to know
+-- it to generate tokens and check tokens that come back to us. The client, however,
+-- never generates a token. Therefore, this can be randomly generated every time we start the server.
+-- If we catch someone between requesting a token and making a POST, they'll be screwed. However,
+-- if they back off and try again (including grabbing the token), they would then get a new token.
+-- So, ourbackoff should be 3-5m.
+-- ALTER DATABASE imls SET "app.jwt_secret" TO select substr(md5(random()::text), 0, 25);
+
+
 create or replace function
 basic_auth.check_role_exists() returns trigger as $$
 begin

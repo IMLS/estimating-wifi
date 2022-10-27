@@ -19,7 +19,7 @@ GRANT EXECUTE ON FUNCTION api.login(text, text) to web_anon;
 
 -- Private
 
-GRANT EXECUTE ON FUNCTION api.beat_the_heart(character varying, integer, timestamp with time zone, character varying, character varying) TO sensor;
+GRANT EXECUTE ON FUNCTION api.beat_the_heart(character varying, character varying, character varying) TO sensor;
 GRANT SELECT, INSERT ON imlswifi.heartbeats TO sensor;
 GRANT USAGE ON SCHEMA api TO sensor;
 GRANT USAGE ON SCHEMA imlswifi TO sensor;
