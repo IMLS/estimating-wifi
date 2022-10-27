@@ -64,7 +64,6 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
       POSTGRES_JWT_SECRET: "${POSTGRES_JWT_SECRET:-DozeDischargeLadderStriveUnthawedCharting}"
       POSTGRES_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-imlsimls}@db:5432/${POSTGRES_DB:-imls}"
-
     volumes:
         - "./runtime:/runtime"
         - "./imls-live-config.sh:/usr/local/bin/imls-live-config.sh"
