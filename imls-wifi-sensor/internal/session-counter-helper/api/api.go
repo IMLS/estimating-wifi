@@ -71,3 +71,42 @@ func PostDurations(durations []*state.Duration) error {
 
 	return nil
 }
+
+func PostHeartBeat() error {
+
+	fscs := config.GetFSCSID()
+	uri := config.GetHeartbeatURI()
+	key := config.GetAPIKey()
+
+	data := make(map[string]string)
+	data["_fscs_id"] = fscs
+	data["_sensor_version"] = "1.0"
+	data["_sensor_id"] = "802220" // TODO
+	data["_sensor_serial"] = "" // TODO
+
+	client := resty.New()
+	client.AddRetryCondition(
+		func(r *resty.Response, err error) bool {
+			return r.StatusCode() == http.StatusTooManyRequests
+		},
+	)
+	client.SetTimeout(time.Duration(timeOut) * time.Second)
+
+	resp, err := client.R().
+		SetBody(data).
+		SetAuthToken(key).
+		SetHeader("Content-Type", "application/json").
+		//SetResult(&AuthSuccess{}). Could be incorperated once we have defined response
+		//SetError(&AuthError{}). Could be incorperated once we have defined response
+		Post(uri)
+
+	if err != nil {
+		log.Fatal().
+			Err(err).
+			Str("response", resp.String()).
+			Msg("could not send")
+		return err
+	}
+
+	return nil
+}

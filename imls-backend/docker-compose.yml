@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
   db:
-    image: imls/postgres
+    image: imls:postgres
     ports:
       - "5432:5432"
     networks:
