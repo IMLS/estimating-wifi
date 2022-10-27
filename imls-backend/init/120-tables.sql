@@ -44,19 +44,6 @@ imlswifi.sensors (
 );
 
 CREATE TABLE IF NOT EXISTS
- public.durations_v2 (
-    id SERIAL PRIMARY KEY,
-    pi_serial character varying(16),
-    fcfs_seq_id character varying(16),
-    device_tag character varying(32),
-    session_id character varying(255),
-    patron_index integer,
-    manufacturer_index integer,
-    start text,
-    "end" text
-);
-
-CREATE TABLE IF NOT EXISTS
  public.schema_migrations (
     version character varying(255) PRIMARY KEY NOT NULL
 );

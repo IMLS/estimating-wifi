@@ -33,4 +33,4 @@ class IMLSTests(TestCase):
         headers = {"Prefer": "count=estimated"}
         response = requests.get(url, headers=headers)
         estimated_count = int(response.headers["Content-Range"].split("/")[1])
-        self.assertGreater(estimated_count, 10000)
+        self.assertGreater(estimated_count, 100)

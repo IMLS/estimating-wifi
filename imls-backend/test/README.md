@@ -83,7 +83,7 @@ Your choice of JWT secret here needs to match your choice in the .env file.
 Now, we use Poetry to run the tests.
 
 ```
-source .env ; poetry run pytest
+source .env ; source setup-for-tests.sh ; poetry run pytest
 ```
 
 is a one-liner you can use to make sure you always have the most recent env variables.
