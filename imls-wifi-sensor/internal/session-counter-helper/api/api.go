@@ -1,11 +1,8 @@
 package api
 
 import (
-	"bytes"
-	"encoding/csv"
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	resty "github.com/go-resty/resty/v2"
@@ -27,19 +24,6 @@ type AuthError struct {
 }
 
 var timeOut int = 15
-
-func asCSV(durations []*state.Duration) []byte {
-	b := new(bytes.Buffer)
-	w := csv.NewWriter(b)
-	w.Write([]string{"start_time", "end_time"})
-	for _, d := range durations {
-		s := strconv.FormatInt(d.Start, 10)
-		e := strconv.FormatInt(d.End, 10)
-		w.Write([]string{s, e})
-	}
-	w.Flush()
-	return b.Bytes()
-}
 
 func PostAuthentication(jwt *JWTToken) error {
 	fscs := config.GetFSCSID()
@@ -64,7 +48,7 @@ func PostAuthentication(jwt *JWTToken) error {
 		SetError(&AuthError{}).
 		Post(login)
 
-	if err != nil {
+	if err != nil || resp.StatusCode() != http.StatusOK {
 		log.Error().
 			Err(err).
 			Str("response", resp.String()).
@@ -84,13 +68,16 @@ func PostAuthentication(jwt *JWTToken) error {
 }
 
 func PostDurations(durations []*state.Duration) error {
+	token := JWTToken{}
+	auth_err := PostAuthentication(&token)
+	if auth_err != nil {
+		return auth_err
+	}
 
-	// fscs := config.GetFSCSID()
 	uri := config.GetDurationsURI()
-	key := config.GetAPIKey()
+	data := make(map[string]string)
 
-	data := asCSV(durations)
-
+	// TODO: we need to chunk in case we send more than 2MB data
 	client := resty.New()
 	client.AddRetryCondition(
 		func(r *resty.Response, err error) bool {
@@ -98,21 +85,18 @@ func PostDurations(durations []*state.Duration) error {
 		},
 	)
 	client.SetTimeout(time.Duration(timeOut) * time.Second)
-
-	// TODO: chunking in case we send more than 2MB data
-
 	resp, err := client.R().
 		SetBody(data).
-		SetAuthToken(key).
+		SetAuthToken(token.Token).
 		SetHeader("Content-Type", "text/csv").
 		SetError(&AuthError{}).
 		Post(uri)
 
-	if err != nil {
+	if err != nil || resp.StatusCode() != http.StatusOK {
 		log.Error().
 			Err(err).
 			Str("response", resp.String()).
-			Msg("could not send")
+			Msg("could not send durations")
 		return err
 	}
 
@@ -152,7 +136,7 @@ func PostHeartBeat() error {
 		log.Error().
 			Err(err).
 			Str("response", resp.String()).
-			Msg("could not send")
+			Msg("could not send heartbeat")
 		return err
 	}
 
