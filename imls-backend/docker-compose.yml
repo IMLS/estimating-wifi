@@ -23,7 +23,7 @@ services:
       - "5432:5432"
     networks:
       - postgrest
-    command: postgres -c app.jwt_secret='${POSTGRES_JWT_SECRET}'
+    command: postgres -c app.jwt_secret='${POSTGRES_JWT_SECRET:-DozeDischargeLadderStriveUnthawedCharting}'
     environment:
       POSTGRES_DB: "${POSTGRES_DB:-imls}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"

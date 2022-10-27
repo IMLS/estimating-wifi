@@ -17,7 +17,7 @@ You should be able to get a complete, clean start of the server.
 You'll first need to set some environment variables. In a `.env` file:
 
 ```
-export POETRY_SCHEME="https"
+export POETRY_SCHEME="http"
 export POETRY_HOSTNAME="localhost"
 export POETRY_PORT=3000
 DATABASE_URL="postgres://postgres:imlsimls@localhost:5432/imls?sslmode=disable"
