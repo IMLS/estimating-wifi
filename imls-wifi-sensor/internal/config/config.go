@@ -92,24 +92,27 @@ func GetLoggers() []string {
 	return strings.Split(loggers, ",")
 }
 
-// Updated to use the presence API endpoint
-func GetDurationsURI() string {
+func createURI(what string) string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
-	path := viper.GetString("api.pres_uri")
 	return (scheme + "://" +
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") + "/" +
-		strings.TrimPrefix(path, "/"))
+		strings.TrimPrefix(what, "/"))
 }
 
-// Function to create heartbeat URI
+func GetDurationsURI() string {
+	path := viper.GetString("api.pres_uri")
+	return createURI(path)
+}
+
 func GetHeartbeatURI() string {
-	scheme := viper.GetString("api.scheme")
-	host := viper.GetString("api.host")
 	path := viper.GetString("api.hb_uri")
-	return (scheme + "://" +
-		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") + "/" +
-		strings.TrimPrefix(path, "/"))
+	return createURI(path)
+}
+
+func GetLoginURI() string {
+	path := viper.GetString("api.login_uri")
+	return createURI(path)
 }
 
 func IsProductionMode() bool {
