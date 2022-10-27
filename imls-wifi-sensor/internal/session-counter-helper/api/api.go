@@ -148,7 +148,7 @@ func PostHeartBeat() error {
 		SetError(&AuthError{}).
 		Post(uri)
 
-	if err != nil {
+	if err != nil || resp.StatusCode() != 200 {
 		log.Fatal().
 			Err(err).
 			Str("response", resp.String()).
