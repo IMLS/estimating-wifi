@@ -65,7 +65,7 @@ func PostAuthentication(jwt *JWTToken) error {
 		Post(login)
 
 	if err != nil {
-		log.Fatal().
+		log.Error().
 			Err(err).
 			Str("response", resp.String()).
 			Msg("could not authenticate")
@@ -73,7 +73,7 @@ func PostAuthentication(jwt *JWTToken) error {
 	}
 
 	if json.Unmarshal(resp.Body(), &jwt) != nil {
-		log.Fatal().
+		log.Error().
 			Err(err).
 			Str("response", resp.String()).
 			Msg("could not unmarshal authentication response")
@@ -109,7 +109,7 @@ func PostDurations(durations []*state.Duration) error {
 		Post(uri)
 
 	if err != nil {
-		log.Fatal().
+		log.Error().
 			Err(err).
 			Str("response", resp.String()).
 			Msg("could not send")
@@ -149,7 +149,7 @@ func PostHeartBeat() error {
 		Post(uri)
 
 	if err != nil || resp.StatusCode() != 200 {
-		log.Fatal().
+		log.Error().
 			Err(err).
 			Str("response", resp.String()).
 			Msg("could not send")
