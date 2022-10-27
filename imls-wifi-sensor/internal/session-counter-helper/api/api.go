@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	resty "github.com/go-resty/resty/v2"
@@ -89,8 +88,8 @@ func PostDurations(durations []*state.Duration) error {
 
 	for _, d := range durations {
 		data := make(map[string]string)
-		data["_start"] = strconv.FormatInt(d.Start, 10)
-		data["_end"] = strconv.FormatInt(d.End, 10)
+		data["_start"] = time.Unix(d.Start, 0).Format(time.RFC3339)
+		data["_end"] = time.Unix(d.End, 0).Format(time.RFC3339)
 		data["_fscs"] = fscs
 
 		resp, err := client.R().
