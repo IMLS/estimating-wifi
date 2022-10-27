@@ -80,14 +80,15 @@ func PostDurations(durations []*state.Duration) error {
 func PostHeartBeat() error {
 
 	fscs := config.GetFSCSID()
+	serial := state.GetCachedSerial()
 	uri := config.GetHeartbeatURI()
 	key := config.GetAPIKey()
 
 	data := make(map[string]string)
 	data["_fscs_id"] = fscs
 	data["_sensor_version"] = "1.0"
+	data["_sensor_serial"] = serial
 	data["_sensor_id"] = "802220" // TODO
-	data["_sensor_serial"] = "" // TODO
 
 	client := resty.New()
 	client.AddRetryCondition(
