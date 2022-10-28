@@ -111,7 +111,7 @@ class JWTTests(TestCase):
 
 class LibSearchTests(TestCase):
     def test_imls_query(self):
-        response = requests.get(f"{HOST}/imls_lookup")
+        response = requests.get(f"{HOST}/timezone_lookup")
         self.assertTrue(response.status_code == 200)
         items = response.json()
         self.assertTrue(len(items) > 0)

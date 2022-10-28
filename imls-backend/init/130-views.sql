@@ -10,15 +10,15 @@ CREATE VIEW admin.libraries AS
 
 
 --
--- Name: imls_lookup; Type: VIEW; Schema: api; Owner: -
+-- Name: timezone_lookup; Type: VIEW; Schema: api; Owner: -
 --
 -- NOTE: What is the difference, really, between these two?
-CREATE VIEW api.imls_lookup AS SELECT * FROM imlswifi.imls_lookup;
--- CREATE VIEW api.imls_lookup AS
---  SELECT imls_lookup.id,
---     imls_lookup.fscs_id,
---     imls_lookup.timezone
---    FROM imlswifi.imls_lookup;
+CREATE VIEW api.timezone_lookup AS SELECT * FROM imlswifi.timezone_lookup;
+-- CREATE VIEW api.timezone_lookup AS
+--  SELECT timezone_lookup.id,
+--     timezone_lookup.fscs_id,
+--     timezone_lookup.timezone
+--    FROM imlswifi.timezone_lookup;
 
 
 --

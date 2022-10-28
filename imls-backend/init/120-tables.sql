@@ -8,7 +8,7 @@ imlswifi.libraries (
 );
 
 CREATE TABLE IF NOT EXISTS
-imlswifi.imls_lookup (
+imlswifi.timezone_lookup (
     id SERIAL PRIMARY KEY,
     fscs_id character varying(16) NOT NULL REFERENCES imlswifi.libraries(fscs_id),
     timezone time with time zone NOT NULL

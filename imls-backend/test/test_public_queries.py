@@ -7,8 +7,8 @@ def endpoint(ep_arr):
     return test_url + "/" + "/".join(ep_arr)
 
 class IMLSTests(TestCase):
-    def test_existence_of_libraries_in_imls_lookup_table(self):
-        url = endpoint(["imls_lookup"])
+    def test_existence_of_libraries_in_timezone_lookup_table(self):
+        url = endpoint(["timezone_lookup"])
         response = requests.get(url)
         # If we don't see a 200 response, that's just plain bad.
         if response.status_code != 200:
