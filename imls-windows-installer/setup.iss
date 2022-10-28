@@ -110,15 +110,15 @@ begin
     'Session Counter Pilot Program',
     'Thank you for participating in the Session Counter pilot!',
     'Before proceeding with installation, please confirm that you have gotten ' +
-    'an email from your state library director which contains your API key. ' +
+    'an email from your state library director which contains your password. ' +
     'If not, please stop the installation by clicking ''Cancel''.');
 
   LibraryPage := CreateInputQueryPage(IntroPage.ID,
     'Library Information',
     'This information will help uniquely identify your library in the state system.',
-    'Please enter your API key and your public library Federal-State Cooperative ' +
+    'Please enter your password and your public library Federal-State Cooperative ' +
     'System (FSCS) ID, then click Next.');
-  LibraryPage.Add('API key:', False);
+  LibraryPage.Add('Password:', False);
   LibraryPage.Add('FSCS ID:', False);
 end;
 
@@ -151,7 +151,7 @@ begin
   if CurPageID = LibraryPage.ID then begin
     { Check for empty data }
     if Trim(LibraryPage.Values[0]) = '' then begin
-      MsgBox('You must enter an API key.', mbError, MB_OK);
+      MsgBox('You must enter a password.', mbError, MB_OK);
       Result := False;
     end else begin
       if Trim(LibraryPage.Values[1]) = '' then begin
