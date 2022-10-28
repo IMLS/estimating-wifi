@@ -4,16 +4,17 @@
 -- Name: libraries; Type: VIEW; Schema: admin; Owner: -
 --
 
-CREATE VIEW admin.libraries AS
- SELECT libraries.fscs_id
-   FROM imlswifi.libraries;
+-- FIXME MCJ 20221028 I have no idea what this is or why we have it.
+-- CREATE VIEW admin.libraries AS
+--  SELECT libraries.fscs_id
+--    FROM imlswifi.libraries;
 
 
 --
 -- Name: timezone_lookup; Type: VIEW; Schema: api; Owner: -
 --
 -- NOTE: What is the difference, really, between these two?
-CREATE VIEW api.timezone_lookup AS SELECT * FROM imlswifi.timezone_lookup;
+-- CREATE VIEW api.timezone_lookup AS SELECT * FROM data.timezone_lookup;
 -- CREATE VIEW api.timezone_lookup AS
 --  SELECT timezone_lookup.id,
 --     timezone_lookup.fscs_id,

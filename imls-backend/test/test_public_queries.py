@@ -7,18 +7,15 @@ def endpoint(ep_arr):
     return test_url + "/" + "/".join(ep_arr)
 
 class IMLSTests(TestCase):
-    def test_existence_of_libraries_in_timezone_lookup_table(self):
-        url = endpoint(["timezone_lookup"])
-        response = requests.get(url)
-        # If we don't see a 200 response, that's just plain bad.
-        if response.status_code != 200:
-            print(response.json())
-        self.assertTrue(response.status_code == 200)
-        items = response.json()
-        # We should always see multiple libraries here, even in production.
-        # If we don't that means something is very broken.
-        self.assertTrue(len(items) > 0)
     
+    def test_actual_library_timezone(self):
+        url = endpoint(["rpc", "get_library_timezone"])
+        query = {"fscs_id": "KY0069-002"}
+        r = requests.post(url, json=query)
+        print(r.json())
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['time'], "00:00:00-04")
+
     # NOTE: There's a ?limit parameter on these, because otherwise a lot of 
     # values come back by default, and that makes for  slow tests.
     def test_existence_of_presences(self):
