@@ -32,18 +32,13 @@ class LoginTests(TestCase):
         # blasdlkfjasdflkjas.balskdjfaskjdfhaksjdhf.baskdjhfaskdjhfashkldj
         # The first part of the token will always be the same.
         t1 = t0.split(".")[0]
-        t2 = t0.split(".")[1]
+        _ = t0.split(".")[1]
         self.assertEqual(t1, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
 
-    # Call "beat_the_heart" to see if we can get through authentication.
-    # CREATE OR REPLACE FUNCTION api.beat_the_heart(
-    # _fscs character varying,
-    # _sensor integer,
-    # _hb timestamp with time zone,
-    # _serial character varying,
-    # _version character varying)
-    # RETURNS character varying
     def test_use_token(self):
+        """
+        Call "beat_the_heart" to see if we can get through authentication.
+        """
         token_url = endpoint(["rpc", "login"])
         body = {"fscs_id": "KY0069-002", "api_key": "hello-goodbye"}
         # Need to post, not get, if you're passing params in the body.
