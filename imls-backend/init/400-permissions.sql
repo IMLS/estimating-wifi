@@ -12,6 +12,7 @@ GRANT web_anon TO authenticator;
 
 -- Authentication
 GRANT EXECUTE ON FUNCTION api.login(text, text) to web_anon;
+GRANT EXECUTE ON FUNCTION api.verify_presence(character varying, timestamptz, timestamptz) to web_anon;
 
 -- GRANT EXECUTE ON FUNCTION api.jwt_gen(text, text) TO web_anon;
 -- GRANT EXECUTE ON FUNCTION api.sensor_setup(character varying, character varying, character varying) TO sensor;

@@ -11,3 +11,7 @@ psql ${DATABASE_URL} -v ON_ERROR_STOP=0 <<-EOSQL
         SELECT DISTINCT fscs_id,'00:00:00-04'::TIMETZ FROM imlswifi.libraries
     );
 EOSQL
+
+psql ${DATABASE_URL} -v ON_ERROR_STOP=0 <<-EOSQL
+    NOTIFY pgrst, 'reload schema';
+EOSQL

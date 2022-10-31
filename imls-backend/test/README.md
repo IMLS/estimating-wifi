@@ -10,11 +10,16 @@ From a clean start
 rm -rf data ; docker compose up
 ```
 
-You should be able to get a complete, clean start of the server. 
+You should be able to get a complete, clean start of the server.
 
-## Setting up the .env
+Because all of the code of the application is now encoded as part of the `init`, you will typically need to tear down the server, remove the DB, and restart clean to apply changes. (This is, at least, the most reliable way to get the most recent version of the backend application.) This was chosen as an approach for two reasons:
 
-You'll first need to set some environment variables. In a `.env` file:
+1. It is easier to track during `dev`, and 
+2. We can easily include the app in the container for deployment.
+
+## Setting up the .test_config
+
+You'll first need to set some environment variables. In a `.test_config` file:
 
 ```
 export POETRY_SCHEME="http"
@@ -27,13 +32,13 @@ These variables are used in the unit tests via `os.getenv()`. The JWT_SECRET nee
 
 ## Loading test data
 
-If you want test data, you need to load it.
+The first time you run the tests, you'll need to source in your test data. You will also need to do this every time you `rm` the `data` directory.
 
 ```
-source .env ; source ./setup-for-tests.sh
+source .test_config ; source ./setup-for-tests.sh
 ```
 
-This runs a script that will create a user/password for unit testing, as well as load a bunch of test data.
+This runs a script that will create a user/password for unit testing, as well as load a bunch of test data. This should **never** be run in `prod`.
 
 ## Setting up a venv
 

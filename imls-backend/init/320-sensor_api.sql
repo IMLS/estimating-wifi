@@ -27,3 +27,23 @@ INSERT INTO imlswifi.presences(start_time, end_time, fscs_id, manufacturer_index
    RETURN _fscs;
 end;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION api.verify_presence(
+   _fscs_id character varying(16),
+   _start timestamptz,
+   _end timestamptz)
+   RETURNS INTEGER
+   LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+   _result INTEGER;
+BEGIN 
+   SELECT presence_id INTO _result
+   FROM api.presences
+   WHERE 
+      (presences.fscs_id = _fscs_id) AND
+      (presences.start_time = _start) AND
+      (presences.end_time = _end);
+   RETURN _result;
+end;
+$BODY$;
