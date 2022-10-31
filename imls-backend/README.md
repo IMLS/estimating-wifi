@@ -29,6 +29,22 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
 - List tables `\dt`
 - List views `\dv`
 
+## Connect to the DB via pgAdmin
+
+- Ensure you've started the Docker containers as outlined above
+- Open a browser and go to `localhost:8080`
+- Enter the pgAdmin creds from docker-compose
+  - imls@gsa.gov
+  - imlsimls
+- Click 'Add New Server'
+- In the 'General' tab
+  - Choose a name (can be anything)
+- In the 'Connection' tab
+  - The 'Host name/address' is `db`
+  - The 'Port' is `5432`
+  - The 'Username' is `postgres`
+  - The 'Password' is `imlsimls`
+
 ## Query the DB
 
 - `curl -s http://127.0.0.1:3000/presences`

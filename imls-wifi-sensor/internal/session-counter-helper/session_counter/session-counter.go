@@ -38,6 +38,7 @@ func Run2() {
 	durationsdb := state.NewDurationsDB()
 	c := cron.New()
 
+	// gather wifi statistics every minute
 	go runEvery("*/1 * * * *", c,
 		func() {
 			if config.IsDeveloperMode() {
@@ -52,6 +53,10 @@ func Run2() {
 			}
 		})
 
+	// send a heartbeat at the top of every hour
+	go runEvery("0 * * * *", c, tlp.HeartBeat)
+
+	// send the processed data at the end of each day
 	go runEvery(config.GetResetCron(), c,
 		func() {
 			log.Info().
@@ -66,7 +71,6 @@ func Run2() {
 			// Clear out the ephemeral data for the next day of monitoring
 			state.ClearEphemeralDB()
 			durationsdb.ClearDurationsDB()
-
 		})
 
 	// Start the cron jobs...

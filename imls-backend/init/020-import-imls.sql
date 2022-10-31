@@ -54,4 +54,7 @@ CREATE TABLE data.imls_data (
 -- https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey
 -- This was FY20_Outlet data, renamed.
 
+-- COPYING DATA
+\set quiet
 \copy data.imls_data FROM '/docker-entrypoint-initdb.d/imls-data-2020.csv' DELIMITER ',' CSV HEADER;
+\unset quiet

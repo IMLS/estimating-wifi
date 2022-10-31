@@ -2,27 +2,43 @@
 
 To test the API, there's some configuration that is needed first.
 
-## Setting up the .env
+## Clean start
 
-You'll first need to set some environment variables. In a `.env` file:
+From a clean start
 
 ```
-export POETRY_SCHEME="https"
+rm -rf data ; docker compose up
+```
+
+You should be able to get a complete, clean start of the server.
+
+Because all of the code of the application is now encoded as part of the `init`, you will typically need to tear down the server, remove the DB, and restart clean to apply changes. (This is, at least, the most reliable way to get the most recent version of the backend application.) This was chosen as an approach for two reasons:
+
+1. It is easier to track during `dev`, and 
+2. We can easily include the app in the container for deployment.
+
+## Setting up the .test_config
+
+You'll first need to set some environment variables. In a `.test_config` file:
+
+```
+export POETRY_SCHEME="http"
 export POETRY_HOSTNAME="localhost"
 export POETRY_PORT=3000
+DATABASE_URL="postgres://postgres:imlsimls@localhost:5432/imls?sslmode=disable"
 ```
 
-## Sourcing those into the shell environment
+These variables are used in the unit tests via `os.getenv()`. The JWT_SECRET needs to be set in accordance with the secret injected into the DB (see below).
 
-You will then need to read those into your shell where you are running tests.
+## Loading test data
+
+The first time you run the tests, you'll need to source in your test data. You will also need to do this every time you `rm` the `data` directory.
 
 ```
-source .env
+source .test_config ; source ./setup-for-tests.sh
 ```
 
-You will need to source this every time you open a new shell and want to run tests. `poetry` does not have a mechanism to automatically load environment variables/env files at this time. This might be a FIXME to make our lives easier. (Certainly, this is a CI/CD problem.)
-
-Our `.gitignore` will ignore this file.
+This runs a script that will create a user/password for unit testing, as well as load a bunch of test data. This should **never** be run in `prod`.
 
 ## Setting up a venv
 
@@ -47,30 +63,6 @@ You will need to source this every time you open a new shell and want to run tes
 ```
 poetry install
 ```
-
-Also, to run these tests, there are some things that need to happen to the database. These are not yet automated.
-
-1. ALTER DATABASE needs to happen, inserting `app.jwt_secret` as a parameter of the DB.
-1. The `users` table in the `basic_auth` namespace needs to be populated with a user. The test assumes `KY0069-002` and `hello-goodbye` as a user and password. The role should be `sensor`.
-
-You can run the following in a DB shell (DBeaver, or directly via `psql`):
-
-First, 
-
-```
-psql -h localhost -U postgres -W
-```
-and then
-
-```
-INSERT INTO basic_auth.users VALUES ('KY0069-002', 'hello-goodbye', 'sensor');
-ALTER DATABASE imls SET "app.jwt_secret" TO 'SOMETHINGREALLYLONGLIKEREALLYREALLYLONG';
-NOTIFY pgrst, 'reload schema'
-```
-
-Note that the secret will, ultimately, need to be automated into our setup/teardown process for production. Currently, there is no production environment, and this is only for local testing.
-
-
 
 ## Running the tests
 
