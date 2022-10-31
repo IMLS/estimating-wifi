@@ -74,7 +74,7 @@ func PostDurations(durations []*state.Duration) error {
 		return auth_err
 	}
 
-	fscs := config.GetFSCSID()
+	// fscs := config.GetFSCSID()
 	uri := config.GetDurationsURI()
 
 	// TODO: we need to chunk in case we send more than 2MB data
@@ -90,7 +90,8 @@ func PostDurations(durations []*state.Duration) error {
 		data := make(map[string]string)
 		data["_start"] = time.Unix(d.Start, 0).Format(time.RFC3339)
 		data["_end"] = time.Unix(d.End, 0).Format(time.RFC3339)
-		data["_fscs"] = fscs
+		// 20221031 MCJ: This will be pulled from the authenticated JWT claim.
+		// data["_fscs"] = fscs
 
 		resp, err := client.R().
 			SetBody(data).
@@ -118,11 +119,14 @@ func PostHeartBeat() error {
 		return auth_err
 	}
 
-	fscs := config.GetFSCSID()
+	// fscs := config.GetFSCSID()
 	serial := state.GetCachedSerial()
 	uri := config.GetHeartbeatURI()
 	data := make(map[string]string)
-	data["_fscs_id"] = fscs
+	// 20221031 MCJ: This will be pulled from the authenticated JWT claim.
+	// data["_fscs_id"] = fscs
+	// 20221031 FIXME: The sensor version should not be coded here as a string.
+	// This should be in the config.
 	data["_sensor_version"] = "1.0"
 	data["_sensor_serial"] = serial
 
