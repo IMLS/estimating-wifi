@@ -4,12 +4,12 @@ const BACKEND_BASEURL = import.meta.env.VITE_BACKEND_BASEURL;
 
 export const store = readonly({
   fscs_ids: [
-    { id: "AA0001-001" },
-    { id: "AA0002-001" },
-    { id: "AA0003-001" },
-    { id: "AA0004-001" },
-    { id: "AA0005-001" },
-    { id: "AA0006-001" },
+    { id: "GA0029-002" },
+    { id: "GA0029-003" },
+    { id: "GA0029-004" },
+    { id: "GA0027-004" },
+    { id: "GA0027-008" },
+    { id: "GA0027-011" },
   ],
   hourlyLabels: [
     "12am",
