@@ -1,5 +1,11 @@
 package state
 
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+)
+
 type Duration struct {
 	ID        int
 	SessionID int64
@@ -32,6 +38,10 @@ func (mkv *DurationsDB) Insert(d *Duration) {
 }
 
 func (mkv *DurationsDB) InsertMany(s int64, e EphemeralDB) {
+	log.Debug().
+		Str("InsertMany number to insert", fmt.Sprint(len(e))).
+		Msg("How many are we inserting?")
+
 	for _, ephemera := range e {
 		mkv.Insert(&Duration{
 			SessionID: s,

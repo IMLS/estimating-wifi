@@ -1,6 +1,7 @@
 package tlp
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/rs/zerolog/log"
@@ -8,13 +9,16 @@ import (
 	"gsa.gov/18f/internal/session-counter-helper/state"
 )
 
-func SimpleSend(db *state.DurationsDB) {
+func SimpleSend(db *state.DurationsDB, sq *state.Queue[int64]) {
 	log.Debug().
 		Msg("starting batch send")
 
 	// This only comes in on reset...
-	sq := state.NewQueue[int64]("sent")
+	//sq := state.NewQueue[int64]("sent")
 	sessionsToSend := sq.AsList()
+	log.Debug().
+		Str("sessionsToSend", fmt.Sprint(sessionsToSend)).
+		Msg("sessions in queue to be sent")
 
 	for _, nextSessionIDToSend := range sessionsToSend {
 

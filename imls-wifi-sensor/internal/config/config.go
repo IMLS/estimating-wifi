@@ -95,24 +95,30 @@ func GetLoggers() []string {
 func createURI(what string) string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
+	port := viper.GetInt("api.port")
 	return (scheme + "://" +
-		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") + "/" +
+		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
+		":" + fmt.Sprint(port) + "/" +
 		strings.TrimPrefix(what, "/"))
 }
 
 func GetDurationsURI() string {
-	path := viper.GetString("api.pres_uri")
+	path := viper.GetString("api.presences_uri")
 	return createURI(path)
 }
 
 func GetHeartbeatURI() string {
-	path := viper.GetString("api.hb_uri")
+	path := viper.GetString("api.heartbeat_uri")
 	return createURI(path)
 }
 
 func GetLoginURI() string {
 	path := viper.GetString("api.login_uri")
 	return createURI(path)
+}
+
+func GetLoginPort() int {
+	return viper.GetInt("api.port")
 }
 
 func IsProductionMode() bool {
@@ -156,8 +162,36 @@ func GetMaximumMinutes() int {
 	return viper.GetInt("config.maximum_minutes")
 }
 
+func GetDeviceMemory() int {
+	return viper.GetInt("config.device_memory")
+}
+
 func GetResetCron() string {
 	return viper.GetString("cron.reset")
+}
+
+func GetHeartbeatCron() string {
+	return viper.GetString("cron.heartbeat")
+}
+
+func GetFakesharkNumPerMinute() int {
+	return viper.GetInt("wireshark.fakeshark_num_found_per_minute")
+}
+
+func GetFakesharkNumMacs() int {
+	return viper.GetInt("wireshark.fakeshark_num_macs")
+}
+
+func GetFakesharkMinFound() int {
+	return viper.GetInt("wireshark.fakeshark_min_found")
+}
+
+func GetFakesharkMaxFound() int {
+	return viper.GetInt("wireshark.fakeshark_max_found")
+}
+
+func GetDataCollectionCron() string {
+	return viper.GetString("cron.data_collection_cron")
 }
 
 func SetConfigDefaults() {
@@ -169,14 +203,25 @@ func SetConfigDefaults() {
 	// defaults for running in production
 	viper.SetDefault("config.minimum_minutes", 5)
 	viper.SetDefault("config.maximum_minutes", 600)
+	viper.SetDefault("config.device_memory", 7200)
 	viper.SetDefault("log.level", "DEBUG")
-	viper.SetDefault("log.loggers", "local:stderr,local:tmp,api:directus")
+	viper.SetDefault("log.loggers", "local:stderr,local:tmp")
 	viper.SetDefault("mode.run", "prod")
 	viper.SetDefault("api.scheme", "https")
 	viper.SetDefault("api.host", "rabbit-phase-4.app.cloud.gov")
-	viper.SetDefault("api.uri", "/items/durations_v2/")
+	viper.SetDefault("api.port", 3000)
+	viper.SetDefault("api.login_uri", "/rpc/login")
+	viper.SetDefault("api.heartbeat_uri", "/rpc/beat_the_heart")
+	viper.SetDefault("api.presences_uri", "/rpc/update_presences")
+	// At midnight every night
 	viper.SetDefault("cron.reset", "0 0 * * *")
+	// Every hour
+	viper.SetDefault("cron.heartbeat", "0 0/1 * * *")
+	viper.SetDefault("cron.data_collection_cron", "*/1 * * * *")
 	viper.SetDefault("wireshark.duration", 45)
+	viper.SetDefault("wireshark.fakeshark_num_macs", 500)
+	viper.SetDefault("wireshark.fakeshark_min_found", 20)
+	viper.SetDefault("wireshark.fakeshark_max_found", 100)
 	if runtime.GOOS == "windows" {
 		viper.SetDefault("wireshark.path", "c:/Program Files/Wireshark/tshark.exe")
 		viper.SetDefault("wlanhelper.path", "c:/Windows/System32/Npcap/WlanHelper.exe")

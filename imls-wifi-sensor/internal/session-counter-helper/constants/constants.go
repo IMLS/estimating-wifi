@@ -7,4 +7,4 @@ const MACLENGTH = 17
 // If we see a MAC within this window, we "remember" it.
 // If we see a MAC, 2h go by, and we see it again, we're going
 // to "forget" the original sighting, and pretend the device is new.
-const MAC_MEMORY_DURATION_SEC = 2 * 60 * 60
+// const MAC_MEMORY_DURATION_SEC = 2 * 60 * 60
