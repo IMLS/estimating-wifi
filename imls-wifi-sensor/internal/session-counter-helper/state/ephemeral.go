@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"gsa.gov/18f/internal/session-counter-helper/constants"
+	"gsa.gov/18f/internal/config"
 )
 
 type StartEnd struct {
@@ -34,20 +34,23 @@ func RecordMAC(mac string) {
 		// Has this device been away for more than 2 hours?
 		// Start by grabbing the start/end times.
 		se := ed[mac]
-		if (now > se.End) && ((now - se.End) > constants.MAC_MEMORY_DURATION_SEC) {
+		if (now > se.End) && ((now - se.End) > int64(config.GetDeviceMemory())) {
 			// If it has been, we need to "forget" the old device.
 			// Do this by hashing the mac with the current time, store the original data
 			// unchanged, and create a new entry for the current mac address, in case we
 			// see it again (in less than 2h).
+			//log.Debug().Msg("Been away for 2h. Forgetting old MAC address.")
 			sha1 := sha1.Sum([]byte(mac + fmt.Sprint(now)))
 			ed[fmt.Sprintf("%x", sha1)] = se
 			ed[mac] = StartEnd{Start: now, End: now}
 		} else {
 			// Just update the mac address. It has been less than 2h.
+			//log.Debug().Msg("Updating end time for MAC address.")
 			ed[mac] = StartEnd{Start: p.Start, End: now}
 		}
 	} else {
 		// We have never seen the MAC address.
+		//log.Debug().Msg("New MAC address.")
 		ed[mac] = StartEnd{Start: now, End: now}
 	}
 }
