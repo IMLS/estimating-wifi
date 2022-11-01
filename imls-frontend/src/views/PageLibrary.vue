@@ -1,6 +1,6 @@
 <script>
 import { store } from "@/store/store.js";
-import { format, formatISO, addDays, parseISO, startOfWeek, startOfYesterday } from "date-fns";
+import { format, formatISO, addDays, parseISO, startOfWeek, startOfMonth } from "date-fns";
 
 import FetchData from "@/components/FetchData.vue";
 import USWDSCard from "@/components/USWDSCard.vue";
@@ -23,8 +23,8 @@ export default {
     },
     selectedDate: {
       type: String,
-      // load yesterday by default
-      default: () => startOfYesterday().toISOString().split("T")[0]
+      // load May 2022 by default
+      default: () => startOfMonth(new Date(2022, 4)).toISOString().split("T")[0]
     }, 
   },
   data() {

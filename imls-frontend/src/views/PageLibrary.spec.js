@@ -3,7 +3,7 @@ import { expect } from "vitest";
 import PageLibrary from "./PageLibrary.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
-import { startOfYesterday } from "date-fns";
+import { startOfMonth } from "date-fns";
 
 let router;
 
@@ -17,7 +17,7 @@ beforeEach(async () => {
 });
 
 describe("PageLibrary", () => {
-  it("should render with yesterday's date if no date is provided", () => {
+  it("should render with May first data if no date is provided", () => {
     const wrapper = mount(PageLibrary, {
       props: {
         id: "KnownGoodId",
@@ -41,7 +41,7 @@ describe("PageLibrary", () => {
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
     expect(wrapper.vm.activeDate).toEqual(
-      startOfYesterday().toISOString().split("T")[0]
+      startOfMonth(new Date(2022, 4)).toISOString().split("T")[0]
     );
   });
   it("should render with a preset date if one is provided", () => {
