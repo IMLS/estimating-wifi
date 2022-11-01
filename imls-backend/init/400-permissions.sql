@@ -1,6 +1,7 @@
 
 GRANT USAGE ON SCHEMA api TO web_anon;
 GRANT USAGE ON SCHEMA data TO web_anon;
+GRANT SELECT ON TABLE data.imls_data TO web_anon;
 
 GRANT SELECT ON TABLE api.imls_lookup TO web_anon;
 GRANT SELECT ON TABLE api.presences TO web_anon;
@@ -20,8 +21,8 @@ GRANT EXECUTE ON FUNCTION api.verify_presence(character varying, timestamptz, ti
 
 -- Private
 
-GRANT EXECUTE ON FUNCTION api.beat_the_heart(character varying, character varying, character varying) TO sensor;
-GRANT EXECUTE ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone, character varying) TO sensor;
+GRANT EXECUTE ON FUNCTION api.beat_the_heart(character varying, character varying) TO sensor;
+GRANT EXECUTE ON FUNCTION api.update_presence(timestamp with time zone, timestamp with time zone) TO sensor;
 GRANT SELECT, INSERT ON imlswifi.heartbeats TO sensor;
 GRANT USAGE ON SCHEMA api TO sensor;
 GRANT USAGE ON SCHEMA imlswifi TO sensor;

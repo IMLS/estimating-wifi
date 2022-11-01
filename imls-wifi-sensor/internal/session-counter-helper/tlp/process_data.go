@@ -11,7 +11,7 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 
 	log.Debug().
 		Int64("session", session).
-		Msg("queueing to images and send")
+		Msg("queueing to send")
 
 	if session >= 0 {
 		sq.Enqueue(session)

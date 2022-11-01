@@ -50,7 +50,6 @@ class LoginTests(TestCase):
 
         url = endpoint(["rpc", "beat_the_heart"])
         body = {
-            "_fscs_id": "KY0069-002",
             "_sensor_serial": "abcde",
             "_sensor_version": "3.0",
         }

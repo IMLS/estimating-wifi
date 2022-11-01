@@ -23,7 +23,6 @@ class PresencesTests(TestCase):
 
         url = endpoint(["rpc", "update_presence"])
         body = {
-            "_fscs": "KY0069-002",
             "_start": str(self.now),
             "_end": str(self.end),
         }
