@@ -54,7 +54,7 @@ export default {
     },
     formatFSCSandSequence(fscsid, seq) {
       return fscsid + '-' + this.leftPadSequence(seq)
-    }
+    },
   },
   computed: {
     stateName () {
@@ -75,10 +75,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      // access to component public instance via `vm`
-      // if no matching state abbreviation is found, redirect to 404 page
-      if (!vm.stateName) {
-        console.log("No state found")
+      if (vm.stateName === undefined) {
         vm.$router.push({name: 'NotFound'});
       }
     })
@@ -103,9 +100,10 @@ export default {
 
         <ol class="usa-list">
           <li v-for="system in this.fetchedData"  :key=system>
-          <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
-            {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
-          </RouterLink>
+            <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
+              {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
+            </RouterLink>
+         
           </li>
         </ol>
       

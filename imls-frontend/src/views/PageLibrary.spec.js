@@ -97,4 +97,36 @@ describe("PageLibrary", () => {
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);
   });
+
+
+  it("should update with a new library when the id prop changes", async () => {
+    const wrapper = await shallowMount(PageLibrary, {
+      props: {
+        id: "KnownEmptyId",
+      },
+      global: {
+        plugins: [router],
+        stubs: [
+          "USWDSDatePicker",
+          "USWDSCard",
+          "FetchData",
+          "Histogram",
+          "Heatmap",
+          "HeatmapWeeklyCalendar",
+          "USWDSTable",
+        ],
+      },
+    });
+    await flushPromises();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("h1").text()).toEqual("Library KnownEmptyId");
+    expect(wrapper.vm.fetchedLibraryData).toBeNull();
+
+    await wrapper.setProps({ id: "KnownGoodId" });
+    await flushPromises();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("h1").text()).toEqual("ANCHOR POINT PUBLIC LIBRARY");
+    expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
+    wrapper.unmount();
+  });
 });

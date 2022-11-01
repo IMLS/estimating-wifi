@@ -96,6 +96,10 @@ export const restHandlers = [
     switch (stateAbbr) {
       case 'AK' :
         return res(ctx.status(200), ctx.json(statewideLibrariesMock))
+      case 'AL' :
+        return res(ctx.status(200), ctx.json(statewideLibrariesMock))
+      case 'ZZ' :
+        return res(ctx.status(400), ctx.json(errorMock))
       default:
         return res(ctx.status(400), ctx.json(errorMock))
     }
