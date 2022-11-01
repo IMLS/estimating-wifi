@@ -6,7 +6,7 @@ import (
 )
 
 func HeartBeat() {
-	log.Debug().Msg("starting heartbeat")
+	log.Debug().Msg("Running heartbeat")
 	err := api.PostHeartBeat()
 	if err != nil {
 		log.Error().

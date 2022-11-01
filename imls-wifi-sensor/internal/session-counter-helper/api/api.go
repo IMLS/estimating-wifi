@@ -42,6 +42,7 @@ func PostAuthentication(jwt *JWTToken) error {
 	login_data["api_key"] = key
 
 	login := config.GetLoginURI()
+
 	resp, err := client.R().
 		SetBody(login_data).
 		SetHeader("Content-Type", "application/json").
@@ -74,7 +75,6 @@ func PostDurations(durations []*state.Duration) error {
 		return auth_err
 	}
 
-	fscs := config.GetFSCSID()
 	uri := config.GetDurationsURI()
 
 	// TODO: we need to chunk in case we send more than 2MB data
@@ -90,7 +90,6 @@ func PostDurations(durations []*state.Duration) error {
 		data := make(map[string]string)
 		data["_start"] = time.Unix(d.Start, 0).Format(time.RFC3339)
 		data["_end"] = time.Unix(d.End, 0).Format(time.RFC3339)
-		data["_fscs"] = fscs
 
 		resp, err := client.R().
 			SetBody(data).
@@ -118,11 +117,9 @@ func PostHeartBeat() error {
 		return auth_err
 	}
 
-	fscs := config.GetFSCSID()
 	serial := state.GetCachedSerial()
 	uri := config.GetHeartbeatURI()
 	data := make(map[string]string)
-	data["_fscs_id"] = fscs
 	data["_sensor_version"] = "1.0"
 	data["_sensor_serial"] = serial
 

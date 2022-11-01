@@ -1,15 +1,14 @@
 package mock_hw
 
 import (
+	"fmt"
 	"math/rand"
 
-	"gsa.gov/18f/internal/session-counter-helper/tlp"
-	"gsa.gov/18f/internal/wifi-hardware-search/models"
+	"github.com/rs/zerolog/log"
+	"gsa.gov/18f/internal/config"
 )
 
-var NUMMACSHELPER int
-var NUMFOUNDPERMINUTEHELPER int
-var consistentMACsHelper = make([]string, 0)
+var consistentMACarray = make([]string, 0)
 
 func generateFakeMac() string {
 	var letterRunes = []rune("ABCDEF0123456789")
@@ -27,31 +26,30 @@ func generateFakeMac() string {
 	return string(b)
 }
 
-func runFakeWireshark(device string) []string {
-
-	thisTime := rand.Intn(NUMFOUNDPERMINUTEHELPER)
+func RunFakeWireshark(device string) []string {
+	minimum := config.GetFakesharkMinFound()
+	maximum := config.GetFakesharkMaxFound()
+	thisTime := rand.Intn(maximum-minimum) + minimum
 	send := make([]string, thisTime)
 	for i := 0; i < thisTime; i++ {
-		send[i] = consistentMACsHelper[rand.Intn(len(consistentMACsHelper))]
+		send[i] = consistentMACarray[rand.Intn(len(consistentMACarray))]
 	}
+
+	log.Debug().
+		Str("number of devices generated", fmt.Sprint(len(send))).
+		Msg("runFakeWireshark")
+
 	return send
 }
 
-func FakeWiresharkHelper(numfoundperminute int, nummacs int) {
+func FakeWiresharkSetup() {
+
+	num_macs := config.GetFakesharkNumMacs()
 	// Create a pool of NUMMACS devices to draw from.
 	// We will send NUMFOUNDPERMINUTE each minute
-	NUMFOUNDPERMINUTEHELPER = numfoundperminute
-	NUMMACSHELPER = nummacs
-	consistentMACsHelper = make([]string, NUMMACSHELPER)
-	for i := 0; i < NUMMACSHELPER; i++ {
-		consistentMACsHelper[i] = generateFakeMac()
+	consistentMACarray = make([]string, num_macs)
+	for i := 0; i < num_macs; i++ {
+		consistentMACarray[i] = generateFakeMac()
 	}
 
-	tlp.SimpleShark(
-		// search.SetMonitorMode,
-		func(d *models.Device) {},
-		// search.SearchForMatchingDevice,
-		func() *models.Device { return &models.Device{Exists: true, Logicalname: "fakewan0"} },
-		// tlp.TSharkRunner
-		runFakeWireshark)
 }
