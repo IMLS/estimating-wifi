@@ -56,6 +56,8 @@ DECLARE
     _day_end INT := 24;
     num_devices_arr INT[];
     _timezone_offset INT;
+    _min_minutes INT := 5;
+    _max_minutes INT := 600;
 BEGIN
     SELECT api.get_timezone_from_fscs_id(_fscs_id) INTO _timezone_offset;
     _hour := _hour - _timezone_offset;
@@ -74,7 +76,10 @@ BEGIN
         WHERE  fscs_id = _fscs_id
         AND (presences.start_time::TIMESTAMPTZ < presences.end_time::TIMESTAMPTZ)
         AND (presences.start_time::TIMESTAMPTZ <= _end::TIMESTAMPTZ)
-        AND (presences.end_time > _init_start::TIMESTAMPTZ);
+        AND (presences.end_time > _init_start::TIMESTAMPTZ)
+        AND EXTRACT(EPOCH FROM (presences.end_time::TIMESTAMPTZ - presences.start_time::TIMESTAMPTZ))/60 >= _min_minutes
+        AND EXTRACT(EPOCH FROM (presences.end_time::TIMESTAMPTZ - presences.start_time::TIMESTAMPTZ))/60 <= _max_minutes;
+
         num_devices_arr := array_append(num_devices_arr, _count);
 
         _hour := _hour + 1;

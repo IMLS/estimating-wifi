@@ -116,5 +116,7 @@ class BinningTests(TestCase):
         res = r.json()
         # This should return 7 lists of length 24, each containing all zeros.
         self.assertEqual(24, len(res))
-        actual = [156, 156, 156, 150, 144, 150, 150, 144, 138, 162, 126, 120, 108, 114, 138, 102, 120, 90, 108, 120, 108, 90, 90, 84]
-        self.assertEqual(res, actual)
+        # Unfiltered
+        # unfiltered = [156, 156, 156, 150, 144, 150, 150, 144, 138, 162, 126, 120, 108, 114, 138, 102, 120, 90, 108, 120, 108, 90, 90, 84]
+        filtered = [90, 90, 90, 84, 78, 84, 84, 78, 66, 90, 54, 48, 42, 42, 66, 36, 36, 24, 42, 54, 42, 30, 30, 24]
+        self.assertEqual(res, filtered)
