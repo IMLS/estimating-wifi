@@ -67,8 +67,6 @@ class BinningTests(TestCase):
     def test_no_data(self):
         # _start date, _fscs_id text, _direction boolean, _days integer
         url = endpoint(["rpc", "bin_devices_over_time"])
-        dtz =  datetime.datetime(2022, 5, 5, 0, 0, 0, 0, pytz.UTC)
-
         query = {
             "_fscs_id": "KY0069-002",
             "_start": "2022-02-02",
