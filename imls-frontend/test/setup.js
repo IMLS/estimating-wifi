@@ -91,7 +91,7 @@ export const restHandlers = [
         return res(ctx.status(400), ctx.json(errorMock))
     }
   }),
-    rest.get('*/rpc/lib_search_state', (req, res, ctx) => {
+  rest.get('*/rpc/lib_search_state', (req, res, ctx) => {
     let stateAbbr = req.url.searchParams.get("_state_code");
     switch (stateAbbr) {
       case 'AK' :
@@ -100,6 +100,15 @@ export const restHandlers = [
         return res(ctx.status(200), ctx.json(statewideLibrariesMock))
       case 'ZZ' :
         return res(ctx.status(400), ctx.json(errorMock))
+      default:
+        return res(ctx.status(400), ctx.json(errorMock))
+    }
+  }),
+  rest.get('*/rpc/lib_search_name', (req, res, ctx) => {
+    let textString = req.url.searchParams.get("_name");
+    switch (textString) {
+      case 'anchor point' :
+        return res(ctx.status(200), ctx.json(statewideLibrariesMock))
       default:
         return res(ctx.status(400), ctx.json(errorMock))
     }

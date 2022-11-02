@@ -103,7 +103,7 @@ The backend stack relies on a postgres image that includes pgcrypto and pgjwt. T
   - lib_search_name
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_name={TEXT variable}"`
     - EXAMPLE:
-        `curl "http://localhost:3000/rpc/lib_search_state?_name=POINT"`
+        `curl "http://localhost:3000/rpc/lib_search_name?_name=POINT"`
     - Returns any row matching the _point, case insensative, will search for %_name% meaning all chars before or after the _name param.
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]

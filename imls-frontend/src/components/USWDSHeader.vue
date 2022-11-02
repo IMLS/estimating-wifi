@@ -2,12 +2,14 @@
 import { RouterLink } from "vue-router";
 import { store } from "@/store/store.js";
 
+
 export default {
+
   name: "USWDS Header",
   components: { RouterLink },
   data() {
     return {
-      searchString: "",
+      searchString: '',
       store,
     };
   },
@@ -18,7 +20,12 @@ export default {
         path: "/search",
         query: { query: this.searchString },
       });
+      this.resetSearch()
     },
+    resetSearch() {
+      this.searchString = '';
+      this.$refs.searchInput.blur()
+    }
   },
 };
 </script>
@@ -124,11 +131,13 @@ export default {
                 for="extended-search-field-en-small"
               > Search </label>
               <input
+               ref="searchInput"
                 id="extended-search-field-en-small"
                 v-model="searchString"
                 class="usa-input"
                 type="search"
                 name="search"
+                placeholder="Search by library name"
               >
               <button
                 class="usa-button"
