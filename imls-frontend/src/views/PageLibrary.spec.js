@@ -3,7 +3,7 @@ import { expect } from "vitest";
 import PageLibrary from "./PageLibrary.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
-import { startOfYesterday } from "date-fns";
+import { startOfMonth } from "date-fns";
 
 let router;
 
@@ -17,7 +17,7 @@ beforeEach(async () => {
 });
 
 describe("PageLibrary", () => {
-  it("should render with yesterday's date if no date is provided", () => {
+  it("should render with May first data if no date is provided", () => {
     const wrapper = mount(PageLibrary, {
       props: {
         id: "KnownGoodId",
@@ -41,7 +41,7 @@ describe("PageLibrary", () => {
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
     expect(wrapper.vm.activeDate).toEqual(
-      startOfYesterday().toISOString().split("T")[0]
+      startOfMonth(new Date(2022, 4)).toISOString().split("T")[0]
     );
   });
   it("should render with a preset date if one is provided", () => {
@@ -96,5 +96,37 @@ describe("PageLibrary", () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
     expect(spyChangeDate).toHaveBeenCalledTimes(1);
+  });
+
+
+  it("should update with a new library when the id prop changes", async () => {
+    const wrapper = await shallowMount(PageLibrary, {
+      props: {
+        id: "KnownEmptyId",
+      },
+      global: {
+        plugins: [router],
+        stubs: [
+          "USWDSDatePicker",
+          "USWDSCard",
+          "FetchData",
+          "Histogram",
+          "Heatmap",
+          "HeatmapWeeklyCalendar",
+          "USWDSTable",
+        ],
+      },
+    });
+    await flushPromises();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("h1").text()).toEqual("Library KnownEmptyId");
+    expect(wrapper.vm.fetchedLibraryData).toBeNull();
+
+    await wrapper.setProps({ id: "KnownGoodId" });
+    await flushPromises();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("h1").text()).toEqual("ANCHOR POINT PUBLIC LIBRARY");
+    expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
+    wrapper.unmount();
   });
 });
