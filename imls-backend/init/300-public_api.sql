@@ -25,7 +25,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		raise notice 'Value: %', _new_start;
+		-- raise notice 'Value: %', _new_start;
 
 		SELECT api.bin_devices_per_hour(_new_start, _fscs_id) INTO _day_return;
 
@@ -105,7 +105,6 @@ BEGIN
 
     RETURN _timezone_offset;
 END
-
 $$;
 
 
