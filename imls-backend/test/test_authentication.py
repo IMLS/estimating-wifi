@@ -2,6 +2,7 @@ import os
 import requests
 from unittest import TestCase
 
+TEST_USER_PASS="hello-goodbye"
 
 def endpoint(ep_arr):
     test_url = f"{os.getenv('POETRY_SCHEME')}://{os.getenv('POETRY_HOSTNAME')}:{os.getenv('POETRY_PORT')}"
@@ -21,7 +22,7 @@ class LoginTests(TestCase):
 
     def test_login_successfully(self):
         url = endpoint(["rpc", "login"])
-        body = {"fscs_id": "KY0069-002", "api_key": "hello-goodbye"}
+        body = {"fscs_id": "KY0069-002", "api_key": TEST_USER_PASS}
         # Need to post, not get, if you're passing params in the body.
         r = requests.post(url, json=body)
         print("URL ", url)
@@ -40,7 +41,7 @@ class LoginTests(TestCase):
         Call "beat_the_heart" to see if we can get through authentication.
         """
         token_url = endpoint(["rpc", "login"])
-        body = {"fscs_id": "KY0069-002", "api_key": "hello-goodbye"}
+        body = {"fscs_id": "KY0069-002", "api_key": TEST_USER_PASS}
         # Need to post, not get, if you're passing params in the body.
         tr = requests.post(token_url, json=body)
         print("URL ", token_url)
@@ -55,6 +56,6 @@ class LoginTests(TestCase):
         }
         headers = {"Authorization": f"Bearer {t0}"}
         r = requests.post(url, json=body, headers=headers)
-        print(r.json())
+        print("BEAT RESPONSE", r.json())
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()["result"], "OK")
