@@ -19,6 +19,13 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 npm install
 ```
 
+You should add a .env file for local development, which will provide the app with the URL to the backend server for API requests.
+
+`imls-frontend/.env.local`:
+```
+VITE_BACKEND_BASEURL=http://localhost:3000
+```
+
 ### Compile and Hot-Reload for Development
 
 ```sh

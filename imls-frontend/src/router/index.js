@@ -31,6 +31,13 @@ const routes = [
       id: route.params.fscs_id,
     }),
   },
+  {
+    path: "/state/:state_initials/",
+    component: () => import("../views/PageState.vue"),
+    props: (route) => ({
+      stateInitials: route.params.state_initials,
+    }),
+  },
   // will match everything and put it under `$route.params.pathMatch`
   {
     path: "/:pathMatch(.*)*",
