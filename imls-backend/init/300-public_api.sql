@@ -11,7 +11,6 @@ DECLARE
 	_new_start DATE;
 	_cnt INTEGER;
 	_full INTEGER[][]= '{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}';
-	--_full INTEGER[][];
 	_day_return INTEGER[];
 BEGIN
     _cnt := 0;
@@ -24,8 +23,6 @@ BEGIN
 				_new_start := _new_start::date - 1;
 			END IF;
 		END IF;
-
-		-- raise notice 'Value: %', _new_start;
 
 		SELECT api.bin_devices_per_hour(_new_start, _fscs_id) INTO _day_return;
 
@@ -56,6 +53,8 @@ DECLARE
     _day_end INT := 24;
     num_devices_arr INT[];
     _timezone_offset INT;
+    -- FIXME: These are hard-coded in.
+    -- We could pass them in as parameters, for future flexibility.
     _min_minutes INT := 5;
     _max_minutes INT := 600;
 BEGIN
@@ -63,7 +62,6 @@ BEGIN
     _hour := _hour - _timezone_offset;
     _day_end := _day_end - _timezone_offset;
 
-    -- Hardcoded EDT for now. Will add the look up table next to pass in the time zone
     WHILE _hour < _day_end LOOP
 
         -- Casting the DATE variable to a TIMESTAMP to add it to the interval

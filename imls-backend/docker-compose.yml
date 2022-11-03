@@ -25,9 +25,9 @@ services:
       - postgrest
     command: postgres -c app.jwt_secret='${PGRST_JWT_SECRET}'
     environment:
-      POSTGRES_DB: "${POSTGRES_DB:-imls}"
-      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-imlsimls}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - "./data/database:/var/lib/postgresql/data"
       - "./init:/docker-entrypoint-initdb.d"
