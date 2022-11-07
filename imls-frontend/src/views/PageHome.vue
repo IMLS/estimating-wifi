@@ -16,7 +16,6 @@ export default {
 <template>
   <main>
     <h1>Home</h1>
-    <p>I am a homepage</p>
 
     <h2> All States</h2>
 
@@ -24,7 +23,7 @@ export default {
       class="usa-list"
     >
       <li v-for="(stateName, stateAbbr) in store.states" :key="stateName" class="">
-        <RouterLink class="usa-link" :to="{ path: '/state/' + stateAbbr }">
+        <RouterLink class="usa-link" :to="{ path: '/state/' + stateAbbr + '/'}">
           {{ stateName }}
         </RouterLink>
       </li>

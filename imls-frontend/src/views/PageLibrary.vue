@@ -111,7 +111,7 @@ export default {
         },
         { 
           name: this.store.states[this.fetchedLibraryData.stabr],
-          link: `/state/${this.fetchedLibraryData.stabr}` 
+          link: `/state/${this.fetchedLibraryData.stabr}/` 
         },
         {
           name: this.libraryName
