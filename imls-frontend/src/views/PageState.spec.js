@@ -31,6 +31,7 @@ describe("PageState", () => {
       },
     });
     await flushPromises();
+    await flushPromises();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find("h1").text()).toEqual("Alaska Public Libraries");
@@ -76,12 +77,14 @@ describe("PageState", () => {
       },
     });
     await flushPromises();
+    await flushPromises();
     await wrapper.vm.$nextTick();
     expect(wrapper.find("h1").text()).toEqual("Alaska Public Libraries");
     expect(wrapper.findAll("ol.usa-list li").length).toBeGreaterThanOrEqual(1);
     expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
 
     await wrapper.setProps({ stateInitials: "AL" });
+    await flushPromises();
     await flushPromises();
     await wrapper.vm.$nextTick();
 

@@ -124,6 +124,7 @@ describe("PageLibrary", () => {
 
     await wrapper.setProps({ id: "KnownGoodId" });
     await flushPromises();
+    await flushPromises();
     await wrapper.vm.$nextTick();
     expect(wrapper.find("h1").text()).toEqual("ANCHOR POINT PUBLIC LIBRARY");
     expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
