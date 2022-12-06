@@ -8,6 +8,8 @@ import fetch from 'node-fetch';
 global.fetch = fetch;
 // global.canvas = canvas;
 
+const backendBaseurl = process.env.VITE_BACKEND_BASEURL;
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -45,9 +47,7 @@ const statewideLibrariesMock = [
 ]
 
 export const restHandlers = [
-  // todo: update when the backend has a real host
-  // https://mswjs.io/docs/basics/request-matching#path-with-wildcard
-  rest.get('*/rpc/bin_devices_per_hour', (req, res, ctx) => {
+  rest.get(`${backendBaseurl}/rpc/bin_devices_per_hour`, (req, res, ctx) => {
     let requestedID = req.url.searchParams.get("_fscs_id");
     let requestedDay = req.url.searchParams.get("_start");
     switch (requestedID) {
@@ -63,7 +63,7 @@ export const restHandlers = [
         return res(ctx.status(400), ctx.json(errorMock))
     }
   }),
-  rest.get('*/rpc/bin_devices_over_time', (req, res, ctx) => {
+  rest.get(`${backendBaseurl}/rpc/bin_devices_over_time`, (req, res, ctx) => {
     let requestedID = req.url.searchParams.get("_fscs_id");
     let requestedDay = req.url.searchParams.get("_start"); 
     // todo test these other query params
@@ -82,7 +82,7 @@ export const restHandlers = [
         return res(ctx.status(400), ctx.json(errorMock))
     }
   }),
-  rest.get('*/rpc/lib_search_fscs', (req, res, ctx) => {
+  rest.get(`${backendBaseurl}/rpc/lib_search_fscs`, (req, res, ctx) => {
     let requestedID = req.url.searchParams.get("_fscs_id");
     switch (requestedID) {
       case 'KnownGoodId' :
@@ -91,7 +91,7 @@ export const restHandlers = [
         return res(ctx.status(400), ctx.json(errorMock))
     }
   }),
-  rest.get('*/rpc/lib_search_state', (req, res, ctx) => {
+  rest.get(`${backendBaseurl}/rpc/lib_search_state`, (req, res, ctx) => {
     let stateAbbr = req.url.searchParams.get("_state_code");
     switch (stateAbbr) {
       case 'AK' :
@@ -104,7 +104,7 @@ export const restHandlers = [
         return res(ctx.status(400), ctx.json(errorMock))
     }
   }),
-  rest.get('*/rpc/lib_search_name', (req, res, ctx) => {
+  rest.get(`${backendBaseurl}/rpc/lib_search_name`, (req, res, ctx) => {
     let textString = req.url.searchParams.get("_name");
     switch (textString) {
       case 'anchor point' :
@@ -118,10 +118,10 @@ export const restHandlers = [
 
 const server = setupServer(...restHandlers)
 
-// Start server before all tests
+// // Start server before all tests
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 
-//  Close server after all tests
+// //  Close server after all tests
 afterAll(() => server.close())
 
 // Reset handlers after each test `important for test isolation`

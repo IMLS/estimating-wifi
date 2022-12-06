@@ -9,6 +9,6 @@ describe("PageHome", () => {
       },
     });
     expect(wrapper.find("h1").text()).toEqual("Home");
-    expect(wrapper.text()).toContain("I am a homepage");
+    expect(wrapper.text()).toContain("All States");
   });
 });
