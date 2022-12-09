@@ -1,127 +1,119 @@
-# Backend
-
-## Developer configuration
-
-This is for local configuration only and should never be run in production.
-
-### Run Postgrest
-
-The backend stack relies on a postgres image that includes pgcrypto and pgjwt. This must be built before running.
-
-- Run `docker build -t imls:postgres -f Dockerfile.pgjwt .`
-- Run `docker-compose up`
-
-### Run Migrations
-
-- install [dbmate](https://github.com/amacneil/dbmate)
-- configure your `.env` for dbmate:
-  - `DATABASE_URL="postgres://postgres:imlsimls@localhost:5432/imls?sslmode=disable"`
-- Open a separate terminal and run `dbmate up`
-
-## Connect to the DB via CLI
-
-- `psql -h localhost -U postgres -W`
-- Enter the password from the docker compose file
-- Connect to the database: `\c imls`
-- View schemas `\dn`
-- View users `\du`
-- Use a schema `SET schema 'imlswifi';`
-- List tables `\dt`
-- List views `\dv`
-
-## Connect to the DB via pgAdmin
-
-- Ensure you've started the Docker containers as outlined above
-- Open a browser and go to `localhost:8080`
-- Enter the pgAdmin creds from docker-compose
-  - imls@gsa.gov
-  - imlsimls
-- Click 'Add New Server'
-- In the 'General' tab
-  - Choose a name (can be anything)
-- In the 'Connection' tab
-  - The 'Host name/address' is `db`
-  - The 'Port' is `5432`
-  - The 'Username' is `postgres`
-  - The 'Password' is `imlsimls`
-
-## Query the DB
-
-- `curl -s http://127.0.0.1:3000/presences`
-- Fields from the `presences` table
-  - presence_id SERIAL PRIMARY KEY,
-  - start_time TIMESTAMPTZ NOT NULL,
-  - end_time TIMESTAMPTZ NOT NULL,
-  - fscs_id VARCHAR(16) NOT NULL [FOREIGN KEY],
-  - sensor_id SERIAL [FOREIGN KEY],
-  - manufacturer_index INTEGER,
-
-## Query Stored Procedures and Functions from the DB
-
-- `curl "http://localhost:3000/rpc/{function_or_sp_name}`
-- Current stored procedures and functions in the `api` schema
-  - bin_devices_per_hour
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_start={DATE variable}&_fscs_id={TEXT variable}"`
-    - EXAMPLE:
-        `curl "http://localhost:3000/rpc/bin_devices_per_hour?_start=2022-05-10&_fscs_id=AA0003-001"`
-    - Returns an array of INTs (device counts per hour) starting at 12 AM EDT, length 24
-    - EXAMPLE:
-      [22,23,23,27,26,21,23,37,44,50,66,75,75,75,70,88,88,86,70,30,25,25,25,25]
-
-  - bin_devices_over_time
-    - `curl “http://localhost:3000/rpc/{function_or_sp_name}?_start={DATE variable}&_fscs_id={TEXT variable}&direction={BOOL varialbe}&_days={INT variable}“`
-    - EXAMPLE:
-      `curl "http://localhost:3000/rpc/bin_devices_over_time?_start=2022-05-10&_fscs_id=AA0003-001&_direction=true&_days=2"`
-    - Returns an array of INTs (device counts per hour) starting at 12 AM EDT, length 24, for Date+1 Day
-    - EXAMPLE:  
-          [[12,13,13,13,13,13,17,17,15,16,21,22,20,23,20,16,18,21,21,20,20,26,21,21],[26,26,26,25,24,25,25,24,23,27,21,20,18,19,23,17,20,15,18,20,18,15,15,14]]
-
-  - update_presence
-    - `curl “http://localhost:3000/rpc/update_presence?_start={TIMESTAMPTZ variable}&_end={TIMESTAMPTZ variable}_fscs_id={CHAR(16) variable}&_sensor={INT varialbe}&_manufacture={INT variable}“`
-    - EXAMPLE:
-      `curl “http://localhost:3000/rpc/update_presence?_start=2022-09-12 02:21:50+00&_end=2022-09-12 04:21:50+00&_fscs_id=AA0003-001&_sensor=2&_manufacture=7”`
-    - Returns sensor_id upon success requires valid JWT
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}`
-
-  - lib_search_fscs
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_fscs_id={TEXT variable}"`
-    - EXAMPLE:
-        `curl "http://localhost:3000/rpc/lib_search_fscs?_fscs_id=AA0003-001"`
-    - Returns a single row entry matching the fscs_id
-    - EXAMPLE:
-      [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
-  
-  - lib_search_state
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_state_code={TEXT variable}"`
-    - EXAMPLE:
-        `curl "http://localhost:3000/rpc/lib_search_state?_state_code=AK"`
-    - Returns any row matching the _state_code, case insensative, will search
-    on 1-2 chars.
-    - EXAMPLE:
-      [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
-
-  - lib_search_name
-    - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_name={TEXT variable}"`
-    - EXAMPLE:
-        `curl "http://localhost:3000/rpc/lib_search_name?_name=POINT"`
-    - Returns any row matching the _point, case insensative, will search for %_name% meaning all chars before or after the _name param.
-    - EXAMPLE:
-      [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
+You should have cloned the repository to your local machine (perhaps to `$HOME/git/estimating-wifi`), installed Docker (and set permissions correctly, etc.), and installed golang. You might also want a development environment of some sort; our team works in tools like `vim` and VS Code from Microsoft; YMMV.
 
 
-## Persisted Data
+# Building the backend stack locally
 
-- Lives in /imls-backend/data folder
+## Prerequisites
 
-## Errors
+* git clone this repository locally
+* have a functioning Docker daemon running locally
+* for unit tests, install Poetry. [installation instructions](https://python-poetry.org/docs/#installing-with-the-official-installer).
 
-If you get error messages from the API that say "could not find the function in the schema cache", `docker-compose kill -s SIGUSR1 server` will reload the PostgREST cache.
+## Building container images
 
-# Tests
+There are multiple steps here, but the build process should not have to happen often.
 
-We use [poetry](https://python-poetry.org/) to manage python dependencies (mostly `requests`). If testing under a recent Ubuntu, `apt install` both `python3-poetry` and `python3-cachecontrol` first.
+Navigate to the `imls-backend` directory.
+```
+cd imls-backend
+```
 
-- `poetry install` (if doing this for the first time or updating dependencies)
-- `poetry run pytest`
+The backend containers run on two images. Our `postgres` image is extended with security extensions, and must be built before you can proceed. 
 
-If your `poetry install` fails,  try a `poetry update` followed by an install. `cd` into the `test` directory to run the `poetry run pytest` successfully.
+```
+docker build -t imls/postgres:latest -f Dockerfile.pgjwt .
+```
+
+Once you have built this container, you are ready to bring up the backend.
+
+### Clearing the database (not necessary on first run)
+
+During development it's often useful to completely refresh the database backend, including repopulating the database. Removing the `data/` subdirectory accomplishes this.
+
+Make sure you are in the `imls-backend` directory so you don't blow away the wrong `data/` directory.
+```
+# confirm you are in the imls-backend dir, then delete
+pwd
+rm -rf data
+```
+
+### Setting up the Docker environment
+
+To run the backend, you must have a `.env` file in the same directory as the `docker-compose.yml` file. with values that configure the containers. We cannot commit this file to the repository, so you will need to create it yourself.
+
+Create `imls-backend/.env` using a text editor of your choice, and set values for each of the following variables. You can, if you want, copy-paste the values below directly into the file, and things should "just work."
+
+```
+PGRST_JWT_SECRET="EmpowerMuseumsLibrariesGrantmakingResearchPolicyDevelopment"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="imlsimlsimls"
+POSTGRES_DB="imls"
+DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
+```
+
+Yeah, we borrowed the IMLS mission statement for the secret key. **This is for development on LOCAL MACHINES ONLY**. Under no circumstances are these environment variables appropriate for a production environment.
+
+### Running the backend 
+
+Once you have your environment variables in place, you should be able to use the compose file to run the backend for development purposes.
+
+```
+docker compose up
+```
+
+If this is the first time you are running our stack, a Postgrest (API) and Postgres (DB) base image will be downloaded before launch. The launch sequence involves the API container waiting for the DB container. When the DB container starts for the first time, it will load a substantial amount of SQL from the `init` directory. This *only* happens the first time the containers start up; on all subsequent restarts of the system, the `init` directory is not read. You can learn more about this [from the Postgres container documentation](https://hub.docker.com/_/postgres). (This behavior is built into the base image, and is not the result of our work.)
+
+### Optional: Loading test data
+
+At this point, you have a an empty system. It has no users, no data, and is ready for use... but not easily.
+
+You probably want to load some test data and a test user. This is an optional step. However, if you're new to the stack, or want to do anything interesting at all, you're going to need some data and at least one user.
+
+`cd` to `imls-backend/test`.
+
+We have provided some test data from several libraries, collected in May of 2021. Please note that **the data in the file is not actually from the libraries named in the file**. It is, for all intents and purposes, completely anonymous... but using *fake* library IDs breaks many things, so there's *real* library IDs attached to (essentially) *fake* data.
+
+We have a small script you can run to load that data.
+
+We recommend running this script as follows:
+
+```
+./setup-for-tests.sh
+```
+
+This will read in the environment variables for your containers (which we need), and then run a sequence of SQL commands to insert test data as well as create a user. That user is library `KY0069-002` and the API key for that user is `hello-goodbye`.
+
+## Testing everything
+
+You should now be able to run the unit tests. This is a good test of whether your stack is functional. The tests in this file will only pass if you have loaded the test data in the previous step.
+
+Poetry will read the `pyproject.toml` file and install all dependencies into a virtual environment with the command (issued from the imls-backend/ folder)
+
+```
+poetry install
+```
+
+After this, you can drop into the virtual environment with the command
+
+```
+poetry shell
+```
+
+Now run the tests
+```
+source .env ; cd test && poetry run pytest
+```
+
+If all goes well, you'll see all the tests pass.
+
+### Optional: Using a DB browser
+
+There are many options for DB browsers. We recommend using DBeaver. The community edition will work just fine.
+
+[Instructions for installing DBeaver](https://dbeaver.io/download/).
+
+You will need to create a new database connection. The connection parameters will be the same as in the `.env` file in the imls-backend/ folder. If you did not modify the environment variables, you should be able to use the username `postgres`, database `imls`, and password `imlsimlsimls`.
+
+## What now?
+
+You have now stood up the API and data storage backend. This does not include either the web-based frontend for browsing the data or the code that estimates wifi device presence. So, you're only part way there if you're looking to stand up the entire system on a dev machine.
