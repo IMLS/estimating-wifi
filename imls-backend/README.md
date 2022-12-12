@@ -49,7 +49,7 @@ POSTGRES_DB="imls"
 DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
 ```
 
-Yeah, we borrowed the IMLS mission statement for the secret key. **This is for development on LOCAL MACHINES ONLY**. Under no circumstances are these environment variables appropriate for a production environment.
+**This is for development on LOCAL MACHINES ONLY**. Environment variables displayed here are inappropriate for a production environment.
 
 ### Running the backend 
 
@@ -63,13 +63,11 @@ If this is the first time you are running our stack, a Postgrest (API) and Postg
 
 ### Optional: Loading test data
 
-At this point, you have a an empty system. It has no users, no data, and is ready for use... but not easily.
-
-You probably want to load some test data and a test user. This is an optional step. However, if you're new to the stack, or want to do anything interesting at all, you're going to need some data and at least one user.
+At this point, you have a an empty system. It has no users and no data but is ready for use. If you're new to the stack, or want to do anything interesting at all, you're going to need some data and at least one user.
 
 `cd` to `imls-backend/test`.
 
-We have provided some test data from several libraries, collected in May of 2021. Please note that **the data in the file is not actually from the libraries named in the file**. It is, for all intents and purposes, completely anonymous... but using *fake* library IDs breaks many things, so there's *real* library IDs attached to (essentially) *fake* data.
+This directory has some test data to populate the database. **The data are not actually from the libraries named in the file**. Using invalid library IDs breaks many things, so there are *real* library IDs attached to *fake* data.
 
 We have a small script you can run to load that data.
 
