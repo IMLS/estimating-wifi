@@ -1,13 +1,12 @@
-You should have cloned the repository to your local machine (perhaps to `$HOME/git/estimating-wifi`), installed Docker (and set permissions correctly, etc.), and installed golang. You might also want a development environment of some sort; our team works in tools like `vim` and VS Code from Microsoft; YMMV.
+# Building and Testing imls-backend
 
-
-# Building the backend stack locally
+The imls-backend component of this repository runs a RESTful API server built with [Postgrest](https://postgrest.org/en/stable/). Using Docker and Python-Poetry, it is possible to build, run, and test the backend in a local development environment.
 
 ## Prerequisites
 
 * git clone this repository locally
-* have a functioning Docker daemon running locally
-* for unit tests, install Poetry. [installation instructions](https://python-poetry.org/docs/#installing-with-the-official-installer).
+* A functioning Docker daemon running locally
+* for unit tests, [install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer).
 
 ## Building container images
 
@@ -36,12 +35,11 @@ Make sure you are in the `imls-backend` directory so you don't blow away the wro
 pwd
 rm -rf data
 ```
-
 ### Setting up the Docker environment
 
-To run the backend, you must have a `.env` file in the same directory as the `docker-compose.yml` file. with values that configure the containers. We cannot commit this file to the repository, so you will need to create it yourself.
+To run the backend, you need a `.env` file in the same directory as the `docker-compose.yml` file. The `.env` file is configured with values specific for these containers, and needs to be created locally.
 
-Create `imls-backend/.env` using a text editor of your choice, and set values for each of the following variables. You can, if you want, copy-paste the values below directly into the file, and things should "just work."
+Create `imls-backend/.env` using a text editor of your choice, and set values for each of the following variables. You may copy-paste the values below directly into the file and things should "just work."
 
 ```
 PGRST_JWT_SECRET="EmpowerMuseumsLibrariesGrantmakingResearchPolicyDevelopment"
