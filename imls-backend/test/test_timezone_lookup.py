@@ -6,12 +6,11 @@ import urllib
 
 
 def endpoint(ep_arr):
-    test_url = f"{os.getenv('POETRY_SCHEME')}://{os.getenv('POETRY_HOSTNAME')}:{os.getenv('POETRY_PORT')}"
+    test_url = f"{os.getenv('PYTEST_SCHEME')}://{os.getenv('PYTEST_HOSTNAME')}:{os.getenv('PYTEST_PORT')}"
     return test_url + "/" + "/".join(ep_arr)
 
 
 class TimezoneTests(TestCase):
-
     def test_get_timezone_from_fscs_id(self):
         url = endpoint(["rpc", "get_timezone_from_fscs_id"])
         params = {"_fscs_id": "KY0069-002"}
@@ -23,7 +22,6 @@ class TimezoneTests(TestCase):
         # We should always see multiple libraries here, even in production.
         # If we don't that means something is very broken.
         self.assertEqual(tz, -4)
-
 
     def test_tz_fail_on_non_id(self):
         url = endpoint(["rpc", "get_timezone_from_fscs_id"])

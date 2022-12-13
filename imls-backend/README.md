@@ -95,16 +95,17 @@ After this, you can drop into the virtual environment with the command
 poetry shell
 ```
 
-Now run the tests
+Now run the tests. Note there is a `.test-config` file in the `test/` directory. This file supplies environmental variables specific to running the `pytest` tests, and needs to be sourced in the shell where `pytest` is run.
+
 ```
-source .env ; cd test && poetry run pytest
+source test/.test-config && pytest test/
 ```
 
 If all goes well, you'll see all the tests pass.
 
 ### Optional: Using a DB browser
 
-There are many options for DB browsers. We recommend using DBeaver. The community edition will work just fine.
+There are many options for DB browsers. DBeaver is a good optoin, and the community edition will work just fine.
 
 [Instructions for installing DBeaver](https://dbeaver.io/download/).
 
