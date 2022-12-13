@@ -4,7 +4,7 @@ import { store } from "@/store/store.js";
 import { nextTick } from 'vue'
 
 export default {
-  name: 'Fetch Data Wrapper',
+  name: 'FetchDataWrapper',
   props: {
     fscsId: {
       type: String,
@@ -30,6 +30,17 @@ export default {
       fetchError: {},
       fetchedData: {},
       isLoading: false,
+    }
+  },
+  computed: {
+    queryString() {
+      if (this.queryParams && Object.keys(this.queryParams).length !== 0) {
+        return '&' + Object.keys(this.queryParams).map(key => key + '=' + this.queryParams[key]).join('&');
+      }
+      return ''
+    },
+    responseIsOKButEmpty() {
+      return (this.reduceArray(this.fetchedData) === 0)
     }
   },
   watch: {
@@ -75,36 +86,25 @@ export default {
         return arr
       }
     }
-  },
-  computed: {
-    queryString() {
-      if (this.queryParams && Object.keys(this.queryParams).length !== 0) {
-        return '&' + Object.keys(this.queryParams).map(key => key + '=' + this.queryParams[key]).join('&');
-      }
-      return ''
-    },
-    responseIsOKButEmpty() {
-      return (this.reduceArray(this.fetchedData) === 0)
-    }
   }
 };
 </script>
 
 <template>
   <div class="loading-area">
-    <div v-if="this.isLoading" class="loading-indicator">
+    <div v-if="isLoading" class="loading-indicator">
       <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">
         <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>
       </svg>
     </div>
-    <div class="loaded--error" v-if="this.fetchError && this.fetchError.message">
-      <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
+    <div v-if="fetchError && fetchError.message" class="loaded--error">
+      <p>Oops! Error encountered: {{ fetchError.message }}</p>
     </div>
-    <div class="loaded--no-data" v-if="!this.fetchedData || (this.fetchedData.length > 1 && responseIsOKButEmpty) ||  (this.fetchedData && this.fetchedData.length < 1)">
-      <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ this.selectedDate }}</b>. Please choose a different date or library.</p>
+    <div v-if="!fetchedData || (fetchedData.length > 1 && responseIsOKButEmpty) ||  (fetchedData && fetchedData.length < 1)" class="loaded--no-data">
+      <p>No data was found that matched your request for devices present near <b>{{ fscsId }}</b> on <b>{{ selectedDate }}</b>. Please choose a different date or library.</p>
     </div>
-    <div class="loaded--has-data" v-else-if="this.fetchedData.length > 0">
-      <slot :fetchedData="this.fetchedData" ></slot>
+    <div v-else-if="fetchedData.length > 0" class="loaded--has-data">
+      <slot :fetched-data="fetchedData" ></slot>
     </div>
   </div>
 </template>

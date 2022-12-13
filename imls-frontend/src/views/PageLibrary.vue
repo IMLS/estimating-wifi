@@ -12,7 +12,7 @@ import USWDSTable from '../components/USWDSTable.vue';
 import USWDSBreadcrumb from '../components/USWDSBreadcrumb.vue';
 
 export default {
-  name: 'Single Library',
+  name: 'LibraryPage',
   components: {FetchData, USWDSCard, USWDSDatePicker, Histogram, Heatmap, HeatmapWeeklyCalendar, USWDSTable, USWDSBreadcrumb },
 
   props: {
@@ -34,51 +34,6 @@ export default {
       fetchError: {},
       isLoading: false
     }
-  },
-  methods: {
-    generateDayLabels(startingDateISO, count) {
-      let startingDate = parseISO(startingDateISO + "T00:00");
-      let dates = Array.from(Array(count), ( _, i ) => { 
-          return format(addDays(startingDate, i), 'M/d/yy' )
-      });
-      return dates
-    },
-    navigateToSelectedDate(date) {
-      this.$router.push({
-        query: { ...this.$router.query, date: encodeURIComponent(date) }
-      })
-    },
-    async fetchLibraryData() {
-      if (this.id.length !== 0) {
-        this.isLoading = true;
-        try {
-          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getLibraryDetailsById}?_fscs_id=${this.id}`);
-          if (await !response.ok) {
-            throw new Error(response.status);
-          }
-          this.fetchedLibraryData = await response.json();
-        } catch (error) {
-          this.fetchError = error;
-        }
-        this.isLoading = false;
-      }
-    },
-    leftPadSequence(seq) {
-      return (parseInt(seq) + 1000).toString().substring(1);
-    },
-    formatFSCSandSequence(fscsid, seq) {
-      return fscsid + '-' + this.leftPadSequence(seq)
-    }
-  },
-  watch: {
-    id(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.fetchLibraryData();
-      }
-    }
-  },
-  async beforeMount() {
-    await this.fetchLibraryData();
   },
   computed: {
     activeDate() {
@@ -118,6 +73,51 @@ export default {
         }
       ]
     }
+  },
+  watch: {
+    id(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchLibraryData();
+      }
+    }
+  },
+  async beforeMount() {
+    await this.fetchLibraryData();
+  },
+  methods: {
+    generateDayLabels(startingDateISO, count) {
+      let startingDate = parseISO(startingDateISO + "T00:00");
+      let dates = Array.from(Array(count), ( _, i ) => { 
+          return format(addDays(startingDate, i), 'M/d/yy' )
+      });
+      return dates
+    },
+    navigateToSelectedDate(date) {
+      this.$router.push({
+        query: { ...this.$router.query, date: encodeURIComponent(date) }
+      })
+    },
+    async fetchLibraryData() {
+      if (this.id.length !== 0) {
+        this.isLoading = true;
+        try {
+          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getLibraryDetailsById}?_fscs_id=${this.id}`);
+          if (await !response.ok) {
+            throw new Error(response.status);
+          }
+          this.fetchedLibraryData = await response.json();
+        } catch (error) {
+          this.fetchError = error;
+        }
+        this.isLoading = false;
+      }
+    },
+    leftPadSequence(seq) {
+      return (parseInt(seq) + 1000).toString().substring(1);
+    },
+    formatFSCSandSequence(fscsid, seq) {
+      return fscsid + '-' + this.leftPadSequence(seq)
+    }
   }
 };
 </script>
@@ -132,7 +132,7 @@ export default {
       {{ fetchedLibraryData.city }},   {{ fetchedLibraryData.stabr }}   {{ fetchedLibraryData.zip }}
     </div>
 
-    <USWDSDatePicker :initialDate=activeDate @date_changed="navigateToSelectedDate" />
+    <USWDSDatePicker :initial-date=activeDate @date_changed="navigateToSelectedDate" />
 
     <div class="usa-card-group margin-top-6">
 
@@ -143,13 +143,13 @@ export default {
             <div class="grid-col">
               <FetchData 
               v-slot="slotProps"
-              :fscsId=id
+              :fscs-id=id
               :path="store.backendPaths.get24HoursBinnedByHour"
-              :selectedDate="selectedDate">
+              :selected-date="selectedDate">
                 <Histogram 
                 :dataset="slotProps.fetchedData" 
                 :labels="store.hourlyLabels" 
-                :datasetIdKey="id"></Histogram>
+                :dataset-id-key="id"></Histogram>
                 
                 <div class="usa-accordion usa-accordion--bordered margin-top-4">
                   <h3 class="usa-accordion__heading">
@@ -163,7 +163,7 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTableDaily" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :columnHeaders="store.hourlyLabels" :rows="[slotProps.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${this.selectedDate}`" />
+                    <USWDSTable :column-headers="store.hourlyLabels" :rows="[slotProps.fetchedData]" :caption="`Devices present during each hour of the day, starting at 12am on ${selectedDate}`" />
                   </div>
                 </div>
               </FetchData>
@@ -184,14 +184,14 @@ export default {
             <div class="grid-col">
               <FetchData 
               v-slot="slotProps"
-              :fscsId=id
+              :fscs-id=id
               :path="store.backendPaths.get24HoursBinnedByHourForNDays"
-              :selectedDate="selectedDate"
-              :queryParams="{ _direction: true,  _days : 7 }">
+              :selected-date="selectedDate"
+              :query-params="{ _direction: true,  _days : 7 }">
                 <Heatmap 
                 :dataset="slotProps.fetchedData" 
-                :binLabels="store.hourlyLabels"
-                :datasetLabels="generateDayLabels(this.selectedDate, 7)"></Heatmap>
+                :bin-labels="store.hourlyLabels"
+                :dataset-labels="generateDayLabels(selectedDate, 7)"></Heatmap>
                 
                 <div class="usa-accordion usa-accordion--bordered margin-top-4">
                   <h3 class="usa-accordion__heading">
@@ -205,7 +205,7 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTableWeekly" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(this.selectedDate, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${this.selectedDate}, for one week`" />
+                    <USWDSTable :column-headers="store.hourlyLabels"  :row-headers="generateDayLabels(selectedDate, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${selectedDate}, for one week`" />
                   </div>
                 </div>
               </FetchData>
@@ -226,15 +226,15 @@ export default {
             <div class="grid-col">
               <FetchData 
               v-slot="slotProps"
-              :fscsId=id
+              :fscs-id=id
               :path="store.backendPaths.get24HoursBinnedByHourForNDays"
-              :selectedDate="startOfWeekInISO"
-              :queryParams="{ _direction: true,  _days : 7 }">
+              :selected-date="startOfWeekInISO"
+              :query-params="{ _direction: true,  _days : 7 }">
                 <HeatmapWeeklyCalendar 
                 :dataset="slotProps.fetchedData" 
-                :binLabels="store.hourlyLabels"
-                :weekStartDateISO="startOfWeekInISO"
-                :selectedDate="selectedDate"
+                :bin-labels="store.hourlyLabels"
+                :week-start-date-i-s-o="startOfWeekInISO"
+                :selected-date="selectedDate"
                 ></HeatmapWeeklyCalendar>
                 
                 <div class="usa-accordion usa-accordion--bordered margin-top-4">
@@ -249,7 +249,7 @@ export default {
                     </button>
                   </h3>
                   <div id="viewTableWeeklyCalendar" class="usa-accordion__content usa-prose" hidden>
-                    <USWDSTable :columnHeaders="store.hourlyLabels"  :rowHeaders="generateDayLabels(startOfWeekInISO, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${startOfWeekInISO}, for one week`" />
+                    <USWDSTable :column-headers="store.hourlyLabels"  :row-headers="generateDayLabels(startOfWeekInISO, 7)" :rows="slotProps.fetchedData" :caption="`Devices present during each hour of the day, starting at 12am on ${startOfWeekInISO}, for one week`" />
                   </div>
                 </div>
               </FetchData>

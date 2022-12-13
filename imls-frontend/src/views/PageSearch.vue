@@ -16,6 +16,16 @@ export default {
       isLoading: false
     }
   },
+  watch: {
+    query(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.searchLibraryNames();
+      }
+    }
+  },
+  async beforeMount() {
+    await this.searchLibraryNames();
+  },
   methods: {
     async searchLibraryNames() {
       if (this.query.length !== 0) {
@@ -39,16 +49,6 @@ export default {
       return fscsid + '-' + this.leftPadSequence(seq)
     },
   },
-  watch: {
-    query(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.searchLibraryNames();
-      }
-    }
-  },
-  async beforeMount() {
-    await this.searchLibraryNames();
-  },
 }
 </script>
 
@@ -59,7 +59,7 @@ export default {
     <div v-if="fetchedLibraries !== null">
       <p>Results found: {{ fetchedLibraries.length }}</p>
         <ol class="usa-list">
-        <li v-for="system in this.fetchedLibraries" :key=system>
+        <li v-for="system in fetchedLibraries" :key=system>
           <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
               {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
             </RouterLink>

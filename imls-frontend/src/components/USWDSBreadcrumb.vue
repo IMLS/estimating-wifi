@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'USWDS Breadcrumb',
+  name: 'USWDSBreadcrumb',
   props: { 
     crumbs: {
       type: Array,
@@ -44,7 +44,8 @@ export default {
         <span v-if="isLast(index)" property="name">
           {{ crumb.name }}
         </span>
-        <a v-else
+        <a
+v-else
           property="item"
           typeof="WebPage"
           :href="crumb.link"

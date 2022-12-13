@@ -5,8 +5,15 @@ import 'whatwg-fetch'
 import USWDSBreadcrumb from '../components/USWDSBreadcrumb.vue';
 
 export default {
-  name: 'All Library Systems for a State',
+  name: 'StatePage',
   components: { USWDSBreadcrumb },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (vm.stateName === undefined) {
+        vm.$router.push({name: 'NotFound'});
+      }
+    })
+  },
 
   props: {
     stateInitials: {
@@ -22,6 +29,23 @@ export default {
       fetchError: {},
       fetchedData: [],
       isLoading: false,
+    }
+  },
+  computed: {
+    stateName () {
+      return this.store.states[this.stateInitials]
+    },
+    breadcrumbs () {
+      return [
+         { 
+          name: "All States",
+          link: "/" 
+        },
+        { 
+          name: this.stateName,
+          link: `/system/${this.stateInitials}` 
+        }
+      ]
     }
   },
   watch: {
@@ -56,30 +80,6 @@ export default {
     formatFSCSandSequence(fscsid, seq) {
       return fscsid + '-' + this.leftPadSequence(seq)
     },
-  },
-  computed: {
-    stateName () {
-      return this.store.states[this.stateInitials]
-    },
-    breadcrumbs () {
-      return [
-         { 
-          name: "All States",
-          link: "/" 
-        },
-        { 
-          name: this.stateName,
-          link: `/system/${this.stateInitials}` 
-        }
-      ]
-    }
-  },
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      if (vm.stateName === undefined) {
-        vm.$router.push({name: 'NotFound'});
-      }
-    })
   }
 };
 </script>
@@ -89,18 +89,18 @@ export default {
     <USWDSBreadcrumb :crumbs=breadcrumbs />
     <h1>{{ stateName }} Public Libraries</h1>
     <div class="loading-area">
-      <div v-if="this.isLoading" class="loading-indicator">
+      <div v-if="isLoading" class="loading-indicator">
         <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">
           <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>
         </svg>
       </div>
-      <div class="loaded--error" v-if="this.fetchError && this.fetchError.message">
-        <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
+      <div v-if="fetchError && fetchError.message" class="loaded--error">
+        <p>Oops! Error encountered: {{ fetchError.message }}</p>
       </div> 
-      <div class="loaded--has-data" v-else-if="this.fetchedData.length > 0">
+      <div v-else-if="fetchedData.length > 0" class="loaded--has-data">
 
         <ol class="usa-list">
-          <li v-for="system in this.fetchedData"  :key=system>
+          <li v-for="system in fetchedData"  :key=system>
             <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
               {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
             </RouterLink>
