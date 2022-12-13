@@ -49,7 +49,7 @@ POSTGRES_DB="imls"
 DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
 ```
 
-**This is for development on LOCAL MACHINES ONLY**. Environment variables displayed here are inappropriate for a production environment.
+**The above values are for development on LOCAL MACHINES ONLY**. Environment variables displayed here are inappropriate to deploy to a production environment.
 
 ### Running the backend 
 
@@ -77,7 +77,7 @@ We recommend running this script as follows:
 ./setup-for-tests.sh
 ```
 
-This will read in the environment variables for your containers (which we need), and then run a sequence of SQL commands to insert test data as well as create a user. That user is library `KY0069-002` and the API key for that user is `hello-goodbye`.
+This will read in the needed environment variables for your containers, and then run a sequence of SQL commands to insert test data as well as create a user. That user is library `KY0069-002` and the API key for that user is `hello-goodbye`.
 
 ## Testing everything
 
