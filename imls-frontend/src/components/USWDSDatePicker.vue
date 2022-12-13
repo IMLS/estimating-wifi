@@ -30,7 +30,7 @@ export default {
   mounted() {
     this.enableUSWDSFeatures();
   },
-  emits: ['dateChanged'],
+  emits: ['date_changed'],
   methods: {
     async enableUSWDSFeatures(){
       await datePicker.init();

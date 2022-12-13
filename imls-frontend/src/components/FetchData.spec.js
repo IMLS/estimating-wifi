@@ -1,14 +1,17 @@
 import { shallowMount, flushPromises } from "@vue/test-utils";
 import FetchData from "./FetchData.vue";
 import { afterEach, vi } from "vitest";
-import fetch from "node-fetch";
+import "whatwg-fetch";
 import { enableAutoUnmount } from "@vue/test-utils";
 
 enableAutoUnmount(afterEach);
+beforeEach(async () => {
+  vi.useFakeTimers();
+});
 
 describe("FetchData", () => {
-  it("should render a loading area", () => {
-    const wrapper = shallowMount(FetchData);
+  it("should render a loading area", async () => {
+    const wrapper = await shallowMount(FetchData);
     expect(wrapper.findAll(".loading-area")).toHaveLength(1);
   });
 
@@ -20,16 +23,19 @@ describe("FetchData", () => {
         selectedDate: "2022-05-01",
       },
     });
-    await flushPromises();
-    expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
+    setTimeout(() => {
+      expect(wrapper.findAll(".loaded--has-data")).toHaveLength(1);
+    }, 50)
   });
 
   it("should render a message when the backend returns no data for the requested query (such as a missing date)", async () => {
     const wrapper = await shallowMount(FetchData, {
       props: { path: "/rpc/bin_devices_per_hour", fscsId: "KnownEmptyId" },
     });
-    await flushPromises();
-    expect(await wrapper.findAll(".loaded--no-data")).toHaveLength(1);
+    setTimeout(() => {
+      expect(wrapper.findAll(".loaded--no-data")).toHaveLength(1);
+    }, 50)
+
   });
 
   it("should update with new data when the library id prop changes", async () => {
@@ -40,12 +46,18 @@ describe("FetchData", () => {
         selectedDate: "2022-05-01",
       },
     });
-    await flushPromises();
-    expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
-    await wrapper.setProps({ fscsId: "KnownEmptyId" });
-    await flushPromises();
-    expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(0);
-    expect(await wrapper.findAll(".loaded--no-data")).toHaveLength(1);
+    
+    setTimeout(() => {
+      expect(wrapper.findAll(".loaded--has-data")).toHaveLength(1);
+    }, 50)
+
+    wrapper.setProps({ fscsId: "KnownEmptyId" });
+
+    setTimeout(() => {
+      expect(wrapper.findAll(".loaded--has-data")).toHaveLength(0);
+      expect(wrapper.findAll(".loaded--no-data")).toHaveLength(1);
+    }, 50)
+
     wrapper.unmount();
   });
 
@@ -58,39 +70,48 @@ describe("FetchData", () => {
         selectedDate: "2022-05-01",
       },
     });
-    await flushPromises();
-    expect(spyChangeDate).toHaveBeenCalledTimes(1);
-    expect(wrapper.vm.fetchedData).toEqual([0, 1, 2, 3, 4]);
+
+    setTimeout(() => {
+      expect(spyChangeDate).toHaveBeenCalledTimes(1);
+      expect(wrapper.vm.fetchedData).toEqual([0, 1, 2, 3, 4]);
+    }, 50)
+
     wrapper.setProps({ selectedDate: "9999-99-99" });
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-    expect(spyChangeDate).toHaveBeenCalledTimes(2);
-    expect(wrapper.vm.fetchedData).toEqual([9, 9, 9, 9, 9]);
+
+    setTimeout(() => {
+      expect(spyChangeDate).toHaveBeenCalledTimes(2);
+      expect(wrapper.vm.fetchedData).toEqual([9, 9, 9, 9, 9]);
+    }, 50)
   });
 
   it("should render a loading indicator before the backend resolves", async () => {
-    const wrapper = shallowMount(FetchData, {
+    const wrapper = await shallowMount(FetchData, {
       props: { path: "/rpc/bin_devices_per_hour", fscsId: "notARealID" },
     });
-    expect(await wrapper.findAll(".loading-indicator")).toHaveLength(1);
-    await flushPromises();
+    setTimeout(() => {
+      expect(wrapper.findAll(".loading-indicator")).toHaveLength(1);
+    }, 10)
+  
   });
 
   it("should not render a loading indicator after the backend resolves", async () => {
-    const wrapper = shallowMount(FetchData, {
+    const wrapper = await shallowMount(FetchData, {
       props: { path: "/rpc/bin_devices_per_hour", fscsId: "notARealID" },
     });
-    await flushPromises();
-    expect(await wrapper.findAll(".loading-indicator")).toHaveLength(0);
+    setTimeout(() => {
+      expect(wrapper.findAll(".loading-indicator")).toHaveLength(0);
+    }, 50)
   });
 
   it("should render a loading error when the backend returns an error", async () => {
     const wrapper = await shallowMount(FetchData, {
       props: { path: "/rpc/bin_devices_per_hour", fscsId: "notARealID" },
     });
-    await flushPromises();
-    expect(await wrapper.findAll(".loaded--error")).toHaveLength(1);
+    setTimeout(() => {
+      expect(wrapper.findAll(".loaded--error")).toHaveLength(1);
+    }, 50)
   });
+
   it("should compose params in a query string from an object's key/value pairs", () => {
     expect(
       FetchData.computed.queryString.call({

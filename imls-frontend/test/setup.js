@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll } from 'vitest'
 import { setupServer } from 'msw/node'
 import { graphql, rest } from 'msw'
-import fetch from 'node-fetch';
+import 'whatwg-fetch';
 // import canvas from 'canvas';
 // before enabling a canvas mock, check status on https://github.com/vitest-dev/vitest/issues/740
 
@@ -59,6 +59,7 @@ export const restHandlers = [
       case 'KnownEmptyId':
         return res(ctx.status(200), ctx.json(knownEmptyDevicesPerHourMock))
       case 'notARealID':
+        return res(ctx.status(200), ctx.delay(2000), ctx.json(knownEmptyDevicesPerHourMock))
       default:
         return res(ctx.status(400), ctx.json(errorMock))
     }
@@ -119,7 +120,13 @@ export const restHandlers = [
 const server = setupServer(...restHandlers)
 
 // // Start server before all tests
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+beforeAll(() => server.listen({ onUnhandledRequest(req) {
+    console.error(
+      'Found an unhandled %s request to %s',
+      req.method,
+      req.url.href,
+    )
+  }, }))
 
 // //  Close server after all tests
 afterAll(() => server.close())

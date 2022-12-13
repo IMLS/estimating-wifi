@@ -1,5 +1,6 @@
 <script>
 import { store } from "@/store/store.js";
+import 'whatwg-fetch'
 
 import USWDSBreadcrumb from '../components/USWDSBreadcrumb.vue';
 

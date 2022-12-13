@@ -1,8 +1,9 @@
 import { mount, shallowMount, flushPromises } from "@vue/test-utils";
-import { expect } from "vitest";
+import { expect, v1 } from "vitest";
 import PageState from "./PageState.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
+import "whatwg-fetch";
 
 let router;
 
@@ -13,11 +14,13 @@ beforeEach(async () => {
   });
   router.push("/");
   await router.isReady();
+  vi.useFakeTimers();
 });
 
 describe("PageState", () => {
+
   it("should render a list of libraries", async () => {
-    const wrapper = mount(PageState, {
+    const wrapper = await mount(PageState, {
       props: {
         stateInitials: "AK",
       },
@@ -26,17 +29,16 @@ describe("PageState", () => {
           "router-link",
           "router-view",
           "RouterView",
-          "RouterLink",,
+          "RouterLink",
         ],
       },
     });
-    await flushPromises();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
+    setTimeout(() => {
+      expect(wrapper.find("h1").text()).toEqual("Alaska Public Libraries");
+      expect(wrapper.findAll("ol.usa-list li").length).toBeGreaterThanOrEqual(1);
+      expect(wrapper.vm.fetchedData.length).toBeGreaterThanOrEqual(1);
+    }, 50)
 
-    expect(wrapper.find("h1").text()).toEqual("Alaska Public Libraries");
-    expect(wrapper.findAll("ol.usa-list li").length).toBeGreaterThanOrEqual(1);
-    expect(wrapper.vm.fetchedData.length).toBeGreaterThanOrEqual(1);
   });
 
 
@@ -59,11 +61,13 @@ describe("PageState", () => {
       },
     });
 
+    
     PageState.beforeRouteEnter.call(wrapper.vm, undefined, undefined, (c) => c(wrapper.vm));
-    await wrapper.vm.$nextTick();
-    await flushPromises();
-    expect(spyRedirect).toHaveBeenCalledTimes(1);
-    expect(spyRedirect).toHaveBeenCalledWith({"name": "NotFound"});
+
+    setTimeout(() => {    
+      expect(spyRedirect).toHaveBeenCalledTimes(1);
+      expect(spyRedirect).toHaveBeenCalledWith({"name": "NotFound"});
+    }, 50)
 
   });
 
@@ -76,25 +80,16 @@ describe("PageState", () => {
         plugins: [router],
       },
     });
-    await flushPromises();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find("h1").text()).toEqual("Alaska Public Libraries");
-    expect(wrapper.findAll("ol.usa-list li").length).toBeGreaterThanOrEqual(1);
-    expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
+  
+    wrapper.setProps({ stateInitials: "AL" });
 
-    await wrapper.setProps({ stateInitials: "AL" });
-    await flushPromises();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-
-    expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
-    expect(await wrapper.findAll(".loaded--no-data")).toHaveLength(0);
-    expect(wrapper.find("h1").text()).toEqual("Alabama Public Libraries");
-    expect(wrapper.findAll("ol.usa-list li").length).toBeGreaterThanOrEqual(1);
-    expect(await wrapper.findAll(".loaded--has-data")).toHaveLength(1);
-
-    wrapper.unmount();
+    setTimeout(() => {
+      expect(wrapper.findAll(".loaded--has-data")).toHaveLength(1);
+      expect(wrapper.findAll(".loaded--no-data")).toHaveLength(0);
+      expect(wrapper.find("h1").text()).toEqual("Alabama Public Libraries");
+      expect(wrapper.findAll("ol.usa-list li").length).toBeGreaterThanOrEqual(1);
+      expect(wrapper.findAll(".loaded--has-data")).toHaveLength(1);
+    }, 50)
   });
   
 });

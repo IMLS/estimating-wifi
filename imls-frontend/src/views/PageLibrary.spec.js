@@ -38,12 +38,14 @@ describe("PageLibrary", () => {
         ],
       },
     });
+    
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
     expect(wrapper.vm.activeDate).toEqual(
       startOfMonth(new Date(2022, 4)).toISOString().split("T")[0]
     );
   });
+
   it("should render with a preset date if one is provided", () => {
     const wrapper = shallowMount(PageLibrary, {
       props: {
@@ -62,6 +64,7 @@ describe("PageLibrary", () => {
       PageLibrary.methods.generateDayLabels("1999-12-31", 3)
     ).toStrictEqual(["12/31/99", "1/1/00", "1/2/00"]);
   });
+  
   it("should return the first day of the week in ISO", () => {
     expect(
       PageLibrary.computed.startOfWeekInISO.call({ selectedDate: "1999-12-31" })
@@ -117,17 +120,16 @@ describe("PageLibrary", () => {
         ],
       },
     });
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find("h1").text()).toEqual("Library KnownEmptyId");
-    expect(wrapper.vm.fetchedLibraryData).toBeNull();
 
-    await wrapper.setProps({ id: "KnownGoodId" });
-    await flushPromises();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find("h1").text()).toEqual("ANCHOR POINT PUBLIC LIBRARY");
-    expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
-    wrapper.unmount();
+    setTimeout(() => {
+      expect(wrapper.find("h1").text()).toEqual("Library KnownEmptyId");
+      expect(wrapper.vm.fetchedLibraryData).toBeNull();
+      wrapper.setProps({ id: "KnownGoodId" });
+      setTimeout(() => {
+        expect(wrapper.find("h1").text()).toEqual("ANCHOR POINT PUBLIC LIBRARY");
+        expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
+      }, 50)
+    }, 50)
+
   });
 });
