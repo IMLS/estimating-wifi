@@ -4,7 +4,7 @@
 [![CodeQL](https://github.com/IMLS/estimating-wifi/actions/workflows/codeql.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/codeql.yml)
 [![snyk](https://github.com/IMLS/estimating-wifi/actions/workflows/snyk.yml/badge.svg)](https://github.com/IMLS/estimating-wifi/actions/workflows/snyk.yml)
 
-Estimating Wifi is a pilot project to automate the monitoring of proximal wifi devices via low-cost and open source tools.
+Estimating Wifi is a pilot project to automate the censusing of proximal wifi devices via low-cost and open source tools.
 
 This project provides:
 
