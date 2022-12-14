@@ -1,12 +1,5 @@
 # Notes on Working with the Database
 
-### Run Migrations
-
-- install [dbmate](https://github.com/amacneil/dbmate)
-- configure your `.env` for dbmate:
-  - `DATABASE_URL="postgres://postgres:imlsimls@localhost:5432/imls?sslmode=disable"`
-- Open a separate terminal and run `dbmate up`
-
 ## Connect to the DB via CLI
 
 - `psql -h localhost -U postgres -W`
