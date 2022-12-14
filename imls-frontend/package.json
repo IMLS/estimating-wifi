@@ -36,8 +36,8 @@
   "devDependencies": {
     "@vue/test-utils": "^2.0.2",
     "c8": "^7.12.0",
-    "msw": "^0.44.2",
     "vitest": "^0.20.3",
+    "vitest-fetch-mock": "^0.2.1",
     "whatwg-fetch": "^3.6.2"
   },
   "msw": {

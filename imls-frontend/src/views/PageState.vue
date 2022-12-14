@@ -1,6 +1,5 @@
 <script>
 import { store } from "@/store/store.js";
-import 'whatwg-fetch'
 
 import USWDSBreadcrumb from '../components/USWDSBreadcrumb.vue';
 
@@ -26,8 +25,8 @@ export default {
     return {
       store,
       fetchCount: null,
-      fetchError: {},
-      fetchedData: [],
+      fetchError: null,
+      fetchedLibraries: [],
       isLoading: false,
     }
   },
@@ -51,25 +50,25 @@ export default {
   watch: {
     stateInitials(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.fetchData();
+        this.fetchLibraries();
       }
     }
   },
   async beforeMount() {
-    await this.fetchData();
+    await this.fetchLibraries();
   },
   methods: {
-    async fetchData() {
+    async fetchLibraries() {
       if (this.stateInitials.length !== 0) {
         this.isLoading = true;
         try {
           const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getAllSystemsByStateInitials}?_state_code=${this.stateInitials}`);
-          if (await !response.ok) {
-            throw new Error(response.status);
-          }
-          this.fetchedData = await response.json();
+          const parsedResponse = await response.json();
+
+          // the API currently returns null instead of an empty array on no matches
+          this.fetchedLibraries = await !!parsedResponse ? parsedResponse : []
         } catch (error) {
-          this.fetchError = error;
+          this.fetchError = error.message;
         }
         this.isLoading = false;
       }
@@ -94,13 +93,14 @@ export default {
           <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>
         </svg>
       </div>
-      <div v-if="fetchError && fetchError.message" class="loaded--error">
-        <p>Oops! Error encountered: {{ fetchError.message }}</p>
-      </div> 
-      <div v-else-if="fetchedData.length > 0" class="loaded--has-data">
+      <div v-if="fetchedLibraries == null || fetchedLibraries.length < 1" class="loaded--no-data">
+        <p>Sorry, no matching libraries found. </p>
+        <span v-if="fetchError">Oops! Error encountered: {{ fetchError }} </span>
+      </div>
+      <div v-else class="loaded--has-data">
 
         <ol class="usa-list">
-          <li v-for="system in fetchedData"  :key=system>
+          <li v-for="system in fetchedLibraries"  :key=system>
             <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
               {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
             </RouterLink>

@@ -12,8 +12,8 @@ export default {
     return {
       store,
       fetchedLibraries: null, 
-      fetchError: {},
-      isLoading: false
+      fetchError: null,
+      isLoading: false,
     }
   },
   watch: {
@@ -32,12 +32,12 @@ export default {
         this.isLoading = true;
         try {
           const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.textSearchLibraryNames}?_name=${this.query}`);
-          if (await !response.ok) {
-            throw new Error(response.status);
-          }
-          this.fetchedLibraries = await response.json();
+          const parsedResponse = await response.json();
+
+          // the API currently returns null instead of an empty array on no matches
+          this.fetchedLibraries = await parsedResponse ? parsedResponse : []
         } catch (error) {
-          this.fetchError = error;
+          this.fetchError = error.message;
         }
         this.isLoading = false;
       }
@@ -56,7 +56,11 @@ export default {
   <div class="search">
     <h1>Libraries matching "{{ query }}"</h1>
 
-    <div v-if="fetchedLibraries !== null">
+    <div v-if="fetchedLibraries == null || fetchedLibraries.length < 1">
+      <p>Sorry, no matching libraries found. </p>
+      <span v-if="fetchError">Oops! Error encountered: {{ fetchError }} </span>
+    </div>
+    <div v-else>
       <p>Results found: {{ fetchedLibraries.length }}</p>
         <ol class="usa-list">
         <li v-for="system in fetchedLibraries" :key=system>
@@ -66,9 +70,7 @@ export default {
         </li>
       </ol>
     </div>
-    <div v-else>
-      <p>Sorry, no matching libraries found. </p>
-    </div>
+
 
   </div>
 </template>

@@ -102,9 +102,6 @@ export default {
         this.isLoading = true;
         try {
           const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getLibraryDetailsById}?_fscs_id=${this.id}`);
-          if (await !response.ok) {
-            throw new Error(response.status);
-          }
           this.fetchedLibraryData = await response.json();
         } catch (error) {
           this.fetchError = error;
