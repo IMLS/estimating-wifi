@@ -103,14 +103,10 @@ source test/.test-config && pytest test/
 
 If all goes well, you'll see all the tests pass.
 
-### Optional: Using a DB browser
+### Interacting with the Database
 
-There are many options for DB browsers. DBeaver is a good optoin, and the community edition will work just fine.
-
-[Instructions for installing DBeaver](https://dbeaver.io/download/).
-
-You will need to create a new database connection. The connection parameters will be the same as in the `.env` file in the imls-backend/ folder. If you did not modify the environment variables, you should be able to use the username `postgres`, database `imls`, and password `imlsimlsimls`.
+[Database Notes](DATABASE_NOTES.md)
 
 ## What now?
 
-You have now stood up the API and data storage backend. This does not include either the web-based frontend for browsing the data or the code that estimates wifi device presence. So, you're only part way there if you're looking to stand up the entire system on a dev machine.
+You have now stood up the API and data storage backend. This does not include either the [web-based frontend](../imls-frontend/README.md) for browsing the data or the code that [estimates wifi device presence](../imls-wifi-sensor/README.md). So, you're only part way there if you're looking to stand up the entire system on a dev machine.
