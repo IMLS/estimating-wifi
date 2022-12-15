@@ -90,7 +90,7 @@ You will need to create a new database connection. The connection parameters wil
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_state_code={TEXT variable}"`
     - EXAMPLE:
         `curl "http://localhost:3000/rpc/lib_search_state?_state_code=AK"`
-    - Returns any row matching the _state_code, case insensative, will search
+    - Returns any row matching the _state_code, case insensitive, will search
     on 1-2 chars.
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
@@ -99,7 +99,7 @@ You will need to create a new database connection. The connection parameters wil
     - `curl "http://localhost:3000/rpc/{function_or_sp_name}?_name={TEXT variable}"`
     - EXAMPLE:
         `curl "http://localhost:3000/rpc/lib_search_name?_name=POINT"`
-    - Returns any row matching the _point, case insensative, will search for %_name% meaning all chars before or after the _name param.
+    - Returns any row matching the _point, case insensitive, will search for %_name% meaning all chars before or after the _name param.
     - EXAMPLE:
       [{"stabr":"AK","fscskey":"AK0001","fscs_seq":2,"c_fscs":"Y","libid":"AK0001-002"...]
 

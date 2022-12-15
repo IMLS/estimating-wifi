@@ -10,8 +10,6 @@ The imls-backend component of this repository runs a RESTful API server built wi
 
 ## Building container images
 
-There are multiple steps here, but the build process should not have to happen often.
-
 Navigate to the `imls-backend` directory.
 ```
 cd imls-backend
@@ -63,7 +61,7 @@ If this is the first time you are running our stack, a Postgrest (API) and Postg
 
 ### Optional: Loading test data
 
-At this point, you have a an empty system. It has no users and no data but is ready for use. If you're new to the stack, or want to do anything interesting at all, you're going to need some data and at least one user.
+At this point, you have an empty system. It has no users and no data but is ready for use. If you're new to the stack, or want to do anything interesting at all, you're going to need some data and at least one user.
 
 `cd` to `imls-backend/test`.
 
@@ -100,8 +98,6 @@ Now run the tests. Note there is a `.test-config` file in the `test/` directory.
 ```
 source test/.test-config && pytest test/
 ```
-
-If all goes well, you'll see all the tests pass.
 
 ### Interacting with the Database
 
