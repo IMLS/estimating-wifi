@@ -1,5 +1,6 @@
 # Notes on Working with the Database
 
+The database notes below assume you have setup the backend as laid out in the [backend README](README.md), including having the Docker containers up and running.
 ## Connect to the DB via CLI
 
 - `psql -h localhost -U postgres -W`
