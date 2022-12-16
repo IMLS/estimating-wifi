@@ -116,7 +116,6 @@ export default {
       }
     }
   },
-  methods: {},
   computed: {
     computedChartData: function() { 
       return {
@@ -133,7 +132,8 @@ export default {
         ] ,
       }
     },
-  }
+  },
+  methods: {}
 }
 </script>
 

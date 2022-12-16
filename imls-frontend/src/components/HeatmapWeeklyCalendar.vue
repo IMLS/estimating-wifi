@@ -31,6 +31,19 @@ export default {
       store
     }
   },
+  computed: {
+    datesForWeek()  {
+      return this.generateDayLabels(this.weekStartDateISO)
+    },
+    allValuesSorted() {
+      return [...this.sortArrayAscending(this.dataset.slice().flat())];
+    },
+    // the calendar axis origin is 12am, the first tick is 1am
+    shiftedHourlyLabels() {
+      const [first, ...rest] = store.hourlyLabels;
+      return [...rest, first]
+    }
+  },
   methods: {
     generateDayLabels(startingDateISO) {
       let startingDate = parseISO(startingDateISO + "T00:00");
@@ -54,19 +67,6 @@ export default {
     formatDateLabel(date, pattern) {
       return format(date, pattern);
     }
-  },
-  computed: {
-    datesForWeek()  {
-      return this.generateDayLabels(this.weekStartDateISO)
-    },
-    allValuesSorted() {
-      return [...this.sortArrayAscending(this.dataset.slice().flat())];
-    },
-    // the calendar axis origin is 12am, the first tick is 1am
-    shiftedHourlyLabels() {
-      const [first, ...rest] = store.hourlyLabels;
-      return [...rest, first]
-    }
   }
 }
 </script>
@@ -84,21 +84,23 @@ export default {
           Local time
         </div>
         <!-- Each hour/bin gets a row: -->
-        <div class="weekly-calendar__hour-labels__label weekly-calendar__cell" v-bind:key="hour" v-for="hour in shiftedHourlyLabels">
+        <div v-for="hour in shiftedHourlyLabels" :key="hour" class="weekly-calendar__hour-labels__label weekly-calendar__cell">
           <span>{{ hour }}</span>
         </div>
       </div>
 
       <!-- Each day gets a column: -->
-      <div class="weekly-calendar__day" v-bind:key="i" v-for="row, i in dataset" 
-          :class="{ 'isSelectedDate': isSelectedDate(datesForWeek[i]) } ">
+      <div
+v-for="row, headerIndex in dataset" :key="headerIndex" class="weekly-calendar__day" 
+          :class="{ 'isSelectedDate': isSelectedDate(datesForWeek[headerIndex]) } ">
         <!-- A day column starts with a header-->
         <div class="weekly-calendar__day__label">
-          <h3 class="weekly-calendar__day__label--day">{{ store.dayOfWeekLabels[i] }}</h3>
-          <h4 class="weekly-calendar__day__label--date">{{ formatDateLabel(datesForWeek[i], 'M/d/yy') }}</h4>
+          <h3 class="weekly-calendar__day__label--day">{{ store.dayOfWeekLabels[headerIndex] }}</h3>
+          <h4 class="weekly-calendar__day__label--date">{{ formatDateLabel(datesForWeek[headerIndex], 'M/d/yy') }}</h4>
         </div>
         <!-- A day column also has a list of values-->
-        <div v-bind:key="i" v-for="cell, i in row" class="weekly-calendar__cell" 
+        <div
+v-for="cell, index in row" :key="index" class="weekly-calendar__cell" 
           :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}">
           {{ cell }}
         </div>

@@ -12,32 +12,9 @@ export default {
     return {
       store,
       fetchedLibraries: null, 
-      fetchError: {},
-      isLoading: false
+      fetchError: null,
+      isLoading: false,
     }
-  },
-  methods: {
-    async searchLibraryNames() {
-      if (this.query.length !== 0) {
-        this.isLoading = true;
-        try {
-          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.textSearchLibraryNames}?_name=${this.query}`);
-          if (await !response.ok) {
-            throw new Error(response.status);
-          }
-          this.fetchedLibraries = await response.json();
-        } catch (error) {
-          this.fetchError = error;
-        }
-        this.isLoading = false;
-      }
-    },
-    leftPadSequence(seq) {
-      return (parseInt(seq) + 1000).toString().substring(1);
-    },
-    formatFSCSandSequence(fscsid, seq) {
-      return fscsid + '-' + this.leftPadSequence(seq)
-    },
   },
   watch: {
     query(newVal, oldVal) {
@@ -49,6 +26,29 @@ export default {
   async beforeMount() {
     await this.searchLibraryNames();
   },
+  methods: {
+    async searchLibraryNames() {
+      if (this.query.length !== 0) {
+        this.isLoading = true;
+        try {
+          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.textSearchLibraryNames}?_name=${this.query}`);
+          const parsedResponse = await response.json();
+
+          // the API currently returns null instead of an empty array on no matches
+          this.fetchedLibraries = await parsedResponse ? parsedResponse : []
+        } catch (error) {
+          this.fetchError = error.message;
+        }
+        this.isLoading = false;
+      }
+    },
+    leftPadSequence(seq) {
+      return (parseInt(seq) + 1000).toString().substring(1);
+    },
+    formatFSCSandSequence(fscsid, seq) {
+      return fscsid + '-' + this.leftPadSequence(seq)
+    },
+  },
 }
 </script>
 
@@ -56,19 +56,21 @@ export default {
   <div class="search">
     <h1>Libraries matching "{{ query }}"</h1>
 
-    <div v-if="fetchedLibraries !== null">
+    <div v-if="fetchedLibraries == null || fetchedLibraries.length < 1">
+      <p>Sorry, no matching libraries found. </p>
+      <span v-if="fetchError">Oops! Error encountered: {{ fetchError }} </span>
+    </div>
+    <div v-else>
       <p>Results found: {{ fetchedLibraries.length }}</p>
         <ol class="usa-list">
-        <li v-for="system in this.fetchedLibraries" :key=system>
+        <li v-for="system in fetchedLibraries" :key=system>
           <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
               {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
             </RouterLink>
         </li>
       </ol>
     </div>
-    <div v-else>
-      <p>Sorry, no matching libraries found. </p>
-    </div>
+
 
   </div>
 </template>

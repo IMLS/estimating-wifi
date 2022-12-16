@@ -7,6 +7,31 @@ import { startOfMonth } from "date-fns";
 
 let router;
 
+
+const MOCK_ERROR_MSG = "mocked error message";
+// the API currently returns null instead of an empty array on no matches
+const MOCK_NO_LIBS_FOUND = null;
+const MOCK_ONE_LIB_FOUND = {
+  "stabr":"MK",
+  "fscskey":"MOCK001",
+  "fscs_seq":1,
+  "libname":"MOCKED PUBLIC LIBRARY",
+  "address":"1234 MOCKINGBIRD ROAD",
+  "city":"MOUNT MOCKINGTON",
+  "zip":"00000"
+};
+const MOCK_ANOTHER_LIB_FOUND = {
+  "stabr":"MK",
+  "fscskey":"MOCK001",
+  "fscs_seq":2,
+  "libname":"ANOTHER MOCKED PUBLIC LIBRARY",
+  "address":"5678 MOCKINGBIRD ROAD",
+  "city":"MOUNT MOCKINGTON",
+  "zip":"00000"
+}
+
+
+
 beforeEach(async () => {
   router = createRouter({
     history: createWebHistory(),
@@ -14,6 +39,8 @@ beforeEach(async () => {
   });
   router.push("/");
   await router.isReady();
+  await flushPromises();
+  fetch.resetMocks();
 });
 
 describe("PageLibrary", () => {
@@ -38,12 +65,14 @@ describe("PageLibrary", () => {
         ],
       },
     });
+    
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
     expect(wrapper.vm.activeDate).toEqual(
       startOfMonth(new Date(2022, 4)).toISOString().split("T")[0]
     );
   });
+
   it("should render with a preset date if one is provided", () => {
     const wrapper = shallowMount(PageLibrary, {
       props: {
@@ -62,6 +91,7 @@ describe("PageLibrary", () => {
       PageLibrary.methods.generateDayLabels("1999-12-31", 3)
     ).toStrictEqual(["12/31/99", "1/1/00", "1/2/00"]);
   });
+  
   it("should return the first day of the week in ISO", () => {
     expect(
       PageLibrary.computed.startOfWeekInISO.call({ selectedDate: "1999-12-31" })
@@ -99,10 +129,10 @@ describe("PageLibrary", () => {
   });
 
 
-  it("should update with a new library when the id prop changes", async () => {
+  it("should request and display new library data when the id prop changes", async () => {
     const wrapper = await shallowMount(PageLibrary, {
       props: {
-        id: "KnownEmptyId",
+        id: "oneMockedLibrary",
       },
       global: {
         plugins: [router],
@@ -117,16 +147,40 @@ describe("PageLibrary", () => {
         ],
       },
     });
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find("h1").text()).toEqual("Library KnownEmptyId");
-    expect(wrapper.vm.fetchedLibraryData).toBeNull();
 
-    await wrapper.setProps({ id: "KnownGoodId" });
-    await flushPromises();
+    fetch.mockResponseOnce(JSON.stringify(MOCK_ONE_LIB_FOUND))
+    await wrapper.vm.fetchLibraryData();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find("h1").text()).toEqual("ANCHOR POINT PUBLIC LIBRARY");
+    expect(wrapper.find("h1").text()).toEqual("MOCKED PUBLIC LIBRARY");
     expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
-    wrapper.unmount();
+
+    wrapper.setProps({ id: "anotherMockedLibrary" });
+    fetch.mockResponseOnce(JSON.stringify(MOCK_ANOTHER_LIB_FOUND))
+    await wrapper.vm.fetchLibraryData();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("h1").text()).toEqual("ANOTHER MOCKED PUBLIC LIBRARY");
+    expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
+
+
   });
+    // note that this should not be required when all REST endpoints return a usable unique library ID
+  it("should format a FSCS ID and sequence into a library key", () => {
+    // sequence as int
+    expect(
+      PageLibrary.methods.formatFSCSandSequence("AA0001", 1)
+    ).toStrictEqual("AA0001-001");
+    // sequence as string
+    expect(
+      PageLibrary.methods.formatFSCSandSequence("AA0001", "2")
+    ).toStrictEqual("AA0001-002");
+    // sequence as already-padded string
+    expect(
+      PageLibrary.methods.formatFSCSandSequence("AA0001", "003")
+    ).toStrictEqual("AA0001-003");
+    // sequence as already-padded string that's too long
+    expect(
+      PageLibrary.methods.formatFSCSandSequence("AA0001", "00004")
+    ).toStrictEqual("AA0001-004");
+  });
+
 });

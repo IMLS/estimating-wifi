@@ -30,17 +30,17 @@ export default {
     <thead>
       <tr>
         <th v-if="rowHeaders.length > 0" scope="row"></th>
-        <th v-bind:key="header" v-for="header in columnHeaders" scope="col">{{ header }}</th>
+        <th v-for="header in columnHeaders" :key="header" scope="col">{{ header }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-bind:key="i" v-for="row, i in rows">
+      <tr v-for="row, headerIndex in rows" :key="headerIndex">
         <th v-if="rowHeaders.length > 0" scope="row">
           <span class="text-bold text-no-wrap">
-            {{ rowHeaders[i] }}
+            {{ rowHeaders[headerIndex] }}
           </span>
         </th>
-        <td v-bind:key="i" v-for="cell, i in row" class="font-mono-sm text-tabular text-right">{{ cell }}</td>
+        <td v-for="cell, index in row" :key="index" class="font-mono-sm text-tabular text-right">{{ cell }}</td>
       </tr>
     </tbody>
   </table>

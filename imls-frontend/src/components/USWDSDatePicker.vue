@@ -8,7 +8,7 @@ const MIN_DATE = "2022-05-01";
 const MAX_DATE = "2022-05-31";
 
 export default {
-  name: "USWDS Date Picker",
+  name: "USWDSDatePicker",
   props: {
     label: {  
       type: String,
@@ -20,6 +20,7 @@ export default {
     },
     
   },
+  emits: ['date_changed'],
   data() {
     return {
       selectedDate: null,
@@ -30,7 +31,6 @@ export default {
   mounted() {
     this.enableUSWDSFeatures();
   },
-  emits: ['dateChanged'],
   methods: {
     async enableUSWDSFeatures(){
       await datePicker.init();
@@ -46,25 +46,26 @@ export default {
 
 <template>
   <div class="usa-form-group">
-    <label class="usa-label" id="date-label" for="date"
+    <label id="date-label" class="usa-label" for="date"
       >{{ label }}</label
     >
-    <div class="usa-hint" id="date-hint">mm/dd/yyyy</div>
-    <div class="usa-date-picker maxw-card-lg" 
-      ref="picker" 
+    <div id="date-hint" class="usa-hint">mm/dd/yyyy</div>
+    <div
+ref="picker" 
+      class="usa-date-picker maxw-card-lg" 
       :data-default-value="initialDate"
       :data-selected-date="!!selectedDate ? selectedDate : initialDate"
       :data-min-date="minDate"
       :data-max-date="maxDate"
       >
       <input
-        ref="date"
-        @change="detectChange"
-        class="usa-input"
         id="date"
+        ref="date"
+        class="usa-input"
         name="date"
         aria-labelledby="date-label"
         aria-describedby="date-hint"
+        @change="detectChange"
       />
     </div>
   </div>
