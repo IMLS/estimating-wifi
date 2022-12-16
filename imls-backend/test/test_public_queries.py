@@ -45,14 +45,14 @@ def validate(test_obj, fscs_id):
     r = requests.post(url, json=query)
     obj = r.json()
     test_obj.assertEqual(obj['fscskey'], fscs_id.split("-")[0])
-class LibSearchTests(TestCase):
+class LibSearchFSCSTests(TestCase):
     def test_validate_one(self):
         url = endpoint(["rpc", "lib_search_fscs"])
         query = {"_fscs_id": "KY0069-002"}
         r = requests.post(url, json=query)
         print(r.json())
         obj = r.json()
-        self.assertEqual(obj['fscskey'], "KY0069")
+        self.assertEqual(obj['fscs_id'], "KY0069-002")
 
     # First, this takes forever.
     # Second, I generated the list of FSCS Ids from the DB itself.
@@ -62,6 +62,24 @@ class LibSearchTests(TestCase):
     #     for line in open("all_fscs_ids.txt"):
     #         self.assertEqual(len(line.strip()), 10)
     #         validate(self, line.strip())
+
+class LibSearchNameTests(TestCase):
+    def test_validate_one(self):
+        url = endpoint(["rpc", "lib_search_name"])
+        query = {"_name": "STRAWBERRY POINT PUB"}
+        r = requests.post(url, json=query)
+        print(r.json())
+        obj = r.json()
+        self.assertEqual(obj[0]['fscs_id'], "IA0141-002")
+
+class LibSearchStateTests(TestCase):
+    def test_validate_one(self):
+        url = endpoint(["rpc", "lib_search_state"])
+        query = {"_state_code": "AK"}
+        r = requests.post(url, json=query)
+        print(r.json())
+        obj = r.json()
+        self.assertEqual(obj[0]['fscs_id'], "AK0001-002")
 
 class BinningTests(TestCase):
     def test_no_data(self):
