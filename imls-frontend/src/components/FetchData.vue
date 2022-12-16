@@ -35,6 +35,7 @@ export default {
   computed: {
     queryString() {
       if (this.queryParams && Object.keys(this.queryParams).length !== 0) {
+        // construct the query string according to the params passed in from the outer component
         return '&' + Object.keys(this.queryParams).map(key => key + '=' + this.queryParams[key]).join('&');
       }
       return ''
