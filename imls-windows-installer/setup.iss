@@ -57,9 +57,6 @@ Source:"WinSw-x64.xml"; \
 Source:"Wireshark-win64-4.0.0.exe"; \
   DestDir: "{app}\Wireshark"; \
   Flags: ignoreversion
-Source:"npcap-1.60.exe"; \
-  DestDir: "{app}\Wireshark"; \
-  Flags: ignoreversion
 
 [Run]
 ;Filename: "{app}\{#MySecondaryAppExeName}"; \
@@ -67,10 +64,6 @@ Source:"npcap-1.60.exe"; \
   ;Flags: runascurrentuser
 Filename: "{app}\Wireshark\Wireshark-win64-4.0.0.exe"; \
   Description: "Wireshark 4.0.0"; \
-  Parameters: "\D C:\imls"; \
-  Flags: runascurrentuser
-Filename: "{app}\Wireshark\npcap-1.60.exe"; \
-  Description: "npcap 1.60"; \
   Parameters: "\D C:\imls"; \
   Flags: runascurrentuser
 Filename: "{app}\service\WinSw-x64.exe"; \
