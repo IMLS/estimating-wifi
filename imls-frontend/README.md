@@ -38,7 +38,7 @@ npm run dev
 npm run build
 ```
 
-If you'd like to test the production build locally, install
+If you'd like to run and host the production build locally, install
 [http-server](https://www.npmjs.com/package/http-server_)
 and then host the `/imls-frontend/dist` folder:
 

@@ -2,10 +2,11 @@ import os
 import requests
 from unittest import TestCase
 
-TEST_USER_PASS="hello-goodbye"
+TEST_USER_PASS = "hello-goodbye"
+
 
 def endpoint(ep_arr):
-    test_url = f"{os.getenv('POETRY_SCHEME')}://{os.getenv('POETRY_HOSTNAME')}:{os.getenv('POETRY_PORT')}"
+    test_url = f"{os.getenv('PYTEST_SCHEME')}://{os.getenv('PYTEST_HOSTNAME')}:{os.getenv('PYTEST_PORT')}"
     return test_url + "/" + "/".join(ep_arr)
 
 

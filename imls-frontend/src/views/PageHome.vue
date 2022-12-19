@@ -3,7 +3,7 @@ import { RouterLink } from "vue-router";
 import { store } from "@/store/store.js";
 
 export default {
-  name: "USWDS Header",
+  name: "HomePage",
   components: { RouterLink },
   data() {
     return {
