@@ -54,7 +54,7 @@ Source:"WinSw-x64.xml"; \
   DestDir: "{app}\service"; \
   Flags: ignoreversion
 ; Wireshark 3.6.5 portable app
-Source:"WiresharkPortable64_3.6.5.paf.exe"; \
+Source:"Wireshark-win64-4.0.0.exe"; \
   DestDir: "{app}\Wireshark"; \
   Flags: ignoreversion
 Source:"npcap-1.60.exe"; \
@@ -65,8 +65,8 @@ Source:"npcap-1.60.exe"; \
 ;Filename: "{app}\{#MySecondaryAppExeName}"; \
   ;Description: "wifi-hardware-search-windows"; \
   ;Flags: runascurrentuser
-Filename: "{app}\Wireshark\WiresharkPortable64_3.6.5.paf.exe"; \
-  Description: "Wireshark 3.6.5"; \
+Filename: "{app}\Wireshark\Wireshark-win64-4.0.0.exe"; \
+  Description: "Wireshark 4.0.0"; \
   Parameters: "\D C:\imls"; \
   Flags: runascurrentuser
 Filename: "{app}\Wireshark\npcap-1.60.exe"; \
