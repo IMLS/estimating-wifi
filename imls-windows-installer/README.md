@@ -12,8 +12,11 @@ Navigate to your Downloads folder, and extract the .zip file.
 
 ### Run the Installer
 - Right click on SessionCounterInstall.exe and click "Run as Administrator"
-- Follow the instructions
-- Note: the WiresharkPortable app cannot be placed in any Program Files directories
+- Follow the instructions to install Wireshark 
+- For npcap, check all three options
+	- Restrict Npcap driver's access to Administrator only
+	- Support raw 802.11 traffic (and monitor mode) for wireless adapters
+	- Install Npcap in WinPcap API-compatible mode
 
 ### Check to Ensure Session-Counter is Running
 - Ctrl + Alt + Delete to open the Task Manager
