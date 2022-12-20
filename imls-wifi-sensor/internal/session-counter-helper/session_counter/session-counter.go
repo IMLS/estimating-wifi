@@ -52,7 +52,7 @@ func Run2(mode string) {
 			// We have a race on the ephemeral DB.
 			// If we're in the data collection loop, we shouldn't let the data send and clear the DB.
 			sem <- 1
-			if config.IsDeveloperMode() {
+			if mode == "dev" {
 				tlp.SimpleShark(
 					// search.SetMonitorMode,
 					func(d *models.Device) {},
