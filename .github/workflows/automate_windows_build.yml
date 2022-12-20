@@ -34,7 +34,6 @@ jobs:
         run: |
           cd imls-windows-installer
           Get-Content setup.iss
-          cd 'Inno Setup 6'
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
           
       - name: Upload the artifact
