@@ -1,11 +1,9 @@
 <script>
 import datePicker from "uswds/src/js/components/date-picker";
+import { startOfYesterday } from "date-fns";
 
-// artificially limits selectable dates to the time we have 
-// deterministic placeholder data for. 
-// todo: refactor when we're using actual data
-const MIN_DATE = "2022-05-01";
-const MAX_DATE = "2022-05-31";
+const MIN_DATE = "2022-01-01";
+const MAX_DATE = startOfYesterday().toISOString().split("T")[0];
 
 export default {
   name: "USWDSDatePicker",
@@ -52,7 +50,7 @@ export default {
     <div id="date-hint" class="usa-hint">mm/dd/yyyy</div>
     <div
 ref="picker" 
-      class="usa-date-picker maxw-card-lg" 
+      class="usa-date-picker maxw-date-picker" 
       :data-default-value="initialDate"
       :data-selected-date="!!selectedDate ? selectedDate : initialDate"
       :data-min-date="minDate"

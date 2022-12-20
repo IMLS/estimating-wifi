@@ -26,6 +26,12 @@ You should add a .env file for local development, which will provide the app wit
 VITE_BACKEND_BASEURL=http://localhost:3000
 ```
 
+If have loaded the [sample data](../imls-backend/README.md) via the "setup-for-tests.sh" script in your backend docker container (see the "Optional: Loading test data" section), you may provide a default date override via env variable so that the Library page loads at the most recent date where we have sample data. For now, we have sample data for the month of May 2022:
+
+```
+VITE_DEFAULT_DATE_OVERRIDE=2022-05-31
+```
+
 ### Compile and Hot-Reload for Development
 
 ```sh

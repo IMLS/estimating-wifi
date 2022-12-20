@@ -1,9 +1,10 @@
 import { mount, shallowMount, flushPromises } from "@vue/test-utils";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 import PageLibrary from "./PageLibrary.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
-import { startOfMonth } from "date-fns";
+import { startOfYesterday } from "date-fns";
+
 
 let router;
 
@@ -44,7 +45,7 @@ beforeEach(async () => {
 });
 
 describe("PageLibrary", () => {
-  it("should render with May first data if no date is provided", () => {
+  it("should load at yesterday's date when no date is provided", () => {
     const wrapper = mount(PageLibrary, {
       props: {
         id: "KnownGoodId",
@@ -68,10 +69,11 @@ describe("PageLibrary", () => {
     
     expect(wrapper.find("h1").text()).toEqual("Library KnownGoodId");
     expect(wrapper.findAll(".usa-card").length).toBeGreaterThanOrEqual(1);
-    expect(wrapper.vm.activeDate).toEqual(
-      startOfMonth(new Date(2022, 4)).toISOString().split("T")[0]
+    expect(wrapper.vm.selectedDateUTC).toEqual(
+       startOfYesterday()
     );
   });
+
 
   it("should render with a preset date if one is provided", () => {
     const wrapper = shallowMount(PageLibrary, {
@@ -83,20 +85,53 @@ describe("PageLibrary", () => {
         stubs: ["router-link", "router-view", "RouterView", "RouterLink"],
       },
     });
-    expect(wrapper.vm.activeDate).toEqual("2022-05-02");
+    expect(PageLibrary.methods.toISODate(wrapper.vm.selectedDateUTC)).toEqual("2022-05-02");
+    
   });
 
   it("should format day labels for n days given a date and count", () => {
     expect(
-      PageLibrary.methods.generateDayLabels("1999-12-31", 3)
+      PageLibrary.methods.generateDayLabels( new Date("1999-12-31T00:00"), 3)
     ).toStrictEqual(["12/31/99", "1/1/00", "1/2/00"]);
   });
-  
-  it("should return the first day of the week in ISO", () => {
-    expect(
-      PageLibrary.computed.startOfWeekInISO.call({ selectedDate: "1999-12-31" })
-    ).toBe("1999-12-26");
+
+
+  describe("should compute the start and end times for each graph on the library page", () => {
+    const wrapper = mount(PageLibrary, {
+      props: {
+        id: "KnownGoodId",
+        selectedDate: "1999-12-31"
+      },
+      global: {
+        stubs: [
+          "router-link",
+          "router-view",
+          "RouterView",
+          "RouterLink",
+          "USWDSDatePicker",
+          "USWDSCard",
+          "FetchData",
+          "Histogram",
+          "Heatmap",
+          "HeatmapWeeklyCalendar",
+          "USWDSTable",
+        ],
+      },
+    });
+      // TODO: TEST ALL THE NEW COMPUTEDS
+    it("should return the first day of the current week", () => {
+      expect(wrapper.vm.startOfCurrentWeekUTC).toStrictEqual(new Date("1999-12-26T00:00"))
+    });
+    it("should return the last day of the current week", () => {
+      expect(wrapper.vm.endOfCurrentWeekUTC).toStrictEqual(new Date("2000-01-02T00:00"))
+    });
+    it("should return the date six days ago", () => {
+      expect(wrapper.vm.sixDaysAgoUTC).toStrictEqual(new Date("1999-12-25T00:00"))
+    });
+
   });
+
+
 
   it("should respond by navigating to a new route query param when the selected date changes", async () => {
     const spyChangeDate = vi.spyOn(
