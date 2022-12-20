@@ -4,7 +4,6 @@ import PageLibrary from "./PageLibrary.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
 import { startOfYesterday } from "date-fns";
-import { loadEnv } from 'vite';
 
 
 let router;
