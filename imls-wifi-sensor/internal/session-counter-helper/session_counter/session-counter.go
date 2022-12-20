@@ -35,13 +35,13 @@ func runEvery(process string, crontab string, c *cron.Cron, fun func()) {
 	}
 }
 
-func Run2() {
+func Run2(mode string) {
 	sq := state.NewQueue[int64]("sent")
 	durationsdb := state.NewDurationsDB()
 	c := cron.New()
 	var sem = make(chan int, 1)
 
-	if config.IsDeveloperMode() {
+	if mode == "dev" {
 		log.Debug().Msg("DEV MODE, RUNNING FAKESHARK (IT'S A DOLPHIN)")
 		mock_hw.FakeWiresharkSetup()
 	}
