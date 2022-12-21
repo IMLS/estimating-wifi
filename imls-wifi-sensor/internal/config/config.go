@@ -101,6 +101,7 @@ func createURI(what string) string {
 		// ":" + fmt.Sprint(port) + "/" +
 		// strings.TrimPrefix(what, "/"))
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
+		"/" +
 		strings.TrimPrefix(what, "/"))
 
 }
