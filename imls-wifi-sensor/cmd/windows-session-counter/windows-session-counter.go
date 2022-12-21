@@ -5,7 +5,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gsa.gov/18f/internal/config"
 	"gsa.gov/18f/internal/session-counter-helper/session_counter"
 	"gsa.gov/18f/internal/session-counter-helper/state"
@@ -14,7 +13,7 @@ import (
 
 var (
 	cfgFile string
-	mode    string
+	mode    string = "prod"
 )
 
 func launchTLP() {
@@ -42,7 +41,7 @@ func launchTLP() {
 	// Run the network
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go session_counter.Run2()
+	go session_counter.Run2(mode)
 	// Wait forever.
 	wg.Wait()
 }
@@ -63,7 +62,7 @@ func main() {
 		"config",
 		"session-counter.ini",
 		"config file (default is session-counter.ini in /etc/imls, %PROGRAMDATA%\\IMLS, or current directory")
-	rootCmd.PersistentFlags().StringVar(&mode, "mode", "prod", "Mode to run the program in")
-	viper.BindPFlag("mode.run", rootCmd.PersistentFlags().Lookup("mode"))
+	//rootCmd.PersistentFlags().StringVar(&mode, "mode", "prod", "Mode to run the program in")
+	//viper.BindPFlag("mode.run", rootCmd.PersistentFlags().Lookup("mode"))
 	rootCmd.Execute()
 }

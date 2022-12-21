@@ -17,7 +17,7 @@ Set-Location imls-wifi-sensor\cmd\windows-session-counter
 Write-Host "Building windows-session-counter executable."
 # call the Go executable directly since we might have just installed Go and it
 # may not be in our Path yet
-& 'C:\Program Files\Go\bin\go.exe' build windows-session-counter.go
+& 'C:\Program Files\Go\bin\go.exe' build -ldflags="-X 'main.mode="dev"'" windows-session-counter.go
 $wd = Get-Location
 $exe_path = "$wd\windows-session-counter.exe"
 

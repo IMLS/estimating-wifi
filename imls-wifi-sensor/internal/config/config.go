@@ -95,11 +95,15 @@ func GetLoggers() []string {
 func createURI(what string) string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
-	port := viper.GetInt("api.port")
+	//port := viper.GetInt("api.port")
 	return (scheme + "://" +
+		// strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
+		// ":" + fmt.Sprint(port) + "/" +
+		// strings.TrimPrefix(what, "/"))
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
-		":" + fmt.Sprint(port) + "/" +
+		"/" +
 		strings.TrimPrefix(what, "/"))
+
 }
 
 func GetDurationsURI() string {
@@ -212,7 +216,7 @@ func SetConfigDefaults() {
 	viper.SetDefault("api.port", 3000)
 	viper.SetDefault("api.login_uri", "/rpc/login")
 	viper.SetDefault("api.heartbeat_uri", "/rpc/beat_the_heart")
-	viper.SetDefault("api.presences_uri", "/rpc/update_presences")
+	viper.SetDefault("api.presences_uri", "/rpc/update_presence")
 	// At midnight every night
 	viper.SetDefault("cron.reset", "0 0 * * *")
 	// Every hour

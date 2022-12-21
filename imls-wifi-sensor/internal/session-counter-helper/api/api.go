@@ -43,6 +43,12 @@ func PostAuthentication(jwt *JWTToken) error {
 
 	login := config.GetLoginURI()
 
+	log.Debug().
+		Str("login_uri", login).
+		Str("fscs", fscs).
+		Str("api_key", key).
+		Msg("login information")
+
 	resp, err := client.R().
 		SetBody(login_data).
 		SetHeader("Content-Type", "application/json").
