@@ -95,11 +95,14 @@ func GetLoggers() []string {
 func createURI(what string) string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
-	port := viper.GetInt("api.port")
+	//port := viper.GetInt("api.port")
 	return (scheme + "://" +
+		// strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
+		// ":" + fmt.Sprint(port) + "/" +
+		// strings.TrimPrefix(what, "/"))
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
-		":" + fmt.Sprint(port) + "/" +
 		strings.TrimPrefix(what, "/"))
+
 }
 
 func GetDurationsURI() string {
