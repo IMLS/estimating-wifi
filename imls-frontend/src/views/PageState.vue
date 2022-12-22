@@ -4,8 +4,15 @@ import { store } from "@/store/store.js";
 import USWDSBreadcrumb from '../components/USWDSBreadcrumb.vue';
 
 export default {
-  name: 'All Library Systems for a State',
+  name: 'StatePage',
   components: { USWDSBreadcrumb },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (vm.stateName === undefined) {
+        vm.$router.push({name: 'NotFound'});
+      }
+    })
+  },
 
   props: {
     stateInitials: {
@@ -18,43 +25,10 @@ export default {
     return {
       store,
       fetchCount: null,
-      fetchError: {},
-      fetchedData: [],
+      fetchError: null,
+      fetchedLibraries: [],
       isLoading: false,
     }
-  },
-  watch: {
-    stateInitials(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.fetchData();
-      }
-    }
-  },
-  async beforeMount() {
-    await this.fetchData();
-  },
-  methods: {
-    async fetchData() {
-      if (this.stateInitials.length !== 0) {
-        this.isLoading = true;
-        try {
-          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getAllSystemsByStateInitials}?_state_code=${this.stateInitials}`);
-          if (await !response.ok) {
-            throw new Error(response.status);
-          }
-          this.fetchedData = await response.json();
-        } catch (error) {
-          this.fetchError = error;
-        }
-        this.isLoading = false;
-      }
-    },
-    leftPadSequence(seq) {
-      return (parseInt(seq) + 1000).toString().substring(1);
-    },
-    formatFSCSandSequence(fscsid, seq) {
-      return fscsid + '-' + this.leftPadSequence(seq)
-    },
   },
   computed: {
     stateName () {
@@ -73,12 +47,38 @@ export default {
       ]
     }
   },
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      if (vm.stateName === undefined) {
-        vm.$router.push({name: 'NotFound'});
+  watch: {
+    stateInitials(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchLibraries();
       }
-    })
+    }
+  },
+  async beforeMount() {
+    await this.fetchLibraries();
+  },
+  methods: {
+    async fetchLibraries() {
+      if (this.stateInitials.length !== 0) {
+        this.isLoading = true;
+        try {
+          const response = await fetch(`${store.backendBaseUrl}${store.backendPaths.getAllSystemsByStateInitials}?_state_code=${this.stateInitials}`);
+          const parsedResponse = await response.json();
+
+          // the API currently returns null instead of an empty array on no matches
+          this.fetchedLibraries = await !!parsedResponse ? parsedResponse : []
+        } catch (error) {
+          this.fetchError = error.message;
+        }
+        this.isLoading = false;
+      }
+    },
+    leftPadSequence(seq) {
+      return (parseInt(seq) + 1000).toString().substring(1);
+    },
+    formatFSCSandSequence(fscsid, seq) {
+      return fscsid + '-' + this.leftPadSequence(seq)
+    },
   }
 };
 </script>
@@ -88,18 +88,19 @@ export default {
     <USWDSBreadcrumb :crumbs=breadcrumbs />
     <h1>{{ stateName }} Public Libraries</h1>
     <div class="loading-area">
-      <div v-if="this.isLoading" class="loading-indicator">
+      <div v-if="isLoading" class="loading-indicator">
         <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">
           <use xlink:href="~uswds/img/sprite.svg#autorenew"></use>
         </svg>
       </div>
-      <div class="loaded--error" v-if="this.fetchError && this.fetchError.message">
-        <p>Oops! Error encountered: {{ this.fetchError.message }}</p>
-      </div> 
-      <div class="loaded--has-data" v-else-if="this.fetchedData.length > 0">
+      <div v-if="fetchedLibraries == null || fetchedLibraries.length < 1" class="loaded--no-data">
+        <p>Sorry, no matching libraries found. </p>
+        <span v-if="fetchError">Oops! Error encountered: {{ fetchError }} </span>
+      </div>
+      <div v-else class="loaded--has-data">
 
         <ol class="usa-list">
-          <li v-for="system in this.fetchedData"  :key=system>
+          <li v-for="system in fetchedLibraries"  :key=system>
             <RouterLink class="usa-link" :to="{ path: '/library/' + formatFSCSandSequence(system.fscskey, system.fscs_seq) + '/' }">
               {{ formatFSCSandSequence(system.fscskey, system.fscs_seq) }} - {{ system.libname }}
             </RouterLink>

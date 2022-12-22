@@ -1,0 +1,4 @@
+export PYTEST_SCHEME="http"
+export PYTEST_HOSTNAME="localhost"
+export PYTEST_PORT=3000
+export PYTEST_JWT_SECRET="${PGRST_JWT_SECRET}"

@@ -136,7 +136,7 @@ CREATE FUNCTION api.lib_search_name(_name text) RETURNS json
     LANGUAGE sql
     AS $$
 SELECT json_agg(X) FROM
-(SELECT *  FROM data.imls_data WHERE libname LIKE '%'|| UPPER(_name) || '%') AS X;
+(SELECT *, CONCAT(fscskey,'-',TO_CHAR(fscs_seq, 'fm000')) AS fscs_id FROM data.imls_data WHERE libname LIKE '%'|| UPPER(_name) || '%') AS X;
 $$;
 
 
@@ -148,7 +148,7 @@ CREATE FUNCTION api.lib_search_state(_state_code text) RETURNS json
     LANGUAGE sql
     AS $$
 SELECT json_agg(X) FROM
-(SELECT *  FROM data.imls_data WHERE stabr LIKE UPPER(_state_code) || '%') AS X;
+(SELECT *, CONCAT(fscskey,'-',TO_CHAR(fscs_seq, 'fm000')) AS fscs_id FROM data.imls_data WHERE stabr LIKE UPPER(_state_code) || '%') AS X;
 $$;
 
 -- migrate:down

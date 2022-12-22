@@ -5,7 +5,7 @@ import { store } from "@/store/store.js";
 
 export default {
 
-  name: "USWDS Header",
+  name: "USWDSHeader",
   components: { RouterLink },
   data() {
     return {
@@ -131,8 +131,8 @@ export default {
                 for="extended-search-field-en-small"
               > Search </label>
               <input
-               ref="searchInput"
-                id="extended-search-field-en-small"
+               id="extended-search-field-en-small"
+                ref="searchInput"
                 v-model="searchString"
                 class="usa-input"
                 type="search"

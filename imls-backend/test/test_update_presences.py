@@ -6,7 +6,7 @@ import urllib
 
 
 def endpoint(ep_arr):
-    test_url = f"{os.getenv('POETRY_SCHEME')}://{os.getenv('POETRY_HOSTNAME')}:{os.getenv('POETRY_PORT')}"
+    test_url = f"{os.getenv('PYTEST_SCHEME')}://{os.getenv('PYTEST_HOSTNAME')}:{os.getenv('PYTEST_PORT')}"
     return test_url + "/" + "/".join(ep_arr)
 
 
@@ -33,23 +33,31 @@ class PresencesTests(TestCase):
 
     def test_verify_insertion(self):
         verify_insert_url = endpoint(["rpc", "verify_presence"])
-        params = {"_fscs_id": "KY0069-002", "_start": str(self.now), "_end": str(self.end)}
+        params = {
+            "_fscs_id": "KY0069-002",
+            "_start": str(self.now),
+            "_end": str(self.end),
+        }
         headers = {"Prefer": "count=estimated"}
         rv = requests.post(verify_insert_url, headers=headers, json=params)
         self.assertEqual(rv.status_code, 200)
         # FIXME: I'd like to know what the actual id is. There must be a better way
-        # to validate that the insertion happened correctly. This query takes a 
+        # to validate that the insertion happened correctly. This query takes a
         # particular library ID, start, and end time, and returns the UID for the presences table
-        # if it exists. 
+        # if it exists.
         print(rv.content)
-        self.assertNotEqual(rv.content, b'null')
+        self.assertNotEqual(rv.content, b"null")
         self.assertIsInstance(int(rv.content), int)
 
     def test_verify_failure_on_non_insertion(self):
         verify_insert_url = endpoint(["rpc", "verify_presence"])
-        params = {"_fscs_id": "KY0069-003", "_start": str(self.now), "_end": str(self.end)}
+        params = {
+            "_fscs_id": "KY0069-003",
+            "_start": str(self.now),
+            "_end": str(self.end),
+        }
         headers = {"Prefer": "count=estimated"}
         rv = requests.post(verify_insert_url, headers=headers, json=params)
         self.assertEqual(rv.status_code, 200)
         print(rv.content)
-        self.assertEqual(rv.content, b'null')
+        self.assertEqual(rv.content, b"null")

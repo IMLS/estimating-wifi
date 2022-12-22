@@ -1,7 +1,7 @@
 <script>
 
 export default {
-  name: 'Heatmap',
+  name: 'HeatmapTable',
   props: {
     binLabels: {
       type: Array,
@@ -25,6 +25,12 @@ export default {
       default: () => [120,124,206]
     }
   },
+  computed: {
+    allValuesSorted() {
+      return [...this.sortArrayAscending(this.dataset.slice().flat())];
+    }
+
+  },
   methods: {
     sortArrayAscending(arr){
       return arr.sort(function(a,b){ return parseFloat(a) - parseFloat(b);});
@@ -35,12 +41,6 @@ export default {
       return (this.allValuesSorted.slice().filter((item) => item <= (thisVal) ).length / this.allValuesSorted.length);
     },
     // todo: consider determining saturation separately from alpha channel of background color (to prevent low contrast conflicts)
-  },
-  computed: {
-    allValuesSorted() {
-      return [...this.sortArrayAscending(this.dataset.slice().flat())];
-    }
-
   }
 }
 </script>
@@ -53,19 +53,19 @@ export default {
       <thead>
         <tr>
           <th v-if="datasetLabels.length > 0" scope="row"></th>
-          <th v-bind:key="label" v-for="label in binLabels" class="data-grid__bin-label border-bottom" scope="col">
+          <th v-for="label in binLabels" :key="label" class="data-grid__bin-label border-bottom" scope="col">
             <span class="font-sans-xs">{{ label }}</span>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="i" v-for="row, i in dataset">
+        <tr v-for="row, headerIndex in dataset" :key="headerIndex">
           <th v-if="datasetLabels.length > 0" class="data-grid__dataset-label padding-y-2 text-right padding-right-2 border-right" scope="row">
             <span class="text-bold text-no-wrap">
-              {{ datasetLabels[i] }}
+              {{ datasetLabels[headerIndex] }}
             </span>
           </th>
-          <td v-bind:key="i" v-for="cell, i in row" class="data-grid__cell font-mono-md text-center padding-y-2 border" :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}">
+          <td v-for="cell, i in row" :key="i" class="data-grid__cell font-mono-md text-center padding-y-2 border" :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}">
             {{ cell }}
           </td>
         </tr>
