@@ -30,7 +30,7 @@ imlswifi.heartbeats (
     heartbeat_id SERIAL PRIMARY KEY,
     fscs_id character varying(16) NOT NULL REFERENCES imlswifi.libraries(fscs_id),
     ping_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    sensor_serial character varying(32) NOT NULL,
+    sensor_serial character varying(64) NOT NULL,
     sensor_version character varying(16) NOT NULL
 );
 
