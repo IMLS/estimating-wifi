@@ -96,10 +96,14 @@ func createURI(what string) string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
 	port := viper.GetInt("api.port")
-	return (scheme + "://" +
+	api_uri := viper.GetString("api.api_uri")
+	fullURI := (scheme + "://" +
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
 		":" + fmt.Sprint(port) + "/" +
+		strings.TrimPrefix(api_uri, "/") + "/" +
 		strings.TrimPrefix(what, "/"))
+	log.Debug().Msg("createURI(): " + fullURI)
+	return (fullURI)
 }
 
 func GetDurationsURI() string {
@@ -207,9 +211,10 @@ func SetConfigDefaults() {
 	viper.SetDefault("log.level", "DEBUG")
 	viper.SetDefault("log.loggers", "local:stderr,local:tmp")
 	viper.SetDefault("mode.run", "prod")
-	viper.SetDefault("api.scheme", "https")
-	viper.SetDefault("api.host", "rabbit-phase-4.app.cloud.gov")
-	viper.SetDefault("api.port", 443)
+	viper.SetDefault("api.scheme", "http")
+	viper.SetDefault("api.host", "localhost")
+	viper.SetDefault("api.port", 80)
+	viper.SetDefault("api.api_uri", "")
 	viper.SetDefault("api.login_uri", "/rpc/login")
 	viper.SetDefault("api.heartbeat_uri", "/rpc/beat_the_heart")
 	viper.SetDefault("api.presences_uri", "/rpc/update_presence")
