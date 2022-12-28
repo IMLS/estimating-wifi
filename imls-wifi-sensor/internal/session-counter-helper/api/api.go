@@ -70,7 +70,7 @@ func PostAuthentication(jwt *JWTToken) error {
 }
 
 func PostDurations(durations []*state.Duration) error {
-	log.Debug().Msg("PostDurations(): Posting" + strconv.Itoa(len(durations)) + "durations...")
+	log.Debug().Msg("PostDurations(): Posting " + strconv.Itoa(len(durations)) + " durations...")
 	token := JWTToken{}
 	auth_err := PostAuthentication(&token)
 	if auth_err != nil {
