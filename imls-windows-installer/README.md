@@ -23,6 +23,18 @@ Navigate to your Downloads folder, and extract the .zip file.
 - Scroll to the Background Processes section
 - If `Windows Service Wrapper` is running the `estimating-wifi` program, then it's running in the background as expected
 
+### Update session-counter.ini
+
+While the service is running in the background, you may need to update session-counter.ini with new config values.
+- Open your Windows start menu and search for Notepad
+- Right click the Notepad app and click 'Run as administrator'
+- Click 'File' > 'Open' and navigate to 'C:\Program Files (x86)\IMLS Session Counter\service\session-counter.ini'
+- Update `session-counter.ini` with your desired variable(s), then save the file
+- Open Powershell as an admin and cd to C:\Program Files (x86)\IMLS Session Counter\service
+- Run `./WinSw-x64.exe restart estimating-wifi`
+- Run `./WinSw-x64.exe status estimating-wifi` (just to confirm it's running)
+- You can check `WinSw-x64.err.log` to see if your changes were made
+
 ## Manual Build Process
 
 This process assumes a user is using a Windows machine, has admin rights, has downloaded the entire repository as a .zip, extracted all files into a folder, and is currently in the imls-windows-installer directory.
