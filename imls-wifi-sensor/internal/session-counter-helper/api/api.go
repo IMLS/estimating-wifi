@@ -71,7 +71,7 @@ func PostAuthentication(jwt *JWTToken) error {
 }
 
 func PostDurations(durations []*state.Duration) error {
-	log.Debug().Msg(fmt.printLn("PostDurations(): Posting",
+	log.Debug().Msg(fmt.Println("PostDurations(): Posting",
 				    strconv.Itoa(len(durations)),
 				    "durations..."))
 	token := JWTToken{}
