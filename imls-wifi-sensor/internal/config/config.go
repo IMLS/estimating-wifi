@@ -100,7 +100,7 @@ func createURI(what string) string {
 	fullURI := (scheme + "://" +
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
 		":" + fmt.Sprint(port) + "/" +
-		strings.TrimPrefix(api_uri, "/")) + "/" +
+		strings.TrimPrefix(api_uri, "/") + "/" +
 		strings.TrimPrefix(what, "/"))
 	log.Info().Msg("FULL URI: " + fullURI)
 	return (fullURI)
