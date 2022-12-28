@@ -209,10 +209,10 @@ func SetConfigDefaults() {
 	viper.SetDefault("mode.run", "prod")
 	viper.SetDefault("api.scheme", "https")
 	viper.SetDefault("api.host", "rabbit-phase-4.app.cloud.gov")
-	viper.SetDefault("api.port", 3000)
+	viper.SetDefault("api.port", 443)
 	viper.SetDefault("api.login_uri", "/rpc/login")
 	viper.SetDefault("api.heartbeat_uri", "/rpc/beat_the_heart")
-	viper.SetDefault("api.presences_uri", "/rpc/update_presences")
+	viper.SetDefault("api.presences_uri", "/rpc/update_presence")
 	// At midnight every night
 	viper.SetDefault("cron.reset", "0 0 * * *")
 	// Every hour
