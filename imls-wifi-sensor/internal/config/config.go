@@ -96,10 +96,12 @@ func createURI(what string) string {
 	scheme := viper.GetString("api.scheme")
 	host := viper.GetString("api.host")
 	port := viper.GetInt("api.port")
-	return (scheme + "://" +
+	fullURI = (scheme + "://" +
 		strings.TrimSuffix(strings.TrimPrefix(host, "/"), "/") +
 		":" + fmt.Sprint(port) + "/" +
 		strings.TrimPrefix(what, "/"))
+		log.Info().Msg("FULL URI: " + fullURI)
+	return (fullURI)
 }
 
 func GetDurationsURI() string {
