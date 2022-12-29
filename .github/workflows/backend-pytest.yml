@@ -25,13 +25,10 @@ jobs:
         - run: echo "POSTGRES_DB='imls'" >> .env
         - run: echo "DATABASE_URL='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable'" >> .env
         - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt . && docker compose up -d
-        
-        - name: Make Postgres CLI available
-          uses: akanieski/setup-postgres-cli@v0.1.2
-          with:
-            commands: pg_dump -U postgres -h localhost -p 5432
-            password: imlsimlsimls
-
+        - run: docker exec -it postgres_db mkdir /test
+        - run: docker copy .env postgres_db:.env
+        - run: docker copy test/setup-for-tests.sh
+        - run: docker exec -it /bin/bash test/setup-for-tests.sh
         - name: Run poetry and run Pytest
           uses: Gr1N/setup-poetry@v8
         - run: /bin/bash test/setup-for-tests.sh
