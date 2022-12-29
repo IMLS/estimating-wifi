@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import requests
 from unittest import TestCase
@@ -11,10 +11,13 @@ def endpoint(ep_arr):
 
 
 class PresencesTests(TestCase):
-    now = datetime.now()
+    now = datetime.now(timezone.utc).replace(microsecond=0)
     end = now + timedelta(minutes=5)
+    now = now.astimezone().isoformat()
+    end = end.astimezone().isoformat()
 
     def test_post_random_presence(self):
+
         token_url = endpoint(["rpc", "login"])
         body = {"fscs_id": "KY0069-002", "api_key": "hello-goodbye"}
         tr = requests.post(token_url, json=body)
@@ -32,12 +35,14 @@ class PresencesTests(TestCase):
         self.assertEqual(r.json(), "KY0069-002")
 
     def test_verify_insertion(self):
+
         verify_insert_url = endpoint(["rpc", "verify_presence"])
         params = {
             "_fscs_id": "KY0069-002",
             "_start": str(self.now),
             "_end": str(self.end),
         }
+
         headers = {"Prefer": "count=estimated"}
         rv = requests.post(verify_insert_url, headers=headers, json=params)
         self.assertEqual(rv.status_code, 200)

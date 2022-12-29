@@ -87,30 +87,6 @@ BEGIN
 END
 $$;
 
-
---
--- Name: get_timezone_from_fscs_id(text); Type: FUNCTION; Schema: api; Owner: -
---
-
-CREATE FUNCTION api.get_timezone_from_fscs_id(_fscs_id text) RETURNS integer
-    LANGUAGE plpgsql IMMUTABLE
-    AS $$
-DECLARE
-    _timezone TIMETZ;
-    _timezone_offset INT:=0;
-BEGIN
-    SELECT imls_lookup.timezone::TIMETZ INTO _timezone::TIMETZ
-    FROM api.imls_lookup
-    WHERE imls_lookup.fscs_id = _fscs_id;
-
-    _timezone_offset := extract(timezone_hour FROM _timezone::TIMETZ);
-    SELECT extract(timezone_hour FROM _timezone::TIMETZ) INTO _timezone_offset;
-
-    RETURN _timezone_offset;
-END
-$$;
-
-
 -- migrate:down
 
 

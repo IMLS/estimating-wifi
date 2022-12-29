@@ -8,20 +8,14 @@ imlswifi.libraries (
 );
 
 CREATE TABLE IF NOT EXISTS
-imlswifi.imls_lookup (
-    id SERIAL PRIMARY KEY,
-    fscs_id character varying(16) NOT NULL REFERENCES imlswifi.libraries(fscs_id)
-);
-
-CREATE TABLE IF NOT EXISTS
 imlswifi.presences (
     presence_id SERIAL PRIMARY KEY,
     start_time timestamp with time zone NOT NULL,
     end_time timestamp with time zone NOT NULL,
-    fscs_id character varying(16) NOT NULL REFERENCES imlswifi.libraries(fscs_id),
+    timezone character varying(6) NOT NULL,
+    fscs_id character varying(16) NOT NULL REFERENCES imlswifi.libraries(fscs_id)
     -- FIXME: what about our tag provided by the library IT director?
     -- We're missing something, but it should not be a UID of some sort.
-    manufacturer_index integer
 );
 
 CREATE TABLE IF NOT EXISTS
