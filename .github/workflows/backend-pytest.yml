@@ -16,14 +16,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      step:
-        name: Build the Docker image and run pytest
-        uses: actions/checkout@v3
-        - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt .
-        - run: docker compose up -d
-      step:
-        name: Run poetry and run Pytest
-        uses: Gr1N/setup-poetry@v8
+        - name: Build the Docker image and run pytest
+          uses: actions/checkout@v3
+        - name: Run poetry and run Pytest
+          uses: Gr1N/setup-poetry@v8 
+        - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt . && docker compose up -d
         - run: /bin/bash test/setup-for-tests.sh
         - run: poetry install
         - run: poetry shell
