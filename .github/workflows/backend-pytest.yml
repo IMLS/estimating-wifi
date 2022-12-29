@@ -23,7 +23,7 @@ jobs:
         - name: Make Postgres CLI available
           uses: akanieski/setup-postgres-cli@v0.1.2
           with:
-            user: postgres
+            commands: pg_dump -U postgres -h localhost -p 5432
             password: imlsimlsimls
         - run: echo "PGRST_JWT_SECRET='github-action-secret'" > .env
         - run: echo "POSTGRES_USER='postgres'" >> .env
