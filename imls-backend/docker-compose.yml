@@ -4,6 +4,7 @@ version: "3"
 services:
   server:
     image: postgrest/postgrest
+    container_name: postgrest_api
     ports:
       - "3000:3000"
     networks:
@@ -19,6 +20,7 @@ services:
       - db
   db:
     image: imls/postgres
+    container_name: postgres_db
     ports:
       - "5432:5432"
     networks:
