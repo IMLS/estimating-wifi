@@ -19,8 +19,14 @@ jobs:
         - name: Build the Docker image and run pytest
           uses: actions/checkout@v3
         - name: Run poetry and run Pytest
-          uses: Gr1N/setup-poetry@v8 
+          uses: Gr1N/setup-poetry@v8
         - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt . && docker compose up -d
+        - run: echo "PGRST_JWT_SECRET='github-action-secret'" > .env
+        - run: echo "POSTGRES_USER='postgres'" >> .env
+        - run: echo "POSTGRES_PASSWORD='imlsimlsimls'" >> .env
+        - run: echo "POSTGRES_USER='postgres' >> .env
+        - run: echo "POSTGRES_DB='imls'" >> .env
+        - run: echo "DATABASE_URL='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable'" >> .env
         - run: /bin/bash test/setup-for-tests.sh
         - run: poetry install
         - run: poetry shell
