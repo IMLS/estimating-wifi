@@ -1,0 +1,31 @@
+name: Backend CI
+run-name: Pytest check on imls-backend
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: imls-backend
+    runs-on: ubuntu-latest
+
+    steps:
+      step:
+        name: Build the Docker image and run pytest
+        uses: actions/checkout@v3
+        - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt .
+        - run: docker compose up -d
+      step:
+        name: Run poetry and run Pytest
+        uses: Gr1N/setup-poetry@v8
+        - run: /bin/bash test/setup-for-tests.sh
+        - run: poetry install
+        - run: poetry shell
+        - run: source test/.test_config && pytest test/
+
