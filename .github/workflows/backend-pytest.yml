@@ -24,7 +24,7 @@ jobs:
         - run: echo "PGRST_JWT_SECRET='github-action-secret'" > .env
         - run: echo "POSTGRES_USER='postgres'" >> .env
         - run: echo "POSTGRES_PASSWORD='imlsimlsimls'" >> .env
-        - run: echo "POSTGRES_USER='postgres' >> .env
+        - run: echo "POSTGRES_USER='postgres'" >> .env
         - run: echo "POSTGRES_DB='imls'" >> .env
         - run: echo "DATABASE_URL='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable'" >> .env
         - run: /bin/bash test/setup-for-tests.sh
