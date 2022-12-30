@@ -24,7 +24,8 @@ jobs:
         - run: echo "POSTGRES_USER='postgres'" >> .env
         - run: echo "POSTGRES_DB='imls'" >> .env
         - run: echo "DATABASE_URL='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable'" >> .env
-        - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt . && docker compose up -d
+        - run: docker build -t imls/postgres:latest -f Dockerfile.pgjwt .
+        - run: docker compose up -d
         - run: docker exec postgres_db mkdir /test
         - run: docker cp .env postgres_db:/.env
         - run: docker cp test/setup-for-tests.sh postgres_db:/test/setup-for-tests.sh
