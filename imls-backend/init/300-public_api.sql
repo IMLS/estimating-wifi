@@ -58,7 +58,7 @@ DECLARE
     _min_minutes INT := 5;
     _max_minutes INT := 600;
 BEGIN
-    SELECT api.get_timezone_from_fscs_id(_fscs_id) INTO _timezone_offset;
+    SELECT SUBSTRING(timezone,1,3)::INTEGER FROM api.presences WHERE fscs_id = _fscs_id ORDER BY presence_id LIMIT 1 INTO _timezone_offset;
     _hour := _hour - _timezone_offset;
     _day_end := _day_end - _timezone_offset;
 
