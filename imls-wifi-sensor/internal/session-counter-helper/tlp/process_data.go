@@ -20,7 +20,6 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 	macs := state.GetMACs()
 	for index, element := range macs {
 		log.Debug().
-			Str("count", index).
 			Str("MAC", element).
 			Msg("GetMACs output")
    	}
