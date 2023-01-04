@@ -18,6 +18,12 @@ func ProcessData(dDB *state.DurationsDB, sq *state.Queue[int64]) bool {
 	}
 
 	macs := state.GetMACs()
+	for index, element := range macs {
+		log.Debug().
+			Int64("tally", index).
+			Str("MAC", element).
+			Msg("GetMACs output")
+   	}
 	dDB.InsertMany(session, macs)
 	return true
 }
