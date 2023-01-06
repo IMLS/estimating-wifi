@@ -14,6 +14,18 @@ export default {
   metaInfo: {
     title: "Welcome",
     description: "This tool is the result of a collaborative research project with the Institute of Museum and Library Services, the Georgia Public Library Service, and Technology Transformation Services' 10x program."
+  },
+  methods:{
+    setRouteWrapperFocus() {
+      this.$refs.focus.focus();
+    },
+  },
+  watch: {
+    $route: function() {
+      this.$nextTick(function() {
+        this.setRouteWrapperFocus();
+      });
+    }
   }
 };
 </script>
@@ -30,8 +42,10 @@ export default {
       <div class="grid-container">
         <div class="grid-row grid-gap">
           <main
+            ref="focus"
             id="main-content"
             class="grid-col"
+            tabindex="-1"
           >
             <RouterView />
           </main>

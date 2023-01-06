@@ -17,7 +17,7 @@ export default {
 </script>
 
 <template>
-  <main>
+  <div>
     <h1>Home</h1>
 
     <h2> All States</h2>
@@ -32,5 +32,5 @@ export default {
       </li>
       
     </ul>
-  </main>
+  </div>
 </template>
