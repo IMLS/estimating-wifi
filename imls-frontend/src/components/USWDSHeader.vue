@@ -47,7 +47,7 @@ export default {
               to="/"
               title="Public Library Wifi Estimator"
             > 
-            Public Library Wifi Access Estimator </RouterLink>
+            Public Library Wifi Estimator </RouterLink>
           </em>
         </div>
         <button class="usa-menu-btn">

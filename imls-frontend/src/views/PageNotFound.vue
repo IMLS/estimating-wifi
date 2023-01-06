@@ -7,3 +7,10 @@
 
 <style>
 </style>
+<script>
+export default {
+  metaInfo: {
+    title: "Page not found"
+  }
+}
+</script>

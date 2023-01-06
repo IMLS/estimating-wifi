@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
 import { startOfYesterday } from "date-fns";
 
-
 let router;
 
 
@@ -189,6 +188,7 @@ describe("PageLibrary", () => {
     expect(wrapper.find("h1").text()).toEqual("MOCKED PUBLIC LIBRARY");
     expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
 
+
     wrapper.setProps({ id: "anotherMockedLibrary" });
     fetch.mockResponseOnce(JSON.stringify(MOCK_ANOTHER_LIB_FOUND))
     await wrapper.vm.fetchLibraryData();
@@ -218,4 +218,9 @@ describe("PageLibrary", () => {
     ).toStrictEqual("AA0001-004");
   });
 
+  it("should format a page title using the library and state names", () => {
+    let pageMeta = PageLibrary.metaInfo('prefix', 'postfix');
+    expect(pageMeta).toHaveProperty("title");
+    expect(pageMeta.title).toStrictEqual("prefix | postfix");
+  });
 });

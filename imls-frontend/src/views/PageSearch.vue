@@ -49,6 +49,12 @@ export default {
       return fscsid + '-' + this.leftPadSequence(seq)
     },
   },
+  metaInfo(query = this.query) {
+    const pagePrefix = `Library search results for "${query}"`;
+    return {
+      title: pagePrefix
+    }
+  }
 }
 </script>
 

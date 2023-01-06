@@ -10,6 +10,9 @@ export default {
       store,
     };
   },
+  metaInfo: {
+    title: "Homepage",
+  }
 }
 </script>
 

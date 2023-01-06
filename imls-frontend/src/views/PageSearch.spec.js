@@ -169,4 +169,10 @@ describe("PageSearch", () => {
       PageSearch.methods.formatFSCSandSequence("AA0001", "00004")
     ).toStrictEqual("AA0001-004");
   });
+
+  it("should format a page title using the current query", () => {
+    let pageMeta = PageSearch.metaInfo('searched query');
+    expect(pageMeta).toHaveProperty("title");
+    expect(pageMeta.title).toStrictEqual('Library search results for "searched query"');
+  });
 });
