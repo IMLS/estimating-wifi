@@ -3,9 +3,9 @@ import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
+const Y_AXIS_SCALAR = 1.1;
 
 ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale, ChartDataLabels)
-
 export default {
   name: 'BarChart',
   components: { Bar },
@@ -55,6 +55,13 @@ export default {
     return {
       chartOptions: {
         responsive: true,
+        scales: {
+          y: {
+            afterDataLimits: function(axis) {
+              axis.max *= Y_AXIS_SCALAR;
+            }
+          }
+        },
         plugins: {
           datalabels: {
             // USWSDS blue-70v
@@ -133,7 +140,6 @@ export default {
       }
     },
   },
-  methods: {}
 }
 </script>
 
