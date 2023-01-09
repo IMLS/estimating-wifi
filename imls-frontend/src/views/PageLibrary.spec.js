@@ -78,7 +78,7 @@ describe("PageLibrary", () => {
     const wrapper = shallowMount(PageLibrary, {
       props: {
         id: "KnownGoodId",
-        selectedDate: "2022-05-02",
+        selectedDateFromParams: "2022-05-02",
       },
       global: {
         stubs: ["router-link", "router-view", "RouterView", "RouterLink"],
@@ -86,6 +86,21 @@ describe("PageLibrary", () => {
     });
     expect(PageLibrary.methods.toISODate(wrapper.vm.selectedDateUTC)).toEqual("2022-05-02");
     
+  });
+  it("should determine whether the provided date is usable, and if not, use yesterday", () => {
+    const wrapper = shallowMount(PageLibrary, {
+      props: {
+        id: "KnownGoodId",
+        selectedDateFromParams: "000-00-00",
+      },
+      global: {
+        stubs: ["router-link", "router-view", "RouterView", "RouterLink"],
+      },
+    });
+    expect(wrapper.vm.isParseableDate).toBeFalsy();
+    expect(wrapper.vm.selectedDateUTC).toEqual(
+       startOfYesterday()
+    );          
   });
 
   it("should format day labels for n days given a date and count", () => {
@@ -99,7 +114,7 @@ describe("PageLibrary", () => {
     const wrapper = mount(PageLibrary, {
       props: {
         id: "KnownGoodId",
-        selectedDate: "1999-12-31"
+        selectedDateFromParams: "1999-12-31"
       },
       global: {
         stubs: [
@@ -223,4 +238,6 @@ describe("PageLibrary", () => {
     expect(pageMeta).toHaveProperty("title");
     expect(pageMeta.title).toStrictEqual("prefix | postfix");
   });
+
+
 });

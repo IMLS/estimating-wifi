@@ -1,6 +1,6 @@
 <script>
 import datePicker from "uswds/src/js/components/date-picker";
-import { startOfYesterday } from "date-fns";
+import { format, parseISO, startOfYesterday } from "date-fns";
 
 const MIN_DATE = "2022-01-01";
 const MAX_DATE = startOfYesterday().toISOString().split("T")[0];
@@ -24,19 +24,36 @@ export default {
       selectedDate: null,
       minDate: MIN_DATE,
       maxDate: MAX_DATE,
+      dateIsOutOfBounds: false
     }
   },
   mounted() {
     this.enableUSWDSFeatures();
   },
+  computed: {
+    minDateReadable() {
+      return this.formatReadableDate(this.minDate)
+    }, 
+    maxDateReadable() {
+      return this.formatReadableDate(this.maxDate)
+    },
+  },
   methods: {
+    formatReadableDate(ISO_DATE_SUBSTRING) {
+      return format(new Date(parseISO(ISO_DATE_SUBSTRING).toISOString()), 'MM/dd/yyyy')
+    },
     async enableUSWDSFeatures(){
       await datePicker.init();
       await datePicker.enable(this.$refs.picker);
     },
     detectChange(e) {
       this.selectedDate = this.$refs.date.value;
-      this.$emit('date_changed', encodeURIComponent(e.target.value) )
+      if (this.selectedDate) {
+        this.dateIsOutOfBounds = false
+        this.$emit('date_changed', encodeURIComponent(e.target.value) )
+      } else {
+        this.dateIsOutOfBounds = true;
+      }
     }
   }
 }
@@ -52,7 +69,7 @@ export default {
 ref="picker" 
       class="usa-date-picker maxw-date-picker" 
       :data-default-value="initialDate"
-      :data-selected-date="!!selectedDate ? selectedDate : initialDate"
+      :data-selected-date="initialDate"
       :data-min-date="minDate"
       :data-max-date="maxDate"
       >
@@ -66,6 +83,7 @@ ref="picker"
         @change="detectChange"
       />
     </div>
+    <div v-if="dateIsOutOfBounds" id="date-outside-range" class="usa-hint margin-y-2">Please choose a date within range ({{  minDateReadable }} — {{ maxDateReadable }}).</div>
   </div>
 </template>
 
