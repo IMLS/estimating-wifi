@@ -3,13 +3,17 @@ import { reactive, computed, readonly } from "vue";
 const BACKEND_BASEURL = import.meta.env.VITE_BACKEND_BASEURL;
 
 export const store = readonly({
-  fscs_ids: [
-    { id: "GA0029-002" },
-    { id: "GA0029-003" },
-    { id: "GA0029-004" },
-    { id: "GA0027-004" },
-    { id: "GA0027-008" },
-    { id: "GA0027-011" },
+  example_libraries: [
+    { id: "GA1234-567", name: "Meenu's Dining Room" },
+    { id: "AL1234-567", name: "Meenu's Local Library" },
+    { id: "MN9999-123", name: "Ben's Basement" },
+    { id: "MN1111-123", name: "Ben's Icy Lakes and Wilderness" },
+    { id: "GA0029-002", name: "May 2022 - Library GA0029-002", onlyMay: true },
+    { id: "GA0029-003", name: "May 2022 - Library GA0029-003", onlyMay: true  },
+    { id: "GA0029-004", name: "May 2022 - Library GA0029-004", onlyMay: true  },
+    { id: "GA0027-004", name: "May 2022 - Library GA0027-004", onlyMay: true  },
+    { id: "GA0027-008", name: "May 2022 - Library GA0027-008", onlyMay: true  },
+    { id: "GA0027-011", name: "May 2022 - Library GA0027-011", onlyMay: true  },
   ],
   hourlyLabels: [
     "12am",

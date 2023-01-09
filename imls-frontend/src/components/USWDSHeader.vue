@@ -25,6 +25,12 @@ export default {
     resetSearch() {
       this.searchString = '';
       this.$refs.searchInput.blur()
+    },
+    // for debugging only, remove when we remove the example libraries.
+    jumpToMayForExampleLibraries(existingQuery = null, shouldJump = false) {
+      if (existingQuery.date) return existingQuery;
+      if (shouldJump) return { date: "2022-05-30" }
+      return existingQuery;
     }
   },
 };
@@ -80,9 +86,9 @@ export default {
                 id="extended-nav-section-libraries"
                 class="usa-nav__submenu"
               >
-                <li v-for="library in store.fscs_ids" :key="library.id" class="usa-nav__submenu-item">
-                  <RouterLink :to="{ path: '/library/' + library.id + '/' , query: $route.query}">
-                    Example library {{ library.id }}
+                <li v-for="library in store.example_libraries" :key="library.id" class="usa-nav__submenu-item">
+                  <RouterLink :to="{ path: '/library/' + library.id + '/' , query: jumpToMayForExampleLibraries($route.query, library.onlyMay)}">
+                    {{ library.name }}
                   </RouterLink>
                 </li>
                
