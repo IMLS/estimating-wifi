@@ -17,14 +17,14 @@ export default {
   },
   methods:{
     setRouteWrapperFocus() {
-      this.$refs.focus.focus();
+      this.$nextTick(function() {
+        this.$refs.focus.focus();
+      });
     },
   },
   watch: {
     $route: function() {
-      this.$nextTick(function() {
-        this.setRouteWrapperFocus();
-      });
+      this.setRouteWrapperFocus();
     }
   }
 };
