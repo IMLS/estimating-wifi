@@ -43,6 +43,7 @@ export default {
         <div class="grid-row grid-gap">
           <main
             id="main-content"
+            aria-describedby="pageTitle"
             ref="focus"
             class="grid-col"
             tabindex="-1"

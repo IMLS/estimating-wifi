@@ -79,6 +79,9 @@ export default {
 
     libraryName() {
       if (this.fetchedLibraryData && this.fetchedLibraryData.libname )  return this.fetchedLibraryData.libname;
+      // remove next 2 lines when we aren't listing extra sensors we test with
+      let exampleLibrary = store.example_libraries.find(lib => lib.id == this.id);
+      if (exampleLibrary) return `${exampleLibrary.name} (example library ${this.id})`;
       return "Library " + this.id
     },
     stateAbbr() {
@@ -89,7 +92,7 @@ export default {
       if ( !this.fetchedLibraryData ) return null;
       return this.store.states[this.stateAbbr]
     },
-    breadcrumbs () {
+    breadcrumbs() {
       if ( this.fetchedLibraryData == null ) return []
       return [
          { 
@@ -151,7 +154,7 @@ export default {
       return fscsid + '-' + this.leftPadSequence(seq)
     }
   },
-  metaInfo(prefix = this.libraryName, postfix = this.stateName ) {
+  metaInfo(prefix = this.libraryName, postfix = this.stateName || 'Unknown State' ) {
     const pagePrefix = prefix + " | " + postfix;
     return {
       title: pagePrefix
@@ -163,7 +166,7 @@ export default {
 <template>
   <div>
     <USWDSBreadcrumb :crumbs=breadcrumbs />
-    <h1>{{ libraryName }}</h1>
+    <h1 id="pageTitle">{{ libraryName }}</h1>
     <div v-if="fetchedLibraryData !== null">
       <h2>{{ formatFSCSandSequence(fetchedLibraryData.fscskey, fetchedLibraryData.fscs_seq) }}</h2>
       {{ fetchedLibraryData.address }}<br>

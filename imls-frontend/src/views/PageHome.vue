@@ -18,7 +18,7 @@ export default {
 
 <template>
   <div>
-    <h1>Home</h1>
+    <h1 id="pageTitle">Home</h1>
 
     <h2> All States</h2>
 
