@@ -5,5 +5,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  metaInfo: {
+    title: "Page not found"
+  }
+}
+</script>
 <style>
 </style>

@@ -33,3 +33,7 @@
 .maxw-date-picker{
   max-width: 20em;
 }
+
+main[tabindex]:focus {
+  outline: none;
+}

@@ -23,7 +23,7 @@ export default {
       required: true,
       default: ''
     },
-    selectedDate: {
+    selectedDateFromParams: {
       type: String,
       // start at specific date if provided (for testing)
       default: () => {
@@ -43,6 +43,18 @@ export default {
     }
   },
   computed: {
+    isParseableDate() {
+      if (parseISO(this.selectedDateFromParams) == 'Invalid Date') {
+        return false
+      }
+      return true
+    },
+    selectedDate() {
+      // if selectedDateFromParams is good, use it, 
+      // otherwise use today
+      if (this.isParseableDate) return this.selectedDateFromParams
+      return startOfYesterday().toISOString().split("T")[0]
+    },
     selectedDateUTC() {
       return new Date(this.selectedDate + "T00:00")
     },
@@ -69,6 +81,14 @@ export default {
       if (this.fetchedLibraryData && this.fetchedLibraryData.libname )  return this.fetchedLibraryData.libname;
       return "Library " + this.id
     },
+    stateAbbr() {
+      if ( !this.fetchedLibraryData ) return null;
+      return this.fetchedLibraryData.stabr
+    },
+    stateName() {
+      if ( !this.fetchedLibraryData ) return null;
+      return this.store.states[this.stateAbbr]
+    },
     breadcrumbs () {
       if ( this.fetchedLibraryData == null ) return []
       return [
@@ -77,8 +97,8 @@ export default {
           link: "/" 
         },
         { 
-          name: this.store.states[this.fetchedLibraryData.stabr],
-          link: `/state/${this.fetchedLibraryData.stabr}/` 
+          name: this.stateName,
+          link: `/state/${this.stateAbbr}/` 
         },
         {
           name: this.libraryName
@@ -130,6 +150,12 @@ export default {
     formatFSCSandSequence(fscsid, seq) {
       return fscsid + '-' + this.leftPadSequence(seq)
     }
+  },
+  metaInfo(prefix = this.libraryName, postfix = this.stateName ) {
+    const pagePrefix = prefix + " | " + postfix;
+    return {
+      title: pagePrefix
+    }
   }
 };
 </script>
@@ -145,6 +171,8 @@ export default {
     </div>
 
     <USWDSDatePicker :initial-date=toISODate(selectedDateUTC) @date_changed="navigateToSelectedDate" />
+
+    <template v-if="isParseableDate">
 
     <div class="usa-card-group margin-top-6">
 
@@ -274,9 +302,12 @@ export default {
           </div>
         </USWDSCard>
       </div>
-
-
     </div>
+    </template>
+    <template v-else>
+      <p>Please enter a valid date.</p>
+    </template>
+
   </div>
 </template>
 

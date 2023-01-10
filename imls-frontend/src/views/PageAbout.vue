@@ -12,6 +12,9 @@ export default {
       multilineContent: "I'm the first paragraph. I get special styling in USWDS Content. \nI'm a newline. Any new lines after me are parsed as regular paragraphs. I don't know markdown yet.",
     };
   },
+  metaInfo: {
+    title: 'About',
+  }
 }
 </script>
 

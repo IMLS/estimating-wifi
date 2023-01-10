@@ -27,7 +27,7 @@ const routes = [
     path: "/library/:fscs_id/",
     component: () => import("../views/PageLibrary.vue"),
     props: (route) => ({
-      selectedDate: route.query.date,
+      selectedDateFromParams: route.query.date,
       id: route.params.fscs_id,
     }),
   },

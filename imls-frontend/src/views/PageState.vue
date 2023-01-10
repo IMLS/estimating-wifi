@@ -79,6 +79,12 @@ export default {
     formatFSCSandSequence(fscsid, seq) {
       return fscsid + '-' + this.leftPadSequence(seq)
     },
+  },
+  metaInfo(stateName = this.stateName) {
+    const pagePrefix = `${stateName} Public Libraries`;
+    return {
+      title: pagePrefix
+    }
   }
 };
 </script>
