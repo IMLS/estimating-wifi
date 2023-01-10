@@ -2,6 +2,13 @@
 import { store } from "@/store/store.js";
 import { addDays, parseISO, isSameDay, format } from "date-fns";
 
+let formatNumbers = (val) => {
+  if (val < 1) return "–"
+  // if we prefer commas in the future, use val.toLocaleString()
+  return val
+}
+
+
 export default {
   name: 'HeatmapWeeklyCalendar',
   props: {
@@ -45,6 +52,7 @@ export default {
     }
   },
   methods: {
+    formatNumbers,
     generateDayLabels(startingDateISO) {
       let startingDate = parseISO(startingDateISO + "T00:00");
       // 7 days = 1 week
@@ -101,8 +109,8 @@ v-for="row, headerIndex in dataset" :key="headerIndex" class="weekly-calendar__d
         <!-- A day column also has a list of values-->
         <div
 v-for="cell, index in row" :key="index" class="weekly-calendar__cell" 
-          :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}">
-          {{ cell }}
+          :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}" :data-is-zero="cell === 0 ? true : null">
+          {{ formatNumbers(cell) }}
         </div>
       </div>
 
@@ -133,6 +141,12 @@ v-for="cell, index in row" :key="index" class="weekly-calendar__cell"
   display: flex;
   flex-flow: column;
   justify-content: center;
+  
+  &[data-is-zero] {
+    color: #71767a;
+    border-color: #1b1b1b;
+    background-color: #f5f6f7 !important;
+  }
 }
 .weekly-calendar__day {
   border-width: 0 .25px 0 0 ;

@@ -51,11 +51,18 @@ describe("Heatmap", () => {
       getAlphaFromRGBAColor(allValuesRendered[3].element.style.backgroundColor)
     ).toEqual(0.4);
 
-    // the last value in the sample dataset is also the lowest percentile
+    // the last value in the sample dataset is also a zero value
     expect(allValuesRendered[14].attributes("data-percentile")).toEqual("0");
-    // 0th percentile color should have 0% alpha channel / be at 0% opacity
+    // 0th percentile color should have 0% alpha channel and have a data attribute
+    expect(allValuesRendered[14].attributes("data-is-zero")).toBeTruthy();
     expect(
       getAlphaFromRGBAColor(allValuesRendered[14].element.style.backgroundColor)
     ).toEqual(0);
+
+    // format numbers
+    expect(Heatmap.methods.formatNumbers(1)).toEqual(1);
+    // note that for now, we aren't using commas
+    expect(Heatmap.methods.formatNumbers(1000)).toEqual(1000);
+    expect(Heatmap.methods.formatNumbers(0)).toEqual('–');
   });
 });

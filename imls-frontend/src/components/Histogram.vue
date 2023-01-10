@@ -5,6 +5,11 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const Y_AXIS_SCALAR = 1.1;
 
+let formatNumbers = (val) => {
+  if (val < 1) return "–"
+  // if we prefer commas in the future, use val.toLocaleString()
+  return val
+}
 ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale, ChartDataLabels)
 export default {
   name: 'BarChart',
@@ -56,11 +61,18 @@ export default {
       chartOptions: {
         responsive: true,
         scales: {
+          /* c8 ignore start */ 
           y: {
             afterDataLimits: function(axis) {
               axis.max *= Y_AXIS_SCALAR;
+            },
+            ticks: {
+              callback: (value, index, values) => {
+                return formatNumbers(value); 
+              }
             }
           }
+            /* c8 ignore end */ 
         },
         plugins: {
           datalabels: {
@@ -74,10 +86,15 @@ export default {
               title: {
                 font: {
                   weight: 'bold',
-                  size: 20
+                  size: 18
                 }
               },
+            },
+            /* c8 ignore start */ 
+            formatter: function(value, context) {
+              return formatNumbers(value);
             }
+            /* c8 ignore end */ 
           },
           tooltip: {
             enabled: false
@@ -140,6 +157,9 @@ export default {
       }
     },
   },
+  methods: {
+   formatNumbers
+  }
 }
 </script>
 

@@ -1,5 +1,11 @@
 <script>
 
+let formatNumbers = (val) => {
+  if (val < 1) return "–"
+  // if we prefer commas in the future, use val.toLocaleString()
+  return val
+}
+
 export default {
   name: 'HeatmapTable',
   props: {
@@ -32,6 +38,7 @@ export default {
 
   },
   methods: {
+    formatNumbers,
     sortArrayAscending(arr){
       return arr.sort(function(a,b){ return parseFloat(a) - parseFloat(b);});
     },
@@ -65,8 +72,8 @@ export default {
               {{ datasetLabels[headerIndex] }}
             </span>
           </th>
-          <td v-for="cell, i in row" :key="i" class="data-grid__cell font-mono-md text-center padding-y-2 border" :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}">
-            {{ cell }}
+          <td v-for="cell, i in row" :key="i" class="data-grid__cell  font-mono-sm text-center padding-y-2 border" :data-percentile="Math.round(getPercentile(cell)*100)" :style="{ backgroundColor: 'rgba(' + colorRGB.join() + ', ' + getPercentile(cell) +')'}" :data-is-zero="cell === 0 ? true : null">
+            {{ formatNumbers(cell) }}
           </td>
         </tr>
       </tbody>
@@ -99,6 +106,16 @@ tr {
 th, td {
   
 }
+.data-grid__cell {
+  &[data-is-zero] {
+    color: #71767a;
+    border-color: #1b1b1b;
+    background-color: #f5f6f7 !important;
+  }
+}
+
+
+
 .data-grid__dataset {
 }
 .data-grid__dataset-label {
