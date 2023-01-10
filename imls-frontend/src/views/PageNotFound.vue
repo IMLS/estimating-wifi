@@ -5,8 +5,6 @@
   </div>
 </template>
 
-<style>
-</style>
 <script>
 export default {
   metaInfo: {
@@ -14,3 +12,5 @@ export default {
   }
 }
 </script>
+<style>
+</style>

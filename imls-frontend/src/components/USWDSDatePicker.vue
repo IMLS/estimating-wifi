@@ -27,9 +27,6 @@ export default {
       dateIsOutOfBounds: false
     }
   },
-  mounted() {
-    this.enableUSWDSFeatures();
-  },
   computed: {
     minDateReadable() {
       return this.formatReadableDate(this.minDate)
@@ -37,6 +34,9 @@ export default {
     maxDateReadable() {
       return this.formatReadableDate(this.maxDate)
     },
+  },
+  mounted() {
+    this.enableUSWDSFeatures();
   },
   methods: {
     formatReadableDate(ISO_DATE_SUBSTRING) {

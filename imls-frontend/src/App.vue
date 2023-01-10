@@ -15,17 +15,17 @@ export default {
     title: "Welcome",
     description: "This tool is the result of a collaborative research project with the Institute of Museum and Library Services, the Georgia Public Library Service, and Technology Transformation Services' 10x program."
   },
+  watch: {
+    $route: function() {
+      this.setRouteWrapperFocus();
+    }
+  },
   methods:{
     setRouteWrapperFocus() {
       this.$nextTick(function() {
         this.$refs.focus.focus();
       });
     },
-  },
-  watch: {
-    $route: function() {
-      this.setRouteWrapperFocus();
-    }
   }
 };
 </script>
@@ -34,7 +34,7 @@ export default {
 
   <div>
     <metainfo>
-      <template v-slot:title="{ content }">{{ content }} | Public Library Wifi Estimator</template>
+      <template #title="{ content }">{{ content }} | Public Library Wifi Estimator</template>
     </metainfo>
     <USWDSHeader />
 
@@ -42,8 +42,8 @@ export default {
       <div class="grid-container">
         <div class="grid-row grid-gap">
           <main
-            ref="focus"
             id="main-content"
+            ref="focus"
             class="grid-col"
             tabindex="-1"
           >
