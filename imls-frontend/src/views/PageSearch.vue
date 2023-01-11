@@ -60,7 +60,7 @@ export default {
 
 <template>
   <div class="search">
-    <h1>Libraries matching "{{ query }}"</h1>
+    <h1 id="pageTitle">Libraries matching "{{ query }}"</h1>
 
     <div v-if="fetchedLibraries == null || fetchedLibraries.length < 1">
       <p>Sorry, no matching libraries found. </p>
