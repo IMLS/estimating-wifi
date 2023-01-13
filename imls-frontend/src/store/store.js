@@ -4,6 +4,7 @@ const BACKEND_BASEURL = import.meta.env.VITE_BACKEND_BASEURL;
 
 export const store = readonly({
   example_libraries: [
+    { id: "VA1234-567", name: "Meenu's Apartment" },
     { id: "GA1234-567", name: "Meenu's Dining Room" },
     { id: "AL1234-567", name: "Meenu's Local Library" },
     { id: "MN9999-123", name: "Ben's Basement" },
