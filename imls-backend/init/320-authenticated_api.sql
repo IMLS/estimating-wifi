@@ -51,3 +51,19 @@ BEGIN
    RETURN _result;
 end;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION api.sensor_setup(
+	_sensor character varying,
+	_key character varying,
+	_label character varying)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+INSERT INTO basic_auth.users 
+	VALUES (_sensor, _key, 'sensor');
+INSERT INTO imlswifi.sensors(fscs_id, labels)
+   VALUES(_sensor, _label);
+   RETURN '{"result":"Sensor Inserted"}'::json;
+END;
+$BODY$;
