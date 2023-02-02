@@ -32,7 +32,7 @@ jobs:
         - run: docker cp test/setup-for-tests.sh postgres_db:/test/setup-for-tests.sh
         - run: docker exec postgres_db /bin/cat /.env /test/setup-for-tests.sh
         - run: docker exec postgres_db /bin/bash /test/setup-for-tests.sh
-        - name: Run poetry and run Pytest
+        - name: Run poetry and run Pytest.
           uses: Gr1N/setup-poetry@v8
         - run: poetry install
         - run: poetry shell
