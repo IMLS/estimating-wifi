@@ -54,7 +54,8 @@ describe("HeatmapWeeklyCalendar", () => {
 
     // the last value in the sample dataset is also the lowest percentile
     expect(allValuesRendered[13].attributes("data-percentile")).toEqual("0");
-    // 0th percentile color should have 0% alpha channel / be at 0% opacity
+    // 0th percentile color should have 0% alpha channel and have a data attribute
+    expect(allValuesRendered[13].attributes("data-is-zero")).toBeTruthy();
     expect(
       getAlphaFromRGBAColor(allValuesRendered[13].element.style.backgroundColor)
     ).toEqual(0);
@@ -66,5 +67,11 @@ describe("HeatmapWeeklyCalendar", () => {
     expect(
       wrapper.findAll(".weekly-calendar__day")[6].classes("isSelectedDate")
     ).toBe(false);
+
+    // format numbers
+    expect(HeatmapWeeklyCalendar.methods.formatNumbers(1)).toEqual(1);
+    // note that for now, we aren't using commas
+    expect(HeatmapWeeklyCalendar.methods.formatNumbers(1000)).toEqual(1000);
+    expect(HeatmapWeeklyCalendar.methods.formatNumbers(0)).toEqual('–');
   });
 });

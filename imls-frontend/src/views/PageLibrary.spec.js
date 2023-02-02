@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "../router/index.js";
 import { startOfYesterday } from "date-fns";
 
-
 let router;
 
 
@@ -79,7 +78,7 @@ describe("PageLibrary", () => {
     const wrapper = shallowMount(PageLibrary, {
       props: {
         id: "KnownGoodId",
-        selectedDate: "2022-05-02",
+        selectedDateFromParams: "2022-05-02",
       },
       global: {
         stubs: ["router-link", "router-view", "RouterView", "RouterLink"],
@@ -87,6 +86,21 @@ describe("PageLibrary", () => {
     });
     expect(PageLibrary.methods.toISODate(wrapper.vm.selectedDateUTC)).toEqual("2022-05-02");
     
+  });
+  it("should determine whether the provided date is usable, and if not, use yesterday", () => {
+    const wrapper = shallowMount(PageLibrary, {
+      props: {
+        id: "KnownGoodId",
+        selectedDateFromParams: "000-00-00",
+      },
+      global: {
+        stubs: ["router-link", "router-view", "RouterView", "RouterLink"],
+      },
+    });
+    expect(wrapper.vm.isParseableDate).toBeFalsy();
+    expect(wrapper.vm.selectedDateUTC).toEqual(
+       startOfYesterday()
+    );          
   });
 
   it("should format day labels for n days given a date and count", () => {
@@ -100,7 +114,7 @@ describe("PageLibrary", () => {
     const wrapper = mount(PageLibrary, {
       props: {
         id: "KnownGoodId",
-        selectedDate: "1999-12-31"
+        selectedDateFromParams: "1999-12-31"
       },
       global: {
         stubs: [
@@ -189,6 +203,7 @@ describe("PageLibrary", () => {
     expect(wrapper.find("h1").text()).toEqual("MOCKED PUBLIC LIBRARY");
     expect(wrapper.vm.fetchedLibraryData).toHaveProperty('libname')
 
+
     wrapper.setProps({ id: "anotherMockedLibrary" });
     fetch.mockResponseOnce(JSON.stringify(MOCK_ANOTHER_LIB_FOUND))
     await wrapper.vm.fetchLibraryData();
@@ -217,5 +232,12 @@ describe("PageLibrary", () => {
       PageLibrary.methods.formatFSCSandSequence("AA0001", "00004")
     ).toStrictEqual("AA0001-004");
   });
+
+  it("should format a page title using the library and state names", () => {
+    let pageMeta = PageLibrary.metaInfo('prefix', 'postfix');
+    expect(pageMeta).toHaveProperty("title");
+    expect(pageMeta.title).toStrictEqual("prefix | postfix");
+  });
+
 
 });

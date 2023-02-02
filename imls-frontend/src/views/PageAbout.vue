@@ -12,12 +12,15 @@ export default {
       multilineContent: "I'm the first paragraph. I get special styling in USWDS Content. \nI'm a newline. Any new lines after me are parsed as regular paragraphs. I don't know markdown yet.",
     };
   },
+  metaInfo: {
+    title: 'About',
+  }
 }
 </script>
 
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <h1 id="pageTitle">This is an about page</h1>
     <USWDSContent :multiline-content="multilineContent"/>
      <RouterLink
         to="/"

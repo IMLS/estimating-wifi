@@ -79,6 +79,12 @@ export default {
     formatFSCSandSequence(fscsid, seq) {
       return fscsid + '-' + this.leftPadSequence(seq)
     },
+  },
+  metaInfo(stateName = this.stateName) {
+    const pagePrefix = `${stateName} Public Libraries`;
+    return {
+      title: pagePrefix
+    }
   }
 };
 </script>
@@ -86,7 +92,7 @@ export default {
 <template>
   <div>
     <USWDSBreadcrumb :crumbs=breadcrumbs />
-    <h1>{{ stateName }} Public Libraries</h1>
+    <h1 id="pageTitle">{{ stateName }} Public Libraries</h1>
     <div class="loading-area">
       <div v-if="isLoading" class="loading-indicator">
         <svg class="usa-icon usa-icon--size-9" aria-hidden="true" focusable="false" role="img">

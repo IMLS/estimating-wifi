@@ -23,7 +23,7 @@ export default {
       required: true,
       default: ''
     },
-    selectedDate: {
+    selectedDateFromParams: {
       type: String,
       // start at specific date if provided (for testing)
       default: () => {
@@ -43,6 +43,18 @@ export default {
     }
   },
   computed: {
+    isParseableDate() {
+      if (parseISO(this.selectedDateFromParams) == 'Invalid Date') {
+        return false
+      }
+      return true
+    },
+    selectedDate() {
+      // if selectedDateFromParams is good, use it, 
+      // otherwise use today
+      if (this.isParseableDate) return this.selectedDateFromParams
+      return startOfYesterday().toISOString().split("T")[0]
+    },
     selectedDateUTC() {
       return new Date(this.selectedDate + "T00:00")
     },
@@ -67,9 +79,20 @@ export default {
 
     libraryName() {
       if (this.fetchedLibraryData && this.fetchedLibraryData.libname )  return this.fetchedLibraryData.libname;
+      // remove next 2 lines when we aren't listing extra sensors we test with
+      let exampleLibrary = store.example_libraries.find(lib => lib.id == this.id);
+      if (exampleLibrary) return `${exampleLibrary.name} (example library ${this.id})`;
       return "Library " + this.id
     },
-    breadcrumbs () {
+    stateAbbr() {
+      if ( !this.fetchedLibraryData ) return null;
+      return this.fetchedLibraryData.stabr
+    },
+    stateName() {
+      if ( !this.fetchedLibraryData ) return null;
+      return this.store.states[this.stateAbbr]
+    },
+    breadcrumbs() {
       if ( this.fetchedLibraryData == null ) return []
       return [
          { 
@@ -77,8 +100,8 @@ export default {
           link: "/" 
         },
         { 
-          name: this.store.states[this.fetchedLibraryData.stabr],
-          link: `/state/${this.fetchedLibraryData.stabr}/` 
+          name: this.stateName,
+          link: `/state/${this.stateAbbr}/` 
         },
         {
           name: this.libraryName
@@ -130,6 +153,12 @@ export default {
     formatFSCSandSequence(fscsid, seq) {
       return fscsid + '-' + this.leftPadSequence(seq)
     }
+  },
+  metaInfo(prefix = this.libraryName, postfix = this.stateName || 'Unknown State' ) {
+    const pagePrefix = prefix + " | " + postfix;
+    return {
+      title: pagePrefix
+    }
   }
 };
 </script>
@@ -137,7 +166,7 @@ export default {
 <template>
   <div>
     <USWDSBreadcrumb :crumbs=breadcrumbs />
-    <h1>{{ libraryName }}</h1>
+    <h1 id="pageTitle">{{ libraryName }}</h1>
     <div v-if="fetchedLibraryData !== null">
       <h2>{{ formatFSCSandSequence(fetchedLibraryData.fscskey, fetchedLibraryData.fscs_seq) }}</h2>
       {{ fetchedLibraryData.address }}<br>
@@ -145,6 +174,8 @@ export default {
     </div>
 
     <USWDSDatePicker :initial-date=toISODate(selectedDateUTC) @date_changed="navigateToSelectedDate" />
+
+    <template v-if="isParseableDate">
 
     <div class="usa-card-group margin-top-6">
 
@@ -274,9 +305,12 @@ export default {
           </div>
         </USWDSCard>
       </div>
-
-
     </div>
+    </template>
+    <template v-else>
+      <p>Please enter a valid date.</p>
+    </template>
+
   </div>
 </template>
 

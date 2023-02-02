@@ -10,12 +10,15 @@ export default {
       store,
     };
   },
+  metaInfo: {
+    title: "Homepage",
+  }
 }
 </script>
 
 <template>
-  <main>
-    <h1>Home</h1>
+  <div>
+    <h1 id="pageTitle">Home</h1>
 
     <h2> All States</h2>
 
@@ -29,5 +32,5 @@ export default {
       </li>
       
     </ul>
-  </main>
+  </div>
 </template>

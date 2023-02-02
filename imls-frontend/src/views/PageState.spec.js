@@ -184,4 +184,10 @@ describe("PageState", () => {
       PageState.methods.formatFSCSandSequence("AA0001", "00004")
     ).toStrictEqual("AA0001-004");
   });
+  
+  it("should format a page title using the current state name", () => {
+    let pageMeta = PageState.metaInfo('prefix');
+    expect(pageMeta).toHaveProperty("title");
+    expect(pageMeta.title).toStrictEqual("prefix Public Libraries");
+  });
 });
