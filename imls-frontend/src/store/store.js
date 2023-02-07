@@ -4,11 +4,14 @@ const BACKEND_BASEURL = import.meta.env.VITE_BACKEND_BASEURL;
 
 export const store = readonly({
   example_libraries: [
+    { id: "MN9999-123", name: "Windows VM + PAU06" },
+    { id: "MN1111-123", name: "Windows VM + PAU05" },
+    { id: "MN6666-123", name: "Raspberry Pi #1 + PAU05" },
+    { id: "MN5555-123", name: "Raspberry Pi #2 + PAU05" },
+    { id: "DC0001-123", name: "John's Laptop + PAU09" },
     { id: "VA1234-567", name: "Meenu's Apartment" },
     { id: "GA1234-567", name: "Meenu's Dining Room" },
     { id: "AL1234-567", name: "Meenu's Local Library" },
-    { id: "MN9999-123", name: "Ben's Basement" },
-    { id: "MN1111-123", name: "Ben's Icy Lakes and Wilderness" },
     { id: "GA0029-002", name: "May 2022 - Library GA0029-002", onlyMay: true },
     { id: "GA0029-003", name: "May 2022 - Library GA0029-003", onlyMay: true  },
     { id: "GA0029-004", name: "May 2022 - Library GA0029-004", onlyMay: true  },
