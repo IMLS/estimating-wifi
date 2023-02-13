@@ -22,8 +22,8 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Download the prerequisite software
       - uses: actions/checkout@v3
+      - name: Download the prerequisite software
         run: |
           cd imls-windows-installer
           ./windows-session-counter_build_prereqs.ps1
@@ -33,8 +33,8 @@ jobs:
           cd imls-windows-installer
           Get-Content setup.iss
           ISCC.exe 'D:\a\estimating-wifi\estimating-wifi\imls-windows-installer\setup.iss'
-          
-      - name: Release the .exe
-        uses: softprops/action-gh-release@v1
+      
+      - name: GH Release the windows .exe file
+        uses: softprops/action-gh-release@v0.1.15
         with:
           name: SessionCounterInstall.exe
