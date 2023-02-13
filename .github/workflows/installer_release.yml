@@ -5,9 +5,8 @@ name: Tag and Release the Windows Installer
 on:
   # Triggers the workflow on tags that start with "v"
   push:
-    paths:
-      tags:
-      - 'v*'
+    tags:
+    - 'v*'
     
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
