@@ -30,6 +30,9 @@ wifi-hardware-search-cli: deps
 wifi-hardware-search-windows: deps
 	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-windows
 
+wifi-device-reset-windows: deps
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-device-reset-windows
+
 test:
 	go test -coverprofile all.out -timeout 45m $(shell go list ./... | grep -v windows)
 

@@ -51,6 +51,8 @@ This process assumes a user is using a Windows machine, has admin rights, has do
 - If session-counter.exe is already found in imls-windows-installer, the script deletes it and builds a new one
  4. Builds wifi-hardware-search-windows.exe from the imls-wifi-sensor directory and moves it to the imls-windows-installer directory
 - If wifi-hardware-search-windows.exe is already found in imls-windows-installer, the script deletes it and builds a new one
+ 4. Builds wifi-device-reset-windows.exe from the imls-wifi-sensor directory and moves it to the imls-windows-installer directory
+- If wifi-device-reset-windows.exe is already found in imls-windows-installer, the script deletes it and builds a new one
 
 ### Build the Installer
 

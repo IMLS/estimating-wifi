@@ -4,6 +4,7 @@
 #define MyAppURL "https://github.com/IMLS/estimating-wifi"
 #define MyAppExeName "windows-session-counter.exe"
 #define MySecondaryAppExeName "wifi-hardware-search-windows.exe"
+#define MyTertiaryAppExeName "wifi-device-reset-windows.exe"
 
 [Setup]
 AppId={{8D2CDEA5-9C55-44D4-84B3-ACDE9D4035BD}
@@ -40,6 +41,9 @@ Source: "{#MyAppExeName}"; \
 Source: "{#MySecondaryAppExeName}"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
+Source: "{#MyTertiaryAppExeName}"; \
+  DestDir: "{app}"; \
+  Flags: ignoreversion
 Source: "README.md"; \
   DestDir: "{app}"; \
   Flags: ignoreversion
@@ -61,6 +65,9 @@ Source:"Wireshark-win64-4.0.0.exe"; \
 [Run]
 ;Filename: "{app}\{#MySecondaryAppExeName}"; \
   ;Description: "wifi-hardware-search-windows"; \
+  ;Flags: runascurrentuser
+;Filename: "{app}\{#MyTertiaryAppExeName}"; \
+  ;Description: "wifi-device-reset-windows"; \
   ;Flags: runascurrentuser
 Filename: "{app}\Wireshark\Wireshark-win64-4.0.0.exe"; \
   Description: "Wireshark 4.0.0"; \
