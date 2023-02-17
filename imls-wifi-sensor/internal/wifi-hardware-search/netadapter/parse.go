@@ -24,6 +24,14 @@ var (
 		"ConvertTo-Json"
 )
 
+func RestartNetAdapter(AdapterName string) {
+	ps := New()
+	//var restartNetPSCommand = "Get-NetAdapter -Physical -Name \"" + AdapterName + "\"| Restart-NetAdapter"
+	// for testing purposes
+	var restartNetPSCommand = "Get-NetAdapter -Physical -Name \"" + AdapterName + "\"| Disable-NetAdapter -Confirm:$false"
+	ps.Execute(restartNetPSCommand)
+}
+
 type PowerShell struct {
 	powerShell string
 }
