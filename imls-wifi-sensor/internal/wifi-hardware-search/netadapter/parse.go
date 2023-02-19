@@ -11,7 +11,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/wifi-hardware-search/models"
-	"gsa.gov/18f/internal/wifi-hardware-search/search"
 )
 
 var (
@@ -26,17 +25,14 @@ var (
 		"ConvertTo-Json"
 )
 
-func RestartNetAdapter() {
+func RestartNetAdapter(AdapterName string) {
 	// this is a windows-only restart of the ralink adapter
 	// for use in periodically assisting the adapter not getting in a bad state
 	if runtime.GOOS == "windows" {
-		device := search.SearchForMatchingDevice()
-		if device.Exists {
-			ps := New()
-			var restartNetPSCommand = "Get-NetAdapter -Physical -Name \"" + device.Logicalname + "\"| Restart-NetAdapter -Confirm:$false"
-			log.Debug().Msg("Restarting the adapter on Windows")
-			ps.Execute(restartNetPSCommand)
-		}
+		ps := New()
+		var restartNetPSCommand = "Get-NetAdapter -Physical -Name \"" + AdapterName + "\"| Restart-NetAdapter -Confirm:$false"
+		log.Debug().Msg("Restarting the adapter on Windows")
+		ps.Execute(restartNetPSCommand)
 	}
 }
 
