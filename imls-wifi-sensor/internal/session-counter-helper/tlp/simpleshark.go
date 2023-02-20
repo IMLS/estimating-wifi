@@ -20,6 +20,9 @@ func TSharkRunner(adapter string) []string {
 		config.GetWiresharkPath(),
 		"-a", fmt.Sprintf("duration:%d", config.GetWiresharkDuration()),
 		"-I", "-i", adapter,
+                "-o", "wlan.check_fcs:TRUE",
+                "-o", "wlan.check_checksum:TRUE",
+                "-o", "tcp.check_checksum:TRUE",
 		"-Tfields", "-e", "wlan.sa")
 
 	tsharkOut, err := tsharkCmd.StdoutPipe()

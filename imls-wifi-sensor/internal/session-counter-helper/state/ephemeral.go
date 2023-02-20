@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"gsa.gov/18f/internal/config"
 )
 
@@ -50,7 +51,10 @@ func RecordMAC(mac string) {
 		}
 	} else {
 		// We have never seen the MAC address.
-		//log.Debug().Msg("New MAC address.")
+
+		// XXX Not for production. Stop logging MACs outside of testing
+		log.Debug().Msg("New MAC address--> " + mac)
+
 		ed[mac] = StartEnd{Start: now, End: now}
 	}
 }
