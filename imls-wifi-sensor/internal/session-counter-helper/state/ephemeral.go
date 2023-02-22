@@ -35,6 +35,10 @@ func RecordMAC(mac string) {
 		// Has this device been away for more than 2 hours?
 		// Start by grabbing the start/end times.
 		se := ed[mac]
+
+		// XXX Not for production. Stop logging MACs outside of testing
+		log.Debug().Msg("Known MAC address--> " + mac)
+
 		if (now > se.End) && ((now - se.End) > int64(config.GetDeviceMemory())) {
 			// If it has been, we need to "forget" the old device.
 			// Do this by hashing the mac with the current time, store the original data
