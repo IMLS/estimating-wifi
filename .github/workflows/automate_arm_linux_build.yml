@@ -5,24 +5,10 @@ on:
   pull_request:
 
 jobs:
-  xgo:
+  steps:
     runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Build
-        uses: crazy-max/ghaction-xgo@v2
-        with:
-          xgo_version: latest
-          go_version: 1.19
-          dest: build
-          pkg: imls-wifi-sensor
-          targets: linux/arm64
-          v: true
-          x: false
-          race: false
-          ldflags: -X gsa.gov/18f/version.Semver=v3.5
-          buildmode: default
-          trimpath: true
+  - uses: actions/checkout@v3
+  - uses: actions/setup-go@v4
+    with:
+      go-version: '^1.19.5' # The Go version to download (if necessary) and use.
+  - run: go version
