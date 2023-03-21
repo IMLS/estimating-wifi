@@ -4,10 +4,11 @@ on:
   push:
   pull_request:
 
-steps:
-- runs-on: ubuntu-latest
-- uses: actions/checkout@v3
-- uses: actions/setup-go@v4
-  with:
-    go-version: '^1.19.5' # The Go version to download (if necessary) and use.
-- run: go version
+jobs:
+  steps:
+  - runs-on: ubuntu-latest
+  - uses: actions/checkout@v3
+  - uses: actions/setup-go@v4
+    with:
+      go-version: '^1.19.5' # The Go version to download (if necessary) and use.
+  - run: go version
