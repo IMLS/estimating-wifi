@@ -2,13 +2,21 @@ name: Linux ARM build
 
 on:
   push:
+    paths:
+      - 'imls-wifi-sensor/**'
   pull_request:
+    paths:
+      - 'imls-wifi-sensor/**'
+
+  workflow_dispatch:
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
   steps:
-  - runs-on: ubuntu-latest
-  - uses: actions/checkout@v3
-  - uses: actions/setup-go@v4
-    with:
-      go-version: '^1.19.5' # The Go version to download (if necessary) and use.
-  - run: go version
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '^1.19.5' # The Go version to download (if necessary) and use.
+    - name: build the executables
+      run: go version
