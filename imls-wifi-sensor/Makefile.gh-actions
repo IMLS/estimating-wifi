@@ -1,0 +1,16 @@
+.PHONY: all
+
+VERSION := $(shell git describe --tags --abbrev=0)
+LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
+ENVVARS = GOOS=linux GOARCH=arm GOARM=7
+
+all: session-counter wifi-hardware-search-cli
+
+deps:
+	go mod download
+
+session-counter: deps
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/linux-session-counter
+
+wifi-hardware-search-cli: deps
+	${ENVVARS} go install -ldflags $(LDFLAGS) gsa.gov/18f/cmd/wifi-hardware-search-cli

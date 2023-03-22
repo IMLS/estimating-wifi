@@ -10,6 +10,5 @@
 #GOOS=linux GOARCH=arm GOARM=7 go install gsa.gov/18f/cmd/wifi-hardware-search-cli
 
 go mod download
-echo "FOOBAR"
-#GOOS=linux GOARCH=arm GOARM=7 go install imls-wifi-sensor/cmd/linux-session-counter
-#GOOS=linux GOARCH=arm GOARM=7 go install imls-wifi-sensor/cmd/wifi-hardware-search-cli
+GOOS=linux GOARCH=arm GOARM=7 go install imls-wifi-sensor/cmd/linux-session-counter
+GOOS=linux GOARCH=arm GOARM=7 go install imls-wifi-sensor/cmd/wifi-hardware-search-cli
