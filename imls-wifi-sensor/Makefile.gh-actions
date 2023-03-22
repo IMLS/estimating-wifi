@@ -1,7 +1,8 @@
 .PHONY: all
 
-VERSION := $(shell git describe --tags --abbrev=0)
-LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
+#VERSION := $(shell git describe --tags --abbrev=0)
+#LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
+LDFLAGS = "-X gsa.gov/18f/version.Semver=v3.5"
 ENVVARS = GOOS=linux GOARCH=arm GOARM=7
 
 all: session-counter wifi-hardware-search-cli
