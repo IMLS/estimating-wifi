@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'imls-wifi-sensor/**'
+      - '.github/workflows/automate_arm_linux_build.yml'
   pull_request:
     paths:
       - 'imls-wifi-sensor/**'
