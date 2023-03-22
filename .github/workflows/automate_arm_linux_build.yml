@@ -26,7 +26,7 @@ jobs:
         run: | 
           cd imls-wifi-sensor
           make -f Makefile.gh-actions all
-          ls -R
+          ls ..
       - name: Upload the artifacts
         uses: actions/upload-artifact@v3
         with:
