@@ -27,12 +27,10 @@ jobs:
           cd imls-wifi-sensor
           make -f Makefile.gh-actions all
           ls 
-          echo "This is the GITHUB_WORKSPACE variable: $GITHUB_WORKSPACE"
-          ls $GITHUB_WORKSPACE
-          ls $GITHUB_WORKSPACE/imls-wifi-sensor
       - name: Upload the artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: session-counter
-          path: imls-wifi-sensor/session-counter
+          - name: session-counter
+            path: imls-wifi-sensor/linux-session-counter
+
           #wifi-hardware-search-cli
