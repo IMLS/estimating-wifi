@@ -27,10 +27,14 @@ jobs:
           cd imls-wifi-sensor
           make -f Makefile.gh-actions all
           ls 
-      - name: Upload the artifacts
+      - name: Upload the session counter
         uses: actions/upload-artifact@v3
         with:
-          name: session-counter
+          name: linux-session-counter
           path: imls-wifi-sensor/linux-session-counter
+      - name: Upload the hardware search cli tool
+        uses: actions/upload-artifact@v3
+        with:
+          name: wifi-hardware-search-cli
+          path: imls-wifi-sensor/wifi-hardware-search-cli
 
-          #wifi-hardware-search-cli
