@@ -26,7 +26,7 @@ jobs:
         run: | 
           cd imls-wifi-sensor
           make -f Makefile.gh-actions all
-          ls ..
+          ls 
           echo "This is the GITHUB_WORKSPACE variable: $GITHUB_WORKSPACE"
           ls $GITHUB_WORKSPACE
       - name: Upload the artifacts
