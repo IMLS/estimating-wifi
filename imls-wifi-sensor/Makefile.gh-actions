@@ -3,7 +3,7 @@
 #VERSION := $(shell git describe --tags --abbrev=0)
 #LDFLAGS = "-X gsa.gov/18f/version.Semver=$(VERSION)"
 LDFLAGS = "-X gsa.gov/18f/version.Semver=v3.5"
-ENVVARS = GOOS=linux GOARCH=arm GOARM=7 GOBIN=.
+ENVVARS = GOOS=linux GOARCH=arm GOARM=7 GOBIN=/home/runner/work/estimating-wifi/estimating-wifi/imls-wifi-sensor
 
 all: session-counter wifi-hardware-search-cli
 
