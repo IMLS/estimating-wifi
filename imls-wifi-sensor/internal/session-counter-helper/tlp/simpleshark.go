@@ -19,7 +19,7 @@ func TSharkRunner(adapter string) []string {
 	tsharkCmd := exec.Command(
 		config.GetWiresharkPath(),
 		"-a", fmt.Sprintf("duration:%d", config.GetWiresharkDuration()),
-		"-I", "-i", adapter,
+		"-i", adapter,
 		"-Tfields", "-e", "wlan.sa")
 
 	tsharkOut, err := tsharkCmd.StdoutPipe()
