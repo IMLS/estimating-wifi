@@ -1,0 +1,42 @@
+name: Linux ARM build
+
+on:
+  push:
+    paths:
+      # only trigger the action if things are changing
+      # in the imls-wifi-sensor or in this yaml file
+      - 'imls-wifi-sensor/**'
+      - '.github/workflows/automate_arm_linux_build.yml'
+  pull_request:
+    paths:
+      - 'imls-wifi-sensor/**'
+      - '.github/workflows/automate_arm_linux_build.yml'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          # use the go.mod and go.sum files for deps and versioning
+          go-version-file: imls-wifi-sensor/go.mod
+          cache-dependency-path: imls-wifi-sensor/go.sum
+      - name: build the executables
+        run: | 
+          cd imls-wifi-sensor
+          # there is a special Makefile just for gh-actions
+          make -f Makefile.gh-actions all
+      - name: Upload the session counter
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-session-counter
+          path: imls-wifi-sensor/linux-session-counter
+      - name: Upload the hardware search cli tool
+        uses: actions/upload-artifact@v3
+        with:
+          name: wifi-hardware-search-cli
+          path: imls-wifi-sensor/wifi-hardware-search-cli
+
