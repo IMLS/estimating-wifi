@@ -26,14 +26,20 @@ GRANT USAGE ON SCHEMA api TO sensor;
 GRANT USAGE ON SCHEMA imlswifi TO sensor;
 GRANT USAGE ON SCHEMA basic_auth TO sensor;
 GRANT SELECT, INSERT ON imlswifi.sensors to sensor;
-GRANT SELECT, INSERT ON basic_auth.users TO sensor;
+GRANT SELECT, UPDATE, DELETE, INSERT ON basic_auth.users TO sensor;
 GRANT SELECT, INSERT ON imlswifi.presences TO sensor;
-GRANT SELECT, INSERT ON imlswifi.sensors to sensor;
+GRANT SELECT, INSERT, DELETE ON imlswifi.sensors to sensor;
 GRANT usage, SELECT ON SEQUENCE imlswifi.sensors_sensor_id_seq TO sensor;
 GRANT usage, SELECT ON SEQUENCE imlswifi.heartbeats_heartbeat_id_seq TO sensor;
 GRANT usage, SELECT ON SEQUENCE imlswifi.presences_presence_id_seq TO sensor;
 GRANT EXECUTE ON FUNCTION api.sensor_setup TO postgres;
 GRANT EXECUTE ON FUNCTION api.sensor_setup TO sensor;
+GRANT EXECUTE ON FUNCTION api.update_password TO postgres;
+GRANT EXECUTE ON FUNCTION api.update_password TO sensor;
+ALTER FUNCTION api.sensor_remove(character varying)
+    OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION api.sensor_remove(character varying) TO postgres;
+GRANT EXECUTE ON FUNCTION api.sensor_remove(character varying) TO sensor;
 
 
 

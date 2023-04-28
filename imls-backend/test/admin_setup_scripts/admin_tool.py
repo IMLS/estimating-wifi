@@ -89,7 +89,7 @@ def addMultipleSensors(username, password, file):
 @click.option('--address', help='New address for existing sensor')
 @click.option('--genPDF', is_flag=True, show_default=True, default=False, help='Generate a new PDF for existing sensor')
 def updateSensor():
-    """A program to update an existing sensor."""
+    """A program to update an existing sensor. NOT FUNCTIONAL"""
     print("updating password")
 
 @cli.command(name='removeSensor')
@@ -105,7 +105,7 @@ def removeSensor(sensor):
 @click.password_option('--password', help='Admin account password')
 @click.option('--server', prompt=True, help='The IP/Hostname of the PiSpots server')
 def removeSensor():
-    """A program to test the PiSpots stack"""
+    """A program to test the PiSpots stack. NOT FUNCTIONAL"""
     print("testing stack")
 
 if __name__ == '__main__':

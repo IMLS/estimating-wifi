@@ -67,3 +67,20 @@ INSERT INTO imlswifi.sensors(fscs_id, labels)
    RETURN '{"result":"Sensor Inserted"}'::json;
 END;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION api.sensor_remove(
+	_sensor character varying)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+DELETE FROM basic_auth.users 
+	WHERE fscs_id = _sensor;
+DELETE FROM imlswifi.sensors
+   WHERE fscs_id = _sensor;
+   RETURN '{"result":"Sensor Deleted"}'::json;
+END;
+$BODY$;
+
+
+

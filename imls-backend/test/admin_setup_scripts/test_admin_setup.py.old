@@ -69,6 +69,25 @@ class setupSensor:
         headers = {"Authorization": f"Bearer {t0}"}
         r = requests.post(url, json=body, headers=headers)
         print("BEAT RESPONSE", r.json())
+    
+    def callUpdatePassword(self, s, u, p):
+        """
+        Call "update_password" to update sensor password in the database.
+        """
+        token_url = s + "/rpc/login"
+        body = {"fscs_id": u, "api_key": p}
+        # Need to post, not get, if you're passing params in the body.
+        tr = requests.post(token_url, json=body)
+        t0 = tr.json()["token"]
+        url = s + "/rpc/update_password" 
+        body = {
+            "_sensor": self.sensor,
+            "_key": self.key,
+        }
+        headers = {"Authorization": f"Bearer {t0}"}
+        r = requests.post(url, json=body, headers=headers)
+        print("UPDATE RESPONSE", r.json())
+
 
     def genPDF(self):
         """
@@ -92,10 +111,27 @@ class setupSensor:
         pdf.output(self.sensor + ".pdf")  
         print("PDF created for ", self.sensor)
 
+    def updatePassword(self):
+        pass
+
+
+def updatePassword(server, u, p, sid):
+    """
+    Function to update sensor password. Prints password.
+    NOTE: Need error checking
+    """
+    #Create sensor object
+    s = setupSensor(sid)
+    s.genKeyword()
+    s.callUpdatePassword(server, u, p)
+    print(f'The new password for {sid} is {s.key}')
+
+
 
 def readCSV(filename, server, u, p):
     """
     Loop to read the CSV and setup each sensor
+    NOTE: Need error checking
     """
     with open(filename, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -129,10 +165,11 @@ def main(argv):
     server_addr = ''
     user = ''
     password = ''
-    opts, args = getopt.getopt(argv,"hf:s:u:p:",["file=","server=","user=", "pass="])
+    sid = ''
+    opts, args = getopt.getopt(argv,"hf:s:u:p:x:",["file=","server=","user=", "pass=","sid="])
     for opt, arg in opts:
         if opt == '-h':
-            print ('test_admin_setup.py -f <csv_path> -s <protocol://url:port> -u <username> -p <password>')
+            print ('test_admin_setup.py -f <csv_path> -s <protocol://url:port> -u <username> -p <password> -x <sensor_id>')
             sys.exit()
         elif opt in ("-f", "--file"):
             filename = arg
@@ -142,14 +179,22 @@ def main(argv):
             user = arg
         elif opt in ("-p", "--pass"):
             password = arg
+        elif opt in ("-x", "--sid"):
+            sid = arg
+        
     # print ('Args f ', filename)
     # print ('Args s ', server_addr)
     # print ('Args u ', user)
     # print ('Args p ', password)
 
-    print("***READING CSV FILE*** ", filename)
-    readCSV(filename, server_addr, user, password)
-    print("***SETUP COMPLETE***")
+    print("Yo", sid)
+    if sid != '':
+        print(f'***UPDATING PASSWORD FOR {sid}***')
+        updatePassword(server_addr, user, password, sid)
+    else:
+        print("***READING CSV FILE*** ", filename)
+        readCSV(filename, server_addr, user, password)
+        print("***SETUP COMPLETE***")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
